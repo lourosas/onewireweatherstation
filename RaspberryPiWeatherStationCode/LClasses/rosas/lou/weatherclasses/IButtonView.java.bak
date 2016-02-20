@@ -1,0 +1,723 @@
+/*
+* Copyright (C) 2011 Lou Rosas
+* This file is part of many applications registered with
+* the GNU General Public License as published
+* by the Free Software Foundation; either version 3 of the License,
+* or (at your option) any later version.
+* PaceCalculator is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied
+* warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+* You should have received a copy of the GNU General Public License
+* along with this program.
+* If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package rosas.lou.weatherclasses;
+
+import java.lang.*;
+import java.util.*;
+import java.io.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
+import rosas.lou.weatherclasses.*;
+import myclasses.*;
+import rosas.lou.lgraphics.TestPanel2;
+
+public class IButtonView  extends GenericJFrame
+implements MemoryListener, MissionListener,LogListener{
+   
+   private static final short WIDTH  = 600;
+   private static final short HEIGHT = 400;
+   
+   private ButtonGroup itemGroup = null;
+   //Temperature Low Alarm Label
+   private JLabel tlal           = null;
+   //Temperature High Alarm Label
+   private JLabel thal           = null;
+   //Temperature Low Alarm Text Field
+   private JTextField  tlatf     = null;
+   //Temperature High Alarm Text Field
+   private JTextField  thatf     = null;
+   //Sampling Rate Text Field
+   private JTextField  srtf      = null;
+   //Mission Start Delay Text Field
+   private JTextField  msdltf    = null;
+   //The JCheckBox Fields
+   private JCheckBox   srtc      = null;
+   private JCheckBox   er        = null;
+   
+   private IButton ib            = null;
+   
+   private String      fromTemp  = null;
+   private String      toTemp    = null;
+   
+   //********************Constructor********************************
+   /*
+   Constructor of no arguments
+   */
+   public IButtonView(){
+      this("", null);
+   }
+   
+   /*
+   Constructor taking the Title attribute and Controller Object
+   */
+   public IButtonView(String title, Object controller){
+      super(title);
+      this.ib = new IButton();
+      this.ib.addLogListener(this);
+      this.ib.addMemoryListener(this);
+      this.ib.addMissionListener(this);
+      this.setUpGUI(controller);
+   }
+   
+   //*******************Public Methods******************************
+   /*
+   */
+   public void highTemperatureAlarmError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the High Temperature Alarm");
+      String display = new String("Input Error");
+      String error   = new String("High Temperature Alarm Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.thatf.requestFocus();
+      this.thatf.selectAll();  
+   }
+   
+   /*
+   */
+   public void lowTemperatureAlarmError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Low Temperature Alarm");
+      String display = new String("Input Error");
+      String error   = new String("Low Temperature Alarm Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.tlatf.requestFocus();
+      this.tlatf.selectAll();  
+   }
+   
+   /*
+   */
+   public void missionStartDelayError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Mission Start Delay");
+      String display = new String("Input Error");
+      String error   = new String("Mission Start Delay Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.msdltf.requestFocus();
+      this.msdltf.selectAll();      
+   }
+   
+   /*
+   Implementation of the MemoryListener interface
+   */
+   public void onMemoryEvent(MemoryEvent event){
+      String message = event.getMessage();
+      if(message.split(" ")[0].equals("Memory") &&
+         message.split(" ")[1].equals("Cleared")){
+         String display = new String("Mission Cleared");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
+      }
+      else{
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);         
+      }
+   }
+   
+   /*
+   Implementation of the MissionListener interface
+   */
+   public void onMissionEvent(MissionEvent event){
+      String message = event.getMessage();
+      if(message.split(" ")[0].equals("Mission") &&
+         message.split(" ")[1].equals("Started")){
+         String display = new String("Mission Started");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
+      }
+      //More to be put in here, as the System is Developed
+      else if(message.split(" ")[0].equals("Mission") &&
+              message.split(" ")[1].equals("Stopped")){
+         String display = new String("Mission Stopped");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
+      }
+      else{
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Dewpoint Logs
+   */
+   public void onDewpointLogEvent(LogEvent event){
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Dew"))  ||
+         !(message.split(" ")[1].equals("Point")) ||
+         !(message.split(" ")[2].equals("Calculated"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Heat Index Logs
+   */
+   public void onHeatIndexLogEvent(LogEvent event){
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Heat"))  ||
+         !(message.split(" ")[1].equals("Index")) ||
+         !(message.split(" ")[2].equals("Calculated"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Humidity Logs
+   */
+   public void onHumidityLogEvent(LogEvent event){
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Humidity")) ||
+         !(message.split(" ")[1].equals("Log"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Humidity Time Logs
+   */
+   public void onHumidityTimeLogEvent(LogEvent event){
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Humidity")) ||
+         !(message.split(" ")[1].equals("Time"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Temperature Logs
+   */
+   public void onTemperatureLogEvent(LogEvent event){
+      String message = event.getMessage();
+      //This would indicate an error (bigtime)
+      if(!(message.split(" ")[0].equals("Temperature")) ||
+         !(message.split(" ")[1].equals("Log"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         this.setUpTemperatureGraph(event);
+      }
+   }
+   
+   /*
+   Implementation of the LogListener interface:
+   Temperature Time Logs
+   */
+   public void onTemperatureTimeLogEvent(LogEvent event){
+      String message = event.getMessage();
+      //This would indicate an error (bigtime)
+      if(!(message.split(" ")[0].equals("Temperature")) ||
+         !(message.split(" ")[1].equals("Time"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         this.setUpTemperatureTimeGraph(event);
+      }
+   }
+   
+   /*
+   */
+   public String requestSamplingRate(){
+      return this.srtf.getText();
+   }
+   
+   /*
+   */
+   public String requestMissionStartDelay(){
+      return this.msdltf.getText();
+   }
+   
+   /*
+   */
+   public String requestTemperatureLowAlarm(){
+      return this.tlatf.getText();
+   }
+   
+   /*
+   */
+   public String requestTemperatureHighAlarm(){
+      return this.thatf.getText();
+   }
+   
+   /*
+   */
+   public void resetNewMissionDefaults(){
+      Enumeration e = this.itemGroup.getElements();
+      while(e.hasMoreElements()){
+         Object o = e.nextElement();
+         if(o instanceof JRadioButton){
+            JRadioButton b = (JRadioButton)o;
+            if(b.getActionCommand().equals("NMCelsius")){
+               b.setSelected(true);
+               b.doClick();
+            }
+         }
+      }
+      //Clear out the Check Box Values, as well and alert the
+      //listeners
+      //Synchronize Real Time Clock
+      this.srtc.setSelected(false);
+      //Enable Rollover
+      this.er.setSelected(false);
+      this.thatf.setText(""); this.tlatf.setText("");
+      this.srtf.setText("");  this.msdltf.setText("");
+   }
+   
+   /*
+   */
+   public void samplingRateError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Sampling Rate");
+      String display = new String("Input Error");
+      String error   = new String("Sampling Rate Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.srtf.requestFocus();
+      this.srtf.selectAll();
+   }
+   
+   //*******************Private Methods*****************************
+   /*
+   */
+   private void convertTemperatures(ItemEvent e, AbstractButton ab){
+      String lowAlarmString  = null;
+      String highAlarmString = null;
+      double lowAlarm        = Double.NaN;
+      double highAlarm       = Double.NaN;
+      if(e.getStateChange() == ItemEvent.DESELECTED){
+         this.fromTemp = ab.getActionCommand();
+      }
+      else if(e.getStateChange() == ItemEvent.SELECTED){
+         this.toTemp = ab.getActionCommand();
+      }
+      if(!this.fromTemp.equals(this.toTemp)){
+         //Low Alarm Issues
+         try{
+            lowAlarmString = this.tlatf.getText();
+            lowAlarm =
+                  this.setConvert(lowAlarmString, fromTemp, toTemp);
+            lowAlarmString =
+                        String.format("%.2f", new Double(lowAlarm));
+            this.tlatf.setText(lowAlarmString);
+         }
+         //In this case either the toTemp, fromTemp, or both will
+         //be null, and that will be OK, since the Low Alarm Text
+         //Field will be populated, with an appropriate value
+         //(as specified)
+         //A null for the Low Alarm Text field will bennifit as
+         //well, since nothing will be set in the text field,
+         //possibly indicating something is wrong.
+         catch(NullPointerException npe){}
+         catch(NumberFormatException nfe){ this.tlatf.setText(""); }
+         //High Alarm Issues
+         try{
+            highAlarmString = this.thatf.getText();
+            highAlarm =
+                 this.setConvert(highAlarmString, fromTemp, toTemp);
+            highAlarmString =
+                       String.format("%.2f", new Double(highAlarm));
+            this.thatf.setText(highAlarmString);
+         }
+         //In this case either the toTemp, fromTemp, or both will 
+         //be null, and that will be OK, since the High Alarm Text
+         //Field will be populated, with an appropriate value
+         //(as specified)
+         //A null for the High Alarm Text field will benefit as
+         //well, since nothing will be set in the text field,
+         //possibly indicating something is wrong.
+         catch(NullPointerException npe){}
+         catch(NumberFormatException nfe){ this.thatf.setText(""); }
+      }
+   }
+   
+   /*
+   */
+   private double setConvert(String alarm, String from, String to)
+   throws NumberFormatException{
+      double convert = Double.NaN;  
+      convert = Double.parseDouble(alarm);
+
+      if(from.equals("NMCelsius") && to.equals("NMFahrenheit")){
+         convert = WeatherConvert.celsiusToFahrenheit(convert);
+      }
+      else if(from.equals("NMCelsius") && to.equals("NMKelvin")){
+         convert = WeatherConvert.celsiusToKelvin(convert);
+      }
+      else if(from.equals("NMFahrenheit")&&to.equals("NMCelsius")){
+         convert = WeatherConvert.fahrenheitToCelsius(convert);
+      }
+      else if(from.equals("NMFahrenheit") && to.equals("NMKelvin")){
+         convert = WeatherConvert.fahrenheitToKelvin(convert);
+      }
+      else if(from.equals("NMKelvin") && to.equals("NMCelsius")){
+         convert = WeatherConvert.kelvinToCelsius(convert);
+      }
+      else if(from.equals("NMKelvin") && to.equals("NMFahrenheit")){
+         convert = WeatherConvert.kelvinToFahrenheit(convert);
+      }
+      else{
+         throw new NumberFormatException();
+      }
+      return convert;
+   }
+
+   /*
+   */
+   private JPanel setMissionButtonPanel(Object controller){
+      //controller object currently not used
+      //Button Panel
+      JPanel buttonPanel = new JPanel();
+      buttonPanel.setBorder(BorderFactory.createTitledBorder(
+                                 BorderFactory.createEtchedBorder(),
+                                 "Command")
+      );
+      JButton start = new JButton("Start New Mission");
+      buttonPanel.add(start);
+      start.addActionListener(new IButtonController(this.ib, this));
+      start.addKeyListener(new IButtonController(this.ib, this));
+      //start.addActionListener((ActionListener)controller);
+      //start.addKeyListener((KeyListener)controller);
+      JButton clear = new JButton("Clear Mission");
+      buttonPanel.add(clear);
+      //clear.addActionListener((ActionListener)controller);
+      clear.addActionListener(new IButtonController(this.ib, this));
+      clear.addKeyListener(new IButtonController(this.ib, this));
+      JButton stop = new JButton("Stop Mission");
+      buttonPanel.add(stop);
+      //stop.addActionListener((ActionListener)controller);
+      stop.addActionListener(new IButtonController(this.ib, this));
+      stop.addKeyListener(new IButtonController(this.ib, this));
+      JButton refresh = new JButton("Refresh Mission Data");
+      buttonPanel.add(refresh);
+      //refresh.addActionListener((ActionListener)controller);
+      refresh.addActionListener(
+                               new IButtonController(this.ib,this));
+      refresh.addKeyListener(new IButtonController(this.ib, this));
+      
+      return buttonPanel;
+   }
+   
+   /*
+   */
+   private JPanel setMissionPanel(Object controller){
+      JPanel missionPanel = new JPanel();
+      missionPanel.setLayout(new BorderLayout());
+      
+      missionPanel.add(this.setNewMissionPanel(controller),
+                                               BorderLayout.CENTER);
+      missionPanel.add(this.setMissionButtonPanel(controller),
+                                                BorderLayout.SOUTH);
+
+      return missionPanel;
+   }
+
+   
+   /*
+   */
+   private JPanel setNewMissionPanel(Object controller){
+      //controller object currently NOT USED!
+      //New Mission Panel
+      this.itemGroup         = new ButtonGroup();
+      JPanel newMissionPanel = new JPanel();
+      newMissionPanel.setLayout(new BorderLayout());
+      newMissionPanel.setBorder(
+                                 BorderFactory.createTitledBorder(
+                                 BorderFactory.createEtchedBorder(),
+                                 "New Mission Settings")
+      );
+      //Radio Panel
+      JPanel radioPanel = new JPanel();
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      //New Mission Celsius
+      celsius.setActionCommand("NMCelsius");
+      this.setUpLocalItemListener(celsius);
+      this.itemGroup.add(celsius);
+      celsius.addItemListener(new IButtonController(this.ib));
+      //celsius.addItemListener((ItemListener)controller));
+      radioPanel.add(celsius);
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      //New Mission Fahrenheit
+      fahrenheit.setActionCommand("NMFahrenheit");
+      this.setUpLocalItemListener(fahrenheit);
+      fahrenheit.addItemListener(new IButtonController(this.ib));
+      //fahrenheit.addItemListener((ItemListener)controller);
+      this.itemGroup.add(fahrenheit);
+      radioPanel.add(fahrenheit);
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      //New Mission Kelvin
+      kelvin.setActionCommand("NMKelvin");
+      kelvin.addItemListener(new IButtonController(this.ib));
+      //kelvin.addItemListener((ItemListener)controller);
+      this.setUpLocalItemListener(kelvin);
+      this.itemGroup.add(kelvin);
+      radioPanel.add(kelvin);
+      newMissionPanel.add(radioPanel, BorderLayout.NORTH);
+      
+      //Center Panel
+      JPanel centerPanel = new JPanel();
+      GroupLayout centerLayout = new GroupLayout(centerPanel);
+      centerPanel.setLayout(centerLayout);
+      //Synchronize Real Time Clock
+      this.srtc = new JCheckBox("Synchronize Real Time Clock?");
+      this.srtc.addItemListener(new IButtonController(this.ib));
+      //Enable Rollover
+      this.er = new JCheckBox("Enable Rollover?");
+      this.er.addItemListener(new IButtonController(this.ib));
+      //Sampling Rate Label
+      JLabel srl = new JLabel("Sampling Rate (in minutes)",
+                                              SwingConstants.RIGHT);
+      //Mission Start Delay Label
+      JLabel msdl = new JLabel("Mission Start Delay?",
+                                              SwingConstants.RIGHT);
+      //Temperature Low Alarm Label
+      this.tlal = new JLabel("Temperature Low Alarm? (\u00B0C)",
+                                              SwingConstants.RIGHT);
+      //Temperature High Alarm Label
+      this.thal= new JLabel("Temperature High Alarm? (\u00B0C)",
+                                              SwingConstants.RIGHT);
+
+      //Sampling Rate Text Field
+      this.srtf   = new JTextField(4);
+      //Mission Start Delay Text Field
+      this.msdltf = new JTextField(4);
+      //Temperature Low Alarm Text Field
+      this.tlatf  = new JTextField(4);
+      //Temperature High Alarm Text Field
+      this.thatf  = new JTextField(4);
+      centerLayout.setHorizontalGroup(
+         centerLayout.createParallelGroup(
+                                   GroupLayout.Alignment.LEADING)
+         .addGroup(centerLayout.createSequentialGroup()
+             .addGroup(centerLayout.createParallelGroup(
+                            GroupLayout.Alignment.LEADING, false)
+                 .addGroup(centerLayout.createSequentialGroup()
+                     .addGap(33, 33, 33)
+                     .addComponent(srtc))
+                 .addGroup(centerLayout.createSequentialGroup()
+                     .addContainerGap()
+                     .addGroup(centerLayout.createParallelGroup(
+                                     GroupLayout.Alignment.TRAILING)
+                         .addComponent(msdl)
+                         .addComponent(srl))
+                     .addPreferredGap(
+                             LayoutStyle.ComponentPlacement.RELATED)
+                     .addGroup(centerLayout.createParallelGroup(
+                                      GroupLayout.Alignment.LEADING)
+                         .addComponent(this.msdltf,
+                                          GroupLayout.DEFAULT_SIZE,
+                                          59,
+                                          Short.MAX_VALUE)
+                         .addComponent(this.srtf, 0, 0,
+                                                 Short.MAX_VALUE))))
+             .addGap(33, 33, 33)
+             .addGroup(centerLayout.createParallelGroup(
+                               GroupLayout.Alignment.LEADING, false)
+                 .addGroup(centerLayout.createParallelGroup(
+                                      GroupLayout.Alignment.LEADING)
+                     .addComponent(er)
+                     .addGroup(GroupLayout.Alignment.TRAILING,
+                                centerLayout.createSequentialGroup()
+                         .addComponent(tlal)
+                         .addPreferredGap(
+                             LayoutStyle.ComponentPlacement.RELATED)
+                         .addComponent(this.tlatf,
+                                         GroupLayout.PREFERRED_SIZE,
+                                           GroupLayout.DEFAULT_SIZE,
+                                       GroupLayout.PREFERRED_SIZE)))
+                 .addGroup(centerLayout.createSequentialGroup()
+                     .addComponent(thal)
+                     .addPreferredGap(
+                             LayoutStyle.ComponentPlacement.RELATED,
+                                           GroupLayout.DEFAULT_SIZE,
+                                                    Short.MAX_VALUE)
+                     .addComponent(this.thatf,
+                                         GroupLayout.PREFERRED_SIZE,
+                                           GroupLayout.DEFAULT_SIZE,
+                                       GroupLayout.PREFERRED_SIZE)))
+             .addGap(20, 20, 20))
+      );
+      centerLayout.setVerticalGroup(
+         centerLayout.createParallelGroup(
+                                      GroupLayout.Alignment.LEADING)
+         .addGroup(centerLayout.createSequentialGroup()
+             .addContainerGap()
+             .addGroup(centerLayout.createParallelGroup(
+                                     GroupLayout.Alignment.BASELINE)
+                 .addComponent(srtc)
+                 .addComponent(er))
+             .addGap(20, 20, 20)
+             .addGroup(centerLayout.createParallelGroup(
+                                     GroupLayout.Alignment.BASELINE)
+                 .addComponent(srl)
+                 .addComponent(this.srtf,
+                               GroupLayout.PREFERRED_SIZE,
+                               GroupLayout.DEFAULT_SIZE,
+                               GroupLayout.PREFERRED_SIZE)
+                 .addComponent(this.tlatf,
+                               GroupLayout.PREFERRED_SIZE,
+                               GroupLayout.DEFAULT_SIZE,
+                               GroupLayout.PREFERRED_SIZE)
+                 .addComponent(tlal))
+             .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+             .addGroup(centerLayout.createParallelGroup(
+                                      GroupLayout.Alignment.BASELINE)
+                 .addComponent(msdl)
+                 .addComponent(this.msdltf,
+                                       GroupLayout.PREFERRED_SIZE,
+                                       GroupLayout.DEFAULT_SIZE,
+                                       GroupLayout.PREFERRED_SIZE)
+                 .addComponent(thal)
+                 .addComponent(this.thatf,
+                                       GroupLayout.PREFERRED_SIZE,
+                                         GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.PREFERRED_SIZE))
+             .addContainerGap(120, Short.MAX_VALUE))
+      );
+      newMissionPanel.add(centerPanel, BorderLayout.CENTER);
+      
+      return newMissionPanel;
+   }
+   
+   /*
+   */
+   private void setUpLocalItemListener(JToggleButton jtb){
+      jtb.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            Object o = e.getItem();
+            if(o instanceof AbstractButton){
+               AbstractButton ab = (AbstractButton)o;
+               convertTemperatures(e, ab);
+               if(ab.isSelected()){
+                  if(ab.getActionCommand().equals("NMCelsius")){
+                     tlal.setText(
+                                "Temperature Low Alarm? (\u00B0C)");
+                     thal.setText(
+                               "Temperature High Alarm? (\u00B0C)");
+                  }
+                  else if(ab.getActionCommand().
+                                            equals("NMFahrenheit")){
+                     tlal.setText(
+                                "Temperature Low Alarm? (\u00B0F)");
+                     thal.setText(
+                               "Temperature High Alarm? (\u00B0F)");
+                  
+                  }
+                  else if(ab.getActionCommand().equals("NMKelvin")){
+                     tlal.setText("Temperature Low Alarm? (K)");
+                     thal.setText("Temperature High Alarm? (K)");
+                  }
+               }
+            }
+         }
+      });
+   }
+   
+   /*
+   Set up the GUI
+   */
+   private void setUpGUI(Object controller){
+      try{
+         UIManager.setLookAndFeel(
+                  "com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+         //UIManager.setLookAndFeel(
+         //              UIManager.getSystemLookAndFeelClassName());
+         //UIManager.setLookAndFeel(
+         //              "javax.swing.plaf.metal.MetalLookAndFeel");
+         this.setSize(WIDTH, HEIGHT);
+         this.setResizable(false);
+         JTabbedPane jtp = new JTabbedPane();
+         jtp.addTab("Mission",
+                    null,
+                    this.setMissionPanel(controller),
+                    "Setting/Clearing Mission Data");
+         jtp.addTab("Temperature",
+                    null,
+                    new JLabel("TBD"),
+                    "Viewing Temperature Mission Data");
+         jtp.addTab("Humidity",
+                    null,
+                    new JLabel("TBD"),
+                    "Viewing Humidity Mission Data");
+         jtp.addTab("Dew Point",
+                    null,
+                    new JLabel("TBD"),
+                    "Viewing Dew Point Mission Data");
+         jtp.addTab("Heat Index",
+                    null,
+                    new JLabel("TBD"),
+                    "Viewing Heat Index Mission Data");
+         this.getContentPane().add(jtp);
+         //this.pack();
+         this.setVisible(true);
+      }
+      catch(Exception e){ e.printStackTrace(); }
+   }
+   
+   /*
+   */
+   private void setUpTemperatureGraph(LogEvent event){
+      try{
+         LinkedList list = new LinkedList(event.getDataList());
+         Iterator i = list.iterator();
+         while(i.hasNext()){
+            Double d = (Double)i.next();
+            System.out.println("" + d);
+         }
+         //Will need to change
+         GenericJInteractionFrame testFrame =
+                          new GenericJInteractionFrame("Temp Test");
+         TestPanel2 tp = new TestPanel2(list);
+         testFrame.setSize(500, 375);
+         testFrame.setResizable(false);
+         testFrame.add(tp);
+         testFrame.setVisible(true);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Temperature Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   */
+   private void setUpTemperatureTimeGraph(LogEvent event){
+   }
+}
