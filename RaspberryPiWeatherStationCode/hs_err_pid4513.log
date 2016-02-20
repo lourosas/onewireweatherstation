@@ -1,0 +1,433 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00001c88, pid=4513, tid=2908562544
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0-b132) (build 1.8.0-b132)
+# Java VM: Java HotSpot(TM) Client VM (25.0-b70 mixed mode linux-arm )
+# Problematic frame:
+# C  0x00001c88
+#
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.sun.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x016fbe18):  JavaThread "Thread-1" [_thread_in_native, id=4523, stack(0xad583000,0xad5d3000)]
+
+siginfo:si_signo=SIGSEGV: si_errno=0, si_code=1 (SEGV_MAPERR), si_addr=0x00001c88
+
+Registers:
+  r0  = 0x00000001
+  r1  = 0xad5d1910
+  r2  = 0x00000001
+  r3  = 0x30000002
+  r4  = 0xb428245c
+  r5  = 0xb400f140
+  r6  = 0x00000000
+  r7  = 0x00000000
+  r8  = 0xad5d1910
+  r9  = 0xaddf7758
+  r10 = 0x016fbe18
+  fp  = 0xad5d187c
+  r12 = 0xb40151d8
+  sp  = 0xad5d1860
+  lr  = 0xb400f160
+  pc  = 0x00001c88
+  cpsr = 0x60000010
+
+Top of Stack: (sp=0xad5d1860)
+0xad5d1860:   00000004 00000001 ad5d1910 016fbf44
+0xad5d1870:   add7ade0 00000000 ad5d1900 b425084c
+0xad5d1880:   ad5d188c 00000007 00000000 000af93b
+0xad5d1890:   00000000 ad5d1894 add8ac3d ad5d18dc
+0xad5d18a0:   add8c4f8 00000000 add8ac80 00000004
+0xad5d18b0:   ae02dca0 ad5d18b4 add78128 ad5d18e4
+0xad5d18c0:   add7ade0 00000000 add78138 00000000
+0xad5d18d0:   ad5d18dc ad5d1908 b4248dc0 00000001 
+
+Instructions: (pc=0x00001c88)
+0x00001c68:   
+[error occurred during error reporting (printing registers, top of stack, instructions near pc), id 0xb]
+
+Register to memory mapping:
+
+  r0  = 0x00000001
+0x00000001 is an unknown value
+
+  r1  = 0xad5d1910
+0xad5d1910 is pointing into the stack for thread: 0x016fbe18
+
+  r2  = 0x00000001
+0x00000001 is an unknown value
+
+  r3  = 0x30000002
+0x30000002 is an unknown value
+
+  r4  = 0xb428245c
+0xb428245c is at code_begin+2076 in 
+[CodeBlob (0xb4281c08)]
+Framesize: 0
+BufferBlob (0xb4281c08) used for native signature handlers
+
+  r5  = 0xb400f140
+
+[error occurred during error reporting (printing register info), id 0xb]
+
+Stack: [0xad583000,0xad5d3000],  sp=0xad5d1860,  free space=314k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  0x00001c88
+
+[error occurred during error reporting (printing native stack), id 0xb]
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  com.dalsemi.onewire.adapter.PDKAdapterUSB.Reset(I)I+0
+j  com.dalsemi.onewire.adapter.PDKAdapterUSB.reset()I+13
+j  com.dalsemi.onewire.adapter.DSPortAdapter.isPresent([B)Z+1
+j  com.dalsemi.onewire.container.OneWireContainer.doSpeed()V+24
+j  com.dalsemi.onewire.container.OneWireContainer10.readDevice()[B+6
+j  TestiButton.measureTemp()V+4
+j  TestiButton.update(Lrosas/lou/clock/TimeFormater;)V+1
+j  rosas.lou.clock.StopWatch.publishElapsedTime()V+76
+j  rosas.lou.clock.StopWatch.running()V+16
+j  rosas.lou.clock.StopWatch.run()V+31
+j  java.lang.Thread.run()V+11
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x015e7ab0 JavaThread "SIGHUP handler" daemon [_thread_blocked, id=6752, stack(0xad513000,0xad563000)]
+  0x015349a0 JavaThread "DestroyJavaVM" [_thread_blocked, id=4514, stack(0xb6300000,0xb6350000)]
+=>0x016fbe18 JavaThread "Thread-1" [_thread_in_native, id=4523, stack(0xad583000,0xad5d3000)]
+  0x015b6c00 JavaThread "Service Thread" daemon [_thread_blocked, id=4520, stack(0xad6a9000,0xad6f9000)]
+  0x015b1c98 JavaThread "C1 CompilerThread0" daemon [_thread_blocked, id=4519, stack(0xad6f9000,0xad779000)]
+  0x015b0808 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=4518, stack(0xad779000,0xad7c9000)]
+  0x0158f190 JavaThread "Finalizer" daemon [_thread_blocked, id=4517, stack(0xad940000,0xad990000)]
+  0x0158dd90 JavaThread "Reference Handler" daemon [_thread_blocked, id=4516, stack(0xad990000,0xad9e0000)]
+
+Other Threads:
+  0x01589f70 VMThread [stack: 0xb4048000,0xb40c8000] [id=4515]
+  0x015b8b30 WatcherThread [stack: 0xad629000,0xad6a9000] [id=4521]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap:
+ def new generation   total 1920K, used 367K [0xae000000, 0xae200000, 0xb0000000)
+  eden space 1792K,  13% used [0xae000000, 0xae03bd98, 0xae1c0000)
+  from space 128K, 100% used [0xae1e0000, 0xae200000, 0xae200000)
+  to   space 128K,   0% used [0xae1c0000, 0xae1c0000, 0xae1e0000)
+ tenured generation   total 4096K, used 530K [0xb0000000, 0xb0400000, 0xb4000000)
+   the space 4096K,  12% used [0xb0000000, 0xb0084868, 0xb0084a00, 0xb0400000)
+ Metaspace       used 2343K, capacity 2432K, committed 2456K, reserved 4400K
+
+Card table byte_map: [0xb4193000,0xb41c4000] byte_map_base: 0xb3c23000
+
+Polling page: 0xb6f27000
+
+CodeCache: size=32768Kb used=696Kb max_used=696Kb free=32071Kb
+ bounds [0xb4244000, 0xb42f4000, 0xb6244000]
+ total_blobs=177 nmethods=36 adapters=73
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 5.068 Thread 0x015b1c98   32             java.util.HashMap::hash (20 bytes)
+Event: 5.070 Thread 0x015b1c98 nmethod 32 0xb42ee908 code [0xb42ee9f0, 0xb42eeab4]
+Event: 5.070 Thread 0x015b1c98   33             sun.misc.FDBigInteger::mult (64 bytes)
+Event: 5.074 Thread 0x015b1c98 nmethod 33 0xb42eeb08 code [0xb42eebf0, 0xb42eedb8]
+Event: 100.957 Thread 0x015b1c98   34             com.dalsemi.onewire.adapter.DSPortAdapter::strongAccess (167 bytes)
+Event: 100.968 Thread 0x015b1c98 nmethod 34 0xb42eef48 code [0xb42ef050, 0xb42ef3b0]
+Event: 164.296 Thread 0x015b1c98   35             sun.nio.cs.UTF_8$Encoder::encodeArrayLoop (489 bytes)
+Event: 164.397 Thread 0x015b1c98 nmethod 35 0xb42ef688 code [0xb42ef9d0, 0xb42f064c]
+Event: 195.019 Thread 0x015b1c98   36             com.dalsemi.onewire.adapter.DSPortAdapter::arrayWriteBit (48 bytes)
+Event: 195.022 Thread 0x015b1c98 nmethod 36 0xb42f1f08 code [0xb42f1ff0, 0xb42f2128]
+
+GC Heap History (2 events):
+Event: 3.740 GC heap before
+{Heap before GC invocations=0 (full 0):
+ def new generation   total 1920K, used 1792K [0xae000000, 0xae200000, 0xb0000000)
+  eden space 1792K, 100% used [0xae000000, 0xae1c0000, 0xae1c0000)
+  from space 128K,   0% used [0xae1c0000, 0xae1c0000, 0xae1e0000)
+  to   space 128K,   0% used [0xae1e0000, 0xae1e0000, 0xae200000)
+ tenured generation   total 4096K, used 0K [0xb0000000, 0xb0400000, 0xb4000000)
+   the space 4096K,   0% used [0xb0000000, 0xb0000000, 0xb0000200, 0xb0400000)
+ Metaspace       used 2288K, capacity 2400K, committed 2456K, reserved 4400K
+Event: 3.806 GC heap after
+Heap after GC invocations=1 (full 0):
+ def new generation   total 1920K, used 128K [0xae000000, 0xae200000, 0xb0000000)
+  eden space 1792K,   0% used [0xae000000, 0xae000000, 0xae1c0000)
+  from space 128K, 100% used [0xae1e0000, 0xae200000, 0xae200000)
+  to   space 128K,   0% used [0xae1c0000, 0xae1c0000, 0xae1e0000)
+ tenured generation   total 4096K, used 530K [0xb0000000, 0xb0400000, 0xb4000000)
+   the space 4096K,  12% used [0xb0000000, 0xb0084868, 0xb0084a00, 0xb0400000)
+ Metaspace       used 2288K, capacity 2400K, committed 2456K, reserved 4400K
+}
+
+Deoptimization events (0 events):
+No events
+
+Internal exceptions (10 events):
+Event: 3.558 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1a3f68) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.595 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1a8f70) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.612 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1ae480) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.620 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1b2908) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.654 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1b5070) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.676 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1bb100) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.687 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae1bd958) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 3.882 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae000790) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.950 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae003738) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+Event: 4.975 Thread 0x015349a0 Exception <a 'java/security/PrivilegedActionException'> (0xae015c00) thrown at [/HUDSON/workspace/8-2-build-glinux-arm-vfp-hflt/jdk8/2238/hotspot/src/share/vm/prims/jvm.cpp, line 1248]
+
+Events (10 events):
+Event: 5.012 loading class sun/misc/FloatingDecimal$PreparedASCIIToBinaryBuffer
+Event: 5.012 loading class sun/misc/FloatingDecimal$ASCIIToBinaryConverter
+Event: 5.012 loading class sun/misc/FloatingDecimal$ASCIIToBinaryConverter done
+Event: 5.013 loading class sun/misc/FloatingDecimal$PreparedASCIIToBinaryBuffer done
+Event: 5.015 loading class sun/misc/FDBigInteger
+Event: 5.017 loading class sun/misc/FDBigInteger done
+Event: 5.095 Thread 0x016fbe18 Thread added: 0x016fbe18
+Event: 5.096 Thread 0x015349a0 Thread exited: 0x015349a0
+Event: 5.096 Thread 0x015349a0 Thread added: 0x015349a0
+Event: 25091.439 loading class sun/misc/Signal$1
+
+
+Dynamic libraries:
+00008000-00009000 r-xp 00000000 b3:06 135297     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/bin/java
+00010000-00011000 rw-p 00000000 b3:06 135297     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/bin/java
+0152e000-0171d000 rw-p 00000000 00:00 0          [heap]
+ad513000-ad516000 ---p 00000000 00:00 0 
+ad516000-ad563000 rw-p 00000000 00:00 0          [stack:6752]
+ad563000-ad569000 r-xp 00000000 b3:06 260648     /lib/arm-linux-gnueabihf/libusb-0.1.so.4.4.4
+ad569000-ad570000 ---p 00006000 b3:06 260648     /lib/arm-linux-gnueabihf/libusb-0.1.so.4.4.4
+ad570000-ad571000 r--p 00005000 b3:06 260648     /lib/arm-linux-gnueabihf/libusb-0.1.so.4.4.4
+ad571000-ad572000 rw-p 00006000 b3:06 260648     /lib/arm-linux-gnueabihf/libusb-0.1.so.4.4.4
+ad572000-ad573000 rw-p 00000000 00:00 0 
+ad583000-ad586000 ---p 00000000 00:00 0 
+ad586000-ad5d3000 rw-p 00000000 00:00 0          [stack:4523]
+ad5d3000-ad629000 r--s 00408000 b3:06 135345     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/ext/jfxrt-graphics.jar
+ad629000-ad62a000 ---p 00000000 00:00 0 
+ad62a000-ad6a9000 rw-p 00000000 00:00 0          [stack:4521]
+ad6a9000-ad6ac000 ---p 00000000 00:00 0 
+ad6ac000-ad6f9000 rw-p 00000000 00:00 0          [stack:4520]
+ad6f9000-ad6fc000 ---p 00000000 00:00 0 
+ad6fc000-ad779000 rw-p 00000000 00:00 0          [stack:4519]
+ad779000-ad77c000 ---p 00000000 00:00 0 
+ad77c000-ad7c9000 rw-p 00000000 00:00 0          [stack:4518]
+ad7c9000-ad940000 r--p 00000000 b3:06 7948       /usr/lib/locale/locale-archive
+ad940000-ad943000 ---p 00000000 00:00 0 
+ad943000-ad990000 rw-p 00000000 00:00 0          [stack:4517]
+ad990000-ad993000 ---p 00000000 00:00 0 
+ad993000-ad9e0000 rw-p 00000000 00:00 0          [stack:4516]
+ad9e0000-adbb4000 r--s 03c85000 b3:06 135301     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/rt.jar
+adbb4000-ade1a000 rw-p 00000000 00:00 0 
+ade1a000-ae000000 ---p 00000000 00:00 0 
+ae000000-ae200000 rw-p 00000000 00:00 0 
+ae200000-b0000000 ---p 00000000 00:00 0 
+b0000000-b0400000 rw-p 00000000 00:00 0 
+b0400000-b4000000 ---p 00000000 00:00 0 
+b400d000-b4015000 r-xp 00000000 b3:06 134635     /usr/local/lib/libonewireUSB.so
+b4015000-b4016000 rw-p 00008000 b3:06 134635     /usr/local/lib/libonewireUSB.so
+b4016000-b4048000 r--s 0023c000 b3:06 135344     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/ext/jfxrt-controls.jar
+b4048000-b4049000 ---p 00000000 00:00 0 
+b4049000-b4175000 rw-p 00000000 00:00 0          [stack:4515]
+b4175000-b4193000 ---p 00000000 00:00 0 
+b4193000-b4194000 rw-p 00000000 00:00 0 
+b4194000-b41a3000 ---p 00000000 00:00 0 
+b41a3000-b41a5000 rw-p 00000000 00:00 0 
+b41a5000-b41c3000 ---p 00000000 00:00 0 
+b41c3000-b41c7000 rw-p 00000000 00:00 0 
+b41c7000-b4244000 ---p 00000000 00:00 0 
+b4244000-b42f4000 rwxp 00000000 00:00 0 
+b42f4000-b6244000 ---p 00000000 00:00 0 
+b6244000-b625b000 r-xp 00000000 b3:06 135419     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libzip.so
+b625b000-b6262000 ---p 00017000 b3:06 135419     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libzip.so
+b6262000-b6263000 rw-p 00016000 b3:06 135419     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libzip.so
+b6263000-b626d000 r-xp 00000000 b3:06 260733     /lib/arm-linux-gnueabihf/libnss_files-2.13.so
+b626d000-b6274000 ---p 0000a000 b3:06 260733     /lib/arm-linux-gnueabihf/libnss_files-2.13.so
+b6274000-b6275000 r--p 00009000 b3:06 260733     /lib/arm-linux-gnueabihf/libnss_files-2.13.so
+b6275000-b6276000 rw-p 0000a000 b3:06 260733     /lib/arm-linux-gnueabihf/libnss_files-2.13.so
+b6276000-b627f000 r-xp 00000000 b3:06 260707     /lib/arm-linux-gnueabihf/libnss_nis-2.13.so
+b627f000-b6286000 ---p 00009000 b3:06 260707     /lib/arm-linux-gnueabihf/libnss_nis-2.13.so
+b6286000-b6287000 r--p 00008000 b3:06 260707     /lib/arm-linux-gnueabihf/libnss_nis-2.13.so
+b6287000-b6288000 rw-p 00009000 b3:06 260707     /lib/arm-linux-gnueabihf/libnss_nis-2.13.so
+b6288000-b6299000 r-xp 00000000 b3:06 260741     /lib/arm-linux-gnueabihf/libnsl-2.13.so
+b6299000-b62a0000 ---p 00011000 b3:06 260741     /lib/arm-linux-gnueabihf/libnsl-2.13.so
+b62a0000-b62a1000 r--p 00010000 b3:06 260741     /lib/arm-linux-gnueabihf/libnsl-2.13.so
+b62a1000-b62a2000 rw-p 00011000 b3:06 260741     /lib/arm-linux-gnueabihf/libnsl-2.13.so
+b62a2000-b62a4000 rw-p 00000000 00:00 0 
+b62a4000-b62aa000 r-xp 00000000 b3:06 260822     /lib/arm-linux-gnueabihf/libnss_compat-2.13.so
+b62aa000-b62b1000 ---p 00006000 b3:06 260822     /lib/arm-linux-gnueabihf/libnss_compat-2.13.so
+b62b1000-b62b2000 r--p 00005000 b3:06 260822     /lib/arm-linux-gnueabihf/libnss_compat-2.13.so
+b62b2000-b62b3000 rw-p 00006000 b3:06 260822     /lib/arm-linux-gnueabihf/libnss_compat-2.13.so
+b62b3000-b62d6000 r-xp 00000000 b3:06 135413     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libjava.so
+b62d6000-b62de000 ---p 00023000 b3:06 135413     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libjava.so
+b62de000-b62df000 rw-p 00023000 b3:06 135413     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libjava.so
+b62df000-b62e8000 r-xp 00000000 b3:06 135401     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libverify.so
+b62e8000-b62f0000 ---p 00009000 b3:06 135401     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libverify.so
+b62f0000-b62f1000 rw-p 00009000 b3:06 135401     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/libverify.so
+b62f1000-b62f7000 r-xp 00000000 b3:06 260631     /lib/arm-linux-gnueabihf/librt-2.13.so
+b62f7000-b62fe000 ---p 00006000 b3:06 260631     /lib/arm-linux-gnueabihf/librt-2.13.so
+b62fe000-b62ff000 r--p 00005000 b3:06 260631     /lib/arm-linux-gnueabihf/librt-2.13.so
+b62ff000-b6300000 rw-p 00006000 b3:06 260631     /lib/arm-linux-gnueabihf/librt-2.13.so
+b6300000-b6303000 ---p 00000000 00:00 0 
+b6303000-b6350000 rw-p 00000000 00:00 0          [stack:4514]
+b6350000-b63b8000 r-xp 00000000 b3:06 260686     /lib/arm-linux-gnueabihf/libm-2.13.so
+b63b8000-b63bf000 ---p 00068000 b3:06 260686     /lib/arm-linux-gnueabihf/libm-2.13.so
+b63bf000-b63c0000 r--p 00067000 b3:06 260686     /lib/arm-linux-gnueabihf/libm-2.13.so
+b63c0000-b63c1000 rw-p 00068000 b3:06 260686     /lib/arm-linux-gnueabihf/libm-2.13.so
+b63c1000-b68fd000 r-xp 00000000 b3:06 135429     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/client/libjvm.so
+b68fd000-b6904000 ---p 0053c000 b3:06 135429     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/client/libjvm.so
+b6904000-b692e000 rw-p 0053b000 b3:06 135429     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/client/libjvm.so
+b692e000-b6d4f000 rw-p 00000000 00:00 0 
+b6d4f000-b6d6f000 r-xp 00000000 b3:06 260637     /lib/arm-linux-gnueabihf/libgcc_s.so.1
+b6d6f000-b6d76000 ---p 00020000 b3:06 260637     /lib/arm-linux-gnueabihf/libgcc_s.so.1
+b6d76000-b6d77000 rw-p 0001f000 b3:06 260637     /lib/arm-linux-gnueabihf/libgcc_s.so.1
+b6d77000-b6e9a000 r-xp 00000000 b3:06 260644     /lib/arm-linux-gnueabihf/libc-2.13.so
+b6e9a000-b6ea1000 ---p 00123000 b3:06 260644     /lib/arm-linux-gnueabihf/libc-2.13.so
+b6ea1000-b6ea3000 r--p 00122000 b3:06 260644     /lib/arm-linux-gnueabihf/libc-2.13.so
+b6ea3000-b6ea4000 rw-p 00124000 b3:06 260644     /lib/arm-linux-gnueabihf/libc-2.13.so
+b6ea4000-b6ea7000 rw-p 00000000 00:00 0 
+b6ea7000-b6ea9000 r-xp 00000000 b3:06 260677     /lib/arm-linux-gnueabihf/libdl-2.13.so
+b6ea9000-b6eb0000 ---p 00002000 b3:06 260677     /lib/arm-linux-gnueabihf/libdl-2.13.so
+b6eb0000-b6eb1000 r--p 00001000 b3:06 260677     /lib/arm-linux-gnueabihf/libdl-2.13.so
+b6eb1000-b6eb2000 rw-p 00002000 b3:06 260677     /lib/arm-linux-gnueabihf/libdl-2.13.so
+b6eb2000-b6ec6000 r-xp 00000000 b3:06 135412     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/jli/libjli.so
+b6ec6000-b6ecd000 ---p 00014000 b3:06 135412     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/jli/libjli.so
+b6ecd000-b6ece000 rw-p 00013000 b3:06 135412     /usr/lib/jvm/jdk-8-oracle-arm-vfp-hflt/jre/lib/arm/jli/libjli.so
+b6ece000-b6ee2000 r-xp 00000000 b3:06 260671     /lib/arm-linux-gnueabihf/libpthread-2.13.so
+b6ee2000-b6ee9000 ---p 00014000 b3:06 260671     /lib/arm-linux-gnueabihf/libpthread-2.13.so
+b6ee9000-b6eea000 r--p 00013000 b3:06 260671     /lib/arm-linux-gnueabihf/libpthread-2.13.so
+b6eea000-b6eeb000 rw-p 00014000 b3:06 260671     /lib/arm-linux-gnueabihf/libpthread-2.13.so
+b6eeb000-b6eed000 rw-p 00000000 00:00 0 
+b6ef1000-b6ef5000 r--s 0006c000 b3:06 679812     /home/pi/Downloads/OneWireViewer-Linux/onewireapi_java/OneWireAPI.jar
+b6ef5000-b6efd000 rw-s 00000000 b3:06 678976     /tmp/hsperfdata_pi/4513
+b6efd000-b6eff000 r-xp 00000000 b3:06 2997       /usr/lib/arm-linux-gnueabihf/libcofi_rpi.so
+b6eff000-b6f06000 ---p 00002000 b3:06 2997       /usr/lib/arm-linux-gnueabihf/libcofi_rpi.so
+b6f06000-b6f07000 rw-p 00001000 b3:06 2997       /usr/lib/arm-linux-gnueabihf/libcofi_rpi.so
+b6f07000-b6f24000 r-xp 00000000 b3:06 260810     /lib/arm-linux-gnueabihf/ld-2.13.so
+b6f25000-b6f26000 rw-p 00000000 00:00 0 
+b6f26000-b6f27000 r--p 00000000 b3:06 398707     /usr/share/locale/en_GB/LC_MESSAGES/libc.mo
+b6f27000-b6f28000 r--p 00000000 00:00 0 
+b6f28000-b6f2c000 rw-p 00000000 00:00 0 
+b6f2c000-b6f2d000 r--p 0001d000 b3:06 260810     /lib/arm-linux-gnueabihf/ld-2.13.so
+b6f2d000-b6f2e000 rw-p 0001e000 b3:06 260810     /lib/arm-linux-gnueabihf/ld-2.13.so
+bec37000-bec58000 rw-p 00000000 00:00 0          [stack]
+bef6f000-bef70000 r-xp 00000000 00:00 0          [sigpage]
+ffff0000-ffff1000 r-xp 00000000 00:00 0          [vectors]
+
+VM Arguments:
+jvm_args: -Djava.library.path=/usr/local/lib 
+java_command: TestiButton
+java_class_path (initial): /home/pi/Downloads/OneWireViewer-Linux/onewireapi_java/OneWireAPI.jar:/home/pi/Downloads/OneWireViewer-Linux/PDKAdapterUSB:/home/pi/javaclasses:.
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+CLASSPATH=.:/home/pi/javaclasses:/home/pi/javaclasses/OneWireViewer-Linux/onewireapi_java/OneWireAPI.jar:/home/pi/javaclasses/RXTXcomm.jar:/home/pi/javaclasses/myclasses:/home/pi/javaclasses/rosas
+PATH=.:/home/pi/bin:/home/pi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x4c7b40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGBUS: [libjvm.so+0x4c7b40], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGFPE: [libjvm.so+0x3cc1ac], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGPIPE: [libjvm.so+0x3cc1ac], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGXFSZ: [libjvm.so+0x3cc1ac], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGILL: [libjvm.so+0x3cc1ac], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: [libjvm.so+0x3cc2dc], sa_mask[0]=0x00000000, sa_flags=0x10000004
+SIGHUP: [libjvm.so+0x3cc710], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGINT: [libjvm.so+0x3cc710], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGTERM: [libjvm.so+0x3cc710], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+SIGQUIT: [libjvm.so+0x3cc710], sa_mask[0]=0x7ffbfeff, sa_flags=0x10000004
+
+
+---------------  S Y S T E M  ---------------
+
+OS:PRETTY_NAME="Raspbian GNU/Linux 7 (wheezy)"
+NAME="Raspbian GNU/Linux"
+VERSION_ID="7"
+VERSION="7 (wheezy)"
+ID=raspbian
+ID_LIKE=debian
+ANSI_COLOR="1;31"
+HOME_URL="http://www.raspbian.org/"
+SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
+BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+
+uname:Linux 4.1.6+ #810 PREEMPT Tue Aug 18 15:19:58 BST 2015 armv6l
+libc:glibc 2.13 NPTL 2.13 
+rlimit: STACK 8192k, CORE 0k, NPROC 2902, NOFILE 4096, AS infinity
+load average:0.53 0.27 0.18
+
+/proc/meminfo:
+MemTotal:         380088 kB
+MemFree:           69980 kB
+MemAvailable:     240068 kB
+Buffers:           28848 kB
+Cached:           159596 kB
+SwapCached:            0 kB
+Active:           188880 kB
+Inactive:          92396 kB
+Active(anon):      76624 kB
+Inactive(anon):    17984 kB
+Active(file):     112256 kB
+Inactive(file):    74412 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:        102396 kB
+SwapFree:         102396 kB
+Dirty:               180 kB
+Writeback:             0 kB
+AnonPages:         92876 kB
+Mapped:            59052 kB
+Shmem:              1736 kB
+Slab:              13368 kB
+SReclaimable:       7800 kB
+SUnreclaim:         5568 kB
+KernelStack:        1768 kB
+PageTables:         2256 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:      292440 kB
+Committed_AS:     666064 kB
+VmallocTotal:     630784 kB
+VmallocUsed:        3272 kB
+VmallocChunk:     386244 kB
+CmaTotal:           8192 kB
+CmaFree:            2680 kB
+
+
+CPU:total 1 (ARMv6), vfp
+
+/proc/cpuinfo:
+processor	: 0
+model name	: ARMv6-compatible processor rev 7 (v6l)
+BogoMIPS	: 2.00
+Features	: half thumb fastmult vfp edsp java tls 
+CPU implementer	: 0x41
+CPU architecture: 7
+CPU variant	: 0x0
+CPU part	: 0xb76
+CPU revision	: 7
+
+Hardware	: BCM2708
+Revision	: 000e
+Serial		: 00000000627d055e
+
+
+Memory: 4k page, physical 380088k(69980k free), swap 102396k(102396k free)
+
+vm_info: Java HotSpot(TM) Client VM (25.0-b70) for linux-arm-vfp-hflt JRE (1.8.0-b132), built on Mar  4 2014 06:39:31 by "java_re" with gcc 4.7.2 20120910 (prerelease)
+
+time: Fri Jan 22 18:24:45 2016
+elapsed time: 25092 seconds
+
