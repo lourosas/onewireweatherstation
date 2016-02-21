@@ -49,13 +49,58 @@ public class WeatherStation implements TimeListener{
       this.setUpDSPA();
       this.setUpdateRate(DEFAULTUPDATERATE);
    }
+
+   /***/
+   public void addBarometerObserver(BarometerObserver bo){
+      try{
+         this.b_o_List.add(bo);
+      }
+      catch(NullPointerException npe){
+         this.b_o_List = new Vector<BarometerObserver>();
+         this.b_o_List.add(bo);
+      }
+   }   
+   
+   /***/
+   public void addHumidityObserver(HumidityObserver ho){
+      try{
+         this.h_o_List.add(ho);
+      }
+      catch(NullPointerException npe){
+         this.h_o_List = new Vector<HumidityObserver>();
+         this.h_o_List.add(ho);
+      }
+   }
+   
+   /***/
+   public void addTemperatureObserver(TemperatureObserver to){
+      try{
+         this.t_o_List.add(to);
+      }
+      catch(NullPointerException npe){
+         this.t_o_List = new Vector<TemperatureObserver>();
+         this.t_o_List.add(to);
+      }
+   }
+   
+   /***/
+   public void addTimeObserver(TimeObserver to){
+      try{
+         this.ti_o_List.add(to);
+      }
+      catch(NullPointerException npe){
+         this.ti_o_List = new Vector<TimeObserver>();
+         this.ti_o_List.add(to);
+      }
+   }
    
    /*
    */
    public void mesure(){
-      System.out.println("measure");
+      this.publishTimeEvent();
       this.publishTemperature();
       this.publishHumidity();
+      this.publishBarometricPressure();
    }
    
    ////////////Implementation of the TimeListener Interface///////////
@@ -95,28 +140,135 @@ public class WeatherStation implements TimeListener{
                //BUT different addresses:  this IS the biggest PAIN in
                //the ASS with the OneWireSystem!!!
                else if(name.equals("DS2438")){
-                  Sensor hygrometer = Hygrometer.getInstance();
-                  hygrometer.initialize(units,address,name,this.dspa);
-                  System.out.println(hygrometer);
+                  if(address.equals("92000000BCA3EF26")){
+                     Sensor barometer = Barometer.getInstance();
+                     barometer.initialize(units, address, name,
+                                                           this.dspa);
+                     System.out.println(barometer);
+                  }
+                  else{
+                     Sensor hygrometer = Hygrometer.getInstance();
+                     hygrometer.initialize(units, address, name,
+                                                           this.dspa);
+                     System.out.println(hygrometer);
+                  }
                }
             }
          }
       }
       catch(EmptyStackException ese){}
+      catch(Exception e){ e.printStackTrace(); }
+   }
+   
+   /**
+   */
+   private void publishBarometricPressure(){
+      WeatherEvent evt1     = null;
+      WeatherEvent evt2     = null;
+      WeatherEvent evt3     = null;
+      Units  units          = Units.METRIC;
+      Sensor barometer      = Barometer.getInstance();
+      String type           = barometer.getType();
+      double data1          = barometer.measure();
+      evt1 = new WeatherEvent(barometer, type, data1, units);
+
+      units = Units.ENGLISH;
+      data1 = ((Barometer)barometer).getBarometricPressure(units);
+      evt2  = new WeatherEvent(barometer, type, data1, units);
+
+      units = Units.ABSOLUTE;
+      data1 = ((Barometer)barometer).getBarometricPressure(units);
+      evt3  = new WeatherEvent(barometer, type, data1, units);
+      
+      try{
+         Iterator<BarometerObserver> i = this.b_o_List.iterator();
+         while(i.hasNext()){
+            BarometerObserver bo = (BarometerObserver)i.next();
+            bo.updatePressure(evt1);
+            bo.updatePressure(evt2);
+            bo.updatePressure(evt3);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    /**
    */
    private void publishHumidity(){
-      Sensor hygrometer = Hygrometer.getInstance();
-      System.out.println("" + hygrometer.measure());
+      WeatherEvent evt1     = null;
+      WeatherEvent evt2     = null;
+      Sensor     hygrometer = Hygrometer.getInstance();
+      Hygrometer hyg        = Hygrometer.getInstance();
+      String     type       = hygrometer.getType();
+      double     data1      = hygrometer.measure();
+      double     data2      = hyg.getCalculatedHumidity();
+      
+      evt1 = new WeatherEvent(hygrometer, type, data1, Units.METRIC);
+      evt2 = new WeatherEvent(hyg, type, data2, Units.METRIC);
+      
+      try{
+         Iterator<HumidityObserver> i = this.h_o_List.iterator();
+         while(i.hasNext()){
+            HumidityObserver ho = (HumidityObserver)i.next();
+            ho.updateHumidity(evt1);
+            ho.updateHumidity(evt2);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    /**
    */
    private void publishTemperature(){
+      WeatherEvent evt1  = null;
+      WeatherEvent evt2  = null;
+      WeatherEvent evt3  = null;
+      Units units        = Units.METRIC;
       Sensor thermometer = Thermometer.getInstance();
-      System.out.println("" + thermometer.measure());
+      String type        = thermometer.getType();
+      double data        = thermometer.measure(units);
+      evt1 = new WeatherEvent(thermometer, type, data, units);
+      
+      units = Units.ENGLISH;
+      data  = ((Thermometer)thermometer).getTemperature(units);
+      evt2  = new WeatherEvent(thermometer, type, data, units);
+      
+      units = Units.ABSOLUTE;
+      data  = ((Thermometer)thermometer).getTemperature(units);
+      evt3  = new WeatherEvent(thermometer, type, data, units);
+      
+      try{
+         Iterator<TemperatureObserver> i = this.t_o_List.iterator();
+         while(i.hasNext()){
+            TemperatureObserver to = (TemperatureObserver)i.next();
+            to.updateTemperature(evt1);
+            to.updateTemperature(evt2);
+            to.updateTemperature(evt3);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+   
+   /**
+   */
+   private void publishTimeEvent(){
+      Calendar cal = Calendar.getInstance();
+      String time = String.format("%tc", cal.getTime());
+      try{
+         Iterator<TimeObserver> i = this.ti_o_List.iterator();
+         while(i.hasNext()){
+            (i.next()).updateTime(time);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    /**

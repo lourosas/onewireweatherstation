@@ -18,7 +18,7 @@ public class Barometer extends Sensor{
    private double mmHg;
    private double millibars;
    
-   private ADContainer barometricSensor;
+   private ADContainer barometricSensor = null;
    
    private static Barometer instance = null;
    
@@ -77,16 +77,17 @@ public class Barometer extends Sensor{
    */
    public void initialize
    (
-      Units  units,   //English, Metric, Absolute
-      String address, //64-bit Address as a String
-      String name     //DS1920, DS
+      Units  units,      //English, Metric, Absolute
+      String address,    //64-bit Address as a String
+      String name,       //DS2438, DS
+      DSPortAdapter dspa //The DSPortAdpater...
    ){
       //First, save off the attributes
       this.setUnits(units);
       this.setAddress(address);
       this.setName(name);
       this.setType("Barometer");
-      this.setUSBAdapter();
+      this.setUSBAdapter(dspa);
       
       //Next, go ahead and set up the Barometric Sensor (the actual
       //Dallas Semiconductor hardware device communicating over the
