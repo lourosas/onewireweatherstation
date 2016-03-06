@@ -3,7 +3,7 @@ import java.util.*;
 import rosas.lou.weatherclasses.*;
 
 public class TestWeatherStation implements TemperatureObserver,
-HumidityObserver, TimeObserver, BarometerObserver{
+HumidityObserver, TimeObserver, BarometerObserver, CalculatedObserver{
    public static void main(String [] args){
       new TestWeatherStation();
    }
@@ -25,6 +25,7 @@ HumidityObserver, TimeObserver, BarometerObserver{
       ws.addHumidityObserver(this);
       ws.addTemperatureObserver(this);
       ws.addBarometerObserver(this);
+      ws.addCalculatedObserver(this);
    }
    
    public void printStack(Stack<String> s){
@@ -36,6 +37,18 @@ HumidityObserver, TimeObserver, BarometerObserver{
          String address = e.nextElement();
       }
    }
+
+   //Implementation of the Caclulated Observer Interface
+   public void updateDewpoint(WeatherEvent evt){
+      System.out.print(String.format("DP:  %.2f ", evt.getValue()));
+      System.out.println(evt.getUnits());
+   }
+
+   //Implementation of the Calculated Observer Interface
+   public void updateHeatIndex(WeatherEvent evt){
+      System.out.print(String.format("HI:  %.2f ", evt.getValue()));
+      System.out.println(evt.getUnits());
+   }
    
    //Implementation of the HumidityObserver Interface
    public void updateHumidity(WeatherEvent evt){
@@ -44,13 +57,14 @@ HumidityObserver, TimeObserver, BarometerObserver{
    
    //Implementation of the BarometerObserver Interface
    public void updatePressure(WeatherEvent evt){
-      System.out.print(String.format("%.2f  ", evt.getValue()));
+      System.out.print(String.format("BP:  %.2f  ", evt.getValue()));
       System.out.println(evt.getUnits());
    }
    
    //Implementation of the TemperatureObserver Interface
    public void updateTemperature(WeatherEvent evt){
-      System.out.println(evt.getValue() + " " + evt.getUnits());
+      System.out.print(String.format("Temp: %.2f ", evt.getValue()));
+      System.out.println(evt.getUnits());
    }
    
    //Implementation of the TimeObserver Interface
@@ -64,4 +78,7 @@ HumidityObserver, TimeObserver, BarometerObserver{
    
    public void updateTime(String yr, String mo, String day,
                           String hr, String min, String sec){}
+
+   //Implementation of the Calculated Observer Interface
+   public void updateWindChill(WeatherEvent event){}
 }
