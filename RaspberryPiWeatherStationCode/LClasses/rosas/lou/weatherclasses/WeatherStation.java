@@ -60,6 +60,17 @@ public class WeatherStation implements TimeListener{
          this.b_o_List.add(bo);
       }
    }   
+
+   /***/
+   public void addCalculatedObserver(CalculatedObserver co){
+      try{
+         this.c_o_List.add(co);
+      }
+      catch(NullPointerException npe){
+         this.c_o_List = new Vector<CalculatedObserver>();
+         this.c_o_List.add(co);
+      }
+   }
    
    /***/
    public void addHumidityObserver(HumidityObserver ho){
@@ -100,6 +111,8 @@ public class WeatherStation implements TimeListener{
       this.publishTimeEvent();
       this.publishTemperature();
       this.publishHumidity();
+      this.publishDewpoint();
+      this.publishHeatIndex();
       this.publishBarometricPressure();
    }
    
@@ -121,6 +134,126 @@ public class WeatherStation implements TimeListener{
    
    
    ///////////////////////////////////////////////////////////////////
+   /*
+   Very Simple:
+   Calculate the dewpoint for a given pair of humidity and
+   temperature sensors.  This is based on the temperature and
+   humidty sensor stacks and is based on the assumption that
+   That each temp sensor in the temperature stack corresponds 
+   to an exact humidity sensor at the same position in the
+   humidity stack.  The dewpoint is a formulaic calculation
+   based on temperature and relative humidity and is an
+   approximation.  The actual calculation depends upon wetbulb
+   and dry bulb measurements.  This is an approximation based on
+   the Manus-Tetens formula.
+   Td = (243.12 * alpha[t,RH])/(17.62 - alpha[t, RH])
+   where alpha[t,RH] = (17.62*t/(243.12 + t)) + ln(RH/100)
+   and 0.0 < RH < 100.0.
+   Temperature -45 to 60 degrees celsius
+   */
+   private double calculateDewpoint(){
+      final double l = 243.12;  //lambda constant
+      final double b =  17.62;  //Beta constant
+
+      double dewpoint = Thermometer.DEFAULTTEMP;
+
+      Thermometer t = Thermometer.getInstance();
+      Hygrometer  h = Hygrometer.getInstance();
+
+      //Temperature in Metric Units
+      double temp     = t.getTemperature(Units.METRIC);
+      double humidity = h.getHumidity();
+
+      if(temp     > Thermometer.DEFAULTTEMP &&
+         humidity > Hygrometer.DEFAULTHUMIDITY){
+         double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
+         dewpoint = (l * alpha)/(b - alpha);
+      }
+
+      return dewpoint;
+   }
+
+   /*
+   Calculate the heat index for a given pair of humidity and
+   temperature sensors.  This is based on the temperature and
+   humidity sensor stacks and is based on the assumption that
+   each temperature sensor in the temperature stack corresponds
+   to an excact humidity sensor at the same position in the
+   humidity stack.  The heat index is a formulaic calculation
+   based on temprature and relative humidity and is an
+   approximation (although pretty good) which is based on sixteen
+   calculations.
+   heatindex = 16.923                            +
+               (.185212*tf)                      +
+               (5.37941 * rh)                    -
+               (.100254*tf*rh)                   +
+               ((9.41685 * 10^-3) * tf^2)        +
+               ((7.28898 * 10^-3) * rh^2)        +
+               ((3.45372*10^-4) * tf^2*rh)       -
+               ((8.14971*10^-4) * tf *rh^2)      +
+               ((1.02102*10^-5) * tf^2 * rh^2)   -
+               ((3.8646*10^-5) * tf^3)           +
+               ((2.91583*10^-5) * rh^3)          +
+               ((1.42721*10^-6) * tf^3 * rh)     +
+               ((1.97483*10^-7) * tf * rh^3)     -
+               ((2.18429*10^-8) * tf^3 * rh^2)   +
+               ((8.43296*10^-10) * tf^2 * rh^3)  -
+               ((4.81975*10^-11)*t^3*rh^3)
+   
+   NOTE:  The Heat Index Calculation becomes inaccurate at a Dry Bulb
+          less than 70 F.  If that is the case, the default value
+          is set.  For those values, the System will have to determine
+          The reason for the default Heat Index.  It is up to the
+          System to figure out the appropriateness of the Heat Index
+          data for display.
+   */
+   private double calculateHeatIndex(){
+      final double MINIMUMTEMP = 70.;
+      double heatIndex = Thermometer.DEFAULTTEMP;
+
+      Thermometer t = Thermometer.getInstance();
+      Hygrometer  h = Hygrometer.getInstance();
+
+      //For this calculation, the tempertaure needs to be in English
+      //units (degrees Fahrenheit)
+      double tf = t.getTemperature(Units.ENGLISH);
+      double rh = h.getHumidity();
+
+      /*
+      Only consider to calculate the HeatIndex if the Temperature
+      and Relative Humidity are not the default values (This would
+      indicate an issue related to the sensors or network)
+      */
+      if(tf > Thermometer.DEFAULTTEMP &&
+         rh > Hygrometer.DEFAULTHUMIDITY){
+         /*If the Temperature and Humidity are valid (at least
+         seem valid), go ahead and determine if the temperature
+         is high enough for a valid heat index calculation (> 70).
+         The Humidity is assumed to be >= 0. by default/expectation
+         of the sensor working correctly.
+         */
+         if(tf >= MINIMUMTEMP){
+            heatIndex  = 16.923;
+            heatIndex += (0.185212 * tf);
+            heatIndex += (5.37941  * rh);
+            heatIndex -= ((0.100254) * tf * rh);
+            heatIndex += ((9.41685 * 0.001) * tf * tf);
+            heatIndex += ((7.28898 * 0.001) * rh * rh);
+            heatIndex += ((3.45372 * 0.0001) * tf * tf * rh);
+            heatIndex -= ((8.14971 * 0.0001) * tf * rh * rh);
+            heatIndex += ((1.02102 * 0.00001) * tf * tf * rh * rh);
+            heatIndex -= ((3.8646  * 0.00001) * tf * tf * tf);
+            heatIndex += ((2.91583 * 0.00001) * rh * rh * rh);
+            heatIndex += ((1.42721 * .000001)* tf * tf * tf *rh);
+            heatIndex += ((1.97483 * .0000001) * tf * rh * rh * rh);
+            heatIndex -= ((2.18429 * .00000001) *tf*tf*tf* rh * rh);
+            heatIndex += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
+            heatIndex-=((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
+         }
+      }
+      return heatIndex;
+   }
+
    /**
    */
    private void findSensors(Stack<String> sensors){
@@ -187,6 +320,84 @@ public class WeatherStation implements TimeListener{
             bo.updatePressure(evt1);
             bo.updatePressure(evt2);
             bo.updatePressure(evt3);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /**
+   */
+   private void publishDewpoint(){
+      WeatherEvent evt1 = null;
+      WeatherEvent evt2 = null;
+      WeatherEvent evt3 = null;
+      Units units       = Units.METRIC;
+      //Dewpoint calculation will return in Metric Units, will need to
+      //convert to other units.
+      double dewpoint   = this.calculateDewpoint();
+      double dewpointF  = Thermometer.DEFAULTTEMP;
+      double dewpointK  = Thermometer.DEFAULTTEMP;
+      evt1 = new WeatherEvent(null, "Dewpoint", dewpoint, units);
+
+      if(dewpoint > Thermometer.DEFAULTTEMP){
+         dewpointF = WeatherConvert.celsiusToFahrenheit(dewpoint);
+         dewpointK = WeatherConvert.celsiusToKelvin(dewpoint);
+      }
+
+      units = Units.ENGLISH;
+      evt2 = new WeatherEvent(null, "Dewpoint", dewpointF, units);
+
+      units = Units.ABSOLUTE;
+      evt3 = new WeatherEvent(null, "Dewpoint", dewpointK, units);
+
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = (CalculatedObserver)i.next();
+            co.updateDewpoint(evt1);
+            co.updateDewpoint(evt2);
+            co.updateDewpoint(evt3);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /**
+   */
+   private void publishHeatIndex(){
+      WeatherEvent evt1 = null;
+      WeatherEvent evt2 = null;
+      WeatherEvent evt3 = null;
+      Units units       = Units.ENGLISH;
+      //Heat Index calculation will return in English Units, will need
+      //to convert to other units
+      double heatIndexF = this.calculateHeatIndex();
+      double heatIndex  = Thermometer.DEFAULTTEMP;
+      double heatIndexK = Thermometer.DEFAULTTEMP;
+      evt2 = new WeatherEvent(null, "Heat Index", heatIndexF, units);
+
+      if(heatIndexF > Thermometer.DEFAULTTEMP){
+         heatIndex  = WeatherConvert.fahrenheitToCelsius(heatIndexF);
+         heatIndexK = WeatherConvert.fahrenheitToKelvin(heatIndexF);
+      }
+
+      units = Units.METRIC;
+      evt1 = new WeatherEvent(null, "Heat Index", heatIndex, units);
+
+      units = Units.ABSOLUTE;
+      evt3 = new WeatherEvent(null, "Heat Index", heatIndexK, units);
+
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = (CalculatedObserver)i.next();
+            co.updateHeatIndex(evt1);
+            co.updateHeatIndex(evt2);
+            co.updateHeatIndex(evt3);
          }
       }
       catch(NullPointerException npe){
