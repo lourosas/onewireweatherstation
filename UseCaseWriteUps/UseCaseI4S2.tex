@@ -1,0 +1,55 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I4S2:  Detailed Description}
+\end{center}
+Use Case Name:  Manage Mission Data\\
+Scenario:  S2:  Save Mission Data\\
+Brief Description:  With the System Running, the User Requests to
+save the current Mission Data (regardless if a Mission is running).
+\\
+Actors:  User\\
+Related Use Cases:  Use Case I4S1:  \textit{The User Shall View
+Mission Data}\\\\
+Stakeholders:  User who want to save the current Mission Data, for
+either/or \textbf{temperature} and/or \textbf{humidity}.  Users who
+want to save the current Mission Data, for either/or
+\textbf{temperature} and/or \textbf{humidity}.\\\\
+Preconditions:  The system is running, the iButton is connected to
+the receptor or another reading device.  The iButton receptor or
+other iButtion reading device is connected to the computer.\\\\
+Postconditions:  The Mission Data (either \textbf{temperature},
+\textbf{humidity}, or both) is retrieved from the iButton and
+saved off in a user-directed file.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Requests Mission data for saving:       & \\
+either Temperature, Humidity or both        & \\\hline
+2.  Inputs the file name and location for   & \\
+saving the requested mission data.          & \\\hline
+3.  Requests the units for the temperature: & \\
+(Celsius, Fahrenheit, Kelvin), if           & \\
+requested.                                  & \\\hline
+& 4.  Retrieves the current requested \\
+& mission data \\\hline
+& 5.  Converts the temperature mission \\
+& data into the user requested units (as \\
+& appropriate). \\\hline
+& 6.  Saves the data to user specified \\
+& file.\\\hline
+& 7.  Indicates to the user the requested \\
+& data was saved in the specified file.\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+4a.  If the requested data of the current mission cannont be
+retrieved, then the system indicates the error to the user with a
+possible reason (One Wire Network issues, One Wire Device issues).
+\\\\
+6a.  If the requested data of the current mission cannot be saved,
+then the system indicates the error to the user.
+\end{document}

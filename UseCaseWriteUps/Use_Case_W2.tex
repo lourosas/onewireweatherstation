@@ -1,0 +1,45 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case W2:  Detailed Description}
+\end{center}
+\vspace{4ex}
+Use Case Name:  Request Humidity Data\\
+Scenario:  N/A\\
+Brief Description:  With the System collecting weather data, the
+weather network requests humidity data by periodically requesting
+requesting the humidity data from the weather stations (system).\\
+Actors:  Weather Network\\\\
+Related Use Cases:\\
+\textbf{Use Case A1:  }\textit{The Administrator shall set the
+Measurement Rate for all all active sensors}\\
+\textbf{Use Case W11:  }\textit{The Weather Network Shall request
+daily humidity extreems}\\
+\textbf{Use Case W16:  }\textit{The Weather Network Shall log
+requested weather data}\\\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus, other
+weather networks and individuals monitoring loacal weather data.\\\\
+\textbf{Preconditions:  }The System is running, the measurement rate
+is set, the network is set and working, the humidity measuring
+hardware is connected to the weather station.\\\\
+\textbf{Postconditions:  }The Humidity data is recieved from the
+weather station(s) (system).\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{Weather Station} & \textbf{System}\\\hline
+1.  Periodically request humidity & \\
+data from the System & 2.  Returns the humidity\\
+                     & data requested in the \\
+                     & appropriate (relative)\\\hline
+3.  Logs data returned by the system & \\
+(See \textbf{Use Case W16}) & \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the Humidity Sensors are not working properly, then the
+system shall report a default humidity (-99.9\%).\\
+2b.  If the the System Network stops working properly, then the
+system shall report a default humidity (-99.9\%).
+\end{document}

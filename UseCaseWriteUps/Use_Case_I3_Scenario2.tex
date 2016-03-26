@@ -1,0 +1,57 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I3S2:  Detailed Description}
+\end{center}
+Use Case Name:  Manage Mission Data\\
+Scenario: S2 View Humidity Data;\\
+Brief Description:  With the System Running, the User requests to view
+the current Humidity Data (regardless if a Mission is Running).\\
+Actors:  User\\
+Related Use Cases:  N/A\\\\
+Stakeholders:  Users who want to view the current Humidity Data from
+the current mission.\\\\
+Preconditions:  The System is running, the iButton is connected to the
+receptor or another reading device.  The iButton receptor or other
+reading device is connected to the computer.\\\\
+Postconditions:  The Humidity data is retrieved from the iButton and
+presented to the User for display.  (In either textual or graphical
+form).\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request Humidity Data for &\\
+viewing & \\\hline
+& 2.  Retrieves the current Humidity\\
+& data\\\hline
+& 3.  Retrieves the associated Date/Time \\
+& for all the current Humidity Data\\\hline
+& 4.  Separates the Humidity Data by\\
+& Date.\\\hline
+& 5.  Determines the Min/Max of the\\
+& current  Humidity data and the\\
+&  asscociated  Date/Time.\\\hline
+& 6.  Presents the requested Humidity\\
+& data to the User for viewing.\\\hline
+8.  Determines how to view the data &\\
+(in \textbf{Text or Graphical} format) &\\
+Makes that request to the System & \\\hline
+& 9.  Presents the data in the requested\\
+& format.\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If no iButton Device is connected to the network, then the system
+indicates the error to the user with the reason (no iButton Attached).
+\\\\
+2a.  If the requested data of the current mission cannot be retrieved,
+then the system indicates the error to the user with the reason
+(\textit{One Wire Network Issues, One Wire Device Issues}).\\\\
+3a.  If the associated Date/Time of the requested data of the current
+mission cannot be retrieved, then the system indicates the error to
+the user with the reason (\textit{One Wire Network Issues, One Wire
+Device Issues, other forms of retrieval exceptions}.)
+\end{document}

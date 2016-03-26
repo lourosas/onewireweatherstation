@@ -1,0 +1,41 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case iButton 1:  Detailed Description}\\\\
+Use Case Name:  Observe Logged Weather Data\\
+Scenario: Observe data textually\\
+Brief Description:  With the System running, the User shall request
+logged weather data from the iButton in textual form.\\\\
+Actors:  User\\
+Related Use Cases:\\
+\textbf{Use Case iButton 5:  }\emph{The User Shall Modify the
+temperature and calculated data units}\\
+\textbf{Stakeholders: }User\\
+\textbf{Preconditions:  }The system is running, the data is logged
+on the iButton, the iButton is connected to the System and ready
+for retrieval'\\
+\textbf{Postconditions:  }The weather data is presented to the user
+in textual, row, column form.\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Requests specific logged weather & \\
+data in appropriate units (See & \\
+\textbf{Use Case iButton 5}) & 2.  Returns the requested\\
+ & weather data in tabular form,\\
+ & labled with the type and units at\\
+ & the top of the table.  Different\\
+ & weather data separated into separate\\
+ & columns\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If the data is unretrievable, then the system shall note that
+to the user, giving the user the option to clear the memory on the
+iButton for logging a new set of data.\\
+2a.  If the user decides to change units, then the system shall
+return the requested data in the specific units, displaying the
+data again in tabular form.
+\end{document}

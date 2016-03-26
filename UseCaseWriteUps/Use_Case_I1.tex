@@ -1,0 +1,37 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I1:  Detailed Description}
+\end{center}
+Use Case Name:  Clear Device Memory\\
+Scenario:  N/A\\
+Brief Description:  With the System Running, the User clears the
+memory on the iButton device.\\
+Actors:  User\\
+Related Use Cases:  Use Case I2:
+\textit{The User Shall Manage a Mission}\\\\
+Stakeholders:  Users who want to clear the memory on the iButton for
+a new mission.\\\\
+Preconditions:  The System is running, the iButton is connected to
+the receptor or reading device.  The iButton receptor or reading
+device is connected to the computer.\\\\
+Postconditions:  The Memory in the iButton is cleared\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request the iButton memory & \\
+cleared & \\\hline
+ & 2.  Stops a Mission (See Use Case I2)\\\hline
+ & 3.  Clears the iButton memory\\\hline
+ & 4.  Indicates to the User the \\
+ & iButton Memory is cleared\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the Memory Cannot be cleared from the iButton, then the
+system indicates the error to the user with a possible reason
+(One Wire Network Issues, One Wire Device Issues).
+\end{document}

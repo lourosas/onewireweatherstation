@@ -1,0 +1,48 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case W1:  Detailed Description}
+\end{center}
+\vspace{4ex}
+Use Case Name:  Request Temperature Data\\
+Scenario:  N/A\\
+Brief Description:  With the System Collecting weather data, the
+weather network requests temperature data by periodically requesting
+temperature data from the weather stations (system).\\
+Actors:  Weather Network\\
+Related Use Cases:\\
+\textbf{Use Case A1:  }\textit{The Administrator shall set the
+Measurement Rate foall all active sensors}\\
+\textbf{Use Case W10:  }\textit{The Weather Network Shall request
+daily temperature extreems}\\
+\textbf{Use Case W15:  }\textit{The Weather Network Shall set
+measurment units for weather data}\\
+\textbf{Use Case W16:  }\textit{The Weather Network Shall log
+requested weather data}\\\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus, other
+weather networks and individuals monitoring loacal weather data.\\\\
+\textbf{Preconditions:  }The System is running, the measurement rate
+is set, the network is set and working, the thermometer hardware is
+connected to the weather station.\\\\
+\textbf{Postconditions:  }The Temperature data is recieved from the
+weather station(s) (system).\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{Weather Station} & \textbf{System}\\\hline
+1.  Periodically request temperature & \\
+data from the System & 2.  Returns the temperature\\
+                     & data requested in the \\
+                     & appropriate units\\\hline
+3.  Logs data returned by the system & \\
+(See \textbf{Use Case W16}) & \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the Temperature Sensors are not working properly, then the
+system shall report a default temperature (-999.9$^\circ$).\\
+2b.  If the the System Network stops working properly, then the
+system shall report a default temperature (-999.9$^\circ$).
+\end{document}

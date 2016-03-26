@@ -1,0 +1,61 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I3S5:  Detailed Description}
+\end{center}
+Use Case Name:  Manage Mission Data\\
+Scenario:  S5 Save Mission Data\\
+Brief Description:  With the System Running, the User requests to
+save the current data to the current Database. The user also saves off
+the data in text format by entering the directory and file name where
+to save the data (usually in .cvs format).\\
+Actors:  User, Database Administrator\\
+Related Use Cases:  none\\\\
+Stakeholders:  Users who want to archive the data.  Database
+Administrators who want to maintain and safely archive the Mission
+data.\\\\
+Precondtions:  The system is running.  Mission Data is loaded onto the
+System:  See Use Cases \textbf{I3S1-I3S4}, View Temperature Data,
+View Humidity Data, View Heat Index Data, View Dew Point Data. The
+Data Base is set up, with the Data Base Server running.\\\\
+Postconditions:  The Mission Data is saved to the appropriate CSV file
+and/or to the approriate Data Base.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request to Save the Mission Data & \\\hline
+& 2.  Presents the dialog box to save\\
+& the data in CSV format\\\hline
+3.  Decides if to save the data in & \\
+CSV format and where entering the & \\
+Data as appropriate & \\\hline
+& 4. Opens the CSV file and saves\\
+& the data.\\\hline
+& 5.  Appends the appropriate data to\\
+& the Data Base:  Temperature, Humidity\\
+& Dewpoint, Heat Index with the \\
+& Appropriate Time and the Appropriate\\
+& Units (Fahrenheit, Celsius, Kelvin)\\
+& for the Temperature, Dewpoint, Heat\\
+& Index\\\hline
+& 6.  Sends the appropriate ``save" message\\
+& to the User, indicating the data was\\
+& saved to the appropriate CSV file (if\\
+& the user requested) and to the appropriate\\
+& Data Base\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a, 4a, 5a.  If there is no data to save, then the system notifies the
+user there is no data.\\\\
+4b.  If there is an error in saving the CSV file, then the system
+notifies the user of the problem.\\\\
+5b.  If the data base is not open/loaded, then the system notifies the
+user the data cannot be saved to the Database.\\\\
+5c.  If there is a write error in appending the data to the Database,
+then the System notifies the user of the write error, and the
+inability of the Database to save/append the data.
+\end{document}

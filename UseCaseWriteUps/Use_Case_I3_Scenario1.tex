@@ -1,0 +1,60 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I3S1:  Detailed Description}
+\end{center}
+Use Case Name: Manage Mission Data\\
+Scenario S1:  View Temperature Data\\
+Brief Description:  With the System Running, the User requests to view
+the current Temperature Data (regardless if a Mission is Running).\\
+Actors:  User\\
+Related Use Cases:  N/A\\\\
+Stakeholders:  Users who want to view the current Temperature Data from
+the current mission.\\\\
+Preconditions:  The System is running, the iButton is connected to the
+receptor or another reading device.  The iButton receptor or other
+reading device is connected to the computer.\\\\
+Postconditions:  The Temperature Data is retrieved from the iButton and
+presented to the User for display.  (Either in textual or graphical
+form).\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request Temperature Data for &\\
+viewing & \\\hline
+& 2.  Retrieves the current temperature\\
+& data\\\hline
+& 3.  Converts the temperature data\\
+& into the three different units: \\
+& \textbf{Metric, English, Absolute}.\\\hline
+& 4.  Retrieves the associated Date/Time\\
+& for all the current temperature data\\\hline
+& 5.  Separates the temperature data by\\
+& date.\\\hline
+& 6.  Determines the Min/Max of the current\\
+& data, converting into the three different\\
+& units:  for every/all data separated by date.\\\hline
+& 7.  Presents the requested temperature\\
+& data to the User for viewing.\\\hline
+8. Determines how to view the data & \\
+(in \textbf{Text or Graphical} format) & \\
+Makes request to the System &\\\hline
+& 9.  Presents the data in the requested\\
+& format\\\hline
+10.  Determines the Units & \\
+\textbf{Metric, Englilsh, Absolute} and & \\
+makes request to the System &\\\hline
+& 11.  Presents the data in the appropriate\\
+& Units\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If no iButton Device is connected to the network, the the system
+indicates the error to the user with the reason (no iButton Atached).\\\\
+2a.  If the requested data of the current mission cannot be retrieved,
+then the system indicates the error to the user with the reason (One
+Wire Netwok Issues, One Wire Device Issues).
+\end{document}
