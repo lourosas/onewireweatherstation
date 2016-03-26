@@ -4,23 +4,23 @@
 \usepackage{graphicx}
 \begin{document}
 \noindent
-\textbf{Use Case S4:  Detailed Description}\\\\
-Use Case Name:  Monitor Dew Point Data\\
-Scenario:  Record  Daily Dew Point Extremes\\
+\textbf{Use Case S5:  Detailed Description}\\\\
+Use Case Name:  Monitor Heat Index Data\\
+Scenario:  Record  Daily Heat Index  Extremes\\
 Brief Description:  With the System running, the System records the
-dew point  extremum data--the minimum and maximum dew point--from the
-calculated dew point data.\\
+heat index extremum data--the minimum and maximum heat index--from the
+calculated heat index data.\\
 Actors:  System\\
 Related Use Cases:\\
-\textbf{Use Case S13:  }\emph{The System Shall Save Dew Point
+\textbf{Use Case S15:  }\emph{The System Shall Save Heat Index
 Extremum}\\
 \textbf{Stakeholders:  }Local and National Weather Bureaus and
 individuals monitoring local weather data.\\
-\textbf{Preconditions:  }The System is running, the dew point
-data is calculated (see \emph{Use Case S4--Calculate Dewpoint}). The
-extremum dew point data values are initialized: -999.9 for max, 999.9
+\textbf{Preconditions:  }The System is running, the heat index
+data is calculated (see \emph{Use Case S5--Calculate Heat Index}). The
+extremum heat index data values are initialized: -999.9 for max, 999.9
 for min.\\
-\textbf{Postconditions:  }The extremum dew point data (minumum
+\textbf{Postconditions:  }The extremum heat index data (minumum
 and maximum) are  noted and coverted to three units (Celsius,
 Fahrenheit, Kelvin).\\\\
 \textbf{Flow of Events}\\
@@ -28,13 +28,13 @@ Fahrenheit, Kelvin).\\\\
 \textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
 & 1.  Return requested temperature\\ 
 &      and humditiy data  measured\\\hline
-2.     Calculates the dew point (See & \\
- \emph{Use Case S4--Calculate Dew Point}) & \\\hline
+2.     Calculates the heat index (See & \\
+ \emph{Use Case S5--Calculate Heat Index}) & \\\hline
 3.     Records the date/time of the & \\
-current dewpoint measurement. & \\\hline
-4.     Compare the current dew point & \\
+current heat index measurement. & \\\hline
+4.     Compare the current heat index & \\
 against both the minimum and maximum. &\\\hline
-5.     Record the current dew point as an &\\
+5.     Record the current heat index as an &\\
 extreme if it is less than or equal to the &\\
 minimum or greater than or equal &\\
 to the maximum. & \\\hline
@@ -51,6 +51,6 @@ maximum values.\\
 1c.  If the One Wire Network breaks, then the System changes neither
 the minumum nor maximum values.\\
 4a-5a.  If the data has changed from the previous messurement (must be
-compared), the dew point extremum are reset to the default
+compared), the  heat index extremum are reset to the default
 values and compared for the new date.
 \end{document}
