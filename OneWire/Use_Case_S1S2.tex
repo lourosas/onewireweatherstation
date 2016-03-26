@@ -1,0 +1,50 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S1:  Detailed Description}\\\\
+Use Case Name:  Monitor Temperature Data\\
+Scenario:  Record  Daily Temperature Extremes\\
+Brief Description:  With the System running, the System records the
+temperature extreme data--the minimum and maximum temperature--from
+the 1-wire temprature sensor.\\
+Actors:  System\\
+Related Use Cases:\\
+\textbf{Use Case S7:  }\emph{The System Shall Save Temprature
+Extremes}\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus and
+individuals monitoring local weather data.\\
+\textbf{Preconditions:  }The System is running, the temerature data
+is received from the thermometer hardware. The extreme temperature
+data values are initialized: -999.9 for max, 999.9 for min.\\
+\textbf{Postconditions:  }The extreme data  tempearature (minumum and
+maximum) data
+found and noted and coverted to three units (Celsius, Fahrenheit,
+Kelvin).\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
+& 1.  Return requested temperature\\ 
+&      data  measured\\\hline
+2.    Records the date/time of the & \\
+       current temperature  measurement. & \\\hline
+3.     Compare the current temperature & \\
+against both the minimum and & \\
+maximum. &\\\hline
+4.     Record the current temperature & \\
+as an extreme if it is less than or & \\
+equal to the minimum or greater & \\
+than or equal to the maximum. & \\\hline
+5.    Record the date and time for & \\
+\emph{event 4} & \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If the One Wire Temperature sensor stops working, then the System
+changes neither the minimum nor maximum values.\\
+1b.  If the One Wire Temperature sensor returns an error, then the
+System changes neither the minumum nore maximum values.\\
+1c.  If the One Wire Network breaks, then the System changes neither
+the minumum nor maximum values.
+\end{document}

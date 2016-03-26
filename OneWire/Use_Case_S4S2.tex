@@ -1,0 +1,56 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S4:  Detailed Description}\\\\
+Use Case Name:  Monitor Dew Point Data\\
+Scenario:  Record  Daily Dew Point Extremes\\
+Brief Description:  With the System running, the System records the
+dew point  extremum data--the minimum and maximum dew point--from the
+calculated dew point data.\\
+Actors:  System\\
+Related Use Cases:\\
+\textbf{Use Case S13:  }\emph{The System Shall Save Dew Point
+Extremum}\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus and
+individuals monitoring local weather data.\\
+\textbf{Preconditions:  }The System is running, the dew point
+data is calculated (see \emph{Use Case S4--Calculate Dewpoint}). The
+extremum dew point data values are initialized: -999.9 for max, 999.9
+for min.\\
+\textbf{Postconditions:  }The extremum dew point data (minumum
+and maximum) are  noted and coverted to three units (Celsius,
+Fahrenheit, Kelvin).\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
+& 1.  Return requested temperature\\ 
+&      and humditiy data  measured\\\hline
+2.     Calculates the dew point (See & \\
+ \emph{Use Case S4--Calculate Dew Point}) & \\\hline
+3.     Records the date/time of the & \\
+current dewpoint measurement. & \\\hline
+4.     Compare the current dew point & \\
+against both the minimum and maximum. &\\\hline
+5.     Record the current dew point as an &\\
+extreme if it is less than or equal to the &\\
+minimum or greater than or equal &\\
+to the maximum. & \\\hline
+6.    Record the date and time for & \\
+\emph{event 5} & \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If either the One Wire temperature or the hygrometer sensor
+stops working, then the System changes neither the minimum nor
+maximum values.\\
+1b.  If either the One Wire temperature  or the hygrometer sensor
+returns an error, then the System changes neither the minumum nor
+maximum values.\\
+1c.  If the One Wire Network breaks, then the System changes neither
+the minumum nor maximum values.\\
+4a-5a.  If the data has changed from the previous messurement (must be
+compared), the barmetric pressure extremum are reset to the default
+values and compared for the new date.
+\end{document}

@@ -1,0 +1,51 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S2:  Detailed Description}\\\\
+Use Case Name:  Monitor Humidity Data\\
+Scenario:  Record Daily Humdity Extremes\\
+Brief Description:  With the System running, the System records the
+daily humidity extreme data--the minimum and maximum humidity--from
+the 1-wire humidity sensor.\\
+Actors:  System\\
+Related Use Cases:\\
+\textbf{Use Case S9:  }\emph{The System Shall Save Humidity
+Extremes}\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus and
+individuals monitoring local weather data.\\
+\textbf{Preconditions:  }The System is running, the humdity data
+is received from the hygrometer hardware. The extreme humidity
+data values are initialized: -1.0 for max, 101.0 for min.\\
+\textbf{Postconditions:  }The extreme humidity (minumum and
+maximum) data
+found and noted.\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Hygrometer Sensor}\\\hline
+& 1.  Return requested humidity\\ 
+&      data  measured\\\hline
+2.    Records the date/time of the & \\
+       current humidity  measurement. & \\\hline
+3.     Compare the current humidity & \\
+against both the minimum and & \\
+maximum. &\\\hline
+4.     Record the current temperature & \\
+as an extreme if it is less than or & \\
+equal to the minimum or greater & \\
+than or equal to the maximum. & \\\hline
+5.    Record the date and time for & \\
+\emph{event 4} & \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+1a.  If the One Wire Hygrometer sensor stops working, then the System
+changes neither the minimum nor maximum values.\\
+1b.  If the One Wire Hygrometer sensor returns an error, then the
+System changes neither the minumum nore maximum values.\\
+1c.  If the One Wire Network breaks, then the System changes neither
+the minumum nor maximum values.\\
+3a-5a.  If the date has changed from the previous measurement, the
+humidity max and min are reset and compared for the new date.
+\end{document}

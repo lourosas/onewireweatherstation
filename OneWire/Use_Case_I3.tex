@@ -1,0 +1,56 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I3:  Detailed Description}
+\end{center}
+Use Case Name:  Alter Data Collection Rate\\
+Scenario:  N/A\\
+Brief Description:  With the System Running, the User set the data
+collection rate prior to starting a mission.  The System sets the
+data collection rate, and starts the requested mission (See
+\textbf{Use Case I2S2})\\
+Actors:  User\\
+Related Use Cases: Use Case I2S2 \textit{Start A Mission}\\
+Use Case I2S1 \textit{Stop A Mission}\\\\
+Stakeholders:  Users who want to change the data collection rate on
+the iButton (from the default setting).\\\\
+Preconditions:  The System is running, the iButton is connected to
+the receptor or another reading device.  The iButton receptor or
+other reading device is connected to the computer.\\\\
+Postconditions:  The Collection rate on the iButton is altered.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request to alter the iButton data & \\
+collection rate & \\\hline
+& 2.  Stops the current Mission\\
+& (see \textbf{Use Case I2S1})\\\hline
+& 3.  Sets the new data collection rate\\\hline
+& 4.  Starts a new mission \\
+& (see \textbf{Use Case I2S2}) by setting\\
+& the data collection rate requested\\
+& the User\\\hline
+& 5.  (Possibly) Indicates to the User the \\
+& new data collection rate in the mission\\
+& started message \\
+& (see \textbf{Use Case I2S2}).\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the current Mission cannot be stopped in the iButton, then
+the system indicates the error to the user with the possible reason
+(One Wire Network issues, One Wire Device issues).  \textbf{See
+Use Case I2S1 for more information regarding starting a Mission}.
+\\\\
+3a.  If the new data collection rate cannot be set, then the system
+indicates the error to the user with a possible reason (One Wire
+Network Issues, One Wire Device issues), maintaining the current
+collection rate.\\\\
+4a.  If the new Mission Cannot be started in the iButton, then the
+system indicates the error to the user with a possible reason
+(One Wire Network issues, One Wire Device issues).  \textbf{See
+Use Case I2S2 for more information regarding starting a Mission}.
+\end{document}

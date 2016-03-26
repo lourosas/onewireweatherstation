@@ -1,0 +1,45 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I4S1:  Detailed Description}
+\end{center}
+Use Case Name:  Manage Mission Data\\
+Scenario:  S1:  View Mission Data\\
+Brief Description:  With the System Running, the User requests to view
+the current Mission Data (regardless if a Mission is running).\\
+Actors:  User\\
+Related Use Cases: N/A\\\\
+Stakeholders:  Users who want to view the current Mission Data:  both
+\textbf{temperature} and \textbf{humidity}. Users
+who want to view particular mission data (either \textbf{temperature}
+or \textbf{humidity}).\\\\
+Preconditions:  The System is running, the iButton is connected to
+the receptor or another reading device.  The iButton receptor or
+other reading device is connected to the computer.\\\\
+Postconditions:  The Mission Data (either \textbf{temperature},
+\textbf{humidity} or both is retrieved from the iButton.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Requests Mission Data for viewing: & \\
+either the Temperature, Humidity or both & \\\hline
+2.  Requests the units for displaying  & \\
+the temperature: (Celsius, Fahrenheit, & \\
+Kelvin), if temperature requested & \\\hline
+& 3. Retrieves the current requested \\
+& mission data \\\hline
+& 4.  Converts the temperature mission\\
+& data into the user requested units (if the.\\
+& User requested Temperature mission data)\\\hline
+& 5.  Presents requested mission data to User\\
+& for viewing\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+3a.  If the requested data of the current mission cannont be
+retrieved, then the system indicates the error to the user with a
+possible reason (One Wire Network issues, One Wire Device issues).
+\end{document}

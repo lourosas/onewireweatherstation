@@ -1,0 +1,60 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+%\setlength{\topmargin}{0in}
+%\setlength{\headsep}{0in}
+%\setlength{\textheight}{9.0in}
+%\setlength{\evensidemargin}{0in}
+%\setlength{\oddsidemargin}{0in}
+%\setlength{\marginparsep}{0in}
+%\setlength{\marginparwidth}{0in}
+%\setlength{\textwidth}{6.5in}
+\begin{document}
+\noindent
+\textbf{Use Case S1:  Detailed Description}\\\\
+Use Case Name:  Monitor Temperature Data\\
+Scenario: N/A\\
+Brief Description:  With the System running, the System monitors the
+temperature data by periodically requesting raw temperature
+information from the 1-wire temperature sensor.\\
+Actors:  System\\
+Related Use Cases:\\
+\textbf{Use Case A1:} \emph{The Administrator shall set the
+Measurement Rate for all active hardware sensors}\\
+\textbf{Use Case S6: }\emph{The System Shall Save Temperature
+data}\\
+\textbf{Use Case S7: }\emph{The System Shall Save Temperature
+Extremes}\\
+\textbf{Use Case S9: }\emph{The System Shall Monitor and Save
+Temperature Extremes}\\
+\textbf{Stakeholders:  } Local and National Weather Bureaus, User
+other systems and individuals monitoring local weather data.\\
+\textbf{Preconditions:  } The System is running, the Measurement
+rate is set, the network is set and working the thermometer hardware
+is connected to the network.\\
+\textbf{Postconditions:  } The Raw Temperature data is received from
+the thermometer hardware, the raw data is converted into actual
+temperature data.  The temperature is converted into the appropriate
+units (Celsius, Fahrenheit, Kelvin).\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
+1. Periodically request raw temperature  & \\
+data from the One Wire Temperature & \\
+Sensor &
+2. Returns the raw temperature data\\\hline
+3. Converts the raw sensor data into & \\the appropriate scales:
+Celsius, & \\Fahrenheit, Kelvin & 
+ \\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2.  If the One Wire Temperature Sensor returns an error, then
+the system shall handle the error and report a default
+temperature (-999.9$^\circ$).\\
+2.  If the One Wire Temperature sensor stops working (drops out),
+the the system shall report an error and display a default
+temperature value (-999.9$^\circ$).\\
+2.  If the One Wire network breaks, then the system shall report an
+error and display default temperature value (-999.9$^\circ$).
+\end{document}

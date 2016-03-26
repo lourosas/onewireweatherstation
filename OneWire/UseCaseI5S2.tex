@@ -1,0 +1,54 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I5S2:  Detailed Description}
+\end{center}
+Use Case Name:  Manage Calculated Weather Data\\
+Scenario:  S2:  Manage Dewpoint Data\\
+Brief Description:  With the System Running, the User requests the
+Dewpoint Data from the System.  The System calculates the Dewpoint
+from the temperature and humidity mission data, returning it to the
+User.\\
+Actors:  User\\
+Related Use Cases: \textit{Use Case I4:  The User shall manage
+mission data}\\\\
+Stakeholders:  Users who want to manage the current Dewpoint Data.
+\\\\
+Preconditions:  The System is running, the iButton is connected to
+the receptor or another reading device.  The iButton receptor or
+other reading device is connected to the computer.\\\\
+Postconditions:  The Dewpoint is calculated and returned to the
+User.  The User can chose how to archive the data or evaluated the
+data imediately.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Requests Dewpoint data & \\\hline
+2.  Requests the Units for displaying & \\
+the Dewpoint data (Celsius, Fahrenheit & \\
+Kelvin) & \\\hline
+ & 3.  Retrieves the temperature data\\
+ & (See \textbf{Use Case I4}), Retrieves\\
+ & the humidity data (See \textbf{Use Case I4})\\\hline
+ & 4.  Applies the appropriate \\
+ & \underline{Dewpoint Calculation}\\\hline
+ & 5.  Converts the data to the appropriate\\
+ & units as requested by the User.\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+3a.  If either the temperature or humidity data or both could not
+be retrieved for the heat index calculation, then the system
+indicates the error by setting the Dewpiont to a defualt value
+(NaN) as well as a possible reason for the error (One Wire Network
+or One Wire Device issues).\\\\
+3b.  If the mission record time for either the temperature or
+humidity data are not the same, then the system indicates the
+error by setting the Dewpoint to a default value (NaN).\\\\
+4a.  If the relative humidity is too low for an accurate Dewpoint
+calculation (humidity $< 0\%$), then the system indicates the issue
+by setting the Dewpoint to a default value (NaN).
+\end{document}

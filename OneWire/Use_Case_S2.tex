@@ -1,0 +1,59 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S2:  Detailed Description}\\\\
+Use Case Name:  Monitor Humidity Data\\
+Scenario:  N/A\\
+Brief Description:  With the System running, the System monitors the
+the humidity data by periodically requesting humidty data from the
+1-wire temperature sensor.\\
+Actors:  System\\
+Related Use Cases:\\
+\textbf{Use Case A1:}\emph{The Administrator shall set the
+Measurement Reate for all active hardware sensors}\\
+\textbf{Use Case S10: }\emph{The System Shall Save Humidity data}\\
+\textbf{Use Case S11: }\emph{The System Shall Monitor and Save
+Humidity Extreemes}\\
+\textbf{Stakeholders: } Local and National Weather Bureaus, other
+systems and users monitoring local weather data.\\
+\textbf{Preconditions:  } The System is running, the Measurement
+rate is set, the network is setup and working, the hygrometer 
+hardware is connected to the network.\\
+\textbf{Postconditions: } The Raw Humidity data is received from the
+hygrometer hardware and converted to an actual Relative Humidity
+value.  The Relative Humidity data is received from the hygrometer
+hardware.\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
+1.  Periodically request raw humidity data & \\
+from the One Wire Humidity Sensor & 2.  Returns the raw humidity
+data\\ & (the supply and output voltages)\\\hline
+3.  Converts the raw humidity data & \\
+(input and supply voltages) & \\into relative humidity & \\\hline
+4.  Periodically request humidity data & \\
+from the One Wire Humidity Sensor & 5.  Returns the relative
+humidity data\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the One Wire Humidity Sensor stops working (drops out), then
+the System shall handle the error and report a default humidity
+(-99.9\%).\\
+2b.  If the One Wire Humidity Sensor returns an error, then the
+System shall handle the error and report a default humidity
+(-99.9\%).\\
+2c.  If the One Wire Network breaks, then the System shall report an
+error and display default humidity value (-99.9\%).\\
+5a.  If the One Wire Humidity Sensor stops working (drops out), then
+\textbf{the System shall follow what is written in Section
+\underline{2a} in the \underline{Exception Conditions} Section}.\\
+5b.  If the One Wire Humidity Sensor returns an error, then
+\textbf{the System shall follow what is written in Section
+\underline{2b} in the \underline{Exception Conditions} Section}.\\
+5c.  If the One Wire Network breaks, then \textbf{the System shall
+follow what is written in Section \underline{2c} in the 
+\underline{Exception Conditions} Section}.
+\end{document}

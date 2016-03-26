@@ -1,0 +1,43 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\begin{center}
+\textbf{Use Case I2:  Detailed Description}
+\end{center}
+Use Case Name:  Manage a Mission\\
+Scenario:  S2:  Start A Mission\\
+Brief Description:  With the System Running, the User Starts a new
+mission on the iButton device.  The System first stops a mission (if
+a mission is already running), and then starts a new mission.\\
+Actors:  User\\
+Related Use Cases: N/A\\\\
+Stakeholders:  Users who want to start a new mission on the iButton
+for the purpose of new temperature/humidity data collection.\\\\
+Preconditions:  The System is running, the iButton is connected to
+the receptor or another reading device.  The iButton receptor or
+other reading device is connected to the computer.\\\\
+Postconditions:  A new Mission on the iButton is started.\\\\
+\textbf{Flow of Events}\\\\
+\begin{tabular}{|l|l|}\hline
+\textbf{User} & \textbf{System}\\\hline
+1.  Request to start a new mission on & \\
+the iButton& \\\hline
+& 2.  Stops the current mission\\
+& (if a mission is running)\\\hline
+& 3.  Starts a new mission by setting\\
+& the default settins (for this system\\
+& that includes rollover \textbf{not} enabled)\\\hline
+& 4.  Indicates to the User a new \\
+& iButton mission is started.\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+2a.  If the Mission Cannot be stopped in the iButton, then the
+system indicates the error to the user with a possible reason
+(One Wire Network issues, One Wire Device issues).\\\\
+3a.  If the new Mission Cannot be started in the iButton, then the
+system indicates the error to the user with a possible reason
+(One Wire Network issues, One Wire Device issues).
+\end{document}
