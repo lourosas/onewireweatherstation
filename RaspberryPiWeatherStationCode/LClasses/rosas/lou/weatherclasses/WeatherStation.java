@@ -22,9 +22,9 @@ import com.dalsemi.onewire.utils.Convert;
 
 public class WeatherStation implements TimeListener{
    private Units units;
-   private DSPortAdapter dspa                  = null;
-   private StopWatch     stopWatch             = null;
-   private String        currentDate           = null;
+   private DSPortAdapter dspa        = null;
+   private StopWatch     stopWatch   = null;
+   private Calendar      currentDate = null;
    //put into a list to handle multiple observers
    private List<TemperatureObserver> t_o_List  = null;
    private List<HumidityObserver>    h_o_List  = null;
@@ -45,12 +45,12 @@ public class WeatherStation implements TimeListener{
    */
    public WeatherStation(Units units){
       final int DEFAULTUPDATERATE = 5; //5 minutes
-      this.currentDate = new String();
+      this.currentDate = Calendar.getInstance();
       this.setUpDSPA();
       this.setUpdateRate(DEFAULTUPDATERATE);
    }
 
-   /***/
+   /**/
    public void addBarometerObserver(BarometerObserver bo){
       try{
          this.b_o_List.add(bo);
@@ -113,10 +113,12 @@ public class WeatherStation implements TimeListener{
       this.publishHumidity();
       this.publishDewpoint();
       this.publishHeatIndex();
-      this.publishBarometricPressure();
+      //Until I can handle null exceptions better
+      //this.publishBarometricPressure();
+      this.monitorExtremes();
+      this.publishExtremes();
    }
    
-         
    /**
    */
    public void setUpdateRate(int mins){
@@ -313,6 +315,20 @@ public class WeatherStation implements TimeListener{
    
    /**
    */
+   private void monitorExtremes(){
+      WeatherExtreme we = WeatherExtreme.getInstance();
+      we.monitorTemperatureExtremes(this.currentDate);
+      we.monitorHumidityExtremes(this.currentDate);
+      we.monitorBarometerExtremes(this.currentDate);
+      double dewpoint = this.calculateDewpoint();
+      we.monitorDewpointExtremes(this.currentDate, dewpoint);
+      //Heat Index comes in measured in English Units!!!
+      double heatIndex = this.calculateHeatIndex();
+      we.monitorHeatIndexExtremes(this.currentDate, heatIndex);
+   }
+   
+   /**
+   */
    private void publishBarometricPressure(){
       WeatherEvent evt1     = null;
       WeatherEvent evt2     = null;
@@ -384,6 +400,13 @@ public class WeatherStation implements TimeListener{
       }
    }
 
+   /*
+   */
+   private void publishExtremes(){
+      WeatherEvent evt  = null;
+      WeatherExtreme we = WeatherExtreme.getInstance();
+      
+   }
    /**
    */
    private void publishHeatIndex(){
@@ -487,12 +510,12 @@ public class WeatherStation implements TimeListener{
    /**
    */
    private void publishTimeEvent(){
-      Calendar cal = Calendar.getInstance();
-      String time = String.format("%tc", cal.getTime());
+      this.currentDate = Calendar.getInstance();
+      String date = String.format("%tc", this.currentDate.getTime());
       try{
          Iterator<TimeObserver> i = this.ti_o_List.iterator();
          while(i.hasNext()){
-            (i.next()).updateTime(time);
+            (i.next()).updateTime(date);
          }
       }
       catch(NullPointerException npe){
