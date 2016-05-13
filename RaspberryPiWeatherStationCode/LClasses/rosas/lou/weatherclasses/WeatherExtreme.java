@@ -16,12 +16,12 @@ public class WeatherExtreme{
    private double   minTempC;
    private double   minTempF;
    private double   minTempK;
-   private String   maxTempDate;
-   private String   minTempDate;
+   private Date     maxTempDate;
+   private Date     minTempDate;
    private double   maxHumidity;
    private double   minHumidity;
-   private String   maxHumidityDate;
-   private String   minHumidityDate;
+   private Date     maxHumidityDate;
+   private Date     minHumidityDate;
    private double   maxPresM;
    private double   maxPresE;
    private double   maxPresA;
@@ -107,105 +107,103 @@ public class WeatherExtreme{
    /*
    */
    public void checkSetDate(){
-      this.checkSetData(Calendar.getInstance());
+      this.checkSetDate(Calendar.getInstance());
    }
    
    /*
    */
-   public void monitorBarometerExtremes(){
-      this.currentDate = Calendar.getInstance();
-      this.monitorBarometerExtremes(this.currentDate);
-   }
-   
-   /*
-   */
-   public void monitorBarometerExtremes(Calendar date){
-      this.monitorBarometerMax(date);
-      this.monitorBarometerMin(date);
-   }
- 
-   /*
-   */ 
-   public void monitorDewpointExtremes(double dewpoint){
-      this.currentDate = Calendar.getInstance();
-      this.monitorDewpointExtremes(this.currentDate, dewpoint);
-   }
-   
-   /*
-   MUST Be messured in METRIC!!!
-   */
-   public void monitorDewpointExtremes(Calendar date,double dewpoint){
-      if(dewpoint > Thermometer.DEFAULTTEMP){
-         if(dewpoint >= this.maxDPC){
-            this.maxDPC = dewpoint;
-            this.maxDPF =WeatherConvert.celsiusToFahrenheit(dewpoint);
-            this.maxDPK =WeatherConvert.celsiusToKelvin(dewpoint);
-            this.maxDPDate = date.getTime();
-         }
-         else if(dewpoint <= this.minDPC){
-            this.minDPC = dewpoint;
-            this.minDPF =WeatherConvert.celsiusToFahrenheit(dewpoint);
-            this.minDPK =WeatherConvert.celsiusToKelvin(dewpoint);
-            this.minDPDate = date.getTime();
-         }
-      }
-   }
-   
-   /*
-   */
-   public void monitorHeatIndexExtremes(double heatIndex){
-      this.currentDate = Calendar.getInstance();
-      this.monitorHeatIndexExtremes(this.currentDate, heatIndex);
-   }
-   
-   /*
-   Must Be messured in ENGLISH!!!
-   */
-   public void monitorHeatIndexExtremes(Calendar date, double hi){
-      if(hi > Thermometer.DEFAULTTEMP){
-         if(hi >= this.maxHIF){
-            this.maxHIF = hi;
-            this.maxHIC = WeatherConvert.fahrenheitToCelsius(hi);
-            this.maxHIK = WeatherConvert.fahrenheitToKelvin(hi);
-            this.maxHIDate = new String(date);
-         }
-         else if(hi <= this.minHIF){
-            this.minHIF = hi;
-            this.minHIC = WeatherConvert.fahrenheitToCelsius(hi);
-            this.minHIK = WeatherConvert.fahrenheitToKelvin(hi);
-            this.minHIDate = new String(date);
-         }
-      }
-   }
-   
-   /*
-   */
-   public void monitorHumidityExtremes(){
+   public void monitorBarometerExtremes(double pressure, Units units){
       Calendar cal = Calendar.getInstance();
-      String date = String.format("%tc", cal.getTime());
-      this.monitorHumidityExtremes(date);
+      this.monitorBarometerExtremes(cal, pressure, units);
    }
    
    /*
    */
-   public void monitorHumidityExtremes(Date date){
-      this.monitorHumidityMax(date);
-      this.monitorHumidityMin(date);
+   public void monitorBarometerExtremes
+   (
+      Calendar cal,
+      double   pressure,
+      Units    units
+   ){
+      this.monitorBarometerMax(cal, pressure, units);
+      this.monitorBarometerMin(cal, pressure, units);
    }
    
    /*
    */
-   public void monitorTemperatureExtremes(){
+   public void monitorDewpointExtremes(double dewpoint, Units units){
       Calendar cal = Calendar.getInstance();
-      String date = String.format("%tc", cal.getTime());
-      this.monitorTemperatureExtremes(date);
+      this.monitorDewpointExtremes(cal, dewpoint, units);
    }
    
    /*
    */
-   public void monitorTemperatureExtremes(Date date){
-      this.monitorTemperatureMax(date);
-      this.monitorTemperatureMin(date);
+   public void monitorDewpointExtremes
+   (
+      Calendar cal,
+      double   dewpoint,
+      Units    units
+   ){
+      this.monitorDewpointMax(cal, dewpoint, units);
+      this.monitorDewpointMin(cal, dewpoint, units);
+   }
+   
+   /*
+   */
+   public void monitorHeatIndexExtremes(double heatIndex,Units units){
+      Calendar cal = Calendar.getInstance();
+      this.monitorHeatIndexExtremes(cal, heatIndex, units);
+   }
+   
+   /*
+   */
+   public void monitorHeatIndexExtremes
+   (
+      Calendar cal,
+      double   heatIndex,
+      Units    units
+   ){
+      this.monitorHeatIndexMax(cal, heatIndex, units);
+      this.monitorHeatIndexMin(cal, heatIndex, units);
+   }
+   
+   /*
+   */
+   public void monitorHumidityExtremes(double humidity, Units units){
+      Calendar cal = Calendar.getInstance();
+      this.monitorHumidityExtremes(cal, humidity, units);
+   }
+   
+   /*
+   */
+   public void monitorHumidityExtremes
+   (
+      Calendar cal,
+      double   humidity,
+      Units    units
+   ){
+      this.monitorHumidityMax(cal, humidity, units);
+      this.monitorHumidityMin(cal, humidity, units);
+   }
+   
+   /*
+   */
+   public void monitorTemperatureExtremes(double temp, Units units){
+      Calendar cal = Calendar.getInstance();
+      String  date = String.format("%tc", cal.getTime());
+      this.monitorTemperatureExtremes(cal, temp, units);
+   }
+   
+   /*
+   */
+   public void monitorTemperatureExtremes
+   (
+      Calendar cal,
+      double   temp,
+      Units    units
+   ){
+      this.monitorTemperatureMax(cal, temp, units);
+      this.monitorTemperatureMin(cal, temp, units);
    }
    
    /*
@@ -218,7 +216,123 @@ public class WeatherExtreme{
       instance.checkSetDate();
       return instance;
    }
-   
+
+   /*
+   */
+   public double requestHumidityMax(){
+      double max = Hygrometer.DEFAULTHUMIDITY;
+      max = this.maxHumidity;
+      return max;
+   }
+
+   /*
+   */
+   public String requestHumidityMaxDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.maxHumidityDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Max Humidity Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
+   public double requestHumidityMin(){
+      double min = -Hygrometer.DEFAULTHUMIDITY;
+      min = this.minHumidity;
+      return min;
+   }
+
+   /*
+   */
+   public String requestHumidityMinDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.minHumidityDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Min Humidity Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
+   public double requestTemperatureMax(Units units){
+      double max = Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            max = this.maxTempC;
+            break;
+         case ENGLISH:
+            max = this.maxTempF;
+            break;
+         case ABSOLUTE:
+            max = this.maxTempK;
+            break;
+         default:
+            max = this.maxTempC;
+      }
+      return max;
+   }
+
+   /*
+   */
+   public String requestTemperatureMaxDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.maxTempDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Max Temp Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
+   public double requestTemperatureMin(Units units){
+      double min = -Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            min = this.minTempC;
+            break;
+         case ENGLISH:
+            min = this.minTempF;
+            break;
+         case ABSOLUTE:
+            min = this.minTempK;
+            break;
+         default:
+            min = this.minTempC;
+      }
+      return min;
+   }
+
+   /*
+   */
+   public String requestTemperatureMinDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.minTempDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Min Temp Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
    //*********************Private Methods*****************************   
    /*
    */
@@ -282,88 +396,353 @@ public class WeatherExtreme{
       maxHIDate = null;
       minHIDate = null;
    }
+   
    /*
    */
-   private void monitorBarometerMax(Calendar date){
-      Barometer bar = Barometer.getInstance();
-      double pressure = bar.getBarometricPressure(Units.METRIC);
+   private void monitorBarometerMax
+   (
+      Calendar cal,
+      double   pressure,
+      Units    units
+   ){
       if(pressure > Barometer.DEFAULTPRESSURE){
-         if(pressure >= this.maxPresM){
-            this.maxPresM = pressure;
-            this.maxPresE = bar.getBarometricPressure(Units.ENGLISH);
-            this.maxPresA = bar.getBarometricPressure(Units.ABSOLUTE);
-            this.maxPressureDate = date.getTime();
+         double pressureM = Barometer.DEFAULTPRESSURE;
+         double pressureE = Barometer.DEFAULTPRESSURE;
+         double pressureA = Barometer.DEFAULTPRESSURE;
+         switch(units){
+            case METRIC:
+            case NULL:
+               pressureM = pressure;
+               pressureE = 
+                        WeatherConvert.millimetersToInches(pressureM);
+               pressureA =WeatherConvert.inchesToMillibars(pressureE);
+               break;
+            case ENGLISH:
+               pressureE = pressure;
+               pressureM =
+                        WeatherConvert.inchesToMillimeters(pressureE);
+               pressureA =WeatherConvert.inchesToMillibars(pressureE);
+               break;
+            case ABSOLUTE:
+               pressureA = pressure;
+               pressureM =
+                     WeatherConvert.millibarsToMillimeters(pressureA);
+               pressureE =
+                          WeatherConvert.millibarsToInches(pressureA);
+               break;
+            default:
+         }
+         if(pressureM >= this.maxPresM){
+            this.maxPresM        = pressureM;
+            this.maxPresE        = pressureE;
+            this.maxPresA        = pressureA;
+            this.maxPressureDate = cal.getTime();
          }
       }
    }
    
    /*
    */
-   private void monitorBarometerMin(Calendar date){
-      Barometer bar = Barometer.getInstance();
-      double pressure = bar.getBarometricPressure(Units.METRIC);
+   private void monitorBarometerMin
+   (
+      Calendar cal,
+      double   pressure,
+      Units    units
+   ){
       if(pressure > Barometer.DEFAULTPRESSURE){
-         if(pressure <= this.minPresM){
-            this.minPresM = pressure;
-            this.minPresE = bar.getBarometricPressure(Units.ENGLISH);
-            this.minPresA = bar.getBarometricPressure(Units.ABSOLUTE);
-            this.minPressureDate = date.getTime();
+         double pressureM = Barometer.DEFAULTPRESSURE;
+         double pressureE = Barometer.DEFAULTPRESSURE;
+         double pressureA = Barometer.DEFAULTPRESSURE;
+         switch(units){
+            case METRIC:
+            case NULL:
+               pressureM = pressure;
+               pressureE = 
+                        WeatherConvert.millimetersToInches(pressureM);
+               pressureA =WeatherConvert.inchesToMillibars(pressureE);
+               break;
+            case ENGLISH:
+               pressureE = pressure;
+               pressureM =
+                        WeatherConvert.inchesToMillimeters(pressureE);
+               pressureA =WeatherConvert.inchesToMillibars(pressureE);
+               break;
+            case ABSOLUTE:
+               pressureA = pressure;
+               pressureM =
+                     WeatherConvert.millibarsToMillimeters(pressureA);
+               pressureE =
+                          WeatherConvert.millibarsToInches(pressureA);
+               break;
+            default:
+         }
+         if(pressureM <= this.minPresM){
+            this.minPresM        = pressureM;
+            this.minPresE        = pressureE;
+            this.minPresA        = pressureA;
+            this.minPressureDate = cal.getTime();
          }
       }
    }
    
    /*
    */
-   private void monitorHumidityMax(String date){
-      Hygrometer hygrometer = Hygrometer.getInstance();
-      double humidity = hygrometer.getHumidity();
-      if(humidity > Hygrometer.DEFAULTHUMIDITY){
-         if(humidity >= this.maxHumidity){
-            this.maxHumidity = humidity;
-            this.maxHumidityDate = new String(date);
+   private void monitorDewpointMax
+   (
+      Calendar cal,
+      double   dewpoint,
+      Units    units
+   ){
+      if(dewpoint > Thermometer.DEFAULTTEMP){
+         double dpC = Thermometer.DEFAULTTEMP;
+         double dpF = Thermometer.DEFAULTTEMP;
+         double dpK = Thermometer.DEFAULTTEMP;
+         switch(units){
+            case METRIC:
+            case   NULL:
+               dpC = dewpoint;
+               dpF = WeatherConvert.celsiusToFahrenheit(dpC);
+               dpK = WeatherConvert.celsiusToKelvin(dpC);
+               break;
+            case ENGLISH:
+               dpF = dewpoint;
+               dpC = WeatherConvert.fahrenheitToCelsius(dpF);
+               dpK = WeatherConvert.fahrenheitToKelvin(dpF);
+               break;
+            case ABSOLUTE:
+               dpK = dewpoint;
+               dpC = WeatherConvert.kelvinToCelsius(dpK);
+               dpF = WeatherConvert.kelvinToFahrenheit(dpK);
+               break;
+            default:
+         }
+         if(dpC >= this.maxDPC){
+            this.maxDPC    = dpC;
+            this.maxDPF    = dpF;
+            this.maxDPK    = dpK;
+            this.maxDPDate = cal.getTime();
          }
       }
    }
    
    /*
    */
-   private void monitorHumidityMin(String date){
-      Hygrometer hygrometer = Hygrometer.getInstance();
-      double humidity = hygrometer.getHumidity();
-      if(humidity > Hygrometer.DEFAULTHUMIDITY){
-         if(humidity <= this.minHumidity){
-            this.minHumidity = humidity;
-            this.minHumidityDate = new String(date);
+   private void monitorDewpointMin
+   (
+      Calendar cal,
+      double   dewpoint,
+      Units    units
+   ){
+      if(dewpoint > Thermometer.DEFAULTTEMP){
+         double dpC = Thermometer.DEFAULTTEMP;
+         double dpF = Thermometer.DEFAULTTEMP;
+         double dpK = Thermometer.DEFAULTTEMP;
+         switch(units){
+            case METRIC:
+            case   NULL:
+               dpC = dewpoint;
+               dpF = WeatherConvert.celsiusToFahrenheit(dpC);
+               dpK = WeatherConvert.celsiusToKelvin(dpC);
+               break;
+            case ENGLISH:
+               dpF = dewpoint;
+               dpC = WeatherConvert.fahrenheitToCelsius(dpF);
+               dpK = WeatherConvert.fahrenheitToKelvin(dpF);
+               break;
+            case ABSOLUTE:
+               dpK = dewpoint;
+               dpC = WeatherConvert.kelvinToCelsius(dpK);
+               dpF = WeatherConvert.kelvinToFahrenheit(dpK);
+               break;
+            default:
+         }
+         if(dpC <= this.minDPC){
+            this.minDPC    = dpC;
+            this.minDPF    = dpF;
+            this.minDPK    = dpK;
+            this.minDPDate = cal.getTime();
          }
       }
    }
    
    /*
    */
-   private void monitorTemperatureMax(String date){
-      Thermometer thermometer = Thermometer.getInstance();
-      double temp = thermometer.getTemperature(Units.METRIC);
+   private void monitorHeatIndexMax
+   (
+      Calendar cal,
+      double   heatIndex,
+      Units    units
+   ){
+      if(heatIndex > Thermometer.DEFAULTTEMP){
+         double hiC = Thermometer.DEFAULTTEMP;
+         double hiF = Thermometer.DEFAULTTEMP;
+         double hiA = Thermometer.DEFAULTTEMP;
+         switch(units){
+            case METRIC:
+            case   NULL:
+               hiC = heatIndex;
+               hiF = WeatherConvert.celsiusToFahrenheit(hiC);
+               hiA = WeatherConvert.celsiusToKelvin(hiC);
+               break;
+            case ENGLISH:
+               hiF = heatIndex;
+               hiC = WeatherConvert.fahrenheitToCelsius(hiF);
+               hiA = WeatherConvert.fahrenheitToKelvin(hiA);
+               break;
+            case ABSOLUTE:
+               hiA = heatIndex;
+               hiF = WeatherConvert.kelvinToFahrenheit(hiA);
+               hiC = WeatherConvert.kelvinToCelsius(hiA);
+               break;
+            default:
+         }
+         if(hiC >= this.maxHIC){
+            this.maxHIC    = hiC;
+            this.maxHIF    = hiF;
+            this.maxHIK    = hiA;
+            this.maxHIDate = cal.getTime();
+         }
+      }
+   }
+   
+   /*
+   */
+   private void monitorHeatIndexMin
+   (
+      Calendar cal,
+      double   heatIndex,
+      Units    units
+   ){
+      if(heatIndex > Thermometer.DEFAULTTEMP){
+         double hiC = Thermometer.DEFAULTTEMP;
+         double hiF = Thermometer.DEFAULTTEMP;
+         double hiA = Thermometer.DEFAULTTEMP;
+         switch(units){
+            case METRIC:
+            case   NULL:
+               hiC = heatIndex;
+               hiF = WeatherConvert.celsiusToFahrenheit(hiC);
+               hiA = WeatherConvert.celsiusToKelvin(hiC);
+               break;
+            case ENGLISH:
+               hiF = heatIndex;
+               hiC = WeatherConvert.fahrenheitToCelsius(hiF);
+               hiA = WeatherConvert.fahrenheitToKelvin(hiA);
+               break;
+            case ABSOLUTE:
+               hiA = heatIndex;
+               hiF = WeatherConvert.kelvinToFahrenheit(hiA);
+               hiC = WeatherConvert.kelvinToCelsius(hiA);
+               break;
+            default:
+         }
+         if(hiC <= this.minHIC){
+            this.minHIC    = hiC;
+            this.minHIF    = hiF;
+            this.minHIK    = hiA;
+            this.minHIDate = cal.getTime();
+         }
+      }
+   }
+   
+   /*
+   */
+   private void monitorHumidityMax
+   (
+      Calendar cal,
+      double   humidity,
+      Units    units
+   ){
+      if(humidity > Hygrometer.DEFAULTHUMIDITY &&
+         humidity >= this.maxHumidity){
+         this.maxHumidity     = humidity;
+         this.maxHumidityDate = cal.getTime();
+      }
+   }
+   
+   /*
+   */
+   private void monitorHumidityMin
+   (
+      Calendar cal,
+      double   humidity,
+      Units    units
+   ){
+      if(humidity > Hygrometer.DEFAULTHUMIDITY &&
+         humidity <= this.minHumidity){
+         this.minHumidity     = humidity;
+         this.minHumidityDate = cal.getTime();
+      }
+   }
+   
+   /*
+   */
+   private void monitorTemperatureMax
+   (
+      Calendar cal,
+      double   temp,
+      Units    units
+   ){
       if(temp > Thermometer.DEFAULTTEMP){
-         if(temp >= this.maxTempC){
-            this.maxTempC = temp;
-            this.maxTempF = thermometer.getTemperature(Units.ENGLISH);
-            this.maxTempK =thermometer.getTemperature(Units.ABSOLUTE);
-            this.maxTempDate = new String(date);
+         double tempC = Thermometer.DEFAULTTEMP;
+         double tempF = Thermometer.DEFAULTTEMP;
+         double tempK = Thermometer.DEFAULTTEMP;
+         if(units == Units.METRIC || units == Units.NULL){
+            tempC = temp;
+            tempF = WeatherConvert.celsiusToFahrenheit(tempC);
+            tempK = WeatherConvert.celsiusToKelvin(tempC);
+         }
+         else if(units == Units.ENGLISH){
+            tempF = temp;
+            tempC = WeatherConvert.fahrenheitToCelsius(tempF);
+            tempK = WeatherConvert.fahrenheitToKelvin(tempF);
+         }
+         else if(units == Units.ABSOLUTE){
+            tempK = temp;
+            tempF = WeatherConvert.kelvinToFahrenheit(tempK);
+            tempC = WeatherConvert.kelvinToCelsius(tempK);
+         }
+         if(tempC >= this.maxTempC){
+            this.maxTempC    = tempC;
+            this.maxTempF    = tempF;
+            this.maxTempK    = tempK;
+            this.maxTempDate = cal.getTime();
          }
       }
    }
    
    /*
    */
-   private void monitorTemperatureMin(String date){
-      Thermometer thermometer = Thermometer.getInstance();
-      double temp = thermometer.getTemperature(Units.METRIC);
+   private void monitorTemperatureMin
+   (
+      Calendar cal,
+      double   temp,
+      Units    units
+   ){
       if(temp > Thermometer.DEFAULTTEMP){
-         if(temp <= this.minTempC){
-            this.minTempC = temp;
-            this.minTempF = thermometer.getTemperature(Units.ENGLISH);
-            this.minTempK =thermometer.getTemperature(Units.ABSOLUTE);
-            this.minTempDate = new String(date);
+         double tempC = Thermometer.DEFAULTTEMP;
+         double tempF = Thermometer.DEFAULTTEMP;
+         double tempK = Thermometer.DEFAULTTEMP;
+         if(units == Units.METRIC || units == Units.NULL){
+            tempC = temp;
+            tempF = WeatherConvert.celsiusToFahrenheit(tempC);
+            tempK = WeatherConvert.celsiusToKelvin(tempC);
+         }
+         else if(units == Units.ENGLISH){
+            tempF = temp;
+            tempC = WeatherConvert.fahrenheitToCelsius(tempF);
+            tempK = WeatherConvert.fahrenheitToKelvin(tempF);         
+         }
+         else if(units == Units.ABSOLUTE){
+            tempK = temp;
+            tempF = WeatherConvert.kelvinToFahrenheit(tempK);
+            tempC = WeatherConvert.kelvinToCelsius(tempK);        
+         }
+         if(tempC <= this.minTempC){
+            this.minTempC    = tempC;
+            this.minTempF    = tempF;
+            this.minTempK    = tempK;
+            this.minTempDate = cal.getTime();
          }
       }
    }

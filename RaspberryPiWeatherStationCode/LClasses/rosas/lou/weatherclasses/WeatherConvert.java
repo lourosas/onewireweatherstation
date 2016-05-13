@@ -74,7 +74,7 @@ public class WeatherConvert{
    Convert barometric pressure in inches to milli-bars
    */
    public static double inchesToMillibars(double inches){
-      final double MILLIBARCONVERSION = 33.8638;
+      final double MILLIBARCONVERSION = 33.8639;
       return inches * MILLIBARCONVERSION;
    }
    
@@ -91,5 +91,21 @@ public class WeatherConvert{
    */
    public static double millimetersToInches(double millimeters){
       return centimetersToInches(millimeters * .1);
+   }
+   
+   /*
+   Convert millibars to inches
+   */
+   public static double millibarsToInches(double milliB){
+      final double INCHCONVERSION = (1/33.8639);
+      return (milliB * INCHCONVERSION);
+   }
+   
+   /*
+   Convert millibars to millimeters
+   */
+   public static double millibarsToMillimeters(double milliB){
+      final double MMCONVERSION = 0.75006375541921;
+      return(milliB * MMCONVERSION);
    }
 }

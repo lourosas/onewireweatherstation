@@ -31,6 +31,7 @@ public class WeatherStation implements TimeListener{
    private List<BarometerObserver>   b_o_List  = null;
    private List<CalculatedObserver>  c_o_List  = null;
    private List<TimeObserver>        ti_o_List = null;
+   private List<ExtremeObserver>     ex_o_List = null;
 
    //************************Constructors*****************************
    /*
@@ -69,6 +70,17 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          this.c_o_List = new Vector<CalculatedObserver>();
          this.c_o_List.add(co);
+      }
+   }
+   
+   /***/
+   public void addExtremeObserver(ExtremeObserver eo){
+      try{
+         this.ex_o_List.add(eo);
+      }
+      catch(NullPointerException npe){
+         this.ex_o_List = new Vector<ExtremeObserver>();
+         this.ex_o_List.add(eo);
       }
    }
    
@@ -115,7 +127,6 @@ public class WeatherStation implements TimeListener{
       this.publishHeatIndex();
       //Until I can handle null exceptions better
       //this.publishBarometricPressure();
-      this.monitorExtremes();
       this.publishExtremes();
    }
    
@@ -315,20 +326,6 @@ public class WeatherStation implements TimeListener{
    
    /**
    */
-   private void monitorExtremes(){
-      WeatherExtreme we = WeatherExtreme.getInstance();
-      we.monitorTemperatureExtremes(this.currentDate);
-      we.monitorHumidityExtremes(this.currentDate);
-      we.monitorBarometerExtremes(this.currentDate);
-      double dewpoint = this.calculateDewpoint();
-      we.monitorDewpointExtremes(this.currentDate, dewpoint);
-      //Heat Index comes in measured in English Units!!!
-      double heatIndex = this.calculateHeatIndex();
-      we.monitorHeatIndexExtremes(this.currentDate, heatIndex);
-   }
-   
-   /**
-   */
    private void publishBarometricPressure(){
       WeatherEvent evt1     = null;
       WeatherEvent evt2     = null;
@@ -355,6 +352,10 @@ public class WeatherStation implements TimeListener{
             bo.updatePressure(evt2);
             bo.updatePressure(evt3);
          }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         data1  = evt1.getValue();
+         units  = evt1.getUnits();
+         we.monitorBarometerExtremes(this.currentDate, data1, units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -394,6 +395,10 @@ public class WeatherStation implements TimeListener{
             co.updateDewpoint(evt2);
             co.updateDewpoint(evt3);
          }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         dewpoint = evt1.getValue();
+         units    = evt1.getUnits();
+         we.monitorDewpointExtremes(this.currentDate,dewpoint,units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -403,9 +408,19 @@ public class WeatherStation implements TimeListener{
    /*
    */
    private void publishExtremes(){
-      WeatherEvent evt  = null;
       WeatherExtreme we = WeatherExtreme.getInstance();
-      
+      WeatherEvent  evt =
+              new WeatherEvent(we, "Weather Extreme", 0., Units.NULL);
+      try{
+         Iterator<ExtremeObserver> i = this.ex_o_List.iterator();
+         while(i.hasNext()){
+            ExtremeObserver eo = (ExtremeObserver)i.next();
+            eo.updateExtremes(evt);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    /**
    */
@@ -440,6 +455,11 @@ public class WeatherStation implements TimeListener{
             co.updateHeatIndex(evt2);
             co.updateHeatIndex(evt3);
          }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         heatIndex = evt1.getValue();
+         units     = evt1.getUnits();
+         we.monitorHeatIndexExtremes(this.currentDate,
+                                                     heatIndex,units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -467,6 +487,10 @@ public class WeatherStation implements TimeListener{
             ho.updateHumidity(evt1);
             ho.updateHumidity(evt2);
          }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         data1  = evt1.getValue();
+         units  = evt1.getUnits();
+         we.monitorHumidityExtremes(this.currentDate, data1, units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -501,6 +525,10 @@ public class WeatherStation implements TimeListener{
             to.updateTemperature(evt2);
             to.updateTemperature(evt3);
          }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         data  = evt1.getValue();
+         units = evt1.getUnits();
+         we.monitorTemperatureExtremes(this.currentDate, data, units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
