@@ -60,6 +60,10 @@ ExtremeObserver{
       this.updateTemperatureMin(evt);
       this.updateHumidityMax(evt);
       this.updateHumidityMin(evt);
+      this.updateDewpointMax(evt);
+      this.updateDewpointMin(evt);
+      this.updateHeatIndexMax(evt);
+      this.updateHeatIndexMin(evt);
    }
    
    //Implementation of the HumidityObserver Interface
@@ -95,6 +99,74 @@ ExtremeObserver{
    public void updateWindChill(WeatherEvent event){}
 
    //*******************Private Methods*******************************
+   /*
+   */
+   private void updateDewpointMax(WeatherEvent evt){
+      System.out.println("Dewpoint Maximum");
+      WeatherExtreme we = (WeatherExtreme)evt.getSource();
+      double maxDPC = we.requestDewpointMax(Units.METRIC);
+      double maxDPF = we.requestDewpointMax(Units.ENGLISH);
+      double maxDPK = we.requestDewpointMax(Units.ABSOLUTE);
+      System.out.print(String.format("%.2f  ", maxDPC));
+      System.out.println(Units.METRIC);
+      System.out.print(String.format("%.2f  ", maxDPF));
+      System.out.println(Units.ENGLISH);
+      System.out.print(String.format("%.2f  ", maxDPK));
+      System.out.println(Units.ABSOLUTE);
+      System.out.println(we.requestDewpointMaxDate());
+   }
+
+   /*
+   */
+   private void updateDewpointMin(WeatherEvent evt){
+      System.out.println("Dewpoint Minimum");
+      WeatherExtreme we = (WeatherExtreme)evt.getSource();
+      double minDPC = we.requestDewpointMin(Units.METRIC);
+      double minDPF = we.requestDewpointMin(Units.ENGLISH);
+      double minDPK = we.requestDewpointMin(Units.ABSOLUTE);
+      System.out.print(String.format("%.2f  ", minDPC));
+      System.out.println(Units.METRIC);
+      System.out.print(String.format("%.2f  ", minDPF));
+      System.out.println(Units.ENGLISH);
+      System.out.print(String.format("%.2f  ", minDPK));
+      System.out.println(Units.ABSOLUTE);
+      System.out.println(we.requestDewpointMinDate());
+   }
+   
+   /*
+   */
+   private void updateHeatIndexMax(WeatherEvent evt){
+      System.out.println("Heat Index Maximum");
+      WeatherExtreme we = (WeatherExtreme)evt.getSource();
+      double maxHIC = we.requestHeatIndexMax(Units.METRIC);
+      double maxHIF = we.requestHeatIndexMax(Units.ENGLISH);
+      double maxHIK = we.requestHeatIndexMax(Units.ABSOLUTE);
+      System.out.print(String.format("%.2f  ", maxHIC));
+      System.out.println(Units.METRIC);
+      System.out.print(String.format("%.2f  ", maxHIF));
+      System.out.println(Units.ENGLISH);
+      System.out.print(String.format("%.2f  ", maxHIK));
+      System.out.println(Units.ABSOLUTE);
+      System.out.println(we.requestHeatIndexMaxDate());
+   }
+   
+   /*
+   */
+   private void updateHeatIndexMin(WeatherEvent evt){
+      System.out.println("Heat Index Minimum");
+      WeatherExtreme we = (WeatherExtreme)evt.getSource();
+      double minHIC = we.requestHeatIndexMin(Units.METRIC);
+      double minHIF = we.requestHeatIndexMin(Units.ENGLISH);
+      double minHIK = we.requestHeatIndexMin(Units.ABSOLUTE);
+      System.out.print(String.format("%.2f  ", minHIC));
+      System.out.println(Units.METRIC);
+      System.out.print(String.format("%.2f  ", minHIF));
+      System.out.println(Units.ENGLISH);
+      System.out.print(String.format("%.2f  ", minHIK));
+      System.out.println(Units.ABSOLUTE);
+      System.out.println(we.requestHeatIndexMinDate());      
+   }
+   
    /*
    */
    private void updateHumidityMax(WeatherEvent evt){
