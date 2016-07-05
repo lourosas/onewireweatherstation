@@ -403,10 +403,6 @@ public class WeatherStation implements TimeListener{
             CalculatedObserver co = (CalculatedObserver)i.next();
             co.updateDewpoint(ws);
          }
-         WeatherExtreme we = WeatherExtreme.getInstance();
-         dewpoint = evt1.getValue();
-         units    = evt1.getUnits();
-         we.monitorDewpointExtremes(this.currentDate,dewpoint,units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -458,17 +454,14 @@ public class WeatherStation implements TimeListener{
 
       try{
          Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+         ws.store(evt2);
+         ws.store(evt3);
          while(i.hasNext()){
             CalculatedObserver co = (CalculatedObserver)i.next();
-            co.updateHeatIndex(evt1);
-            co.updateHeatIndex(evt2);
-            co.updateHeatIndex(evt3);
+            co.updateHeatIndex(ws);
          }
-         WeatherExtreme we = WeatherExtreme.getInstance();
-         heatIndex = evt1.getValue();
-         units     = evt1.getUnits();
-         we.monitorHeatIndexExtremes(this.currentDate,
-                                                     heatIndex,units);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();

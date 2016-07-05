@@ -85,7 +85,11 @@ public class WeatherStorage{
          Calendar cal = this.dewpointDates.get(size - 1);
          event        = this.dewpointHash.get(cal);
       }
-      else if(type.toLowerCase().equals("heatindex")){}
+      else if(type.toLowerCase().equals("heatindex")){
+         int size     = this.heatIndexDates.size();
+         Calendar cal = this.heatIndexDates.get(size - 1);
+         event        = this.heatIndexHash.get(cal);
+      }
       return event;
    }
 
@@ -105,7 +109,9 @@ public class WeatherStorage{
       else if(type.toLowerCase().equals("dewpoint")){
          e = this.dewpointHash.elements();
       }
-      else if(type.toLowerCase().equals("heatindex")){}
+      else if(type.toLowerCase().equals("heatindex")){
+         e = this.heatIndexHash.elements();
+      }
       else if(type.toLowerCase().equals("pressure")){}
       while(e.hasMoreElements()){
          List<WeatherEvent>     list     = e.nextElement();
@@ -153,7 +159,9 @@ public class WeatherStorage{
       else if(type.toLowerCase().equals("dewpoint")){
          e = this.dewpointHash.elements();
       }
-      else if(type.toLowerCase().equals("heatindex")){}
+      else if(type.toLowerCase().equals("heatindex")){
+         e = this.heatIndexHash.elements();
+      }
       else if(type.toLowerCase().equals("pressure")){}
       while(e.hasMoreElements()){
          List<WeatherEvent>     list     = e.nextElement();
@@ -202,7 +210,9 @@ public class WeatherStorage{
       else if(type.equals("Dewpoint")){
          this.storeDewpointData(event);
       }
-      else if(type.equals("Heat Index")){}
+      else if(type.equals("Heat Index")){
+         this.storeHeatIndexData(event);
+      }
       else if(type.equals("Barometer")){}
    }
    
@@ -214,6 +224,50 @@ public class WeatherStorage{
    }
    
    //************************Private Methods**************************
+   /*
+   */
+   private Iterator<Calendar> getDatesIterator(String type){
+      Iterator<Calendar> datesIterator = null;
+      if(type.toLowerCase().equals("dewpoint")){
+         datesIterator = this.dewpointDates.iterator();
+      }
+      else if(type.toLowerCase().equals("heatindex")){
+         datesIterator = this.heatIndexDates.iterator();
+      }
+      else if(type.toLowerCase().equals("humidity")){
+         datesIterator = this.humidityDates.iterator();
+      }
+      else if(type.toLowerCase().equals("pressure")){
+         datesIterator = this.pressureDates.iterator();
+      }
+      else if(type.toLowerCase().equals("temperature")){
+         this.temperatureDates.iterator();
+      }
+      return datesIterator;
+   }
+
+   /*
+   */
+   private Hashtable<Calendar, List> getHash(String type){
+      Hashtable<Calendar, List> hash = null;
+      if(type.toLowerCase().equals("dewpoint")){
+         hash = this.dewpointHash;
+      }
+      else if(type.toLowerCase().equals("heatindex")){
+         hash = this.heatIndexHash;
+      }
+      else if(type.toLowerCase().equals("humidity")){
+         hash = this.humidityHash;
+      }
+      else if(type.toLowerCase().equals("pressure")){
+         hash = this.pressureHash;
+      }
+      else if(type.toLowerCase().equals("temperture")){
+         hash = this.temperatureHash;
+      }
+      return hash;
+   }
+
    /*
    */
    private void initialize(){
@@ -256,6 +310,8 @@ public class WeatherStorage{
       this.saveTemperatureData();
       this.saveHumidityData();
       this.saveData("dewpoint");
+      this.saveData("heatindex");
+      //this.saveData("pressure");
    }
 
    /**
@@ -266,42 +322,20 @@ public class WeatherStorage{
       String fileName = new String(this.setDateString(type));
       fileName = fileName.concat(".csv");
       try{
+         Hashtable<Calendar, List> hash  = this.getHash(type);
+         Enumeration<Calendar>     keys  = hash.keys();
+         Iterator<Calendar>        dates=this.getDatesIterator(type);
          List<WeatherEvent>        event = null;
          Iterator<WeatherEvent>    data  = null;
-         Enumeration<Calendar>     keys  = null;
-         Iterator<Calendar>        dates = null;
-         Hashtable<Calendar, List> hash  = null;
-         fileWriter  = new FileWriter(fileName,    true);
-         printWriter = new PrintWriter(fileWriter, true);
+
+         fileWriter    = new FileWriter(fileName,    true);
+         printWriter   = new PrintWriter(fileWriter, true);
          String header = null;
          if(!(type.toLowerCase().equals("humidty"))){
             header = new String("Time, Humidity");
-            hash   = this.humidityHash;
-            keys   = hash.keys();
-            dates  = this.humidityDates.iterator();
          }
          else{
             header = new String("Time, Metric, English, Absolute");
-            if(type.toLowerCase().equals("temperature")){
-               hash  = this.temperatureHash;
-               keys  = hash.keys();
-               dates = this.temperatureDates.iterator();
-            }
-            else if(type.toLowerCase().equals("dewpoint")){
-               hash  = this.dewpointHash;
-               keys  = hash.keys();
-               dates = this.dewpointDates.iterator();
-            }
-            else if(type.toLowerCase().equals("heatindex")){
-               hash  = this.heatIndexHash;
-               keys  = hash.keys();
-               dates = this.heatIndexDates.iterator();
-            }
-            else if(type.toLowerCase().equals("pressure")){
-               hash  = this.pressureHash;
-               keys  = hash.keys();
-               dates = this.pressureDates.iterator();
-            }
          }
          printWriter.println(header);
          while(dates.hasNext()){
@@ -505,6 +539,32 @@ public class WeatherStorage{
 
    /*
    */
+   private void storeHeatIndexData(WeatherEvent event){
+      Calendar cal = event.getCalendar();
+      List<WeatherEvent> heatIndices = null;
+      try{
+         if(this.heatIndexHash.containsKey(cal)){
+            heatIndices = this.heatIndexHash.get(cal);
+         }
+         else{
+            heatIndices = new LinkedList<WeatherEvent>();
+            this.heatIndexDates.add(cal);
+         }
+      }
+      catch(NullPointerException npe){
+         this.heatIndexHash = new Hashtable<Calendar, List>();
+         heatIndices = new LinkedList<WeatherEvent>();
+         this.heatIndexDates = new LinkedList<Calendar>();
+         this.heatIndexDates.add(cal);
+      }
+      finally{
+         heatIndices.add(event);
+         this.heatIndexHash.put(cal, heatIndices);
+      }
+   }
+
+   /*
+   */
    private void storeHumidityData(WeatherEvent event){
       Calendar cal = event.getCalendar();
       List<WeatherEvent> humids = null;
@@ -536,7 +596,7 @@ public class WeatherStorage{
       List<WeatherEvent> temps = null;
       try{
          if(this.temperatureHash.containsKey(cal)){
-            temps = temperatureHash.get(cal);
+            temps = this.temperatureHash.get(cal);
          }
          else{
             temps = new LinkedList<WeatherEvent>();
