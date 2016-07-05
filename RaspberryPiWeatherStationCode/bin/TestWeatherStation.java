@@ -47,15 +47,41 @@ ExtremeObserver{
    }
 
    //Implementation of the Calculated Observer Interface
+   public void updateDewpoint(WeatherStorage data){
+      List<WeatherEvent> list = data.getLatestData("Dewpoint");
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Dewpoint:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   //Implementation of the Calculated Observer Interface
    public void updateHeatIndex(WeatherEvent evt){
       System.out.print(String.format("HI:  %.2f ", evt.getValue()));
       System.out.println(evt.getUnits());
    }
+
+   //Implementation of the Calculated Observer Interface
+   public void updateHeatIndex(WeatherStorage data){
+      List<WeatherEvent> list = data.getLatestData("HeatIndex");
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Heat Index:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
    
    //Implementation of the Extreme Observer Interface
    public void updateExtremes(WeatherEvent evt){
-      System.out.println(evt.getSource());
-      System.out.println(evt.getPropertyName());
       this.updateTemperatureMax(evt);
       this.updateTemperatureMin(evt);
       this.updateHumidityMax(evt);
@@ -65,10 +91,44 @@ ExtremeObserver{
       this.updateHeatIndexMax(evt);
       this.updateHeatIndexMin(evt);
    }
+
+   //Implementation of the Extreme Observer Interface
+   public void updateExtremes(WeatherStorage ws){
+      List<WeatherEvent> max = ws.getMax("temperature");
+      List<WeatherEvent> min = ws.getMin("temperature");
+      this.updateTemperatureMax(max);
+      this.updateTemperatureMin(min);
+      max = ws.getMax("Humidity");
+      min = ws.getMin("Humidity");
+      this.updateHumidityMax(max);
+      this.updateHumidityMin(min);
+      max = ws.getMax("dewpoint");
+      min = ws.getMin("dewpoint");
+      this.updateDewpointMax(max);
+      this.updateDewpointMin(min);
+      max = ws.getMax("HeatIndex");
+      min = ws.getMin("HeatIndex");
+      this.updateHeatIndexMax(max);
+      this.updateHeatIndexMin(min);
+   }
    
    //Implementation of the HumidityObserver Interface
    public void updateHumidity(WeatherEvent evt){
-      System.out.println(String.format("%.2f%s", evt.getValue(),"%"));
+      System.out.println("Humidity:  " + evt);
+   }
+
+   //Implementation of the HumidityObserver Interface
+   public void updateHumidity(WeatherStorage data){
+      List<WeatherEvent> list = data.getLatestData("Humidity");
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Huimidity:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    //Implementation of the BarometerObserver Interface
@@ -79,8 +139,21 @@ ExtremeObserver{
    
    //Implementation of the TemperatureObserver Interface
    public void updateTemperature(WeatherEvent evt){
-      System.out.print(String.format("Temp: %.2f ", evt.getValue()));
-      System.out.println(evt.getUnits());
+      System.out.println("Temperature:  " + evt);
+   }
+
+   //Implementation of the TemperatureObserver Interface
+   public void updateTemperature(WeatherStorage data){
+      List<WeatherEvent> list = data.getLatestData("Temperature");
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Temperature:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    //Implementation of the TimeObserver Interface
@@ -118,6 +191,20 @@ ExtremeObserver{
 
    /*
    */
+   private void updateDewpointMax(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Dewpoint Max:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /*
+   */
    private void updateDewpointMin(WeatherEvent evt){
       System.out.println("Dewpoint Minimum");
       WeatherExtreme we = (WeatherExtreme)evt.getSource();
@@ -131,6 +218,20 @@ ExtremeObserver{
       System.out.print(String.format("%.2f  ", minDPK));
       System.out.println(Units.ABSOLUTE);
       System.out.println(we.requestDewpointMinDate());
+   }
+
+   /*
+   */
+   private void updateDewpointMin(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Dewpoint Min:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
    
    /*
@@ -149,6 +250,20 @@ ExtremeObserver{
       System.out.println(Units.ABSOLUTE);
       System.out.println(we.requestHeatIndexMaxDate());
    }
+
+   /*
+   */
+   private void updateHeatIndexMax(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Heat Index Max:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
    
    /*
    */
@@ -166,6 +281,20 @@ ExtremeObserver{
       System.out.println(Units.ABSOLUTE);
       System.out.println(we.requestHeatIndexMinDate());      
    }
+
+   /*
+   */
+   private void updateHeatIndexMin(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Heat Index Min:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
    
    /*
    */
@@ -179,12 +308,40 @@ ExtremeObserver{
 
    /*
    */
+   private void updateHumidityMax(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Humidity Max:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /*
+   */
    private void updateHumidityMin(WeatherEvent evt){
       System.out.println("Humdity Minimum");
       WeatherExtreme we = (WeatherExtreme)evt.getSource();
       double minHumidity = we.requestHumidityMin();
       System.out.println(String.format("%.2f%s", minHumidity, "%"));
       System.out.println(we.requestHumidityMinDate());
+   }
+
+   /*
+   */
+   private void updateHumidityMin(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Humidity Min:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
 
    /*
@@ -206,6 +363,20 @@ ExtremeObserver{
 
    /*
    */
+   private void updateTemperatureMax(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Max:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /*
+   */
    private void updateTemperatureMin(WeatherEvent evt){
       System.out.println("Temperature Minimum");
       WeatherExtreme we = (WeatherExtreme)evt.getSource();
@@ -219,5 +390,19 @@ ExtremeObserver{
       System.out.print(String.format("%.2f  ", minAbsolu));
       System.out.println(Units.ABSOLUTE);
       System.out.println(we.requestTemperatureMinDate());
+   }
+
+   /*
+   */
+   private void updateTemperatureMin(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Min:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
 }
