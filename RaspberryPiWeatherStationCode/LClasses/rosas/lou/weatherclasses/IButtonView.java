@@ -1,17 +1,17 @@
-/*********************************************************************
-* Copyright (C) 2013 Lou Rosas
+/**
+* Copyright (C) 2011 Lou Rosas
 * This file is part of many applications registered with
 * the GNU General Public License as published
 * by the Free Software Foundation; either version 3 of the License,
 * or (at your option) any later version.
-* IButton is distributed in the hope that it will be
+* PaceCalculator is distributed in the hope that it will be
 * useful, but WITHOUT ANY WARRANTY; without even the implied
 * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 * See the GNU General Public License for more details.
 * You should have received a copy of the GNU General Public License
 * along with this program.
 * If not, see <http://www.gnu.org/licenses/>.
-*********************************************************************/
+*/
 
 package rosas.lou.weatherclasses;
 
@@ -19,8 +19,6 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
@@ -28,81 +26,76 @@ import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
-import rosas.lou.lgraphics.LPanel;
-import rosas.lou.lgraphics.WeatherPanelTotal;
 
-public class IButtonView extends GenericJFrame
+public class IButtonView  extends GenericJFrame
 implements MemoryListener, MissionListener, LogListener{
    
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 470;
    
    private enum State{GRAPH, DATA}
-
-   private ButtonGroup itemGroup;
+   
+   private ButtonGroup itemGroup = null;
    //Temperature Low Alarm Label
-   private JLabel tlal;
+   private JLabel tlal           = null;
    //Temperature High Alarm Label
-   private JLabel thal;
+   private JLabel thal           = null;
    //Temperature Low Alarm Text Field
-   private JTextField  tlatf;
+   private JTextField  tlatf     = null;
    //Temperature High Alarm Text Field
-   private JTextField  thatf;
+   private JTextField  thatf     = null;
    //Sampling Rate Text Field
-   private JTextField  srtf;
+   private JTextField  srtf      = null;
    //Mission Start Delay Text Field
-   private JTextField  msdltf;
+   private JTextField  msdltf    = null;
    //The JCheckBox Fields
-   private JCheckBox   srtc;
-   private JCheckBox   er;
+   private JCheckBox   srtc      = null;
+   private JCheckBox   er        = null;
    //The JComboBox Properties
-   private JComboBox  tempComboBox;
-   private JComboBox  humiComboBox;
-   private JComboBox  dpComboBox; //Dew Point Combo Box
-   private JComboBox  hiComboBox; //Heat Index Combo Box
+   private JComboBox  tempComboBox = null;
+   private JComboBox  humiComboBox = null;
+   private JComboBox  dpComboBox   = null; //Dew Point Combo Box
+   private JComboBox  hiComboBox   = null; //Heat Index Combo Box
    
-   private IButton ib;
+   private IButton ib            = null;
    
-   private String fromTemp;
-   private String toTemp;
-   private String humiSelectionString;
-   private String dpSelectionString;
-   private String hiSelectionString;
+   private String fromTemp            = null;
+   private String toTemp              = null;
+   private String tempSelectionString = null;
+   private String humiSelectionString = null;
+   private String dpSelectionString   = null;
+   private String hiSelectionString   = null;
    
    //Make the time data global!
    //NEED TO GET RID OF BOTH OF THESE!!!
-   private LinkedList<Date> tempTimeLog;
-   private LinkedList<Date> humiTimeLog;
+   private LinkedList<Date> tempTimeLog = null;
+   private LinkedList<Date> humiTimeLog = null;
    //LogEvent Data Based on current temperature "state"
    //Celsius Temperature Data Event
-   private LogEvent cTempEvent;
+   private LogEvent cTempEvent = null;
    //Fahrenheit Temperature Data Event
-   private LogEvent fTempEvent;
+   private LogEvent fTempEvent = null;
    //Kelvin Temperature Data Event
-   private LogEvent kTempEvent;
+   private LogEvent kTempEvent = null;
    //Humidity Data Event
-   private LogEvent humiEvent;
+   private LogEvent humiEvent  = null;
    //Celsius Dewpoint Data Event
-   private LogEvent cDPEvent;
+   private LogEvent cDPEvent   = null;
    //Kelvin  Dewpoint Data Event
-   private LogEvent kDPEvent;
+   private LogEvent kDPEvent   = null;
    //Fahrenheit Dewpoint Data Event
-   private LogEvent fDPEvent;
+   private LogEvent fDPEvent   = null;
    //Celsius Heat Index Data Event
-   private LogEvent cHIEvent;
+   private LogEvent cHIEvent   = null;
    //Kelvin Heat Index Data Event
-   private LogEvent kHIEvent;
+   private LogEvent kHIEvent   = null;
    //Fahreheit Heat Index Event
-   private LogEvent fHIEvent;
-   //Complete Dewpoint Log Event
-   private LogEvent dewpointLogEvent;
-   //Complete Heat Index Log Event
-   private LogEvent heatIndexLogEvent;
-   //Complete Humidity Log Event
-   private LogEvent humidityLogEvent;
-   //Complete Temperature Log Event
-   private LogEvent temperatureLogEvent;
-   
+   private LogEvent fHIEvent   = null;
+   //Temperature Time Log Event
+   private LogEvent tempTimeLogEvent     = null;
+   //Humidity Time Log Event
+   private LogEvent humidityTimeLogEvent = null;
+
    private Units temperatureUnits;
    private Units dewpointUnits;
    private Units heatIndexUnits;
@@ -113,54 +106,82 @@ implements MemoryListener, MissionListener, LogListener{
    private State temperatureDisplayState;
    //Should the view display the current data, or not?
    private boolean toDisplay;
-
-   //**********************Constructors******************************
-   /**
+   //********************Constructor********************************
+   /*
    Constructor of no arguments
    */
    public IButtonView(){
       this("", null);
    }
    
-   /**
-   Constructor taking the Title and Controller Atributes
+   /*
+   Constructor taking the Title attribute and Controller Object
    */
    public IButtonView(String title, Object controller){
       super(title);
+      this.humiTimeLog = new LinkedList<Date>();
       this.ib = new IButton();
       this.ib.addLogListener(this);
       this.ib.addMemoryListener(this);
       this.ib.addMissionListener(this);
-      if(controller == null){
-         //Create a Controller Object if one is not provided
-         //Object ibc = new IButtonController(this.ib, this);
-         this.setUpGUI(new IButtonController(this.ib, this));
-      }
-      else{
-         this.setUpGUI(controller);
-      }
+      this.setUpGUI(controller);
    }
    
-   //**********************Public Methods****************************
+   //*******************Public Methods******************************
+   /**
+   */
+   public void highTemperatureAlarmError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the High Temperature Alarm");
+      String display = new String("Input Error");
+      String error   = new String("High Temperature Alarm Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.thatf.requestFocus();
+      this.thatf.selectAll();  
+   }
+   
+   /**
+   */
+   public void lowTemperatureAlarmError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Low Temperature Alarm");
+      String display = new String("Input Error");
+      String error   = new String("Low Temperature Alarm Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.tlatf.requestFocus();
+      this.tlatf.selectAll();  
+   }
+   
+   /**
+   */
+   public void missionStartDelayError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Mission Start Delay");
+      String display = new String("Input Error");
+      String error   = new String("Mission Start Delay Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.msdltf.requestFocus();
+      this.msdltf.selectAll();      
+   }
+   
    /**
    Implementation of the MemoryListener interface
-   */   
+   */
    public void onMemoryEvent(MemoryEvent event){
       String message = event.getMessage();
-      if(!message.contains("Exception")){
-         JOptionPane.showMessageDialog(this, message);
-         if(message.contains("Cleared")){
-            //Reset to the default
-            this.resetNewMissionGUI();
-         }
+      if(message.split(" ")[0].equals("Memory") &&
+         message.split(" ")[1].equals("Cleared")){
+         String display = new String("Mission Cleared");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
       }
       else{
-         String error = new String("Exception Occurred in ");
-         error = error.concat("the Mission Memory");
-         JOptionPane.showMessageDialog(this,
-                                       error,
-                                       "Exception Occurred",
-                                       JOptionPane.ERROR_MESSAGE);
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);         
       }
    }
    
@@ -169,16 +190,23 @@ implements MemoryListener, MissionListener, LogListener{
    */
    public void onMissionEvent(MissionEvent event){
       String message = event.getMessage();
-      if(!message.contains("Exception")){
-         JOptionPane.showMessageDialog(this, message);
+      if(message.split(" ")[0].equals("Mission") &&
+         message.split(" ")[1].equals("Started")){
+         String display = new String("Mission Started");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
+      }
+      //More to be put in here, as the System is Developed
+      else if(message.split(" ")[0].equals("Mission") &&
+              message.split(" ")[1].equals("Stopped")){
+         String display = new String("Mission Stopped");
+         JOptionPane.showMessageDialog(this, message, display,
+                                   JOptionPane.INFORMATION_MESSAGE);
       }
       else{
-         String error = new String("Exception Occurred in Stopping");
-         error = error + "\nthe mission";
-         JOptionPane.showMessageDialog(this, 
-                                       error,
-                                       "Exeption Occurred",
-                                       JOptionPane.ERROR_MESSAGE);
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
       }
    }
    
@@ -187,12 +215,29 @@ implements MemoryListener, MissionListener, LogListener{
    Dewpoint Logs
    */
    public void onDewpointLogEvent(LogEvent event){
-      //Save off the LogEvent data
-      this.setDewpointLogEvent(event);
-      //Send to the Dewpoint Tab for appropriate display
-      this.setUpThermalData(Types.DEWPOINT, true);
-      //Send to the All Data Tab for display
-      this.setUpAllData(true);
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Dew"))  ||
+         !(message.split(" ")[1].equals("Point")) ||
+         !(message.split(" ")[2].equals("Calculated"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         if(event.getUnits() == Units.METRIC)
+            this.cDPEvent = event;
+         else if(event.getUnits() == Units.ENGLISH)
+            this.fDPEvent = event;
+         else
+            this.kDPEvent = event;
+         //Since there is no separate time event for the dew point
+         //(connected to temperature), set up the days PRIOR to
+         //setting up the dew point data display
+         //Go ahead and populate the Dew Point JComboBox
+         this.setUpDifferentDaysInDPComboBox();
+         if(this.dewpointUnits == event.getUnits())
+            this.prepDewPointDataDisplay();
+      }
    }
    
    /**
@@ -201,21 +246,40 @@ implements MemoryListener, MissionListener, LogListener{
    */
    public void onExtremeTemperatureLogEvent
    (
-      LogEvent data,
+      LogEvent temp,
       LogEvent time
-   ){}
+   ){
+   }
    
    /**
    Implementation of the LogListener interface:
    Heat Index Logs
    */
    public void onHeatIndexLogEvent(LogEvent event){
-      //Save off the LogEvent data
-      this.setHeatIndexLogEvent(event);
-      //Send to the Heat Index Tab for the appropriate display
-      this.setUpThermalData(Types.HEATINDEX, true);
-      //Send to the All Data Tab for display
-      this.setUpAllData(true);
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Heat"))  ||
+         !(message.split(" ")[1].equals("Index")) ||
+         !(message.split(" ")[2].equals("Calculated"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         if(event.getUnits() == Units.METRIC)
+            this.cHIEvent = event;
+         else if(event.getUnits() == Units.ENGLISH)
+            this.fHIEvent = event;
+         else
+            this.kHIEvent = event;
+         //Since there is no separate time event for the heat index
+         //(connected to temperature), set up the days PRIOR to
+         //setting up the dew point data display
+         //Go ahead and populate the Dew Point JComboBox
+         this.setUpDifferentDaysInHIComboBox();
+         if(this.heatIndexUnits == event.getUnits()){
+            this.prepHeatIndexDataDisplay();
+         }
+      }
    }
    
    /**
@@ -223,89 +287,172 @@ implements MemoryListener, MissionListener, LogListener{
    Humidity Logs
    */
    public void onHumidityLogEvent(LogEvent event){
-      //Save off the LogEvent data
-      this.setHumidityLogEvent(event);
-      //Send to the Humidity Tab for the appropriate display
-      this.setUpHumidityData(Types.HUMIDITY, true);
-      //Send to the All Data Tab for display
-      this.setUpAllData(true);
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Humidity")) ||
+         !(message.split(" ")[1].equals("Log"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         this.humiEvent = event;
+         this.prepHumidityDataDisplay();
+      }
    }
    
    /**
    Implementation of the LogListener Interface for both
    the Humidity and Time Logs
    */
-   public void onHumidityLogEvent(LogEvent humidty, LogEvent time){}
+   public void onHumidityLogEvent
+   (
+      LogEvent humidity,
+      LogEvent time
+   ){
+      //TBD:  need to figure out how to take advantage of this
+   }
    
    /**
    Implementation of the LogListener interface:
    Humidity Time Logs
    */
-   public void onHumidityTimeLogEvent(LogEvent event){}
+   public void onHumidityTimeLogEvent(LogEvent event){
+      String message = event.getMessage();
+      if(!(message.split(" ")[0].equals("Humidity")) ||
+         !(message.split(" ")[1].equals("Time"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         //The event is "valid", so go ahead and populate the
+         //Log data associated with it...
+         this.setUpHumidityTimeData(event);
+         //Also, go ahead and populate the different days in the
+         //Humidity JComboBox
+         this.setUpDifferentDaysInHumiComboBox();
+      }
+   }
    
    /**
    Implementation of the LogListener interface:
-   Temperature Logs.
+   Temperature Logs
    */
    public void onTemperatureLogEvent(LogEvent event){
-      //Need to save off the LogEvent data.
-      this.setTemperatureLogEvent(event);
-      //Send to the Temperature Tab for the appropriate display
-      this.setUpThermalData(Types.TEMPERATURE, true);
-      //Send to the All Data tab for display
-      this.setUpAllData(true);
+      String message = event.getMessage();
+      //This would indicate an error (bigtime)
+      if(!(message.split(" ")[0].equals("Temperature")) ||
+         !(message.split(" ")[1].equals("Log"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      else{
+         if(event.getUnits() == Units.METRIC)
+            this.cTempEvent = event;
+         else if(event.getUnits() == Units.ENGLISH)
+            this.fTempEvent = event;
+         else
+            this.kTempEvent = event;
+         if(this.temperatureUnits == event.getUnits())
+            this.prepTemperatureDataDisplay();
+      }
    }
-
+   
    /**
    Implementation of the LogListener Interface for both the
    Temperature and Time Logs
    */
-   public void onTemperatureLogEvent(LogEvent temp, LogEvent time){}
+   public void onTemperatureLogEvent
+   (
+      LogEvent temp,
+      LogEvent time
+   ){
+      //TBD:  need to figure out how to take advantage of this
+   }
    
    /**
    Implementation of the LogListener interface:
    Temperature Time Logs
    */
-   public void onTemperatureTimeLogEvent(LogEvent event){}
-   
-   /**
-   */
-   public NewMissionData requestNewMissionData(){
-      NewMissionData nmd = new NewMissionData();
-      nmd.setSampleRate(this.srtf.getText());
-      nmd.setStartDelay(this.msdltf.getText());
-      nmd.setTemperatureLowAlarm(this.tlatf.getText());
-      nmd.setTemperatureHighAlarm(this.thatf.getText());
-      Enumeration<AbstractButton> e = this.itemGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = (AbstractButton)e.nextElement();
-         if(ab.isSelected()){
-            nmd.setUnits(ab.getText());
-         }
+   public void onTemperatureTimeLogEvent(LogEvent event){
+      String message = event.getMessage();
+      //This would indicate an error (bigtime)
+      if(!(message.split(" ")[0].equals("Temperature")) ||
+         !(message.split(" ")[1].equals("Time"))){
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
       }
-      nmd.setSynchClock(this.srtc.isSelected());
-      nmd.setRolloverEnabled(this.er.isSelected());
-      return nmd;
+      else{
+         //If the event is "Valid", go ahead and populate the
+         //Time Log data
+         this.setUpTemperatureTimeData(event);
+         //Also, go ahead and populate the different days in the
+         //Temperature JComboBox
+         this.setUpDifferentDaysInTempComboBox();
+      }
    }
    
-   /**
-   TBD...when the Controller is saved off persistently
+   /*
    */
-   public void saveMissionData(){}
+   public String requestSamplingRate(){
+      return this.srtf.getText();
+   }
    
-   /**
+   /*
    */
-   public void saveMissionData(Object controller){
-      int selectMode = JFileChooser.FILES_ONLY;
-      JFileChooser chooser = new JFileChooser();
-      FileNameExtensionFilter filter =
-                          new FileNameExtensionFilter("*.csv", "csv");
-      chooser.setDialogTitle("Save Mission Data");
-      chooser.setFileSelectionMode(selectMode);
-      chooser.setFileFilter(filter);
-      chooser.addActionListener((ActionListener)controller);
-      
-      chooser.showSaveDialog(this);
+   public String requestMissionStartDelay(){
+      return this.msdltf.getText();
+   }
+   
+   /*
+   */
+   public String requestTemperatureLowAlarm(){
+      return this.tlatf.getText();
+   }
+   
+   /*
+   */
+   public String requestTemperatureHighAlarm(){
+      return this.thatf.getText();
+   }
+   
+   /*
+   */
+   public void resetNewMissionDefaults(){
+      Enumeration e = this.itemGroup.getElements();
+      while(e.hasMoreElements()){
+         Object o = e.nextElement();
+         if(o instanceof JRadioButton){
+            JRadioButton b = (JRadioButton)o;
+            if(b.getActionCommand().equals("NMCelsius")){
+               b.setSelected(true);
+               b.doClick();
+            }
+         }
+      }
+      //Clear out the Check Box Values, as well and alert the
+      //listeners
+      //Synchronize Real Time Clock
+      this.srtc.setSelected(false);
+      //Enable Rollover
+      this.er.setSelected(false);
+      this.thatf.setText(""); this.tlatf.setText("");
+      this.srtf.setText("");  this.msdltf.setText("");
+   }
+   
+   /*
+   */
+   public void samplingRateError(){
+      String issue   = new String("Please Enter an Acutal Number");
+      issue = issue.concat(" for the Sampling Rate");
+      String display = new String("Input Error");
+      String error   = new String("Sampling Rate Error");
+      JOptionPane.showMessageDialog(this, issue, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      this.srtf.requestFocus();
+      this.srtf.selectAll();
    }
    
    /**
@@ -315,44 +462,9 @@ implements MemoryListener, MissionListener, LogListener{
    public void setToDisplay(boolean display){
       this.toDisplay = display;
    }
-
-   //**********************Private Methods***************************
-   /**
-   For multiple Weather Data, combine into ONE large Weather Data
-   Object...this should be used when "All Days" is selected
-   Basically, need to get the data in metric units so as to convert
-   to the units to display the data in addtion, this will need to be
-   converted to the appropriate units:  that should not be a problem,
-   since the WeatherData class does that implicitly: it was designed
-   to work directly with the data comming off the OneWire Temp device:
-   which gets the temperature measurement in Metric, regardless.
-   */
-   private LinkedList<WeatherData> combineAllWeatherData
-   (
-      LinkedList<WeatherData> wd,
-      LinkedList<WeatherData> mWD
-   ){
-      LinkedList<WeatherData> weatherList = new LinkedList();
-      LinkedList<Date> dates              = new LinkedList();
-      LinkedList<Double> values           = new LinkedList();
-      //The Units and Type should be consistent with all the data
-      Types type  = ((WeatherData)wd.get(0)).getType();
-      Units units = ((WeatherData)wd.get(0)).getUnits();
-      //Get the temperature in Metric...the WeatherData class will
-      //automatically convert it for you...
-      Iterator<WeatherData> it = mWD.iterator();
-      while(it.hasNext()){
-         WeatherData data = it.next();
-         dates.addAll(data.getDates());
-         values.addAll(data.getData());
-      }
-      WeatherData weatherData =
-                          new WeatherData(type, units, values, dates);
-      weatherList.add(weatherData);
-      //Return this for now
-      return weatherList;
-   }
-   /**
+   
+   //*******************Private Methods*****************************
+   /*
    */
    private void convertTemperatures(ItemEvent e, AbstractButton ab){
       String lowAlarmString  = null;
@@ -405,367 +517,132 @@ implements MemoryListener, MissionListener, LogListener{
       }
    }
    
-   /**
-   */
-   private void drawTheData(JPanel panel, LinkedList<WeatherData> wd){
-      try{
-         System.out.println(panel);
-      }
-      catch(NullPointerException npe){}
-   }
-   
-   /**
-   */
-   private LogEvent getDewpointLogEvent(){
-      return this.dewpointLogEvent;
-   }
-   
-   /**
-   */
-   private LogEvent getHeatIndexLogEvent(){
-      return this.heatIndexLogEvent;
-   }
-   
-   /**
-   */
-   private String getHowToDisplayData(String type){
-      final int BREAK = 1000;
-      String returnDisplay = null;
-      JTabbedPane jtp      = null;
-      JPanel displayPanel  = null;
-      jtp = (JTabbedPane)this.getContentPane().getComponent(0);
-      int currentTab = jtp.getSelectedIndex();
-      for(int i = 0; i < jtp.getTabCount(); i++){
-         if(jtp.getTitleAt(i).equals(type)){
-            jtp.setSelectedIndex(i);
-            JPanel currentPanel=(JPanel)jtp.getSelectedComponent();
-            JPanel topPanel = (JPanel)currentPanel.getComponent(0);
-            for(int j = 0; j < currentPanel.getComponentCount(); j++){
-               displayPanel = (JPanel)topPanel.getComponent(j);
-               if(displayPanel.getName().equals("DataPanel")){
-                  j = BREAK;//Break out of the loop
-               }
-            }
-            returnDisplay = this.getSelectedString(displayPanel);
-         }
-      }
-      jtp.setSelectedIndex(currentTab);
-      return returnDisplay;
-   }
-   
-   /**
-   */
-   private LogEvent getHumidityLogEvent(){
-      return this.humidityLogEvent;
-   }
-   
-   /**
+   /*
    */
    private boolean getToDisplay(){
       return this.toDisplay;
    }
    
    /**
+   Given the Specific Time Log, and a specific date, get all
+   the calendar data associated with that date
    */
-   private String getSelectedString(JPanel panel){
-      String displayType = new String();
-      int count = panel.getComponentCount();
-      for(int j = 0; j< count; j++){
-         JRadioButton jrb = (JRadioButton)panel.getComponent(j);
-         String text = jrb.getText();
-         boolean selected = jrb.isSelected();
-         if(selected){
-            displayType = new String(text);
-         }
-      }
-      return displayType;
-   }
-
-   /**
-   */
-   private LogEvent getTemperatureLogEvent(){
-      return this.temperatureLogEvent;
-   }
-   
-   /**
-   */
-   private JComboBox getTheJComboBox(String type){
-      JComboBox jcb = null;
-      JTabbedPane jtp = null;
-      jtp = (JTabbedPane)this.getContentPane().getComponent(0);
-      int currentTab = jtp.getSelectedIndex();
-      for(int i = 0; i < jtp.getTabCount(); i++){
-         if(jtp.getTitleAt(i).equals(type)){
-            jtp.setSelectedIndex(i);
-            JPanel currentPanel = (JPanel)jtp.getSelectedComponent();
-            JPanel topPanel = (JPanel)currentPanel.getComponent(0);
-            //There are no units in humidity measurements,
-            //Hence, the data panel is the first panel in the
-            //Display Panel
-            if(!type.equals("Humidity")){
-               jcb = (JComboBox)topPanel.getComponent(2);
-            }
-            else if(type.equals("Humidity")){
-               jcb = (JComboBox)topPanel.getComponent(1);
-            }
-         }
-      }
-      jtp.setSelectedIndex(currentTab);
-      return jcb;
-   }
-   
-   /**
-   */
-   private String getUnitsFromPanel(String type){
-      final int BREAK = 1000;
-      String returnType = null;
-      JTabbedPane jtp = null;
-      jtp = (JTabbedPane)this.getContentPane().getComponent(0);
-      int currentTab = jtp.getSelectedIndex();
-      for(int i = 0; i < jtp.getTabCount(); i++){
-         if(jtp.getTitleAt(i).equals(type)){
-            jtp.setSelectedIndex(i);
-            JPanel currentPanel = (JPanel)jtp.getSelectedComponent();
-            JPanel topPanel = (JPanel)currentPanel.getComponent(0);
-            JPanel unitsPanel = null;
-            for(int j = 0; j < topPanel.getComponentCount(); j++){
-               JPanel panel = (JPanel)topPanel.getComponent(j);
-               if(panel.getName().equals("UnitsPanel")){
-                  unitsPanel = (JPanel)panel;
-                  returnType = this.getSelectedString(unitsPanel);
-                  j = BREAK;
-               }
-            }
-         }
-      }
-      jtp.setSelectedIndex(currentTab);
-      return returnType;
-   }
-   
-   /**
-   */
-   private LinkedList<WeatherData> getWeatherData
+   private LinkedList<Integer> getDayIndeces
    (
-      LogEvent event,
-      String date
+      LinkedList<Date> timeLog,
+      String requestedDate
    ){
-      return this.getWeatherData(event, "Celsius", date);
-   }
-
-   /**
-   */
-   private Stack<String> getWhatDataToDisplay(String type){
-      final int BREAK           = 1000;
-      Stack<String> returnStack = null;
-      JTabbedPane jtp           = null;
-      jtp = (JTabbedPane)this.getContentPane().getComponent(0);
-      int currentTab = jtp.getSelectedIndex();
-      for(int i = 0; i < jtp.getTabCount(); i++){
-         if(jtp.getTitleAt(i).equals(type)){
-            jtp.setSelectedIndex(i);
-            JPanel currentPanel = (JPanel)jtp.getSelectedComponent();
-            JPanel topPanel = (JPanel)currentPanel.getComponent(0);
-            JPanel typePanel = null;
-            for(int j = 0; j < topPanel.getComponentCount(); j++){
-               JPanel panel = (JPanel)topPanel.getComponent(j);
-               if(panel.getName().equals("TypePanel")){
-                  typePanel = panel;
-                  int count = typePanel.getComponentCount();
-                  for(int k = 0; k < count; k++){
-                     JCheckBox jcb;
-                     jcb = (JCheckBox)typePanel.getComponent(k);
-                     if(jcb.isSelected()){
-                        try{
-                           returnStack.push(jcb.getName());
-                        }
-                        catch(NullPointerException npe){
-                           returnStack = new Stack<String>();
-                           returnStack.push(jcb.getName());
-                        }
-                     }
-                  }
-                  j = BREAK;
-               }
-            }
-         }
-      }
-      jtp.setSelectedIndex(currentTab);
-      return returnStack;
-   }
-   
-   /**
-   Grab all the data with the appropriate units, on the
-   Appropriate Date
-   */
-   private LinkedList<WeatherData> getWeatherData
-   (
-      LogEvent event,
-      String   units,
-      String   date
-   ){
-      LinkedList<WeatherData> wd = new LinkedList();
-      LinkedList<WeatherData> tempList =
-                                      (LinkedList)event.getDataList();
-      Types type = tempList.get(0).getType();
-      Units unit;
-      if(type != Types.HUMIDITY){
-         if(units.toUpperCase().equals("CELSIUS")){
-            unit = Units.METRIC;
-         }
-         else if(units.toUpperCase().equals("FAHRENHEIT")){
-            unit = Units.ENGLISH;
-         }
-         else{
-            unit = Units.ABSOLUTE;
-         }
+      LinkedList<Integer> indeces = new LinkedList<Integer>();
+      if(requestedDate.equals("All Days")){
+         indeces.add(new Integer(0));
+         indeces.add(new Integer(timeLog.size() - 1));
       }
       else{
-         unit = Units.NULL;
-      }
-      Iterator<WeatherData> it = tempList.iterator();
-      while(it.hasNext()){
-         WeatherData data = it.next();
-         if(data.getUnits() == unit){
-            //Get all the Weather Data in the appropriate units
-            if(date.toUpperCase().equals("ALL DAYS") ||
-               date.equals(data.getDate())){
-               wd.add(data);
+         Iterator i = timeLog.iterator();
+         while(i.hasNext()){
+            Date date = (Date)i.next();
+            String currentDate =
+                          DateFormat.getDateInstance().format(date);
+            if(currentDate.equals(requestedDate)){
+               indeces.add(new Integer(timeLog.indexOf(date)));
             }
          }
       }
-      return wd;
+      return indeces;
    }
    
    /**
-   Reset the GUI Elements on the New Mission Panel
+   Given the Specific Time Log, get the days
    */
-   private void resetNewMissionGUI(){
-      this.srtf.setText("");
-      this.msdltf.setText("");
-      this.tlatf.setText("");
-      this.thatf.setText("");
-      this.srtc.setSelected(false);
-      this.er.setSelected(false);
-      Enumeration<AbstractButton> e = this.itemGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = (AbstractButton)e.nextElement();
-         if(ab.getText().equals("Celsius")){
-            ab.setSelected(true);
-         }
-         else{
-            ab.setSelected(false);
+   private LinkedList<String> getTheDays(LinkedList<Date> timeLog){
+      LinkedList<String> returnStrings = new LinkedList<String>();
+      Calendar cal = Calendar.getInstance();
+      Iterator i = timeLog.iterator();
+      String currentDate = new String("Current");
+      String newDate     = new String("Date");
+      while(i.hasNext()){
+         Date date = (Date)i.next();
+         cal.setTime(date);
+         newDate = DateFormat.getDateInstance().format(date);
+         if(!newDate.equals(currentDate)){
+            currentDate = new String(newDate);
+            returnStrings.add(currentDate);
          }
       }
+      return returnStrings;
    }
    
    /**
+   Go ahead and "prep" the humidity data for display.
+   Then, go ahead and message the appropriate method to set up the
+   dew point data.
    */
-   private JPanel setAllDataCenterPanel(){
-      final int TOP    = 0;
-      final int LEFT   = 5;
-      final int BOTTOM = 0;
-      final int RIGHT  = 5;
-      //Center Border
-      JPanel centerPanel = new JPanel();
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(
-                                              TOP,LEFT,BOTTOM,RIGHT));
-      return centerPanel;
+   private void prepDewPointDataDisplay(){
+      LogEvent event = null;
+      if(this.dewpointUnits == Units.METRIC)
+         event = this.cDPEvent;
+      else if(this.dewpointUnits == Units.ENGLISH)
+         event = this.fDPEvent;
+      else
+         event = this.kDPEvent;
+      if(this.dewpointDisplayState == State.GRAPH)
+         this.setUpDewpointGraph(event);
+      else
+         this.setUpDewpointData();
    }
    
    /**
+   Go ahead and "prep" the heat index data for display.
+   Then, go ahead and message the appropriate method to set up the
+   heat index data
    */
-   private JPanel setAllDataNorthPanel(){
-      JPanel northPanel = new JPanel();
-      northPanel.setName("NorthPanel");
-      northPanel.setBorder(BorderFactory.createEtchedBorder());
-      ButtonGroup temperatureGroup = new ButtonGroup();
-      
-      JPanel typePanel = new JPanel();
-      typePanel.setName("TypePanel");
-      
-      JCheckBox temp = new JCheckBox("Temperature");
-      temp.setName("Temperature");
-      temp.setActionCommand("AllDataTemp");
-      this.setUpLocalCheckBoxItemListener(temp);
-      typePanel.add(temp);
-      
-      JCheckBox humi = new JCheckBox("Humidity");
-      humi.setName("Humidity");
-      humi.setActionCommand("AllDataHumi");
-      this.setUpLocalCheckBoxItemListener(humi);
-      typePanel.add(humi);
-      
-      JCheckBox dewP = new JCheckBox("Dew Point");
-      dewP.setName("Dew Point");
-      dewP.setActionCommand("AllDataDP");
-      this.setUpLocalCheckBoxItemListener(dewP);
-      typePanel.add(dewP);
-      
-      JCheckBox hIdx = new JCheckBox("Heat Index");
-      hIdx.setName("Heat Index");
-      hIdx.setActionCommand("AllDataHI");
-      this.setUpLocalCheckBoxItemListener(hIdx);
-      typePanel.add(hIdx);
-      
-      northPanel.add(typePanel);
-      
-      JPanel tempPanel = new JPanel();
-      tempPanel.setName("UnitsPanel");
-      JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand("AllDataCelsius");
-      this.setUpLocalThermalTabItemListener(celsius);
-      temperatureGroup.add(celsius);
-      tempPanel.add(celsius);
-      
-      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand("AllDataFahrenheit");
-      this.setUpLocalThermalTabItemListener(fahrenheit);
-      temperatureGroup.add(fahrenheit);
-      tempPanel.add(fahrenheit);
-      
-      //Cannot put the Kelvin Scale on in this version of the View!!
-      
-      northPanel.add(tempPanel);
-      
-      String dates[] = {"All Days"};
-      JComboBox allDataComboBox = new JComboBox(dates);
-      allDataComboBox.setName("AllData");
-      this.setUpLocalJCBActionListener(allDataComboBox);
-      northPanel.add(allDataComboBox);
-      
-      return northPanel;
+   private void prepHeatIndexDataDisplay(){
+      LogEvent event = null;
+      if(this.heatIndexUnits == Units.METRIC)
+         event = this.cHIEvent;
+      else if(this.heatIndexUnits == Units.ENGLISH)
+         event = this.fHIEvent;
+      else
+         event = this.kHIEvent;
+      if(this.heatIndexDisplayState == State.GRAPH)
+         this.setUpHeatIndexGraph(event);
+      else
+         this.setUpHeatIndexData();
    }
    
    /**
+   Go ahead and "prep" the humidity data for display.
+   Then, go ahead and message the appropriate method to set up the
+   humidity data
    */
-   private JPanel setAllDataPanel(Object controller){
-      String north  = BorderLayout.NORTH;
-      String center = BorderLayout.CENTER;
-      String south  = BorderLayout.SOUTH;
-      JPanel allPanel = new JPanel();
-      allPanel.setLayout(new BorderLayout());
-      allPanel.add(this.setAllDataNorthPanel(),  north);
-      allPanel.add(this.setAllDataCenterPanel(), center);
-      allPanel.add(this.setAllDataSouthPanel(controller),  south);
-      return allPanel;
+   private void prepHumidityDataDisplay(){
+      LogEvent event = null;
+      if(this.humidityDisplayState == State.GRAPH)
+         this.setUpHumidityGraph(this.humiEvent);
+      else
+         this.setUpHumidityData();
    }
    
    /**
+   Go ahead and "prep" the temperature data for display.
+   Then, go ahead and message the appropriate method to set up the
+   temperature data.
    */
-   private JPanel setAllDataSouthPanel(Object controller){
-      JPanel southPanel = new JPanel();
-      southPanel.setBorder(BorderFactory.createEtchedBorder());
-      
-      JButton refresh = new JButton("Refresh");
-      refresh.setActionCommand("AllData Refresh");
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
-      southPanel.add(refresh);
-      
-      return southPanel;
+   private void prepTemperatureDataDisplay(){
+      LogEvent event = null;
+      if(this.temperatureUnits == Units.METRIC)
+         event = this.cTempEvent;
+      else if(this.temperatureUnits == Units.ENGLISH)
+         event = this.fTempEvent;
+      else
+         event = this.kTempEvent;
+      if(this.temperatureDisplayState == State.GRAPH)
+         this.setUpTemperatureGraph(event);
+      else
+         this.setUpTemperatureData();
    }
-
-   /**
+   
+   /*
    */
    private double setConvert(String alarm, String from, String to)
    throws NumberFormatException{
@@ -796,314 +673,274 @@ implements MemoryListener, MissionListener, LogListener{
       return convert;
    }
    
-   /**
-   */
-   private JPanel setDPCenterPanel(){
-      final int TOP    = 0;
-      final int LEFT   = 5;
-      final int BOTTOM = 0;
-      final int RIGHT  = 5;
-      
-      JPanel centerPanel = new JPanel();
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(
-                                              TOP,LEFT,BOTTOM,RIGHT));
-      return centerPanel;
-   }
-   
-   /**
-   */
-   private JPanel setDPNorthPanel(Object controller){
-      JPanel northPanel      = new JPanel();
-      ButtonGroup unitsGroup = new ButtonGroup();
-      ButtonGroup dataGroup  = new ButtonGroup();
-      northPanel.setBorder(BorderFactory.createEtchedBorder());
-      
-      //Set up the Units Panel
-      JPanel unitsPanel = new JPanel();
-      unitsPanel.setName("UnitsPanel");
-      JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand("DPCelsius");
-      unitsGroup.add(celsius);
-      this.setUpLocalThermalTabItemListener(celsius);
-      unitsPanel.add(celsius);
-      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand("DPFahrenheit");
-      unitsGroup.add(fahrenheit);
-      this.setUpLocalThermalTabItemListener(fahrenheit);
-      unitsPanel.add(fahrenheit);
-      JRadioButton kelvin = new JRadioButton("Kelvin");
-      kelvin.setActionCommand("DPKelvin");
-      unitsGroup.add(kelvin);
-      this.setUpLocalThermalTabItemListener(kelvin);
-      unitsPanel.add(kelvin);
-      northPanel.add(unitsPanel);
-      
-      //Set up the Data Panel
-      JPanel dataPanel = new JPanel();
-      dataPanel.setName("DataPanel");
-      JRadioButton graph = new JRadioButton("Graph", true);
-      graph.setActionCommand("DPGraph");
-      dataGroup.add(graph);
-      this.setUpLocalThermalTabItemListener(graph);
-      dataPanel.add(graph);
-      JRadioButton data = new JRadioButton("Data");
-      data.setActionCommand("DPData");
-      dataGroup.add(data);
-      this.setUpLocalThermalTabItemListener(data);
-      dataPanel.add(data);
-      northPanel.add(dataPanel);
-      
-      //Set Up The Combo Box
-      String dates[] = {"All Days"};
-      JComboBox dewpointComboBox = new JComboBox(dates);
-      dewpointComboBox.setName("Dewpoint");
-      this.setUpLocalJCBActionListener(dewpointComboBox);
-      northPanel.add(dewpointComboBox);
-      return northPanel;
-   }
-
-   /**
-   */
-   private JPanel setDPSouthPanel(Object controller){
-      JPanel southPanel = new JPanel();
-      
-      southPanel.setBorder(BorderFactory.createEtchedBorder());
-
-      JButton refresh = new JButton("Refresh");
-      refresh.setActionCommand("DP Refresh");
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
-      southPanel.add(refresh);
-
-      JButton save = new JButton("Save Dewpoint Data");
-      save.setActionCommand("DP Save");
-      save.addActionListener((ActionListener)controller);
-      save.addKeyListener((KeyListener)controller);
-      southPanel.add(save);
-
-      return southPanel;
-   }
-   
-   /**
-   */
-   private void setDewpointLogEvent(LogEvent event){
-      this.dewpointLogEvent = event;
-   }
-
-   /**
+   /*
    */
    private JPanel setDewpointPanel(Object controller){
-      String north  = BorderLayout.NORTH;
-      String center = BorderLayout.CENTER;
-      String south  = BorderLayout.SOUTH;
       JPanel dewpointPanel = new JPanel();
       dewpointPanel.setLayout(new BorderLayout());
-      dewpointPanel.add(this.setDPNorthPanel(controller),  north);
-      dewpointPanel.add(this.setDPCenterPanel(), center);
-      dewpointPanel.add(this.setDPSouthPanel(controller), south);
-
+      JPanel northPanel = this.setDewpointNorthPanel(controller);
+      JPanel centerPanel= this.setDewpointCenterPanel(controller);
+      JPanel southPanel = this.setDewpointSouthPanel(controller);
+      
+      dewpointPanel.add(northPanel,  BorderLayout.NORTH);
+      dewpointPanel.add(centerPanel, BorderLayout.CENTER);
+      dewpointPanel.add(southPanel,  BorderLayout.SOUTH);
       return dewpointPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHeatIndexPanel(Object controller){
-      String north  = BorderLayout.NORTH;
-      String center = BorderLayout.CENTER;
-      String south  = BorderLayout.SOUTH;
-      
-      JPanel heatIndexPanel = new JPanel();
-      heatIndexPanel.setLayout(new BorderLayout());
-      heatIndexPanel.add(this.setHeatIndexNorthPanel(), north);
-      heatIndexPanel.add(this.setHeatIndexCenterPanel(), center);
-      heatIndexPanel.add(this.setHeatIndexSouthPanel(controller),south);
-      return heatIndexPanel;
-   }
-   
-   /**
-   */
-   private void setHeatIndexLogEvent(LogEvent event){
-      this.heatIndexLogEvent = event;
-   }
-   
-   /**
-   */
-   private JPanel setHeatIndexCenterPanel(){
-      final int TOP    = 0;
-      final int LEFT   = 5;
-      final int BOTTOM = 0;
-      final int RIGHT  = 5;
-      
+   private JPanel setDewpointCenterPanel(Object controller){
       JPanel centerPanel = new JPanel();
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(
-                                              TOP,LEFT,BOTTOM,RIGHT));
-      
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
       return centerPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHeatIndexNorthPanel(){
+   private JPanel setDewpointNorthPanel(Object controller){
       JPanel northPanel      = new JPanel();
       ButtonGroup unitsGroup = new ButtonGroup();
       ButtonGroup dataGroup  = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
       
-      //Set up the Units Panel
-      JPanel unitsPanel = new JPanel();
-      unitsPanel.setName("UnitsPanel");
       JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand("HICelsius");
       unitsGroup.add(celsius);
-      this.setUpLocalThermalTabItemListener(celsius);
-      unitsPanel.add(celsius);
+      this.setUpLocalDPTabItemListener(celsius);
+      this.dewpointUnits = Units.METRIC;
+      northPanel.add(celsius);
+      
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand("HIFahrenheit");
       unitsGroup.add(fahrenheit);
-      this.setUpLocalThermalTabItemListener(fahrenheit);
-      unitsPanel.add(fahrenheit);
+      this.setUpLocalDPTabItemListener(fahrenheit);
+      northPanel.add(fahrenheit);
+      
       JRadioButton kelvin = new JRadioButton("Kelvin");
-      kelvin.setActionCommand("HIKelvin");
       unitsGroup.add(kelvin);
-      this.setUpLocalThermalTabItemListener(kelvin);
-      unitsPanel.add(kelvin);
-      northPanel.add(unitsPanel);
+      this.setUpLocalDPTabItemListener(kelvin);
+      northPanel.add(kelvin);
       
-      //Set up the Data Panel
-      JPanel dataPanel = new JPanel();
-      dataPanel.setName("DataPanel");
       JRadioButton graph = new JRadioButton("Graph", true);
-      graph.setActionCommand("HIGraph");
+      this.dewpointDisplayState = State.GRAPH;
       dataGroup.add(graph);
-      this.setUpLocalThermalTabItemListener(graph);
-      dataPanel.add(graph);
-      JRadioButton data = new JRadioButton("Data");
-      data.setActionCommand("HIData");
-      dataGroup.add(data);
-      this.setUpLocalThermalTabItemListener(data);
-      dataPanel.add(data);
-      northPanel.add(dataPanel);
+      this.setUpLocalDPTabItemListener(graph);
+      northPanel.add(graph);
       
-      //Set Up the Combo Box
+      JRadioButton data = new JRadioButton("Data");
+      dataGroup.add(data);
+      this.setUpLocalDPTabItemListener(data);
+      northPanel.add(data);
+      
+      //Initialize the data
       String dates[] = {"All Days"};
-      JComboBox heatIndexComboBox = new JComboBox(dates);
-      heatIndexComboBox.setName("HeatIndex");
-      this.setUpLocalJCBActionListener(heatIndexComboBox);
-      northPanel.add(heatIndexComboBox);
-
+      this.dpSelectionString = new String(dates[0]);
+      this.dpComboBox = new JComboBox(dates);
+      this.dpComboBox.setName("Dewpoint");
+      this.dpComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDay(dpComboBox);
+         }
+      });
+      northPanel.add(this.dpComboBox);
       return northPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHeatIndexSouthPanel(Object controller){
+   private JPanel setDewpointSouthPanel(Object controller){
       JPanel southPanel = new JPanel();
+      IButtonController ibc = new IButtonController(this.ib, this);
       
       southPanel.setBorder(BorderFactory.createEtchedBorder());
+      
       JButton refresh = new JButton("Refresh");
-      refresh.setActionCommand("HI Refresh");
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
+      //Dew Point Refresh
+      refresh.setActionCommand("DP Refresh");
+      refresh.addActionListener(ibc);
+      refresh.addKeyListener(ibc);
       southPanel.add(refresh);
       
-      JButton save = new JButton("Save Heat Index Data");
-      save.setActionCommand("HI Save");
-      save.addActionListener((ActionListener)controller);
-      save.addKeyListener((KeyListener)controller);
+      JButton save = new JButton("Save Dew Point Data");
+      save.addActionListener(ibc);
+      save.addKeyListener(ibc);
       southPanel.add(save);
       
       return southPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHumiCenterPanel(){
-      final int TOP    = 0;
-      final int LEFT   = 5;
-      final int BOTTOM = 0;
-      final int RIGHT  = 5;
-      //Center Border
+   private JPanel setHeatIndexPanel(Object controller){
+      JPanel heatIndexPanel = new JPanel();
+      heatIndexPanel.setLayout(new BorderLayout());
+      JPanel northPanel = this.setHeatIndexNorthPanel(controller);
+      JPanel centerPanel=this.setHeatIndexCenterPanel(controller);
+      JPanel southPanel = this.setHeatIndexSouthPanel(controller);
+      
+      heatIndexPanel.add(northPanel,  BorderLayout.NORTH);
+      heatIndexPanel.add(centerPanel, BorderLayout.CENTER);
+      heatIndexPanel.add(southPanel,  BorderLayout.SOUTH);
+      return heatIndexPanel;
+   }
+   
+   /*
+   */
+   private JPanel setHeatIndexCenterPanel(Object controller){
       JPanel centerPanel = new JPanel();
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(
-                                              TOP,LEFT,BOTTOM,RIGHT));
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
       return centerPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHumiNorthPanel(){
-      JPanel northPanel          = new JPanel();
-      ButtonGroup dataGroup      = new ButtonGroup();
+   private JPanel setHeatIndexNorthPanel(Object controller){
+      JPanel northPanel      = new JPanel();
+      ButtonGroup unitsGroup = new ButtonGroup();
+      ButtonGroup dataGroup  = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
-      //Set up the Data
-      JPanel dataPanel = new JPanel();
-      dataPanel.setName("DataPanel");
+      
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      unitsGroup.add(celsius);
+      this.setUpLocalHI_TabItemListener(celsius);
+      this.heatIndexUnits = Units.METRIC;
+      northPanel.add(celsius);
+      
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      unitsGroup.add(fahrenheit);
+      this.setUpLocalHI_TabItemListener(fahrenheit);
+      northPanel.add(fahrenheit);
+      
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      unitsGroup.add(kelvin);
+      this.setUpLocalHI_TabItemListener(kelvin);
+      northPanel.add(kelvin);
+      
       JRadioButton graph = new JRadioButton("Graph", true);
-      graph.setActionCommand("HGraph");
-      this.setUpLocalHumiTabItemListener(graph);
+      this.heatIndexDisplayState = State.GRAPH;
       dataGroup.add(graph);
-      dataPanel.add(graph);
+      this.setUpLocalHI_TabItemListener(graph);
+      northPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data");
-      data.setActionCommand("HData");
-      this.setUpLocalHumiTabItemListener(data);
       dataGroup.add(data);
-      dataPanel.add(data);
-      
-      northPanel.add(dataPanel);
-      
-      //Set up the Combo Box
+      this.setUpLocalHI_TabItemListener(data);
+      northPanel.add(data);
+      //Initialize the data
       String dates[] = {"All Days"};
-      JComboBox humidityComboBox = new JComboBox(dates);
-      humidityComboBox.setName("Humidity");
-      this.setUpLocalJCBActionListener(humidityComboBox);
-      northPanel.add(humidityComboBox);
+      this.hiSelectionString = new String(dates[0]);
+      
+      this.hiComboBox = new JComboBox(dates);
+      this.hiComboBox.setName("Heat Index");
+      this.hiComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDay(hiComboBox);
+         }
+      });
+      northPanel.add(this.hiComboBox);
+      
       return northPanel;
    }
    
-   /**
+   /*
    */
-   private JPanel setHumiSouthPanel(Object controller){
+   private JPanel setHeatIndexSouthPanel(Object controller){
       JPanel southPanel = new JPanel();
+      IButtonController ibc = new IButtonController(this.ib, this);
       
       southPanel.setBorder(BorderFactory.createEtchedBorder());
       
       JButton refresh = new JButton("Refresh");
-      refresh.setActionCommand("Humi Refresh");
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
+      //Heat Index Refresh
+      refresh.setActionCommand("HI Refresh");
+      refresh.addActionListener(ibc);
+      refresh.addKeyListener(ibc);
       southPanel.add(refresh);
       
-      JButton save = new JButton("Save Humidity Data");
-      save.setActionCommand("Humi Save");
-      save.addActionListener((ActionListener)controller);
-      save.addKeyListener((KeyListener)controller);
+      JButton save = new JButton("Save Heat Index Data");
+      save.addActionListener(ibc);
+      save.addKeyListener(ibc);
       southPanel.add(save);
       
       return southPanel;
    }
    
-   /**
-   */
-   private void setHumidityLogEvent(LogEvent event){
-      this.humidityLogEvent = event;
-   }
-   
-   /**
+   /*
    */
    private JPanel setHumidityPanel(Object controller){
-      String north  = BorderLayout.NORTH;
-      String center = BorderLayout.CENTER;
-      String south  = BorderLayout.SOUTH;
       JPanel humidityPanel = new JPanel();
       humidityPanel.setLayout(new BorderLayout());
-      humidityPanel.add(this.setHumiNorthPanel(), north);
-      humidityPanel.add(this.setHumiCenterPanel(), center);
-      humidityPanel.add(this.setHumiSouthPanel(controller), south);
+      JPanel northPanel = this.setHumidityNorthPanel(controller);
+      JPanel centerPanel= this.setHumidityCenterPanel(controller);
+      JPanel southPanel = this.setHumiditySouthPanel(controller);
+      
+      humidityPanel.add(northPanel,  BorderLayout.NORTH);
+      humidityPanel.add(centerPanel, BorderLayout.CENTER);
+      humidityPanel.add(southPanel,  BorderLayout.SOUTH);
       return humidityPanel;
    }
+   
+   /*
+   */
+   private JPanel setHumidityCenterPanel(Object controller){
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      return centerPanel;
+   }
 
-   /**
+   /*
+   */
+   private JPanel setHumidityNorthPanel(Object controller){
+      JPanel northPanel     = new JPanel();
+      ButtonGroup dataGroup = new ButtonGroup();
+      northPanel.setBorder(BorderFactory.createEtchedBorder());
+      
+      JRadioButton graph = new JRadioButton("Graph", true);
+      this.humidityDisplayState = State.GRAPH;
+      dataGroup.add(graph);
+      this.setUpLocalHumidityTabItemListener(graph);
+      northPanel.add(graph);
+      
+      JRadioButton data = new JRadioButton("Data");
+      dataGroup.add(data);
+      this.setUpLocalHumidityTabItemListener(data);
+      northPanel.add(data);
+      
+      //Humidity Combo Box data
+      String dates[] = {"All Days"};
+      this.humiSelectionString = new String(dates[0]);
+      this.humiComboBox        = new JComboBox(dates);
+      this.humiComboBox.setName("Humidity");
+      this.humiComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDay(humiComboBox);
+         }
+      });
+      northPanel.add(this.humiComboBox);
+      
+      return northPanel;
+   }
+   
+   /*
+   */
+   private JPanel setHumiditySouthPanel(Object controller){
+      IButtonController ibc = new IButtonController(this.ib, this);
+      JPanel southPanel = new JPanel();
+      southPanel.setBorder(BorderFactory.createEtchedBorder());
+      
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("Humidity Refresh");
+      refresh.addActionListener(ibc);
+      refresh.addKeyListener(ibc);
+      southPanel.add(refresh);
+      
+      JButton save = new JButton("Save Humidity Data");
+      save.addActionListener(ibc);
+      save.addKeyListener(ibc);
+      southPanel.add(save);
+      return southPanel;
+   }
+   
+   /*
    */
    private JPanel setMissionButtonPanel(Object controller){
       //controller object currently not used
@@ -1115,29 +952,35 @@ implements MemoryListener, MissionListener, LogListener{
       );
       JButton start = new JButton("Start New Mission");
       buttonPanel.add(start);
-      start.addActionListener((ActionListener)controller);
-      start.addKeyListener((KeyListener)controller);
+      start.addActionListener(new IButtonController(this.ib, this));
+      start.addKeyListener(new IButtonController(this.ib, this));
+      //start.addActionListener((ActionListener)controller);
+      //start.addKeyListener((KeyListener)controller);
       JButton clear = new JButton("Clear Mission");
       buttonPanel.add(clear);
-      clear.addActionListener((ActionListener)controller);
-      clear.addKeyListener((KeyListener)controller);
+      //clear.addActionListener((ActionListener)controller);
+      clear.addActionListener(new IButtonController(this.ib, this));
+      clear.addKeyListener(new IButtonController(this.ib, this));
       JButton stop = new JButton("Stop Mission");
       buttonPanel.add(stop);
-      stop.addActionListener((ActionListener)controller);
-      stop.addKeyListener((KeyListener)controller);
+      //stop.addActionListener((ActionListener)controller);
+      stop.addActionListener(new IButtonController(this.ib, this));
+      stop.addKeyListener(new IButtonController(this.ib, this));
       JButton refresh = new JButton("Refresh Mission Data");
       buttonPanel.add(refresh);
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
+      //refresh.addActionListener((ActionListener)controller);
+      refresh.addActionListener(
+                               new IButtonController(this.ib,this));
+      refresh.addKeyListener(new IButtonController(this.ib, this));
       JButton save = new JButton("Save Mission Data");
       buttonPanel.add(save);
-      save.addActionListener((ActionListener)controller);
-      save.addKeyListener((KeyListener)controller);
+      save.addActionListener(new IButtonController(this.ib, this));
+      save.addKeyListener(new IButtonController(this.ib, this));
       
       return buttonPanel;
    }
    
-   /**
+   /*
    */
    private JPanel setMissionPanel(Object controller){
       JPanel missionPanel = new JPanel();
@@ -1147,11 +990,11 @@ implements MemoryListener, MissionListener, LogListener{
                                                BorderLayout.CENTER);
       missionPanel.add(this.setMissionButtonPanel(controller),
                                                 BorderLayout.SOUTH);
-      
+
       return missionPanel;
    }
    
-   /**
+   /*
    */
    private JPanel setNewMissionPanel(Object controller){
       //controller object currently NOT USED!
@@ -1171,34 +1014,37 @@ implements MemoryListener, MissionListener, LogListener{
       celsius.setActionCommand("NMCelsius");
       this.setUpLocalMissionTabItemListener(celsius);
       this.itemGroup.add(celsius);
-      //celsius.addItemListener((ItemListener)controller);
+      celsius.addItemListener(new IButtonController(this.ib));
+      //celsius.addItemListener((ItemListener)controller));
       radioPanel.add(celsius);
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       //New Mission Fahrenheit
       fahrenheit.setActionCommand("NMFahrenheit");
       this.setUpLocalMissionTabItemListener(fahrenheit);
+      fahrenheit.addItemListener(new IButtonController(this.ib));
       //fahrenheit.addItemListener((ItemListener)controller);
       this.itemGroup.add(fahrenheit);
       radioPanel.add(fahrenheit);
       JRadioButton kelvin = new JRadioButton("Kelvin");
       //New Mission Kelvin
       kelvin.setActionCommand("NMKelvin");
+      kelvin.addItemListener(new IButtonController(this.ib));
       //kelvin.addItemListener((ItemListener)controller);
       this.setUpLocalMissionTabItemListener(kelvin);
       this.itemGroup.add(kelvin);
       radioPanel.add(kelvin);
       newMissionPanel.add(radioPanel, BorderLayout.NORTH);
-
+      
       //Center Panel
       JPanel centerPanel = new JPanel();
       GroupLayout centerLayout = new GroupLayout(centerPanel);
       centerPanel.setLayout(centerLayout);
       //Synchronize Real Time Clock
       this.srtc = new JCheckBox("Synchronize Real Time Clock?");
-      //this.srtc.addItemListener((ItemListener)controller);
+      this.srtc.addItemListener(new IButtonController(this.ib));
       //Enable Rollover
       this.er = new JCheckBox("Enable Rollover?");
-      //this.er.addItemListener((ItemListener)controller);
+      this.er.addItemListener(new IButtonController(this.ib));
       //Sampling Rate Label
       JLabel srl = new JLabel("Sampling Rate (in minutes)",
                                               SwingConstants.RIGHT);
@@ -1211,6 +1057,7 @@ implements MemoryListener, MissionListener, LogListener{
       //Temperature High Alarm Label
       this.thal= new JLabel("Temperature High Alarm? (\u00B0C)",
                                               SwingConstants.RIGHT);
+
       //Sampling Rate Text Field
       this.srtf   = new JTextField(4);
       //Mission Start Delay Text Field
@@ -1308,15 +1155,17 @@ implements MemoryListener, MissionListener, LogListener{
                                         GroupLayout.PREFERRED_SIZE))
              .addContainerGap(120, Short.MAX_VALUE))
       );
-      newMissionPanel.add(centerPanel, BorderLayout.CENTER);      
-      return newMissionPanel;            
+      newMissionPanel.add(centerPanel, BorderLayout.CENTER);
+      
+      return newMissionPanel;
    }
-
-   /**
+   
+   /*
    */
    private JPanel setTemperaturePanel(Object controller){
       JPanel temperaturePanel = new JPanel();
       temperaturePanel.setLayout(new BorderLayout());
+      
       temperaturePanel.add(this.setTempNorthPanel(controller),
                                                 BorderLayout.NORTH);
       temperaturePanel.add(this.setTempCenterPanel(),
@@ -1336,7 +1185,7 @@ implements MemoryListener, MissionListener, LogListener{
       return centerPanel;
    }
    
-   /**
+   /*
    */
    private JPanel setTempNorthPanel(Object controller){
       JPanel northPanel            = new JPanel();
@@ -1345,54 +1194,58 @@ implements MemoryListener, MissionListener, LogListener{
       northPanel.setBorder(BorderFactory.createEtchedBorder());
       //Set up the temperature panel
       JPanel tempPanel = new JPanel();
-      tempPanel.setName("UnitsPanel");
+      
       JRadioButton celsius = new JRadioButton("Celsius", true);
       celsius.setActionCommand("TCelsius");
       temperatureGroup.add(celsius);
-      this.setUpLocalThermalTabItemListener(celsius);
+      this.setUpLocalTempTabItemListener(celsius);
       this.temperatureUnits = Units.METRIC;
       tempPanel.add(celsius);
       
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("TFahrenheit");
       temperatureGroup.add(fahrenheit);
-      this.setUpLocalThermalTabItemListener(fahrenheit);
+      this.setUpLocalTempTabItemListener(fahrenheit);
       tempPanel.add(fahrenheit);
       
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("TKelvin");
       temperatureGroup.add(kelvin);
-      this.setUpLocalThermalTabItemListener(kelvin);
+      this.setUpLocalTempTabItemListener(kelvin);
       tempPanel.add(kelvin);
       
       northPanel.add(tempPanel);
       
       JPanel dataPanel = new JPanel();
-      dataPanel.setName("DataPanel");
+      
       JRadioButton graph = new JRadioButton("Graph", true);
-      graph.setActionCommand("TGraph");
       this.temperatureDisplayState = State.GRAPH;
       dataGroup.add(graph);
-      this.setUpLocalThermalTabItemListener(graph);
+      this.setUpLocalTempTabItemListener(graph);
       dataPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data");
-      data.setActionCommand("TData");
       dataGroup.add(data);
-      this.setUpLocalThermalTabItemListener(data);
+      this.setUpLocalTempTabItemListener(data);
       dataPanel.add(data);
       
       northPanel.add(dataPanel);
       //Initialize the data
       String dates[] = {"All Days"};
+      this.tempSelectionString = new String("All Days");
+      
       this.tempComboBox = new JComboBox(dates);
       this.tempComboBox.setName("Temperature");
-      this.setUpLocalJCBActionListener(tempComboBox);
+      this.tempComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDay(tempComboBox);
+         }
+      });
       northPanel.add(this.tempComboBox);
       return northPanel;
    }
    
-   /**
+   /*
    */
    private JPanel setTempSouthPanel(Object controller){
       JPanel southPanel = new JPanel();
@@ -1401,23 +1254,17 @@ implements MemoryListener, MissionListener, LogListener{
       
       JButton refresh = new JButton("Refresh");
       refresh.setActionCommand("Temp Refresh");
-      refresh.addActionListener((ActionListener)controller);
-      refresh.addKeyListener((KeyListener)controller);
+      refresh.addActionListener(
+                               new IButtonController(this.ib,this));
+      refresh.addKeyListener(new IButtonController(this.ib, this));
       southPanel.add(refresh);
       
       JButton save = new JButton("Save Temperature Data");
-      save.setActionCommand("Temp Save");
-      save.addActionListener((ActionListener)controller);
-      save.addKeyListener((KeyListener)controller);
+      save.addActionListener(new IButtonController(this.ib, this));
+      save.addKeyListener(new IButtonController(this.ib, this));
       southPanel.add(save);
       
       return southPanel;
-   }   
-
-   /**
-   */
-   private void setTemperatureLogEvent(LogEvent event){
-      this.temperatureLogEvent = event;
    }
    
    /**
@@ -1426,399 +1273,590 @@ implements MemoryListener, MissionListener, LogListener{
    private void setTheDay(Object comboBox){
       if(comboBox instanceof JComboBox){
          JComboBox jcbox = (JComboBox)comboBox;
+         String selected = (String)jcbox.getSelectedItem();
          if(jcbox.getName().equals("Temperature")){
-            this.setUpThermalData(Types.TEMPERATURE, false);
+            //Esentially, a "State String" for the temperature
+            //Selection:  to be used for both graphing and
+            //textual representation of the data...
+            this.tempSelectionString = new String(selected);
+            this.prepTemperatureDataDisplay();
          }
          else if(jcbox.getName().equals("Humidity")){
-            this.setUpHumidityData(Types.HUMIDITY, false);
+            this.humiSelectionString = new String(selected);
+            this.prepHumidityDataDisplay();
          }
          else if(jcbox.getName().equals("Dewpoint")){
-            this.setUpThermalData(Types.DEWPOINT, false);
+            this.dpSelectionString = new String(selected);
+            this.prepDewPointDataDisplay();
          }
-         else if(jcbox.getName().equals("HeatIndex")){
-            this.setUpThermalData(Types.HEATINDEX, false);
-         }
-         else if(jcbox.getName().equals("AllData")){
-            this.setUpAllData(false);
+         else if(jcbox.getName().equals("Heat Index")){
+            this.hiSelectionString = new String(selected);
+            this.prepHeatIndexDataDisplay();
          }
       }
    }
    
    /**
+   Display the Dew Point data in the GUI...
    */
-   private void setUpAllData(boolean displayException){
-      String type                     = new String("All Data");
-      Stack<String> displayStack      = null;
-      JTabbedPane jtp                 = null;
-      LogEvent event                  = null;
-      LinkedList<WeatherData> wd      = null;
-      LinkedList<WeatherData> mWD     = null;
-      LinkedList<WeatherData> allData = null;
+   private void setUpDewpointData(){
+      int dpTab      = -1;
+      int missionTab = -1;
+      String delimeter;
+      double min, max;
       try{
-         jtp = (JTabbedPane)this.getContentPane().getComponent(0);
-         int currentTab     = jtp.getSelectedIndex();
-         String unitsString = this.getUnitsFromPanel(type);
-         boolean grabDate   = false;
-         String  date       = null;
-         //Display what? Temperature, Humidity, Dew Point, Heat Index?
-         displayStack = this.getWhatDataToDisplay(type);
-         while(displayStack.size() > 0){
-            String display = new String(displayStack.pop());
-            if(display.toUpperCase().equals("TEMPERATURE")){
-               event = this.getTemperatureLogEvent();
-            }
-            else if(display.toUpperCase().equals("HUMIDITY")){
-               event = this.getHumidityLogEvent();
-            }
-            else if(display.toUpperCase().equals("DEW POINT")){
-               event = this.getDewpointLogEvent();
-            }
-            else if(display.toUpperCase().equals("HEAT INDEX")){
-               event = this.getHeatIndexLogEvent();
-            }
-            if(event.getMessage().toUpperCase().startsWith("ERROR")){
-               throw new RuntimeException(event.getMessage());
-            }
-            try{
-               //Grab the Date from ONE good event (if possible)
-               if(!grabDate){
-                  JComboBox jcb = this.getTheJComboBox(type);
-                  this.setUpJComboBox(jcb, event);
-                  date = new String((String)jcb.getSelectedItem());
-                  grabDate = true;
-               }
-               wd = this.getWeatherData(event, unitsString, date);
-               if(wd.size() > 1){
-                  mWD = this.getWeatherData(event, date);
-                  wd = this.combineAllWeatherData(wd, mWD);
-               }
-               try{
-                  allData.add((WeatherData)wd.get(0));
-               }
-               catch(NullPointerException npe){
-                  allData = new LinkedList<WeatherData>();
-                  allData.add((WeatherData)wd.get(0));
-               }
-               event = null;//Nullify the event
-            }
-            catch(NullPointerException npe){
-               String message = new String("No "+display+" Data!");
-               String errordisplay = new String("Error!");
-               JOptionPane.showMessageDialog(this, message,
-                                         errordisplay,
-                                         JOptionPane.ERROR_MESSAGE);
-            }
-            catch(RuntimeException re){
-               int option = JOptionPane.ERROR_MESSAGE;
-               String errordisplay = new String("Error!");
-               String message = new String("No "+display+" Data!\n");
-               message = 
-                  message.concat("Could be one of several reasons\n");
-               message =
-                        message.concat("Please check to see if the ");
-               message=message.concat("iButton\nis connected to an ");
-               message=message.concat("adapter and the adapter\nis ");
-               message=message.concat("connected to a computer.");
-               JOptionPane.showMessageDialog(this, message,
-                                         errordisplay,
-                                         JOptionPane.ERROR_MESSAGE);
-            }
-         }
-         this.setUpAllDataGraph(allData, type);
-         jtp.setSelectedIndex(currentTab);
-         //Set Visibity to "force" the system to draw the graph
-         //(Stupid Java will "get around to it" when it wants to)
-         this.setVisible(true);
-      }
-      catch(NullPointerException npe){}
-   }
-   
-   /***/
-   private void setUpAllDataGraph
-   (
-      LinkedList<WeatherData> list,
-      String type
-   ){
-      try{
-         WeatherData tempData = null;
-         WeatherData humiData = null;
-         WeatherData dewpData = null;
-         WeatherData hidxData = null;
-         Iterator it = list.iterator();
-         while(it.hasNext()){
-            WeatherData data = (WeatherData)it.next();
-            if(data.getType() == Types.TEMPERATURE){
-               tempData = data;
-            }
-            else if(data.getType() == Types.HUMIDITY){
-               humiData = data;
-            }
-            else if(data.getType() == Types.DEWPOINT){
-               dewpData = data;
-            }
-            else if(data.getType() == Types.HEATINDEX){
-               hidxData = data;
-            }
-         }
          JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-         JPanel drawPanel = null;
-         for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals(type)){
-               jtp.setSelectedIndex(i);
-               JPanel dataPanel = (JPanel)jtp.getSelectedComponent();
-               drawPanel = (JPanel)dataPanel.getComponent(1);
-               if(drawPanel.getComponentCount() >0){
-                  drawPanel.removeAll(); //Remove Everything
-               }
-               drawPanel.setLayout(new BorderLayout());
-               drawPanel.setBorder(
-                            BorderFactory.createEmptyBorder(5,0,5,0));
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Dew Point")){
+               dpTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
             }
          }
-         WeatherPanelTotal wpt =
-           new WeatherPanelTotal(tempData,humiData,dewpData,hidxData);
-         drawPanel.add(wpt, BorderLayout.CENTER);
-      }
-      catch(NullPointerException npe){}
-   }
-   
-   /**
-   */
-   private void setUpDataGraph
-   (
-      LinkedList<WeatherData> list,
-      String type
-   ){
-      try{
-         WeatherData data = null;
-         //First:  Clear the Drawing Panel out of previous data
-         JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-         JPanel drawPanel = null;
-         for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals(type)){
-               jtp.setSelectedIndex(i);
-               JPanel dataPanel = (JPanel)jtp.getSelectedComponent();
-               drawPanel = (JPanel)dataPanel.getComponent(1);
-               if(drawPanel.getComponentCount() > 0){
-                  drawPanel.removeAll();//Remove everything
-               }
-               drawPanel.setLayout(new BorderLayout());
-               drawPanel.setBorder(
-                            BorderFactory.createEmptyBorder(5,0,5,0));
-            }
-         }
-         if(list.size() == 1){
-            data = (WeatherData)list.get(0);
-            LinkedList<Date> dates = new LinkedList(data.getDates());
-            LinkedList<Double> temps = new LinkedList(data.getData());
-            LinkedList<Object> tempsO = new LinkedList(data.getData());
-            LPanel lp =
-                 new LPanel(tempsO,data.getMin(),data.getMax(),dates);
-            drawPanel.add(lp, BorderLayout.CENTER);
-         }
-         else{
-         }
-      }
-      catch(NullPointerException npe){}
-   }
-
-   /**
-   */
-   private void setUpDataText
-   (
-      LinkedList<WeatherData> list,
-      String type
-   ){
-      try{
-         String delimeter = new String();
-         WeatherData data = null;
-         //First, clear the Text Panel out of previous data
-         JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-         JPanel textPanel = null;
-         for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals(type)){
-               jtp.setSelectedIndex(i);
-               JPanel dataPanel = (JPanel)jtp.getSelectedComponent();
-               textPanel = (JPanel)dataPanel.getComponent(1);
-               if(textPanel.getComponentCount() > 0){
-                  textPanel.removeAll();//Remove Everything
-               }
-               textPanel.setLayout(new BorderLayout());
-            }
-         }
-         //Second: get the Weather Data
-         if(list.size() == 1){
-            data = (WeatherData)list.get(0); //Get the only entry
-         }
-         else{
-            //Something is wrong...and do not draw out the data
-            //might consider throwing an exception
-         }
-         //Third:  put the Selected data in the Text Area
-         JTextArea textArea = new JTextArea(28, 35);
-         //Do not let anyone modify the data
-         textArea.setEditable(false);
-         //Fourth:  put the data in the Text Area
-         if(data.getUnits() == Units.METRIC){
-            delimeter = new String("\u00B0C");
-         }
-         else if(data.getUnits() == Units.ENGLISH){
-            delimeter = new String("\u00B0F");
-         }
-         else if(data.getUnits() == Units.ABSOLUTE){
-            delimeter = new String("K");
-         }
-         else if(data.getUnits() == Units.NULL){
-            //Humidity data
-            delimeter = new String("%");
-         }
-         LinkedList<Date> dates    = new LinkedList(data.getDates());
-         LinkedList<Object> values = new LinkedList(data.getData());
-
-         Iterator d = dates.iterator();
-         Iterator v = values.iterator();
-         while(d.hasNext()){
-            String date = new String((Date)d.next() + ": ");
-            String value = String.format("%.2f", (Double)v.next());
-            String out  = new String(date);
-            out = out.concat(value + delimeter + "\n");
-            textArea.append(out);
-         }
-         double max = data.getMax();
-         double min = data.getMin();
-         Date maxDate = data.getMaxTime();
-         Date minDate = data.getMinTime();
-         String maxString = new String("Max:  ");
-         String minString = new String("Min:  ");
-         maxString =
-                 maxString.concat(String.format("%.2f", (Double)max));
-         minString =
-                 minString.concat(String.format("%.2f", (Double)min));
-         maxString = maxString.concat(delimeter + ", " + maxDate);
-         minString = minString.concat(delimeter + ", " + minDate);
-         textArea.append(minString + "\n");
-         textArea.append(maxString + "\n");
-         //Fifth:  put the Text Area in A Scroll Pane
-         JScrollPane scrollPane = new JScrollPane(textArea);
-         //Sixth:  put the Scroll Pane in the Text Panel
-         textPanel.add(scrollPane, BorderLayout.CENTER);
-      }
-      catch(NullPointerException npe){}
-   }   
-   
-   /**
-   */
-   private void setUpHumidityData
-   (
-      Types types,
-      boolean displayException
-   ){
-      try{
-         String type = null;
-         if(types == Types.HUMIDITY){
-            type = new String("Humidity");
-         }
-         else{
-            type = new String("UKNOWN"); //Should NEVER get here!!!
-         }
-         LogEvent event = this.getHumidityLogEvent();
-         if(event.getMessage().startsWith("Error:")){
-            throw new RuntimeException(event.getMessage());
-         }
-         JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-         int currentTab = jtp.getSelectedIndex();
-         String display = this.getHowToDisplayData(type);
-         JComboBox jcb  = this.getTheJComboBox(type);
-         this.setUpJComboBox(jcb, event);
-         String date = (String)jcb.getSelectedItem();
-         LinkedList<WeatherData> hd = this.getWeatherData(event,date);
-         if(hd.size() > 1){
-            //No Units to attain, just need to get the data and
-            //put in one big Weather Data Linked List
-            hd = this.combineAllWeatherData(hd, hd);
-         }
-         if(display.equals("Graph")){
-            this.setUpDataGraph(hd, type);
-         }
-         else if(display.equals("Data")){
-            //if this works, the name is going to have to change
-            this.setUpDataText(hd, type);
-         }
-         jtp.setSelectedIndex(currentTab);
-         this.setVisible(true);
+         jtp.setSelectedIndex(dpTab);
+         JPanel dpPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)dpPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll();
+         drawPanel.setLayout(new BorderLayout());
+         JScrollPane jsp = this.setUpDewpointText();
+         drawPanel.add(jsp, BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(dpTab);
       }
       catch(NullPointerException npe){
-         if(displayException){
-            String message = new String("No Humidity Data!");
-            String display = new String("Error!");
-            JOptionPane.showMessageDialog(this, message, display,
-                                         JOptionPane.ERROR_MESSAGE);
-         }
-      }
-      catch(RuntimeException re){
-         int option = JOptionPane.ERROR_MESSAGE;
+         //npe.printStackTrace();
+         String message = new String("No Dew Point Data!");
          String display = new String("Error!");
-         String message = new String("No Humidity Data!\n");
-         message=message.concat("Could be one of several reasons\n");
-         message=message.concat("Please check to see if the ");
-         message=message.concat("iButton\nis connected to an ");
-         message=message.concat("adapter and the adapter\nis ");
-         message=message.concat("connected to a computer.");
-         JOptionPane.showMessageDialog(this,message,display,option);
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
       }
    }
    
    /**
+   Get the "appropriate event", put the data in a JTextArea,
+   put the JTextArea in a JScrollPane, return...In this case,
+   this is the Dewpoint Data
    */
-   private void setUpLocalCheckBoxItemListener(JCheckBox jcb){
-      jcb.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            Object o = e.getItem();
-            if(o instanceof AbstractButton){
-               AbstractButton ab = (AbstractButton)o;
-               if(ab.getActionCommand().contains("AllData")){
-                  setUpAllData(false);//Set up all the data
-               }
+   private JScrollPane setUpDewpointText(){
+      String delimeter;
+      double min, max;
+      JScrollPane dpScrollPane = null;
+      try{
+         LogEvent event = null;
+         if(this.dewpointUnits == Units.METRIC){
+            event = this.cDPEvent;
+            delimeter = new String("\u00B0C");
+         }
+         else if(this.dewpointUnits == Units.ENGLISH){
+            event = this.fDPEvent;
+            delimeter = new String("\u00B0F");
+         }
+         else{
+            event = this.kDPEvent;
+            delimeter = new String("K");
+         }
+         JTextArea dpTextArea = new JTextArea(28, 35);
+         dpTextArea.setEditable(false);
+         LinkedList list  = new LinkedList(event.getDataList());
+         LinkedList tlist =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                  this.getDayIndeces(tlist, this.dpSelectionString);
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         tlist= new LinkedList(tlist.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         Iterator i = list.iterator();
+         Iterator t = tlist.iterator();
+         while(i.hasNext()){
+            String date = new String((Date)t.next() + ", ");
+            String data = String.format("%.2f", (Double)i.next());
+            String out = new String(date);
+            out = out.concat(data + " " + delimeter + "\n");
+            dpTextArea.append(out);
+         }
+         min = event.getMin();
+         max = event.getMax();
+         String mins = String.format("%.2f", new Double(min));
+         String maxs = String.format("%.2f", new Double(max));
+         dpTextArea.append("Min:  " + mins + delimeter + "\n");
+         dpTextArea.append("Max:  " + maxs + delimeter + "\n");
+         dpScrollPane = new JScrollPane(dpTextArea);
+      }
+      catch(NullPointerException npe){}
+      catch(IndexOutOfBoundsException ibe){
+         String message = new String("Please Hit the 'Refresh'");
+         message = message.concat(" Button");
+         String display = new String("Hit Refresh");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      finally{
+         return dpScrollPane;
+      }
+   }
+   
+   /**
+   For the Dew Point JComboBox, go ahead and set-up the different
+   days that contain dewpoint data.  This is to allow the user to
+   select specific daily dew point data, as well as viewing ALL the
+   data (every data point recorded from ALL the days).
+   PLEASE NOTE:  there is NO dpTimeLogEvent-->not needed since the
+   dew point is a combination of the temperature and humidity.
+   Hence, I used the tempTimeLogEvent:  since that is what is
+   recorded from the dew point.
+   */
+   private void setUpDifferentDaysInDPComboBox(){
+      //Get the Date Listing for all the Temperature Data
+      //This will be used in for the Dew Point data, as well
+      LinkedList<Date> timeLog =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+      //Get all the separate days from the Temperature Time Log
+      LinkedList<String> days = this.getTheDays(timeLog);
+      Iterator i = days.iterator();
+      while(i.hasNext()){
+         boolean alreadyThere = false;
+         String date = (String)i.next();
+         for(int j = 0; j < this.dpComboBox.getItemCount(); j++){
+            String val = (String)this.dpComboBox.getItemAt(j);
+            if(date.equals(val)){
+               j = this.tempComboBox.getItemCount();
+               alreadyThere = true;
             }
          }
-      });
+         if(!alreadyThere){ this.dpComboBox.addItem(date); }
+      }
+   }
+   
+   /**
+   For the Heat Index JComboBox, go ahead and set-up the different
+   days that contain dewpoint data.  This is to allow the user to
+   select specific daily dew point data, as well as viewing ALL the
+   data (every data point recorded from ALL the days).
+   PLEASE NOTE:  there is NO hiTimeLogEvent-->not needed since the
+   heat index is a combination of the temperature and humidity.
+   Hence, I used the tempTimeLogEvent:  since that is what is
+   recorded from the dew point.
+   */
+   private void setUpDifferentDaysInHIComboBox(){
+      //Get the Date Listing for all the Temperature Data
+      //This will be used for the Heat Index Data, as well
+      LinkedList<Date> timeLog =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+      //Get all the separate days from the Temperature Time Log
+      LinkedList<String> days = this.getTheDays(timeLog);
+      Iterator i = days.iterator();
+      while(i.hasNext()){
+         boolean alreadyThere = false;
+         String date = (String)i.next();
+         for(int j = 0; j < this.hiComboBox.getItemCount(); j++){
+            String val = (String)this.hiComboBox.getItemAt(j);
+            if(date.equals(val)){
+               j = this.hiComboBox.getItemCount();
+               alreadyThere = true;
+            }
+         }
+         if(!alreadyThere){ this.hiComboBox.addItem(date); }
+      }
+   }
+   
+   /**
+   For the Humidity JComboBox, go ahead and set-up the different
+   days that contain humidity data.  This is to allow the user to 
+   select specific daily humidity data, as well as view ALL the data
+   (every data point recorded from ALL the days)
+   */
+   private void setUpDifferentDaysInHumiComboBox(){
+      //Get the Date Listing for all the Humidity Data
+      LinkedList<Date> humiLog =
+            new LinkedList(this.humidityTimeLogEvent.getDataList());
+      //Get all the separate days from the Humidity Time Log
+      LinkedList<String> days = this.getTheDays(humiLog);
+      Iterator i = days.iterator();
+      while(i.hasNext()){
+         boolean alreadyThere = false;
+         String date = (String)i.next();
+         for(int j = 0; j < this.humiComboBox.getItemCount(); j++){
+            String val = (String)this.humiComboBox.getItemAt(j);
+            if(date.equals(val)){
+               j = this.humiComboBox.getItemCount();
+               alreadyThere = true;
+            }
+         }
+         if(!alreadyThere){ this.humiComboBox.addItem(date); }
+      }
+   }
+   
+   /**
+   For the Temperature JComboBox, go ahead and set-up the different
+   days that contain temperature data.  This is to allow the user to
+   select specific daily temperature data, as well as viewing ALL
+   the data (every data point recorded from ALL the days)
+   */
+   private void setUpDifferentDaysInTempComboBox(){
+      //Get the Date Listing for all the Temperature Data
+      LinkedList<Date> timeLog= 
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+      
+      //Get all the separate days from the Temperature Time Log
+      LinkedList<String> days = this.getTheDays(timeLog);
+      Iterator i = days.iterator();
+      while(i.hasNext()){
+         boolean alreadyThere = false;
+         String date = (String)i.next();
+         for(int j = 0; j < this.tempComboBox.getItemCount(); j++){
+            String val = (String)this.tempComboBox.getItemAt(j);
+            if(date.equals(val)){
+               j = this.tempComboBox.getItemCount();
+               alreadyThere = true;
+            }
+         }
+         if(!alreadyThere){ this.tempComboBox.addItem(date); }
+      }
    }
    
    /**
    */
-   private void setUpLocalHumiTabItemListener(JToggleButton jtb){
+   private void setUpDewpointGraph(LogEvent event){
+      int dpTab      = -1;
+      int missionTab = -1;
+      try{
+         LinkedList list = new LinkedList(event.getDataList());
+         //Go ahead and use the Temperature Log Event...
+         LinkedList<Date> date =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                   this.getDayIndeces(date, this.dpSelectionString);
+         date = new LinkedList(date.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Dew Point")){
+               dpTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
+            }
+         }
+         jtp.setSelectedIndex(dpTab);
+         JPanel dpPanel = (JPanel)jtp.getSelectedComponent();
+         GenericJInteractionFrame dpFrame = 
+                          new GenericJInteractionFrame("Dew Point");
+         //Super-Impose the Temperature Time onto the dew point
+         TestPanel2 tp = new TestPanel2(list,
+                                        event.getMin(),
+                                        event.getMax(),
+                                        date);
+         dpFrame.setSize(500, 500);
+         dpFrame.setResizable(false);
+         dpFrame.add(tp);
+         dpFrame.setVisible(true);
+         //Essentially, get the middle component, which is the
+         //Center component to put the graph...
+         JPanel drawPanel = (JPanel)dpPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll();
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(list,
+                                      event.getMin(),
+                                      event.getMax(),
+                                      date),
+                                      BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(dpTab);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Dew Point Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      //In response to the issues associated with the Temperature
+      //Time Log Event updates...want to see if by catching the
+      //exception, I can get the this panel to continue to work.
+      //Because the indeces are based on the time event.
+      catch(IndexOutOfBoundsException ibe){
+         String message = new String("Please Hit the 'Refresh'");
+         message = message.concat(" Button");
+         String display = new String("Hit Refresh!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   */
+   private void setUpHeatIndexData(){
+      int hiTab      = -1;
+      int missionTab = -1;
+      try{
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Heat Index")){
+               hiTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
+            }
+         }
+         jtp.setSelectedIndex(hiTab);
+         JPanel dpPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)dpPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll();
+         drawPanel.setLayout(new BorderLayout());
+         JScrollPane jsp = this.setUpHeatIndexText();
+         drawPanel.add(jsp, BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(hiTab);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Heat Index Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /**
+   Get the "appropriate event", put the data in a JTextArea,
+   put the JTextArea in a JScrollPane, return...In this case,
+   this is the Dewpoint Data
+   */
+   private JScrollPane setUpHeatIndexText(){
+      String delimeter;
+      double min, max;
+      //This should actually be the hiScrollPane!
+      JScrollPane hiScrollPane = null;
+      try{
+         LogEvent event = null;
+         if(this.heatIndexUnits == Units.METRIC){
+            event = this.cHIEvent;
+            delimeter = new String("\u00B0C");
+         }
+         else if(this.heatIndexUnits == Units.ENGLISH){
+            event = this.fHIEvent;
+            delimeter = new String("\u00B0F");
+         }
+         else{
+            event = this.kHIEvent;
+            delimeter = new String("K");
+         }
+         JTextArea hiTextArea = new JTextArea(28, 35);
+         hiTextArea.setEditable(false);
+         LinkedList list = new LinkedList(event.getDataList());
+         LinkedList tlist =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                  this.getDayIndeces(tlist, this.hiSelectionString);
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         tlist= new LinkedList(tlist.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         Iterator i = list.iterator();
+         Iterator t = tlist.iterator();
+         while(i.hasNext()){
+            String date = new String((Date)t.next() + ", ");
+            String data = String.format("%.2f", (Double)i.next());
+            String out  = new String(date);
+            out = out.concat(data + " " + delimeter + "\n");
+            hiTextArea.append(out);
+         }
+         min = event.getMin();
+         max = event.getMax();
+         String mins = String.format("%.2f", new Double(min));
+         String maxs = String.format("%.2f", new Double(max));
+         hiTextArea.append("Min:  " + mins + delimeter + "\n");
+         hiTextArea.append("Max:  " + maxs + delimeter + "\n");
+         hiScrollPane = new JScrollPane(hiTextArea);
+      }
+      catch(NullPointerException npe){}
+      catch(IndexOutOfBoundsException ibe){
+         String message = new String("Please Hit the 'Refresh'");
+         message = message.concat(" Button");
+         String display = new String("Hit Refresh!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      finally{
+         return hiScrollPane;
+      }
+   }
+   
+   /**
+   */
+   private void setUpHeatIndexGraph(LogEvent event){
+      int hiTab      = -1;
+      int missionTab = -1;
+      try{
+         LinkedList list = new LinkedList(event.getDataList());
+         //Go ahead and use the Temperature Log Event...
+         LinkedList<Date> date =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                   this.getDayIndeces(date, this.hiSelectionString);
+         date = new LinkedList(date.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Heat Index")){
+               hiTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
+            }
+         }
+         jtp.setSelectedIndex(hiTab);
+         JPanel hiPanel = (JPanel)jtp.getSelectedComponent();
+         GenericJInteractionFrame hiFrame = 
+                         new GenericJInteractionFrame("Heat Index");
+         //Super-Impose the Temperature Time onto the heat index
+         TestPanel2 tp = new TestPanel2(list,
+                                        event.getMin(),
+                                        event.getMax(),
+                                        date);
+         hiFrame.setSize(500, 500);
+         hiFrame.setResizable(false);
+         hiFrame.add(tp);
+         hiFrame.setVisible(true);
+         //Essentially, get the middle component, which is the
+         //Center component to put the graph...
+         JPanel drawPanel = (JPanel)hiPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll();
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(list,
+                                      event.getMin(),
+                                      event.getMax(),
+                                      date),
+                                      BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(hiTab);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Heat Index Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+      //In response to the issues associated with the Temperature
+      //Time Log Event updates...want to see if by catching the
+      //exception, I can get the this panel to continue to work.
+      //Because the indeces are based on the time event.
+      catch(IndexOutOfBoundsException ibe){
+         String message = new String("Please Hit the 'Refresh'");
+         message = message.concat(" Button");
+         String display = new String("Hit Refresh!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   */
+   private void setUpLocalDPTabItemListener(JToggleButton jtb){
       jtb.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
             Object o = e.getItem();
             if(o instanceof AbstractButton){
                AbstractButton ab = (AbstractButton)o;
                if(ab.isSelected()){
-                  setUpHumidityData(Types.HUMIDITY, false);
+                  //Since displaying the data, stay on the
+                  //current panel...
+                  setToDisplay(true);
+                  if(ab.getActionCommand().equals("Celsius"))
+                     dewpointUnits = Units.METRIC;
+                  else if
+                  (
+                     ab.getActionCommand().equals("Fahrenheit")
+                  )
+                     dewpointUnits = Units.ENGLISH;
+                  else if(ab.getActionCommand().equals("Kelvin"))
+                     dewpointUnits = Units.ABSOLUTE;
+                  else if(ab.getActionCommand().equals("Graph"))
+                     dewpointDisplayState = State.GRAPH;
+                  else if(ab.getActionCommand().equals("Data"))
+                     dewpointDisplayState = State.DATA;
+                  prepDewPointDataDisplay();
                }
             }
          }
       });
    }
    
-   /**
+   /*
    */
-   private void setUpLocalJCBActionListener(JComboBox jcb){
-      jcb.addActionListener(new ActionListener(){
-         public void actionPerformed(ActionEvent e){
-            Object o = e.getSource();
-            if(o instanceof JComboBox){
-               JComboBox jcb = (JComboBox)o;
-               setTheDay(jcb);
+   private void setUpLocalHI_TabItemListener(JToggleButton jtb){
+      jtb.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            Object o = e.getItem();
+            if(o instanceof AbstractButton){
+               AbstractButton ab = (AbstractButton)o;
+               if(ab.isSelected()){
+                  //Since displaying the data, stay on the
+                  //current panel...
+                  setToDisplay(true);
+                  if(ab.getActionCommand().equals("Celsius"))
+                     heatIndexUnits = Units.METRIC;
+                  else if
+                  (
+                     ab.getActionCommand().equals("Fahrenheit")
+                  )
+                     heatIndexUnits = Units.ENGLISH;
+                  else if(ab.getActionCommand().equals("Kelvin"))
+                     heatIndexUnits = Units.ABSOLUTE;
+                  else if(ab.getActionCommand().equals("Graph"))
+                     heatIndexDisplayState = State.GRAPH;
+                  else if(ab.getActionCommand().equals("Data"))
+                     heatIndexDisplayState = State.DATA;
+                  prepHeatIndexDataDisplay();
+               }
             }
          }
       });
    }
-   
+
    /**
+   This will need to be attended to at the time the data display
+   is developed
+   */
+   private void setUpLocalHumidityTabItemListener(JToggleButton jtb){
+      jtb.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            Object o = e.getItem();
+            if(o instanceof AbstractButton){
+               AbstractButton ab = (AbstractButton)o;
+               if(ab.isSelected()){
+                  setToDisplay(true);
+                  if(ab.getActionCommand().equals("Graph")){
+                     humidityDisplayState = State.GRAPH;
+                  }
+                  //Not Graph, it is data...
+                  else{
+                     humidityDisplayState = State.DATA;
+                  }
+                  prepHumidityDataDisplay();
+               }
+            }
+         }
+      });
+   }
+
+   /*
    */
    private void setUpLocalMissionTabItemListener(JToggleButton jtb){
       jtb.addItemListener(new ItemListener(){
@@ -1852,39 +1890,49 @@ implements MemoryListener, MissionListener, LogListener{
       });
    }
    
-   /**
+   /*
    */
-   private void setUpLocalThermalTabItemListener(JToggleButton jtb){
+   private void setUpLocalTempTabItemListener(JToggleButton jtb){
       jtb.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
             Object o = e.getItem();
             if(o instanceof AbstractButton){
                AbstractButton ab = (AbstractButton)o;
                if(ab.isSelected()){
-                  String action = ab.getActionCommand();
-                  if(action.startsWith("T")){
-                     setUpThermalData(Types.TEMPERATURE, false);
-                  }
-                  else if(action.startsWith("DP")){
-                     setUpThermalData(Types.DEWPOINT, false);
-                  }
-                  else if(action.startsWith("HI")){
-                     setUpThermalData(Types.HEATINDEX,false);
-                  }
-                  else if(action.startsWith("All")){
-                     setUpAllData(false);
-                  }
+                  //Since displaying the data, stay on the
+                  //current panel...
+                  setToDisplay(true);
+                  if(ab.getActionCommand().equals("TCelsius"))
+                     temperatureUnits = Units.METRIC;
+                  else if
+                  (
+                     ab.getActionCommand().equals("TFahrenheit")
+                  )
+                     temperatureUnits = Units.ENGLISH;
+                  else if(ab.getActionCommand().equals("TKelvin"))
+                     temperatureUnits = Units.ABSOLUTE;
+                  else if(ab.getActionCommand().equals("Graph"))
+                     temperatureDisplayState = State.GRAPH;
+                  else if(ab.getActionCommand().equals("Data"))
+                     temperatureDisplayState = State.DATA;
+                  prepTemperatureDataDisplay();
                }
             }
          }
       });
    }
    
-   /**
+   /*
    Set up the GUI
    */
    private void setUpGUI(Object controller){
       try{
+         //UIManager.setLookAndFeel(
+         //         "com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+         UIManager.setLookAndFeel(
+                       UIManager.getSystemLookAndFeelClassName());
+         //UIManager.setLookAndFeel(
+         //              "javax.swing.plaf.metal.MetalLookAndFeel");
          this.setSize(WIDTH, HEIGHT);
          this.setResizable(false);
          JTabbedPane jtp = new JTabbedPane();
@@ -1908,10 +1956,6 @@ implements MemoryListener, MissionListener, LogListener{
                     null,
                     this.setHeatIndexPanel(controller),
                     "Viewing Heat Index Mission Data");
-         jtp.addTab("All Data",
-                    null,
-                    this.setAllDataPanel(controller),
-                    "Viewing all the Available Mission Data");
          this.getContentPane().add(jtp);
          //this.pack();
          this.setVisible(true);
@@ -1920,132 +1964,393 @@ implements MemoryListener, MissionListener, LogListener{
    }
    
    /**
+   Display the Humidity data in the GUI...
    */
-   private void setUpJComboBox(JComboBox jcb, LogEvent event){
-      String date = new String("");
-      //A rather cheesy way of doing this, but it works
-      LinkedList<WeatherData> wd = (LinkedList)event.getDataList();
-      //Store the dates in a Temporary Linked List to determine if the
-      //Date that is being retrieved is already in the list.
-      //There is NO reason to put the same date in multiple
-      //Times!!!
-      LinkedList<String> dateList    = new LinkedList();
-      //The Dates that are in the JComboBox
-      LinkedList<String> jcbDateList = new LinkedList();
-      //Add them to the Linked List
-      for(int i = 0; i < jcb.getItemCount(); i++){
-         jcbDateList.add((String)jcb.getItemAt(i));
-      }
-      //Temp:  I need to fix what is below
-      Iterator<WeatherData> it = wd.iterator();
-      while(it.hasNext()){
-         WeatherData data = (WeatherData)it.next();
-         if(dateList.isEmpty()){
-            dateList.add(data.getDate());
-         }
-         else if(!dateList.contains(data.getDate())){
-            dateList.add(data.getDate());
-         }
-      }
-      //Add Dates to the JComboBox that are not there from the
-      //WeatherData
-      if(!(jcbDateList.containsAll(dateList))){
-         Iterator<String> dates = dateList.iterator();
-         while(dates.hasNext()){
-            date = dates.next();
-            if(!jcbDateList.contains(date)){
-               jcb.addItem(date);
+   private void setUpHumidityData(){
+      int humidityTab = -1;
+      int missionTab  = -1;
+      String delimeter;
+      double min, max;
+      try{
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Humidity")){
+               humidityTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
             }
          }
+         jtp.setSelectedIndex(humidityTab);
+         JPanel humidityPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)humidityPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll();
+         drawPanel.setLayout(new BorderLayout());
+         JScrollPane jsp = this.setUpHumidityText();
+         drawPanel.add(jsp, BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(humidityTab);
       }
-      //Now check to see if a date in the JComboBox is not in the
-      //Date List from the Weather Data in the Weather Data List
-      Iterator<String> jcbDates = jcbDateList.iterator();
-      while(jcbDates.hasNext()){
-         date = jcbDates.next();
-         //Do not remove "All Days"  from the JComboBox
-         if(!(date.toUpperCase().contains("ALL")) && 
-            !(dateList.contains(date))){
-            jcb.removeItem(date);  //Hopefully, this will work
-         }
+      catch(NullPointerException npe){
+         String message = new String("No Humidity Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
       }
    }
    
    /**
+   Get the "appropriate event", put the data in a JTextArea,
+   put the JTextArea in a JScrollPane, return...In this case,
+   this is the Dewpoint Data
    */
-   private void setUpThermalData
-   (
-      Types types,
-      boolean displayException
-   ){
-      String type    = null;
-      LogEvent event = null;
-      JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-      int currentTab = jtp.getSelectedIndex();
+   private JScrollPane setUpHumidityText(){
+      double min, max;
+      JScrollPane humidityScrollPane = null;
       try{
-         if(types == Types.TEMPERATURE){
-            type  = new String("Temperature");
-            event = this.getTemperatureLogEvent();
+         JTextArea humidityTextArea = new JTextArea(28, 35);
+         humidityTextArea.setEditable(false);
+         LinkedList list =
+                       new LinkedList(this.humiEvent.getDataList());
+         LinkedList tlist =
+            new LinkedList(this.humidityTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                this.getDayIndeces(tlist, this.humiSelectionString);
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         tlist = new LinkedList(tlist.subList(indeces.getFirst(),
+                                              indeces.getLast()+1));
+         Iterator i = list.iterator();
+         Iterator t = tlist.iterator();
+         while(i.hasNext()){
+            String date = new String((Date)t.next() + ", ");
+            String data = String.format("%.2f", (Double)i.next());
+            String out = new String(date);
+            out = out.concat(data + "%\n");
+            humidityTextArea.append(out);
          }
-         else if(types == Types.DEWPOINT){
-            type  = new String("Dew Point");
-            event = this.getDewpointLogEvent();
-         }
-         else if(types == Types.HEATINDEX){
-            type = new String("Heat Index");
-            event = this.getHeatIndexLogEvent();
-         }
-         else{
-            type = new String("UKNOWN"); //Should never get here!!
-         }
-         //Handle an Error Message
-         if(event.getMessage().startsWith("Error:")){
-            throw new RuntimeException(event.getMessage());
-         }
-         String unitsString = this.getUnitsFromPanel(type);
-         String display     = this.getHowToDisplayData(type);
-         JComboBox jcb      = this.getTheJComboBox(type);
-         this.setUpJComboBox(jcb, event);
-         String date = (String)jcb.getSelectedItem();
-         LinkedList<WeatherData> wd =
-                        this.getWeatherData(event, unitsString, date);
-         if(wd.size() > 1){
-            LinkedList<WeatherData> mWD = new LinkedList();
-            //Get the data in the metric units
-            mWD = this.getWeatherData(event, date);
-            //Get the data in the desired units
-            wd = this.combineAllWeatherData(wd, mWD);
-         }
-         if(display.equals("Graph")){
-            this.setUpDataGraph(wd, type);
-         }
-         else if(display.equals("Data")){
-            this.setUpDataText(wd, type);
-         }
-         jtp.setSelectedIndex(currentTab);
-         //Set Visibity to "force" the system to draw the graph
-         //(Stupid Java will "get around to it" when it wants to)
-         this.setVisible(true);
+         min = this.humiEvent.getMin();
+         max = this.humiEvent.getMax();
+         String mins = String.format("%.2f", new Double(min));
+         String maxs = String.format("%.2f", new Double(max));
+         humidityTextArea.append("Min:  " + mins + "%\n");
+         humidityTextArea.append("Max:  " + maxs+ "%\n");
+         humidityScrollPane = new JScrollPane(humidityTextArea);
       }
       catch(NullPointerException npe){
-         if(displayException){
-            String message = new String("No " + type + " Data!");
-            String display = new String("Error!");
-            JOptionPane.showMessageDialog(this, message, display,
+      }
+      finally{
+         return humidityScrollPane;
+      }
+   }
+
+   /*
+   */
+   private void setUpHumidityGraph(LogEvent event){
+      try{
+         int humidityTab = -1;
+         int missionTab  = -1;
+         LinkedList list = new LinkedList(event.getDataList());
+         LinkedList<Date> date =
+            new LinkedList(this.humidityTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                this.getDayIndeces(date, this.humiSelectionString);
+         date = new LinkedList(date.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).equals("Humidity"))
+               humidityTab = i;
+            else if(jtp.getTitleAt(i).equals("Mission"))
+               missionTab  = i;
+         }
+         jtp.setSelectedIndex(humidityTab);
+         JPanel humiPanel = (JPanel)jtp.getSelectedComponent();
+         GenericJInteractionFrame testFrame =
+                           new GenericJInteractionFrame("Humidity");
+         TestPanel2 tp = new TestPanel2(list,
+                                        event.getMin(),
+                                        event.getMax(),
+                                        date);
+         testFrame.setSize(500,500);
+         testFrame.setResizable(false);
+         testFrame.add(tp);
+         testFrame.setVisible(true);
+         //Essentially, get the middle component, which is the
+         //Center component to put the graph...
+         JPanel drawPanel = (JPanel)humiPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll(); //Remove all as needed 
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(list,
+                                      event.getMin(),
+                                      event.getMax(),
+                                      date),
+                                      BorderLayout.CENTER);
+         System.out.println(drawPanel.getComponentCount());
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(humidityTab);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Humidity Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
                                          JOptionPane.ERROR_MESSAGE);
+      }
+   }
+
+   /*
+   */
+   private void setUpHumidityTimeData(LogEvent event){
+      try{
+         this.humidityTimeLogEvent = event;
+      }
+      catch(NullPointerException npe){
+         //Clear out the Humidity Time Log Linked List
+         this.humiTimeLog.clear();
+         String message = new String("No Humidity Time Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   */
+   private void setUpTemperatureData(){
+      int tempTab    = -1;
+      int missionTab = -1;
+      try{
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Temperature")){
+               tempTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         //Essentially, get the middle component, which is the
+         //Center component to put the graph...
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll(); //Remove all as needed 
+         drawPanel.setLayout(new BorderLayout());
+         JScrollPane jsp = this.setUpTemperatureText();
+         drawPanel.add(jsp, BorderLayout.CENTER);
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Temperature Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /**
+   Given a list of entries (which will usually correspond to a given
+   set of dates) set up the temperature data that corresponds to
+   those given indices
+   */
+   private void setUpTemperatureData(LinkedList<Integer> list){
+      try{
+         int first = (Integer)list.getFirst().intValue();
+         int last  = (Integer)list.getLast().intValue();
+         LinkedList<Date> dates =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Date> currentDates =
+                         new LinkedList(dates.subList(first, last));
+         LogEvent event = null;
+         if(this.temperatureUnits == Units.METRIC){
+            event = this.cTempEvent;
+         }
+         else if(this.temperatureUnits == Units.ENGLISH){
+            event = this.fTempEvent;
+         }
+         else{
+            event = this.kTempEvent;
+         }
+         LinkedList<Double> temp =
+                                new LinkedList(event.getDataList());
+         temp = new LinkedList(temp.subList(first, last));
+      }
+      catch(NullPointerException npe){}
+   }
+   
+   /**
+   Get the "appropriate event", put the data in a JTextArea,
+   put the JTextArea in a JScrollPane, return...In this case,
+   this is the Dewpoint Data
+   */
+   private JScrollPane setUpTemperatureText(){
+      String delimeter;
+      double min, max;
+      JScrollPane tempScrollPane = null;
+      try{
+         LogEvent event = null;
+         if(this.temperatureUnits == Units.METRIC){
+            event     = this.cTempEvent;
+            delimeter = new String("\u00B0C");
+         }
+         else if(this.temperatureUnits == Units.ENGLISH){
+            event     = this.fTempEvent;
+            delimeter = new String("\u00B0F");
+         }
+         else{
+            event     = this.kTempEvent;
+            delimeter = new String("K");            
+         }
+         JTextArea tempTextArea = new JTextArea(28, 35);
+         tempTextArea.setEditable(false);
+         LinkedList list  = new LinkedList(event.getDataList());
+         //This is more TBD than anything else...need to figure
+         //out how to set up the particular day...solution
+         //a "stop gap" for now...
+         LinkedList tlist =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                this.getDayIndeces(tlist, this.tempSelectionString);
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         tlist = new LinkedList(tlist.subList(indeces.getFirst(),
+                                              indeces.getLast()+1));
+         Iterator i = list.iterator();
+         Iterator t = tlist.iterator();
+         while(i.hasNext()){
+            String date = new String((Date)t.next() + ", ");
+            String data = String.format("%.2f", (Double)i.next());
+            String out = new String(date);
+            out = out.concat(data + " " + delimeter + "\n");
+            tempTextArea.append(out);
+         }
+         min = event.getMin();
+         max = event.getMax();
+         String mins = String.format("%.2f", new Double(min));
+         String maxs = String.format("%.2f", new Double(max));
+         tempTextArea.append("Min:  " + mins + delimeter + "\n");
+         tempTextArea.append("Max:  " + maxs + delimeter + "\n");
+         tempScrollPane = new JScrollPane(tempTextArea);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return tempScrollPane;
+      }
+   }
+   
+   /*
+   */
+   private void setUpTemperatureGraph(LogEvent event){
+      try{
+         int tempTab    = -1;
+         int missionTab = -1;
+         LinkedList list = new LinkedList(event.getDataList());
+         LinkedList<Date> date =
+                new LinkedList(this.tempTimeLogEvent.getDataList());
+         LinkedList<Integer> indeces =
+                 this.getDayIndeces(date, this.tempSelectionString);
+         date = new LinkedList(date.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         list = new LinkedList(list.subList(indeces.getFirst(),
+                                            indeces.getLast() + 1));
+         JTabbedPane jtp =
+                 (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int j = 0; j < jtp.getTabCount(); j++){
+            if(jtp.getTitleAt(j).equals("Temperature")){
+               tempTab = j;
+            }
+            else if(jtp.getTitleAt(j).equals("Mission")){
+               missionTab = j;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         //Will need to change
+         GenericJInteractionFrame testFrame =
+                        new GenericJInteractionFrame("Temperature");
+         TestPanel2 tp = new TestPanel2(list,
+                                        event.getMin(),
+                                        event.getMax(),
+                                        date);
+         testFrame.setSize(500, 500);
+         testFrame.setResizable(false);
+         testFrame.add(tp);
+         testFrame.setVisible(true);
+         //Essentially, get the middle component, which is the
+         //Center component to put the graph...
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(1);
+         if(drawPanel.getComponentCount() > 0)
+            drawPanel.removeAll(); //Remove all as needed 
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(list,
+                                      event.getMin(),
+                                      event.getMax(),
+                                      date),
+                                      BorderLayout.CENTER);
+         System.out.println(drawPanel.getComponentCount());
+         jtp.setSelectedIndex(missionTab);
+         if(this.getToDisplay())
+            jtp.setSelectedIndex(tempTab);
+         //Eventually, get rid of the line above, and do this
+         //line below
+         //drawPanel.add(tp, BorderLayout.CENTER);
+      }
+      catch(NullPointerException npe){
+         String message = new String("No Temperature Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   Set up the timeLog LinkedList for the new time data
+   to be used in every data graph as the time reference
+   */
+   private void setUpTemperatureTimeData(LogEvent event){
+      try{
+         this.tempTimeLogEvent = event;
+      }
+      catch(NullPointerException npe){
+         //Clear out the Temperature Time Log Linked List
+         String message = new String("No Temperature Time Data!");
+         String display = new String("Error!");
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
+      }
+   }
+   
+   /*
+   */
+   private void setUpTemperatureTimeGraph(LogEvent event){
+      try{
+         LinkedList list = new LinkedList(event.getDataList());
+         Iterator i = list.iterator();
+         Calendar c = Calendar.getInstance();
+         while(i.hasNext()){
+            c.setTime((Date)i.next());
+            System.out.print(c.get(Calendar.MONTH) + 1 + "/");
+            System.out.println(c.get(Calendar.DAY_OF_MONTH));
+            //System.out.println((Date)i.next());
          }
       }
-      catch(RuntimeException re){
-         int option = JOptionPane.ERROR_MESSAGE;
+      catch(NullPointerException npe){
+         String message = new String("No Temperature Time Data!");
          String display = new String("Error!");
-         String message = new String("No " + type + " Data!\n");
-         message=message.concat("Could be one of several reasons\n");
-         message=message.concat("Please check to see if the ");
-         message=message.concat("iButton\nis connected to an ");
-         message=message.concat("adapter and the adapter\nis ");
-         message=message.concat("connected to a computer.");
-         JOptionPane.showMessageDialog(this,message,display,option);
+         JOptionPane.showMessageDialog(this, message, display,
+                                         JOptionPane.ERROR_MESSAGE);
       }
    }
 }

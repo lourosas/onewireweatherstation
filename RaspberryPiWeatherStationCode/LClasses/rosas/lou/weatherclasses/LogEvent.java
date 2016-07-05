@@ -92,7 +92,7 @@ public class LogEvent{
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
    
-   /**
+   /*
    Constructor initializing everything
    */
       public LogEvent

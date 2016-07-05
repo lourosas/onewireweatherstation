@@ -1,7 +1,7 @@
 /**
 A Generic Search Port Class:  for searching for ports that have a
 Dallas Semiconductor 1-Wire Adapter--Either of the Serial Port
-(DS9097U) or of the USB (DS9094R) type
+(DS9097U) or of the USB (DS9490R) type
 A Class By Lou Rosas
 */
 
@@ -18,7 +18,7 @@ import com.dalsemi.onewire.container.*;
 public class PortSniffer{
    public static final short PORT_USB                = 0;
    public static final short PORT_SERIAL             = 1;
-   private static final String ADAPTER_STRING_USB    = "DS9094R";
+   private static final String ADAPTER_STRING_USB    = "DS9490R";
    private static final String ADAPTER_STRING_SERIAL = "DS9097U";
 
    private short type;
@@ -36,6 +36,17 @@ public class PortSniffer{
    */
    public PortSniffer(short type){
       this.portType(type);
+   }
+
+   /**
+   */
+   public void checkAdapterProperties(){
+      try{
+         DSPortAdapter dspa;
+         dspa = OneWireAccessProvider.getAdapter("DS9490", "USB1");
+      }
+      catch(OneWireIOException owioe){ System.out.println(owioe); }
+      catch(OneWireException owe){ System.out.println(owe); }
    }
 
    /**
@@ -129,7 +140,6 @@ public class PortSniffer{
       OneWireAccessProvider.getProperty("onewire.adapter.default"));
       System.out.println(
       OneWireAccessProvider.getProperty("onewire.port.default"));
-      
    }   
 
    /**
@@ -175,42 +185,46 @@ public class PortSniffer{
    USB ports
    */
    private Stack grabUSBDefaultPortData(){
+      DSPortAdapter dspa;
       Stack returnStack = new Stack();
-      String pd = new String("USB\n"); //pd = Port Data
-      try{
-         DSPortAdapter dspa;
-         dspa = OneWireAccessProvider.getDefaultAdapter();
-         pd = pd.concat(dspa.getAdapterName() + "\n");
-         pd = pd.concat(dspa.getPortName() + "\n");
-         dspa.selectPort(dspa.getPortName());
-         dspa.beginExclusive(true);
-         dspa.setSearchAllDevices();
-         dspa.targetAllFamilies();
-         dspa.setSpeed(DSPortAdapter.SPEED_REGULAR);
-         Enumeration e = dspa.getAllDeviceContainers();
-         while(e.hasMoreElements()){
-            OneWireContainer owc = (OneWireContainer)e.nextElement();
-            //Get the address of the One Wire Container
-            pd = pd.concat(owc.getAddressAsString() + "\n");
-            //Get the Name of the One Wire Container
-            //(Very Important for this stage of developement)
-            pd = pd.concat(owc.getName() + "\n");
+      String pd = new String("USB\n");//Port Data
+      Enumeration e = OneWireAccessProvider.enumerateAllAdapters();
+      while(e.hasMoreElements()){
+         dspa = (DSPortAdapter)e.nextElement();
+         System.out.println("Description: " + dspa.getPortTypeDescription());
+         System.out.println("Version:  " + dspa.getClassVersion());
+         Enumeration p = dspa.getPortNames();
+         while(p.hasMoreElements()){
+            try{
+               String port = (String)p.nextElement();
+               System.out.println("Port:  "  + port);
+               dspa.selectPort(port);
+               if(dspa.adapterDetected()){
+                  pd = pd.concat(dspa.getAdapterName()+"\n");
+                  pd = pd.concat(dspa.getPortName()+"\n");
+                  dspa.beginExclusive(true);
+                  dspa.setSearchAllDevices();
+                  dspa.targetAllFamilies();
+                  dspa.setSpeed(DSPortAdapter.SPEED_REGULAR);
+                  Enumeration c = dspa.getAllDeviceContainers();
+                  while(c.hasMoreElements()){
+                     OneWireContainer owc =
+                                    (OneWireContainer)c.nextElement();
+                     pd = pd.concat(owc.getAddressAsString()+"\n");
+                     pd = pd.concat(owc.getName()+"\n");
+                     //pd = pd.concat(owc.getAlternateNames()+"\n");
+                  }
+                  dspa.endExclusive();
+                  returnStack.push(pd);
+               }
+               dspa.freePort();
+            }
+            catch(OneWireIOException ioe){}
+            catch(OneWireException owe){}
          }
-         dspa.endExclusive();
-         dspa.freePort();
       }
-      catch(OneWireIOException ioe){
-         ioe.printStackTrace();
-         pd = new String("Nothing good here");
-      }
-      catch(OneWireException we){
-         we.printStackTrace();
-         pd = new String("Nothing One-Wire related found");
-      }
-      finally{ returnStack.push(pd); }
       return returnStack;
    }
-
    /**
    Grab the Serial Port Data:  Default or not.
    */

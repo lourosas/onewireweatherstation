@@ -24,31 +24,34 @@ import java.awt.event.*;
 import rosas.lou.weatherclasses.*;
 
 public class NewMissionData{
-   private String  sampleRate;
-   private String  startDelay;
+   //A Default logging rate of 600 seconds = 10 min
+   private static final int DEFAULT_LOGGING_RATE = 600;
+   //A Default Delay of 10 seconds
+   private static final int DEFAULT_START_DELAY  = 10;
+   
+   private int     sampleRate;
+   private int     startDelay;
    private boolean rolloverEnabled;
    private boolean synchClock;
    private boolean enableTemperatureChannel;
    private boolean enableHumidityChannel;
-   private String  units;
-   private String  temperatureLowAlarm;
-   private String  temperatureHighAlarm;
-   private String  humidityLowAlarm;
-   private String  humidityHighAlarm;
+   private double  temperatureLowAlarm;
+   private double  temperatureHighAlarm;
+   private double  humidityLowAlarm;
+   private double  humidityHighAlarm;
    
    //Initializer
    {
-      this.setSampleRate("");
-      this.setStartDelay("");
+      this.setSampleRate(DEFAULT_LOGGING_RATE);
+      this.setStartDelay(DEFAULT_START_DELAY);
       this.setRolloverEnabled(false);
       this.setSynchClock(false);
       this.setEnableTemperatureChannel(true);
       this.setEnableHumidityChannel(true);
-      this.setUnits("Celsius");
-      this.setTemperatureLowAlarm("");
-      this.setTemperatureHighAlarm("");
-      this.setHumidityLowAlarm("");
-      this.setHumidityHighAlarm("");
+      this.setTemperatureLowAlarm(Double.NaN);
+      this.setTemperatureHighAlarm(Double.NaN);
+      this.setHumidityLowAlarm(Double.NaN);
+      this.setHumidityHighAlarm(Double.NaN);
    }
    
    ///////////////////////Constructors//////////////////////////////
@@ -59,9 +62,9 @@ public class NewMissionData{
    public NewMissionData(){}
    
    ///////////////////Public Methods////////////////////////////////
-   public String getSampleRate(){ return this.sampleRate; }
+   public int getSampleRate(){ return this.sampleRate; }
    
-   public String getStartDelay(){ return this.startDelay; }
+   public int getStartDelay(){ return this.startDelay; }
    
    public boolean getRolloverEnabled(){
       return this.rolloverEnabled; 
@@ -76,33 +79,25 @@ public class NewMissionData{
    public boolean getEnableHumidityChannel(){
       return this.enableHumidityChannel;
    }
-
-   public String getUnits(){
-      return this.units;
-   }
    
-   public String getTemperatureLowAlarm(){
+   public double getTemperatureLowAlarm(){
       return this.temperatureLowAlarm;
    }
    
-   public String getTemperatureHighAlarm(){
+   public double getTemperatureHighAlarm(){
       return this.temperatureHighAlarm;
    }
    
-   public String getHumidityLowAlarm(){
+   public double getHumidityLowAlarm(){
       return this.humidityLowAlarm;
    }
-   public String getHumidityHighAlarm(){
+   public double getHumidityHighAlarm(){
       return this.humidityHighAlarm;
    }
-
-   public void setSampleRate(String rate){
-      this.sampleRate = new String(rate);
-   }
    
-   public void setStartDelay(String delay){
-      this.startDelay = new String(delay);
-   }
+   public void setSampleRate(int rate){ this.sampleRate = rate; }
+   
+   public void setStartDelay(int delay){ this.startDelay = delay; }
    
    public void setRolloverEnabled(boolean enabled){
       this.rolloverEnabled = enabled;
@@ -119,25 +114,21 @@ public class NewMissionData{
    public void setEnableHumidityChannel(boolean enable){
       this.enableHumidityChannel = enable;
    }
-
-   public void setUnits(String units){
-      this.units = new String(units);
+   
+   public void setTemperatureLowAlarm(double temp){
+      this.temperatureLowAlarm = temp;
    }
    
-   public void setTemperatureLowAlarm(String temp){
-      this.temperatureLowAlarm = new String(temp);
+   public void setTemperatureHighAlarm(double temp){
+      this.temperatureHighAlarm = temp;
    }
    
-   public void setTemperatureHighAlarm(String temp){
-      this.temperatureHighAlarm = new String(temp);
+   public void setHumidityLowAlarm(double humidity){
+      this.humidityLowAlarm = humidity;
    }
    
-   public void setHumidityLowAlarm(String humidity){
-      this.humidityLowAlarm = new String(humidity);
-   }
-   
-   public void setHumidityHighAlarm(String humidity){
-      this.humidityHighAlarm = new String(humidity);
+   public void setHumidityHighAlarm(double humidity){
+      this.humidityHighAlarm = humidity;
    }
    
    /**/
@@ -148,7 +139,6 @@ public class NewMissionData{
       rs = rs.concat(this.synchClock + "\n");
       rs = rs.concat(this.enableTemperatureChannel + "\n");
       rs = rs.concat(this.enableHumidityChannel + "\n");
-      rs = rs.concat(this.units + "\n");
       rs = rs.concat(this.temperatureLowAlarm + "\n");
       rs = rs.concat(this.temperatureHighAlarm + "\n");
       rs = rs.concat(this.humidityLowAlarm + "\n");

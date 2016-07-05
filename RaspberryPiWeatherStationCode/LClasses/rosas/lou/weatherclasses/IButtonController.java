@@ -29,7 +29,7 @@ implements ActionListener, KeyListener, ItemListener{
    public IButtonView ibuttonview = null; //The View
 
    //**********************Constructors*****************************
-   /**
+   /*
    Constructor of no arguments (just create the damn Model and View
    here)
    */
@@ -38,14 +38,14 @@ implements ActionListener, KeyListener, ItemListener{
       this.ibuttonview = new IButtonView("", this);
    }
    
-   /**
+   /*
    Constructor taking the argument of the Model
    */
    public IButtonController(IButton ib){
       this.ibutton = ib;
    }
    
-   /**
+   /*
    Constructor taking the arguments of the Model and View
    */
    public IButtonController(IButton ib, IButtonView ibv){
@@ -54,7 +54,7 @@ implements ActionListener, KeyListener, ItemListener{
    }
    
    //*********************Public Methods****************************
-   /**
+   /*
    Implementation of the actionPerformed method from the
    ActionListener Interface
    */
@@ -73,7 +73,7 @@ implements ActionListener, KeyListener, ItemListener{
          else if(b.getText().equals("Refresh Mission Data")){
             this.refreshAllMissionData();
          }
-         else if(b.getText().equals("Save Dewpoint Data")){
+         else if(b.getText().equals("Save Dew Point Data")){
             System.out.println(b.getActionCommand());
          }
          else if(b.getText().equals("Save Heat Index Data")){
@@ -83,42 +83,25 @@ implements ActionListener, KeyListener, ItemListener{
             System.out.println(b.getActionCommand());
          }
          else if(b.getText().equals("Save Mission Data")){
-            this.ibuttonview.saveMissionData(this);
+            System.out.println(b.getActionCommand());
          }
          else if(b.getText().equals("Save Temperature Data")){
             System.out.println(b.getActionCommand());
          }
          else if(b.getText().equals("Refresh")){
-            if(b.getActionCommand().equals("Temp Refresh")){
-               this.ibutton.requestTemperatureData();
-            }
-            else if(b.getActionCommand().equals("Humi Refresh")){
-               this.ibutton.requestHumidityData();
-            }
-            else if(b.getActionCommand().equals("DP Refresh")){
-               this.ibutton.requestDewpointData();
-            }
-            else if(b.getActionCommand().equals("HI Refresh")){
-               this.ibutton.requestHeatIndexData();
-            }
-            else if(b.getActionCommand().equals("AllData Refresh")){
-               //Essentially, should have the same effect as
-               //"Refresh Mission Data" on the "Mission" Tab
-               this.refreshAllMissionData();
-            }
-         }
-      }
-      else if(e.getSource() instanceof JFileChooser){
-         JFileChooser jfc = (JFileChooser)e.getSource();
-         if(e.getActionCommand().equals("ApproveSelection")){
-            if(jfc.getDialogTitle().equals("Save Mission Data")){
-               this.ibutton.saveAllData(jfc.getSelectedFile());
-            }
+            if(b.getActionCommand().equals("Temp Refresh"))
+               this.refreshTemperatureData();
+            else if(b.getActionCommand().equals("Humidity Refresh"))
+               this.refreshHumidityData();
+            else if(b.getActionCommand().equals("DP Refresh"))
+               this.refreshDewpointData();
+            else if(b.getActionCommand().equals("HI Refresh"))
+               this.refreshHeatIndexData();
          }
       }
    }
    
-   /**
+   /*
    Implementation of the itemStateChanged method from the
    ItemListener Interface
    */
@@ -132,7 +115,7 @@ implements ActionListener, KeyListener, ItemListener{
       }
    }
    
-   /**
+   /*
    Implementation of the keyPressed method from the KeyListener
    Interface
    */
@@ -151,13 +134,13 @@ implements ActionListener, KeyListener, ItemListener{
       }
    }
    
-   /**
+      /*
    Implementation of the keyReleased method from the KeyListener
    Interface
    */
    public void keyReleased(KeyEvent k){}
 
-   /**
+   /*
    Implementation of the keyTyped method from the KeyListener
    Interface
    */
@@ -170,23 +153,12 @@ implements ActionListener, KeyListener, ItemListener{
       }
    }
    
-   /**
-   */
-   public void setIButton(IButton ib){
-      this.ibutton = ib;
-   }
-   
-   /**
-   */
-   public void setIButtonView(IButtonView ibv){
-      this.ibuttonview = ibv;
-   }
-   
    //********************Private Methods****************************
    /*
    */
    private void clearMission(){
       this.ibutton.clearMemory();
+      this.ibuttonview.resetNewMissionDefaults();
    }
    
    /*
@@ -195,7 +167,7 @@ implements ActionListener, KeyListener, ItemListener{
    throws NumberFormatException{
       String msd               = null;
       int missionStartDelay = IButton.DEFAULT_DELAY;
-      /*try{
+      try{
          msd = this.ibuttonview.requestMissionStartDelay();
          missionStartDelay = Integer.parseInt(msd);
       }
@@ -214,7 +186,7 @@ implements ActionListener, KeyListener, ItemListener{
             //setting up the Mission)
             missionStartDelay = IButton.DEFAULT_DELAY;
          }
-      }*/
+      }
       return missionStartDelay;
    }
    
@@ -223,7 +195,7 @@ implements ActionListener, KeyListener, ItemListener{
    private int getSamplingRate() throws NumberFormatException{
       String sr           = null;
       int samplingRate = IButton.DEFAULT_LOGGING_RATE/60;
-      /*try{
+      try{
          sr = this.ibuttonview.requestSamplingRate();
          samplingRate = Integer.parseInt(sr);
       }
@@ -242,7 +214,7 @@ implements ActionListener, KeyListener, ItemListener{
              //setting up the Mission)
             samplingRate = IButton.DEFAULT_LOGGING_RATE/60;
          }
-      }*/
+      }
       return samplingRate;
    }
    
@@ -252,7 +224,7 @@ implements ActionListener, KeyListener, ItemListener{
    throws NumberFormatException{
       String tha = null;
       double highAlarm = Double.NaN;
-      /*try{
+      try{
          tha = this.ibuttonview.requestTemperatureHighAlarm();
          highAlarm = Double.parseDouble(tha);
       }
@@ -269,7 +241,7 @@ implements ActionListener, KeyListener, ItemListener{
              //Double.NaN
              highAlarm = Double.NaN;
          }
-      }*/
+      }
       return highAlarm;
    }
    
@@ -279,7 +251,7 @@ implements ActionListener, KeyListener, ItemListener{
    throws NumberFormatException{
       String tla      = null;
       double lowAlarm = Double.NaN;
-      /*try{
+      try{
          tla = this.ibuttonview.requestTemperatureLowAlarm();
          lowAlarm = Double.parseDouble(tla);
       }
@@ -297,36 +269,74 @@ implements ActionListener, KeyListener, ItemListener{
              //Double.NaN
              lowAlarm = Double.NaN;
          }
-      }*/
+      }
       return lowAlarm;
    }
    /*
    */
    private void handleJCheckBox(JCheckBox jcb){
       String command = jcb.getActionCommand();
+      if(jcb.isSelected()){
+         if(command.equals("Enable Rollover?")){
+            this.ibutton.setRolloverEnabled(true);
+         }
+         else if(command.equals("Synchronize Real Time Clock?")){
+            this.ibutton.setSynchronizedClock(true);
+         }
+      }
+      else{
+         if(command.equals("Enable Rollover?")){
+            this.ibutton.setRolloverEnabled(false);
+         }
+         else if(command.equals("Synchronize Real Time Clock?")){
+            this.ibutton.setSynchronizedClock(false);
+         }
+      }
    }
    
    /*
    */
    private void handleJRadioButton(JRadioButton jrb){
-      if(jrb.isSelected()){}
+      if(jrb.isSelected())
+         if(jrb.getActionCommand().equals("NMCelsius")){
+            this.ibutton.setNewMissionTempAlarmUnits(Units.METRIC);
+         }
+         else if(jrb.getActionCommand().equals("NMFahrenheit")){
+            this.ibutton.setNewMissionTempAlarmUnits(Units.ENGLISH);
+         }
+         else if(jrb.getActionCommand().equals("NMKelvin")){
+            this.ibutton.setNewMissionTempAlarmUnits(Units.ABSOLUTE);
+         }
    }
    
-   /**
+   /*
    Need to message the Model to get all update all the possible
    data
    */
    private void refreshAllMissionData(){
-      this.ibutton.requestTemperatureData();
-      this.ibutton.requestHumidityData();
-      this.ibutton.requestDewpointData();
-      this.ibutton.requestHeatIndexData();
+      //Set the View to "No Display", so as not to display
+      //any of the data from the measurements
+      try{
+         this.ibuttonview.setToDisplay(false);
+      }
+      catch(NullPointerException npe){
+         //For the time being, do not do anything...
+      }
+      finally{
+         //Request both the temperature and humidiy data in the
+         //current set units of the IButton
+         this.ibutton.requestMissionData(true, true);
+         this.ibutton.requestHeatIndexData();
+         this.ibutton.requestDewpointData();
+         this.ibutton.requestTemperatureMaxData();
+         this.ibutton.requestTemperatureMinData();
+      }
    }
    
    /*
    */
    private void refreshDewpointData(){
-      /*try{
+      try{
          //Set the view to "Display"
          this.ibuttonview.setToDisplay(true);
       }
@@ -339,13 +349,13 @@ implements ActionListener, KeyListener, ItemListener{
          this.ibutton.requestMissionData(true, true);
          //Request the dew point data, specifically
          this.ibutton.requestDewpointData();
-      }*/
+      }
    }
    
    /*
    */
    private void refreshHeatIndexData(){
-      /*try{
+      try{
          //Set the view to "Display"
          this.ibuttonview.setToDisplay(true);
       }
@@ -358,13 +368,13 @@ implements ActionListener, KeyListener, ItemListener{
          this.ibutton.requestMissionData(true, true);
          //Request the heat index data, specifically
          this.ibutton.requestHeatIndexData();
-      }*/
+      }
    }
    
    /*
    */
    private void refreshHumidityData(){
-      /*try{
+      try{
          //Set the view to "Display" the data
          this.ibuttonview.setToDisplay(true);
       }
@@ -375,13 +385,13 @@ implements ActionListener, KeyListener, ItemListener{
       finally{
          //Request the humidity data only
          this.ibutton.requestMissionData(false, true);
-      }*/
+      }
    }
    
    /*
    */
    private void refreshTemperatureData(){
-      /*try{
+      try{
          //Set the view to "Display" the data
          this.ibuttonview.setToDisplay(true);
       }
@@ -394,14 +404,36 @@ implements ActionListener, KeyListener, ItemListener{
          this.ibutton.requestMissionData(true, false);
          this.ibutton.requestTemperatureMaxData();
          this.ibutton.requestTemperatureMinData();
-      }*/
+      }
    }
    
    /*
    */
    private void setUpNewMission(){
-      NewMissionData nmd = this.ibuttonview.requestNewMissionData();
-      this.ibutton.startMission(nmd);
+      try{
+         final int ONE_MINUTE = 60; //Number of seconds in a minute
+         int sr     = this.getSamplingRate();
+         int msd    = this.getMissionStartDelay();
+         double tla = this.getTemperatureLowAlarm();
+         double tha = this.getTemperatureHighAlarm();
+         //Set the Low Temperature Alarm if a "legit" value
+         //is returned from the read of the View
+         this.ibutton.setLowTemperatureAlarm(tla);
+         //Set the High Temperature Alarm if a "legit" value
+         //is returned from the read of the View
+         this.ibutton.setHighTemperatureAlarm(tha);
+         //Start a new mission with the appropriate sample
+         //rate and start delay.  The sample rate is set in minutes
+         //The IButton instance needs it in seconds, need to convert
+         //from minutes to seconds.
+         sr *= ONE_MINUTE;
+         this.ibutton.startMission(sr, msd);
+      }
+      catch(NumberFormatException npe){
+         //Do not commit to a mission
+         //This is handled by the upper methods, just do "press"
+         //Through to the Model
+      }
    }
    
    /*

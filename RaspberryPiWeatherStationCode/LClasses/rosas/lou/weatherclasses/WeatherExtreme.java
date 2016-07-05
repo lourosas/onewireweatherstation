@@ -219,6 +219,142 @@ public class WeatherExtreme{
 
    /*
    */
+   public double requestDewpointMax(Units units){
+      double max = Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            max = this.maxDPC;
+            break;
+         case ENGLISH:
+            max = this.maxDPF;
+            break;
+         case ABSOLUTE:
+            max = this.maxDPK;
+            break;
+         default:  max = this.maxDPC;
+      }
+      return max;
+   }
+
+   /*
+   */
+   public String requestDewpointMaxDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.maxDPDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Max Dewpoint Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
+   public double requestDewpointMin(Units units){
+      double min = -Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            min = this.minDPC;
+            break;
+         case ENGLISH:
+            min = this.minDPF;
+            break;
+         case ABSOLUTE:
+            min = this.minDPK;
+            break;
+         default:  min = this.minDPC;
+      }
+      return min;
+   }
+
+   /*
+   */
+   public String requestDewpointMinDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.minDPDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Min Dewpoint Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
+   public double requestHeatIndexMax(Units units){
+      double max = Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            max = this.maxHIC;
+            break;
+         case ENGLISH:
+            max = this.maxHIF;
+            break;
+         case ABSOLUTE:
+            max = this.maxHIK;
+            break;
+         default:  max = this.maxHIC;
+      }
+      return max;
+   }
+
+   /*
+   */
+   public String requestHeatIndexMaxDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.maxHIDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Max Heat Index Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+   
+   /*
+   */
+   public double requestHeatIndexMin(Units units){
+      double min = -Thermometer.DEFAULTTEMP;
+      switch(units){
+         case METRIC:
+            min = this.minHIC;
+            break;
+         case ENGLISH:
+            min = this.minHIF;
+            break;
+         case ABSOLUTE:
+            min = this.minHIK;
+            break;
+         default:  min = this.minHIC;
+      }
+      return min;
+   }
+   
+   /*
+   */
+   public String requestHeatIndexMinDate(){
+      String dateString = null;
+      try{
+         dateString = String.format("%tc", this.minHIDate);
+      }
+      catch(NullPointerException npe){
+         dateString = new String("No Min Heat Index Date");
+      }
+      finally{
+         return dateString;
+      }
+   }
+
+   /*
+   */
    public double requestHumidityMax(){
       double max = Hygrometer.DEFAULTHUMIDITY;
       max = this.maxHumidity;

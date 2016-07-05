@@ -1,4 +1,4 @@
-/**
+/*
 */
 
 package rosas.lou.weatherclasses;
@@ -7,7 +7,6 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import java.io.File;
 import gnu.io.*;
 
 import com.dalsemi.onewire.*;
@@ -15,14 +14,11 @@ import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 
 public class IButton{
-   public static final int DEFAULT_LOGGING_RATE = 600;
-   public static final int DEFAULT_DELAY = 10;
-   
-   private static final int HIGH     = 0;
-   private static final int LOW      = 1;
-   private static final int TEMP     = 2;
-   private static final int HUMIDITY = 3;
-   
+   //Default Logging Rate set to 600 sec (10 min.)
+   public static final int DEFAULT_LOGGING_RATE =
+                                    MissionLog.DEFAULT_LOGGING_RATE;
+   public static final int DEFAULT_DELAY =
+                                     MissionLog.DEFAULT_START_DELAY;
    private Units units;
    private MissionLog missionLog;
    private String name;
@@ -57,25 +53,25 @@ public class IButton{
    private double  highHumidityAlarm;
      
    //*********************Public Methods***************************
-   /**
+   /*
    */
    public IButton(){
       this.findSensors();
-      this.setUnits("Celsius");
+      this.setUnits(Units.METRIC);
       this.setRolloverEnabled(false);
       this.setSynchronizedClock(false);
-      this.setNewMissionTempAlarmUnits("Celsius");
-      this.setLowTemperatureAlarm("");
-      this.setLowHumidityAlarm("");
-      this.setHighTemperatureAlarm("");
-      this.setHighHumidityAlarm("");
+      this.setNewMissionTempAlarmUnits(Units.METRIC);
+      this.setLowTemperatureAlarm(Double.NaN);
+      this.setLowHumidityAlarm(Double.NaN);
+      this.setHighTemperatureAlarm(Double.NaN);
+      this.setHighHumidityAlarm(Double.NaN);
       this.setHumidityChannelEnabled(true);
       this.setTemperatureChannelEnabled(true);
-      this.setSampleRate("");
-      this.setStartDelay("");
+      this.setSampleRate(DEFAULT_LOGGING_RATE);
+      this.setStartDelay(DEFAULT_DELAY);
    }
    
-   /**
+   /*
    */
    public IButton
    (
@@ -87,21 +83,21 @@ public class IButton{
       this.setName(name);
       this.setAddress(address);
       this.setUpMissionLog(adapterName, adapterPort);
-      this.setUnits("Celsius");
+      this.setUnits(Units.METRIC);
       this.setRolloverEnabled(false);
       this.setSynchronizedClock(false);
-      this.setNewMissionTempAlarmUnits("Celsius");
-      this.setLowTemperatureAlarm("");
-      this.setLowHumidityAlarm("");
-      this.setHighTemperatureAlarm("");
-      this.setHighHumidityAlarm("");
+      this.setNewMissionTempAlarmUnits(Units.METRIC);
+      this.setLowTemperatureAlarm(Double.NaN);
+      this.setLowHumidityAlarm(Double.NaN);
+      this.setHighTemperatureAlarm(Double.NaN);
+      this.setHighHumidityAlarm(Double.NaN);
       this.setHumidityChannelEnabled(true);
       this.setTemperatureChannelEnabled(true);
-      this.setSampleRate("");
-      this.setStartDelay("");
+      this.setSampleRate(DEFAULT_LOGGING_RATE);
+      this.setStartDelay(DEFAULT_DELAY);
    }
    
-   /**
+   /*
    Register a Log Listener
    */
    public void addLogListener(LogListener ll){
@@ -115,7 +111,7 @@ public class IButton{
       }
    }
    
-   /**
+   /*
    Register a Memory Listener
    */
    public void addMemoryListener(MemoryListener ml){
@@ -129,7 +125,7 @@ public class IButton{
       }
    }
    
-   /**
+   /*
    Register a Mission Listener
    */
    public void addMissionListener(MissionListener ml){
@@ -142,113 +138,47 @@ public class IButton{
       }
    }
    
-   /**
+   /*
    */
    public void clearMemory(){
       String memoryEventString = new String();
       try{
-         MissionLog ml = this.getMissionLog();
-         ml.clearLog();
-         memoryEventString = new String("Memory Cleared on ");
-         memoryEventString = memoryEventString.concat(this.getName());
-         memoryEventString = memoryEventString.concat(" device, ");
-         memoryEventString = memoryEventString.concat("address: ");
-         memoryEventString =
-                          memoryEventString.concat(this.getAddress());
+         this.missionLog.clearLog();
+         memoryEventString = new String("Memory Cleared ");
+         memoryEventString = memoryEventString.concat("on iButton");
+         memoryEventString = memoryEventString.concat(" device");
       }
       catch(MemoryException me){
-         memoryEventString =
-                          new String("Exception " + me.getMessage());
+         memoryEventString = new String(me.getMessage());
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
-         memoryEventString =
-                          new String("Exception" + npe.getMessage());
+         memoryEventString = new String(npe.getMessage());
       }
       finally{
          this.publishMemoryEvent(memoryEventString);
       }
    }
    
-   /**
+   /*
    */
    public String getAddress(){
       return this.address;
    }
-      
-   /**
-   */
-   public double getHighHumidityAlarm(){
-      return this.highHumidityAlarm;
-   }
    
-   /**
-   */
-   public double getHighTemperatureAlarm(){
-      return this.highTemperatureAlarm;
-   }
-   
-   /**
-   */
-   public boolean getHumidityChannelEnabled(){
-      return this.isHumidityChannelEnabled;
-   }
-   
-   /**
-   */
-   public double getLowHumidityAlarm(){
-      return this.lowHumidityAlarm;
-   }
-   
-   /**
-   */
-   public double getLowTemperatureAlarm(){
-      return this.lowTemperatureAlarm;
-   }
-   
-   /**
+   /*
    */
    public MissionLog getMissionLog(){
       return this.missionLog;
    }
    
-   /**
+   /*
    */
    public String getName(){
       return this.name;
    }
    
-   /**
-   */
-   public boolean getRolloverEnabled(){
-      return this.isRolloverEnabled;
-   }
-
-   /**
-   */
-   public int getSampleRate(){
-      return this.sampleRate;
-   }
-
-   /**
-   */
-   public int getStartDelay(){
-      return this.startDelay;
-   }
-   
-   /**
-   */
-   public boolean getTemperatureChannelEnabled(){
-      return this.isTemperatureChannelEnabled;
-   }
-   
-   /**
-   */
-   public boolean getSynchronizedClock(){
-      return this.isClockSynchronized;
-   }
-   
-   /**
+   /*
    */
    public Units getUnits(){
       return this.units;
@@ -256,236 +186,231 @@ public class IButton{
    
    /**
    Need both the Temperature and Humidity for this to work
-   NEEDS TO BE REWORKED!!!!
    */
    public void requestDewpointData(){
-      List<WeatherData> dewpoint    = new LinkedList<WeatherData>();
-      List<WeatherData> fdewpoint   = new LinkedList<WeatherData>();
-      List<WeatherData> kdewpoint   = new LinkedList<WeatherData>();
-      //Event String
+      List<Double> dewpointList   = new LinkedList<Double>();
+      List<Double> kDewpointList  = new LinkedList<Double>();
+      List<Double> fDewpointList  = new LinkedList<Double>();
+      double minDP  = Double.NaN; double maxDP  = Double.NaN;
+      double minDPk = Double.NaN; double maxDPk = Double.NaN;
+      double minDPf = Double.NaN; double maxDPf = Double.NaN;
+      //Log Event String
       String les = new String();
       try{
          if(this.getTemperatureChannelEnabled() &&
             this.getHumidityChannelEnabled()){
-            dewpoint = this.getDewpointData();
+            Iterator t = this.temperatureList.iterator();
+            Iterator h = this.humidityList.iterator();
+            while(t.hasNext()){
+               Double temperature = (Double)t.next();
+               Double humidity    = (Double)h.next();
+               Double dp = 
+                      this.calculateDewpoint(temperature, humidity);
+               dewpointList.add(dp);
+            }
+            minDP = this.findMin(dewpointList);
+            maxDP = this.findMax(dewpointList);
+            kDewpointList = new LinkedList<Double>(dewpointList);
+            fDewpointList = new LinkedList<Double>(dewpointList);
+            this.convertCelsiusToKelvin(kDewpointList);
+            this.convertCelsiusToFahrenheit(fDewpointList);
+            minDPk = WeatherConvert.celsiusToKelvin(minDP);
+            maxDPk = WeatherConvert.celsiusToKelvin(maxDP);
+            minDPf = WeatherConvert.celsiusToFahrenheit(minDP);
+            maxDPf = WeatherConvert.celsiusToFahrenheit(maxDP);
             les = new String("Dew Point Calculated and sent to");
             les = les.concat(" listeners");
          }
          else{
-            les = new String("Error:  ");
-            les = les.concat("Dew Point calculation not capable");
-         }
-      }
-      catch(MissionException me){
-         me.printStackTrace();
-         les = new String("Error: " + me.getMessage());
-      }
-      catch(IndexOutOfBoundsException ibe){
-         ibe.printStackTrace();
-         les = new String("Error:  " + ibe.getMessage());
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         les = new String("Error:  " + npe.getMessage());
-      }
-      catch(NumberFormatException nfe){
-         nfe.printStackTrace();
-         les = new String("Error:  " + nfe.getMessage());
-      }
-      finally{
-         this.publishDewpointEvent(les, dewpoint);
-      }
-   }
-   
-   /**
-   Need both the Temperature and Humidity for this to work
-   */
-   public void requestDewpointData(Units units){
-      List<WeatherData> dewpoint = new LinkedList<WeatherData>();
-      //Event String
-      String les = new String();
-      try{
-         if(this.getTemperatureChannelEnabled() &&
-            this.getHumidityChannelEnabled()){
-            dewpoint = this.getDewpointData(units);
-            les = new String("Dew Point Calculated and sent to");
-            les = les.concat(" listeners");
-         }
-         else{
-            les = new String("Error: ");
-            les = les.concat("Dew Point calculation not capable");
-         }
-      }
-      catch(MissionException me){
-         me.printStackTrace();
-         les = new String("Error: " + me.getMessage());
-      }
-      catch(IndexOutOfBoundsException ibe){
-         ibe.printStackTrace();
-         les = new String("Error:  " + ibe.getMessage());
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         les = new String("Error:  " + npe.getMessage());
-      }
-      catch(NumberFormatException nfe){
-         nfe.printStackTrace();
-         les = new String("Error:  " + nfe.getMessage());
-      }
-      finally{
-         this.publishDewpointEvent(les, dewpoint);
-      }
-   }
-   
-   /**
-   */
-   public void requestHeatIndexData(){
-      List<WeatherData> heatIndex   = new LinkedList<WeatherData>();
-      List<WeatherData> fheatIndex  = new LinkedList<WeatherData>();
-      List<WeatherData> kheatIndex  = new LinkedList<WeatherData>();
-      //Event String
-      String les = new String();
-      try{
-         if(this.getTemperatureChannelEnabled() &&
-            this.getHumidityChannelEnabled()){
-            heatIndex = this.getHeatIndexData();
-            les = new String("Heat Index Calculated and sent to");
-            les = les.concat(" listeners");
-         }
-         else{
-            les = new String("Error:  ");
-            les = les.concat("Heat Index Calculation not capable");
-         }
-      }
-      catch(MissionException me){
-         me.printStackTrace();
-         les = new String("Error:  " + me.getMessage());
-      }
-      catch(IndexOutOfBoundsException ibe){
-         ibe.printStackTrace();
-         les = new String("Error:  " + ibe.getMessage());
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         les = new String("Error:  " + npe.getMessage());
-      }
-      catch(NumberFormatException nfe){
-         nfe.printStackTrace();
-         les = new String("Error:  " + nfe.getMessage());
-      }
-      finally{
-         this.publishHeatIndexEvent(les, heatIndex);
-      }
-   }
-   
-   /**
-   */
-   public void requestHeatIndexData(Units units){
-      List<WeatherData> heatindex = new LinkedList<WeatherData>();
-      //Event String
-      String les = new String();
-      try{
-         if(this.getTemperatureChannelEnabled() &&
-            this.getHumidityChannelEnabled()){
-            heatindex = this.getHeatindexData(units);
-            les = new String("Heat Index Calculated and sent to");
-            les = les.concat(" listeners");
-         }
-         else{
-            les = new String("Heat Index Calculation not capable");
+            les = new String("Dew Point not currently able to be ");
+            les = les.concat("calculated");
          }
       }
       catch(IndexOutOfBoundsException ibe){
          ibe.printStackTrace();
          les = new String(ibe.getMessage());
+         dewpointList.add(new Double(Double.NaN));
+         kDewpointList.add(new Double(Double.NaN));
+         fDewpointList.add(new Double(Double.NaN));
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
          les = new String(npe.getMessage());
+         dewpointList.add(new Double(Double.NaN));
+         kDewpointList.add(new Double(Double.NaN));
+         fDewpointList.add(new Double(Double.NaN));
       }
       catch(NumberFormatException nfe){
          nfe.printStackTrace();
          les = new String(nfe.getMessage());
+         dewpointList.add(new Double(Double.NaN));
+         kDewpointList.add(new Double(Double.NaN));
+         fDewpointList.add(new Double(Double.NaN));
       }
       finally{
-         this.publishHeatIndexEvent(les, heatindex);
-      }
+         this.publishDewpointEvent(les, dewpointList, minDP, maxDP,
+                                                      Units.METRIC);
+         this.publishDewpointEvent(les, kDewpointList, minDPk,
+                                            maxDPk, Units.ABSOLUTE);
+         this.publishDewpointEvent(les, fDewpointList, minDPf,
+                                             maxDPf, Units.ENGLISH);
+      }      
    }
    
    /**
-   Request the humidity for each day:  including the Min and Max
    */
-   public void requestHumidityData(){
-      List<WeatherData> humidity = new LinkedList<WeatherData>();
-      //Event String
+   public void requestHeatIndexData(){
+      List<Double> heatIndexList  = new LinkedList<Double>();
+      List<Double> kheatIndexList = new LinkedList<Double>();
+      List<Double> fheatIndexList = new LinkedList<Double>();
+      double minHI  = Double.NaN; double maxHI  = Double.NaN;
+      double minHIk = Double.NaN; double maxHIk = Double.NaN;
+      double minHIf = Double.NaN; double maxHIf = Double.NaN;
+      //Log Event String
       String les = new String();
       try{
-         if(this.getHumidityChannelEnabled()){
-            MissionLog ml  = this.getMissionLog();
-            humidity       = ml.requestHumidityLog();
-            les = new String("Humidity Log Data Received");
-            les = les.concat(" and sent to the listeners");
+         if(this.getTemperatureChannelEnabled() &&
+            this.getHumidityChannelEnabled()){
+            Iterator t = this.temperatureList.iterator();
+            Iterator h = this.humidityList.iterator();
+            while(t.hasNext()){
+               Double temp = (Double)t.next();
+               Double humi = (Double)h.next();
+               Double hi = this.calculateHeatIndex(temp, humi);
+               heatIndexList.add(hi);
+            }
+            kheatIndexList = new LinkedList<Double>(heatIndexList);
+            fheatIndexList = new LinkedList<Double>(heatIndexList);
+            this.convertCelsiusToKelvin(kheatIndexList);
+            this.convertCelsiusToFahrenheit(fheatIndexList);
+            minHI  = this.findMin(heatIndexList);
+            maxHI  = this.findMax(heatIndexList);
+            minHIk = WeatherConvert.celsiusToKelvin(minHI);
+            maxHIk = WeatherConvert.celsiusToKelvin(maxHI);
+            minHIf = WeatherConvert.celsiusToFahrenheit(minHI);
+            maxHIf = WeatherConvert.celsiusToFahrenheit(maxHI);
+            les = new String("Heat Index Calculated and sent ");
+            les = les.concat("to listeners");
          }
          else{
-            les = new String("Error: Humidity Not Currently Enabled");
+            les = new String("Heat Index not currently able to be");
+            les = les.concat("calculated");
          }
       }
-      catch(MissionException me){
-         me.printStackTrace();
-         les = new String("Error: " + me.getMessage());
+      catch(IndexOutOfBoundsException ibe){
+         ibe.printStackTrace();
+         les = new String(ibe.getMessage());
+         heatIndexList.add(new Double(Double.NaN));
+         kheatIndexList.add(new Double(Double.NaN));
+         fheatIndexList.add(new Double(Double.NaN));
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
-         les = new String("Error: " + npe.getMessage());
+         les = new String(npe.getMessage());
+         heatIndexList.add(new Double(Double.NaN));
+         kheatIndexList.add(new Double(Double.NaN));
+         fheatIndexList.add(new Double(Double.NaN));
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         les = new String(nfe.getMessage());
+         heatIndexList.add(new Double(Double.NaN));
+         kheatIndexList.add(new Double(Double.NaN));
+         fheatIndexList.add(new Double(Double.NaN));
       }
       finally{
-         this.publishHumidityLogEvent(les,humidity);
+         this.publishHeatIndexEvent(les, heatIndexList, minHI,
+                                               maxHI, Units.METRIC);
+         this.publishHeatIndexEvent(les, kheatIndexList, minHIk,
+                                            maxHIk, Units.ABSOLUTE);
+         this.publishHeatIndexEvent(les, fheatIndexList, minHIf,
+                                             maxHIf, Units.ENGLISH);
       }
    }
    
    /**
-   Request the temperature in all three units.  Publish all that
-   data for the subscribers to "figure out" what to do.
+   Get mission data (Temperature data in the current Units that are
+   set)
+   */
+   public void requestMissionData
+   (
+      boolean forTemperature,
+      boolean forHumidity
+   ){
+      if(forTemperature){
+         this.requestTemperatureTimeData();
+         this.requestTemperatureData();
+      }
+      if(forHumidity){
+         this.requestHumidityTimeData();
+         this.requestHumidityData();
+      }
+   }
+   
+   /**
+   */
+   public void requestMissionData
+   (
+      boolean forTemperature,
+      boolean forHumidity,
+      Units   units
+   ){
+      this.setUnits(units);
+      if(forTemperature){
+         this.requestTemperatureTimeData();
+         this.requestTemperatureData(this.getUnits());
+      }
+      if(forHumidity){
+         this.requestHumidityTimeData();
+         this.requestHumidityData();
+      }
+   }
+
+   /*
    */
    public void requestTemperatureData(){
-      List<WeatherData> allTemp = new LinkedList<WeatherData>();
+      List<WeatherData> metricTemp = new LinkedList<WeatherData>();
+      List<WeatherData> englishTemp= new LinkedList<WeatherData>();
+      List<WeatherData> absoluteTemp=new LinkedList<WeatherData>();
       //Log Event String
       String les = new String();
       try{
          if(this.getTemperatureChannelEnabled()){
             MissionLog ml = this.getMissionLog();
-            allTemp       = ml.requestTemperatureLog();
-            les = new String("Temperature Log Data Received");
-            les = les.concat(" and sent to the listeners");
+            metricTemp   = ml.requestTemperatureLog(Units.METRIC);
+            englishTemp  = ml.requestTemperatureLog(Units.ENGLISH);
+            absoluteTemp = ml.requestTemperatureLog(Units.ABSOLUTE);
          }
          else{
-            les = new String("Error: ");
-            les = les.concat("Temperature Not Currently Enabled");
+            les = new String("Temperature Not Currently Enabled");
          }
       }
-      catch(MissionException me){
-         me.printStackTrace();
-         les = new String("Error:  " + me.getMessage());
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         les = new String("Error:  " + npe.getMessage());
-      }
-      finally{
-         this.publishTemperatureLogEvent(les, allTemp);
-      }
-   }
-   
-   /**
-   */
-   public void requestTemperatureData(Units units){
-      List<WeatherData> temp = new LinkedList<WeatherData>();
+      catch(MissionException me){}
+      catch(NullPointerException npe){}
+      finally{}
+   /*
+      this.temperatureList    = new LinkedList<Double>();
+      List<Double> kelvinList = new LinkedList<Double>();
+      List<Double> fahrenList = new LinkedList<Double>();
+      double maxTemp  = Double.NaN; double minTemp  = Double.NaN;
+      double maxTempK = Double.NaN; double minTempK = Double.NaN;
+      double maxTempF = Double.NaN; double minTempF = Double.NaN;
       //Log Event String
       String les = new String();
       try{
          if(this.getTemperatureChannelEnabled()){
             MissionLog ml = this.getMissionLog();
-            temp = ml.requestTemperatureLog(units);
+            this.temperatureList = ml.requestTemperatureLog();
+            maxTemp = this.findMax(this.temperatureList);
+            minTemp = this.findMin(this.temperatureList);
+            kelvinList=new LinkedList<Double>(this.temperatureList);
+            fahrenList=new LinkedList<Double>(this.temperatureList);
+            this.convertCelsiusToKelvin(kelvinList);
+            this.convertCelsiusToFahrenheit(fahrenList);
+            maxTempK = WeatherConvert.celsiusToKelvin(maxTemp);
+            maxTempF = WeatherConvert.celsiusToFahrenheit(maxTemp);
+            minTempK = WeatherConvert.celsiusToKelvin(minTemp);
+            minTempF = WeatherConvert.celsiusToFahrenheit(minTemp);
             les = new String("Temperature Log Data Received");
             les = les.concat(" and sent to the listeners");
          }
@@ -496,13 +421,69 @@ public class IButton{
       catch(MissionException me){
          me.printStackTrace();
          les = new String(me.getMessage());
+         //To indicate there was a problem
+         this.temperatureList.add(new Double(Double.NaN));
+         kelvinList.add(new Double(Double.NaN));
+         fahrenList.add(new Double(Double.NaN));
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
          les = new String(npe.getMessage());
+         //To indicate there was a problem
+         this.temperatureList.add(new Double(Double.NaN));
+         kelvinList.add(new Double(Double.NaN));
+         fahrenList.add(new Double(Double.NaN));
       }
       finally{
-         this.publishTemperatureLogEvent(les, temp);
+         this.publishTemperatureLogEvent(les, this.temperatureList,
+                                         minTemp, maxTemp,
+                                         Units.METRIC);
+         this.publishTemperatureLogEvent(les, kelvinList, minTempK,
+                                         maxTempK, Units.ABSOLUTE);
+         this.publishTemperatureLogEvent(les, fahrenList, minTempF,
+                                         maxTempF, Units.ENGLISH);
+      }
+      */
+   }
+
+   /*
+   */
+   private void requestTemperatureData(Units units){
+      double maxTemp = Double.NaN; double minTemp = Double.NaN;
+      this.temperatureList = new LinkedList<Double>();
+      //Log Event String
+      String les           = new String();
+      try{
+         MissionLog ml   = this.getMissionLog();
+         this.temperatureList = ml.requestTemperatureLog();
+         if(units == Units.ABSOLUTE){
+            this.convertCelsiusToKelvin(this.temperatureList);
+         }
+         else if(units == Units.ENGLISH){
+            this.convertCelsiusToFahrenheit(this.temperatureList);
+         }
+         maxTemp = this.findMax(this.temperatureList);
+         minTemp = this.findMin(this.temperatureList);
+         les = new String("Temperature Log Data Received");
+         les = les.concat(" and sent to the listeners");
+      }
+      catch(MissionException me){
+         me.printStackTrace();
+         les = new String(me.getMessage());
+         //To indicate there was a problem
+         this.temperatureList.add(new Double(Double.NaN));
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         les = new String(npe.getMessage());
+         //To indicate there was a problem
+         this.temperatureList.add(new Double(Double.NaN));
+      }
+      finally{
+         this.publishTemperatureLogEvent(les,
+                                         this.temperatureList,
+                                         minTemp,
+                                         maxTemp);
       }
    }
    
@@ -530,7 +511,7 @@ public class IButton{
          fMaxTemps = new LinkedList<Double>(cMaxTemps);
          kMaxTemps = new LinkedList<Double>(cMaxTemps);
          this.convertCelsiusToKelvin(kMaxTemps);
-         this.convertCelsiusToFahrenheit(fMaxTemps);
+         this.covnertCelsiusToFahrenheit(fMaxTemps);
       }
       catch(NoSuchElementException nsee){
          nsee.printStackTrace();
@@ -554,65 +535,69 @@ public class IButton{
    */
    public void requestTemperatureMinData(Units units){}
    
-   /**
+   /*
    */
-   public void saveAllData(File file){
-      //Archive Event String
-      String aes = new String("");
-      
-      List<WeatherData> temp = new LinkedList<WeatherData>();
-      List<WeatherData> humi = new LinkedList<WeatherData>();
-      List<WeatherData> dewp = new LinkedList<WeatherData>();
-      List<WeatherData> hidx = new LinkedList<WeatherData>();
-      try{
-         MissionLog ml = this.getMissionLog();
-         WeatherDataFile wdf = new WeatherDataFile();
-         if(this.getTemperatureChannelEnabled() &&
-            this.getHumidityChannelEnabled()){
-            temp = ml.requestTemperatureLog();
-            humi = ml.requestHumidityLog();
-            dewp = this.getDewpointData(temp, humi);
-            hidx = this.getHeatIndexData(temp, humi);
-            //Save data to the file
-            wdf.setWeatherData(temp);
-            wdf.setWeatherDataFile(file);
-            aes  = new String("All Log data saved at: " + file);
-         }
-         else if(this.getTemperatureChannelEnabled()){
-            temp = ml.requestTemperatureLog();
-            //Save data to the file
-            
-            aes = new String("Error:  ");
-            aes = aes.concat("Temperature Log data saved at:  ");
-            aes = aes.concat(file + "\n");
-            aes = aes.concat("Humidity, Dewpoint and Heat Index\n");
-            aes = aes.concat("were NOT able to be saved");
-            throw new MissionException(aes);
-         }
-         else if(this.getHumidityChannelEnabled()){
-            humi = ml.requestHumidityLog();
-            //Save data to the file
-            
-            aes = new String("Error:  Humidity Log data saved at:  ");
-            aes = aes.concat(file + "\n");
-            aes= aes.concat("Temperature, Dewpoint and Heat Index\n");
-            aes = aes.concat("were NOT able to be saved");
-            throw new MissionException(aes);
-         }
-         else{
-            aes = new String("Error:  ");
-            aes = aes.concat("No Weather Data able to be saved!!!");
-            throw new MissionException(aes);
-         }
-      }
-      catch(MissionException me){
-      }
-      catch(NullPointerException npe){}
-      finally{}
+   public void setHighHumidityAlarm(double alarm){
+      this.highHumidityAlarm = alarm;
+   }
+   
+   /*
+   */
+   public void setHighTemperatureAlarm(double alarm){
+      this.highTemperatureAlarm = alarm;
+   }
+   
+   /*
+   */
+   public void setHumidityChannelEnabled(boolean isEnabled){
+      this.isHumidityChannelEnabled = isEnabled;
+   }
+   
+   /*
+   */
+   public void setLowHumidityAlarm(double alarm){
+      this.lowHumidityAlarm = alarm;
+   }
+   
+   /*
+   */
+   public void setLowTemperatureAlarm(double alarm){
+      this.lowTemperatureAlarm = alarm;
+   }
+   
+   /*
+   */
+   public void setNewMissionTempAlarmUnits(Units units){
+      this.newMissionTempAlarmUnits = units;
    }
 
+   /*
+   */
+   public void setRolloverEnabled(boolean isEnabled){
+      this.isRolloverEnabled = isEnabled;
+   }
+   
+   /*
+   */
+   public void setSampleRate(int rate){ this.sampleRate = rate; }
+   
+   /*
+   */
+   public void setStartDelay(int delay){ this.startDelay = delay; }
+   
+   /*
+   */
+   public void setSynchronizedClock(boolean isSynchronized){
+      this.isClockSynchronized = isSynchronized;
+   }
+   
+   /*
+   */
+   public void setTemperatureChannelEnabled(boolean isEnabled){
+      this.isTemperatureChannelEnabled = isEnabled;
+   }
 
-   /**
+   /*
    Start a mission with the default sample rate set:  600 sec
    (10 min)
    */
@@ -622,7 +607,7 @@ public class IButton{
       this.startMission(DEFAULT_LOGGING_RATE, DEFAULT_DELAY);
    }
    
-   /**
+   /*
    Start a mission with a selected sample rate:  entered in seconds.
    This might mean the sample time needs to be translated from hours
    or minutes to seconds.
@@ -631,7 +616,7 @@ public class IButton{
       this.startMission(sampleRate, DEFAULT_DELAY);
    }
    
-   /**
+   /*
    Start a mission with a selected sample rate:  entered in seconds,
    and the selected start delay:  entered in seconds, as well
    This might mean the sample time needs to be translated from hours
@@ -643,8 +628,8 @@ public class IButton{
       //Class, instead
       String missionEventString = new String();
       //Go ahead and set the sample rate and start delay here.
-      this.setSampleRate(Integer.toString(sampleRate));
-      this.setStartDelay(Integer.toString(startDelay));
+      this.setSampleRate(sampleRate);
+      this.setStartDelay(startDelay);
       try{
          //Get the Mission Log (better way of doing this, I feel)
          MissionLog ml = this.getMissionLog();
@@ -661,13 +646,16 @@ public class IButton{
          missionEventString = missionEventString.concat("delay of ");
          missionEventString = missionEventString.concat("" + startDelay);
          missionEventString = missionEventString.concat(" seconds");
+         //Set up the NewMissionData instance, except for the
+         //Sample Rate and Start Delay
+         NewMissionData nmd = this.setUpNewMissionData();
          //needs to be redone, accepting a NewMissionData object
          //Essentially, start the logging with a NewMissionData
          //object:  since essentially, that is what you are doing,
          //regardless.
-         //ml.startLogging(nmd);
+         ml.startLogging(nmd);
          //Test Print...
-         //System.out.println(nmd);
+         System.out.println(nmd);
       }
       catch(MissionException me){
          missionEventString = new String(me.getMessage());
@@ -680,77 +668,7 @@ public class IButton{
       }
    }
    
-   /**
-   */
-   public void startMission(NewMissionData nmd){
-      String mes = new String();//Mission Event String
-      this.setUnits(nmd.getUnits());
-      this.setRolloverEnabled(nmd.getRolloverEnabled());
-      this.setSynchronizedClock(nmd.getSynchClock());
-      this.setNewMissionTempAlarmUnits(nmd.getUnits());
-      this.setLowTemperatureAlarm(nmd.getTemperatureLowAlarm());
-      this.setLowHumidityAlarm(nmd.getHumidityLowAlarm());
-      this.setHighTemperatureAlarm(nmd.getTemperatureHighAlarm());
-      this.setHighHumidityAlarm(nmd.getHumidityHighAlarm());
-      this.setHumidityChannelEnabled(nmd.getEnableHumidityChannel());
-      this.setTemperatureChannelEnabled(
-                                   nmd.getEnableTemperatureChannel());
-      this.setSampleRate(nmd.getSampleRate());
-      this.setStartDelay(nmd.getStartDelay());
-      //TBD
-      try{
-         if(this.isMissionRunning()){
-            mes = new String("Mission Running, ");
-            mes = mes.concat("please stop the current\nmission to ");
-            mes = mes.concat("start a new mission");
-         }
-         else{
-            double value    = 0.;
-            boolean enabled = false;
-            //TBD on the Mission String
-            MissionLog ml = this.getMissionLog();
-            ml.setRollover(this.getRolloverEnabled());
-            ml.setSynchronizedClock(this.getSynchronizedClock());
-            value = this.getAlarmValue(this.TEMP, this.HIGH);
-            if(value != Double.NaN){
-               ml.setHighTemperatureAlarm(value);
-            }
-            value = this.getAlarmValue(this.TEMP, this.LOW);
-            if(value != Double.NaN){
-               ml.setLowTemperatureAlarm(value);
-            }
-            value = this.getAlarmValue(this.HUMIDITY, this.HIGH);
-            if(value != Double.NaN){
-               ml.setHighHumidityAlarm(value);
-            }
-            value = this.getAlarmValue(this.HUMIDITY, this.HIGH);
-            if(value != Double.NaN){
-               ml.setLowHumidityAlarm(value);
-            }
-            enabled = this.getTemperatureChannelEnabled();
-            ml.setTemperatureEnabled(enabled);
-            enabled = this.getHumidityChannelEnabled();
-            ml.setHumidityEnabled(enabled);
-            ml.setSampleRate(this.getSampleRate());
-            ml.setStartDelay(this.getStartDelay());
-            ml.startLogging();
-            mes = new String("New Mission Started on:  ");
-            mes = mes.concat(this.getName());
-            mes = mes.concat(" device, address:  "+this.getAddress());
-         }
-      }
-      catch(MissionException me){
-         mes = new String(me.getMessage());
-      }
-      catch(NullPointerException npe){
-         mes = new String(npe.getMessage());
-      }
-      finally{
-         this.publishMissionEvent(mes);
-      }
-   }
-   
-   /**
+   /*
    Stop the current mission
    */
    public void stopMission(){
@@ -758,28 +676,22 @@ public class IButton{
       try{
          MissionLog ml = this.getMissionLog();
          ml.stopLogging();
-         missionEventString = new String("Mission Stopped on:  ");
-         missionEventString =
-                           missionEventString.concat(this.getName());
-         missionEventString = missionEventString.concat(" device, ");
-         missionEventString = missionEventString.concat("address: ");
-         missionEventString =
-                        missionEventString.concat(this.getAddress());
+         missionEventString = new String("Mission Stopped on ");
+         missionEventString = missionEventString.concat("iButton");
+         missionEventString = missionEventString.concat(" device");
       }
       catch(MissionException me){
-         missionEventString =
-                          new String("Exception:  "+me.getMessage());
+         missionEventString = new String(me.getMessage());
       }
       catch(NullPointerException npe){
-         missionEventString =
-                         new String("Exception:  "+npe.getMessage());
+         missionEventString = new String(npe.getMessage());
       }
       finally{
          this.publishMissionEvent(missionEventString);
       }
    }
    
-   /**
+   /*
    Override the toString() method from the Object Class
    */
    public String toString(){
@@ -787,7 +699,7 @@ public class IButton{
    }
    
    //**********************Private Methods*************************   
-   /**
+   /*
    Calculate the dewpoint for a given pair of humidity and
    temperature sensors.  This is based on the temperature and
    humidty sensor stacks and is based on the assumption that
@@ -798,7 +710,6 @@ public class IButton{
    approximation.  The actual calculation depends upon wetbulb
    and dry bulb measurements.  This is an approximation based on
    the Manus-Tetens formula.
-   Temperature MUST be in celsius!
    Td = (243.12 * alpha[t,RH])/(17.62 - alpha[t, RH])
    where alpha[t,RH] = (17.62*t/(243.12 + t)) + ln(RH/100)
    and 0.0 < RH < 100.0.
@@ -827,7 +738,7 @@ public class IButton{
       return dewpoint;
    }
    
-   /**
+   /*
    Calculate the heat index for a given pair of humidity and
    temperature sensors.  This is based on the temperature and
    humidity sensor stacks and is based on the assumption that
@@ -1086,295 +997,82 @@ public class IButton{
             String address = (String)element.nextElement();
             if(!name.equals("DS1990A")){
                /*Since this is a Thermochron iButton, I should only
-               have one name and address (aside from the adapter
-               address)*/
+               have one name and address (asside from the adapter
+               address*/
                this.setName(name);
                this.setAddress(address);
-               adapterName = (String)port.pop();//Adapter Name
-               adapterPort = (String)port.pop();//Adapter Port
-               this.setUpMissionLog(adapterName, adapterPort);
             }
          }
+         adapterName = (String)port.pop();//Adapter Name
+         adapterPort = (String)port.pop();//Adapter Port
       }
+      this.setUpMissionLog(adapterName, adapterPort);
    }
    
-   /**
+   /*
    */
-   private double getAlarmValue(int type, int place){
-      double value = Double.NaN;
-      switch(type){
-         case TEMP:
-            Units unit = this.getNewMissionTempAlarmUnits();
-            switch(place){
-               case HIGH:
-                  value = this.getHighTemperatureAlarm();
-                  break;
-               case LOW:
-                  value = this.getLowTemperatureAlarm();
-                  break;
-               default: 
-                  value = Double.NaN;
-            }
-            if(value != Double.NaN){
-               if(unit == Units.ENGLISH){
-                  value = WeatherConvert.fahrenheitToCelsius(value);
-               }
-               else if(unit == Units.ABSOLUTE){
-                     value=WeatherConvert.kelvinToCelsius(value);
-               }
-            }
-            break;
-         case HUMIDITY:
-            switch(place){
-               case HIGH:
-                  value = this.getHighHumidityAlarm();
-                  break;
-               case LOW:
-                  value = this.getLowHumidityAlarm();
-                  break;
-               default:
-                  value = Double.NaN;
-            }
-            break;
-         default:
-            value = Double.NaN;
-      }
-      return value;
+   private double getHighHumidityAlarm(){
+      return this.highHumidityAlarm;
    }
    
-   /**
+   /*
    */
-   private List getDewpointData(){
-      List<WeatherData> temperature = new LinkedList<WeatherData>();
-      List<WeatherData> humidity    = new LinkedList<WeatherData>();
-      List<WeatherData> dewpoint    = new LinkedList<WeatherData>();
-      MissionLog ml                 = this.getMissionLog();
-      
-      //Just need the Celsius Temperature...
-      temperature = ml.requestTemperatureLog(Units.METRIC);
-      humidity    = ml.requestHumidityLog();
-      dewpoint = this.getDewpointData(temperature, humidity);
-      return dewpoint;
-   }
-
-   /**
-   */   
-   private List getDewpointData(Units units){
-      List<WeatherData> temperature = new LinkedList<WeatherData>();
-      List<WeatherData> humidity    = new LinkedList<WeatherData>();
-      List<WeatherData> dewpoint    = new LinkedList<WeatherData>();
-      MissionLog ml                 = this.getMissionLog();
-      //Need the temperature in Metric Units
-      temperature = ml.requestTemperatureLog(Units.METRIC);
-      humidity    = ml.requestHumidityLog();
-      Iterator i  = temperature.iterator();
-      Iterator h  = humidity.iterator();
-      while(i.hasNext()){
-         WeatherData tempData = (WeatherData)i.next();
-         WeatherData humiData = (WeatherData)h.next();
-         List<Double> data    = tempData.getData();
-         List<Date>  dates    = tempData.getDates();
-         List<Double> humi    = humiData.getData();
-         List<Double> dewp    = new LinkedList<Double>();
-         Iterator dt          = data.iterator();
-         Iterator ht          = humi.iterator();
-         while(dt.hasNext()){
-            Double temp = (Double)dt.next();
-            Double hum  = (Double)ht.next();
-            Double dp   = this.calculateDewpoint(temp,hum);
-            dewp.add(dp);
-         }
-         //Create a new WeatherData Object, with the current
-         //Dates and the current dewpoint data
-         WeatherData wd = new WeatherData(Types.DEWPOINT,
-                                          units,
-                                          dewp,
-                                          dates);
-         dewpoint.add(wd);
-      }
-      return dewpoint;
+   private double getHighTemperatureAlarm(){
+      return this.highTemperatureAlarm;
    }
    
-   /**
+   /*
    */
-   private List getDewpointData
-   (
-      List<WeatherData> temp,
-      List<WeatherData> humi
-   ){
-      List<WeatherData> dewpoint = new LinkedList<WeatherData>();
-      Iterator tempi = temp.iterator();
-      Iterator humii = humi.iterator();
-      while(tempi.hasNext()){
-         WeatherData tempData = (WeatherData)tempi.next();
-         if(tempData.getUnits() == Units.METRIC){
-            WeatherData humiData = (WeatherData)humii.next();
-            List<Double> templ   = tempData.getData();
-            List<Date>  tempd   = tempData.getDates();
-            List<Double> humil   = humiData.getData();
-            List<Date> humid   = humiData.getDates();
-            List<Double> dewpl   = new LinkedList<Double>();
-            Iterator templi = templ.iterator();  //Temp Iterator
-            Iterator humili = humil.iterator();  //Humidity Iterator
-            while(templi.hasNext()){
-               Double currentTemp = (Double)templi.next();
-               Double currentHumi = (Double)humili.next();
-               Double dewpt =
-                     this.calculateDewpoint(currentTemp, currentHumi);
-               dewpl.add(dewpt);
-            }
-            WeatherData dewptData = new WeatherData(Types.DEWPOINT,
-                                                    Units.METRIC,
-                                                    dewpl, tempd);
-            dewpoint.add(dewptData);
-            dewptData = new WeatherData(Types.DEWPOINT, Units.ENGLISH,
-                                        dewpl, tempd);
-            dewpoint.add(dewptData);
-            dewptData = new WeatherData(Types.DEWPOINT,
-                                        Units.ABSOLUTE, dewpl, tempd);
-            dewpoint.add(dewptData);
-         }
-      }
-      return dewpoint;
+   private boolean getHumidityChannelEnabled(){
+      return this.isHumidityChannelEnabled;
    }
    
-   /**
+   /*
    */
-   private List getHeatIndexData(){
-      List<WeatherData> temperature = new LinkedList<WeatherData>();
-      List<WeatherData> humidity    = new LinkedList<WeatherData>();
-      List<WeatherData> heatIndex   = new LinkedList<WeatherData>();
-      MissionLog ml                 = this.getMissionLog();
-      
-      //As the way the method calculateHeatIndex was written, just
-      //need to Celsius Temperature
-      temperature = ml.requestTemperatureLog(Units.METRIC);
-      humidity    = ml.requestHumidityLog();
-      heatIndex = this.getHeatIndexData(temperature, humidity);
-      /*
-      Iterator t  = temperature.iterator();
-      Iterator h  = humidity.iterator();
-      while(t.hasNext()){
-         WeatherData tempData = (WeatherData)t.next();
-         WeatherData humiData = (WeatherData)h.next();
-         List<Double> temp    = tempData.getData();
-         List<Date> tempDates = tempData.getDates();
-         List<Double> humi    = humiData.getData();
-         List<Date> humiDates = humiData.getDates();
-         List<Double> hiList  = new LinkedList<Double>();
-         Iterator ti = temp.iterator(); //Temp Iterator
-         Iterator hi = humi.iterator(); //Humidity Iterator
-         while(ti.hasNext()){
-            Double currTemp = (Double)ti.next();
-            Double currHumi = (Double)hi.next();
-            Double hindx = this.calculateHeatIndex(currTemp,currHumi);
-            hiList.add(hindx);
-         }
-         WeatherData hiData = new WeatherData(Types.HEATINDEX,
-                                              Units.METRIC,
-                                              hiList,
-                                              tempDates);
-         heatIndex.add(hiData);
-         hiData = new WeatherData(Types.HEATINDEX,
-                                  Units.ENGLISH,
-                                  hiList,
-                                  tempDates);
-         heatIndex.add(hiData);
-         hiData = new WeatherData(Types.HEATINDEX,
-                                  Units.ABSOLUTE,
-                                  hiList,
-                                  tempDates);
-         heatIndex.add(hiData);
-      }
-      */
-      return heatIndex;
+   private double getLowHumidityAlarm(){
+      return this.lowHumidityAlarm;
    }
    
-   /**
+   /*
    */
-   private List getHeatindexData(Units units){
-      List<WeatherData> temperature = new LinkedList<WeatherData>();
-      List<WeatherData> humidity    = new LinkedList<WeatherData>();
-      List<WeatherData> heatindex   = new LinkedList<WeatherData>();
-      MissionLog ml = this.getMissionLog();
-      //Need the temperature in Metric Units
-      temperature = ml.requestTemperatureLog(Units.METRIC);
-      humidity    = ml.requestHumidityLog();
-      Iterator i  = temperature.iterator();
-      Iterator h  = humidity.iterator();
-      while(i.hasNext()){
-         WeatherData tempData = (WeatherData)i.next();
-         WeatherData humiData = (WeatherData)h.next();
-         List<Double> data    = tempData.getData();
-         List<Date>  dates    = tempData.getDates();
-         List<Double> humi    = humiData.getData();
-         List<Double> heat    = new LinkedList<Double>();
-         Iterator tempi       = data.iterator();
-         Iterator humii       = humi.iterator();
-         while(tempi.hasNext()){
-            Double temp = (Double)tempi.next();
-            Double hum  = (Double)humii.next();
-            Double hi   = this.calculateHeatIndex(temp, hum);
-            heat.add(hi);
-         }
-         //Create a new WeatherData Object, with the current
-         //Dates and current heat index data
-         WeatherData wd = new WeatherData(Types.HEATINDEX,
-                                          units,
-                                          heat,
-                                          dates);
-         heatindex.add(wd);
-      }
-      return heatindex;
+   private double getLowTemperatureAlarm(){
+      return this.lowTemperatureAlarm;
    }
    
-   /**
-   */
-   private List getHeatIndexData
-   (
-      List<WeatherData> temp,
-      List<WeatherData> humi
-   ){
-      List<WeatherData> heatIndex = new LinkedList<WeatherData>();
-      Iterator tempi = temp.iterator();
-      Iterator humii = humi.iterator();
-      while(tempi.hasNext()){
-         WeatherData tempData = (WeatherData)tempi.next();
-         if(tempData.getUnits() == Units.METRIC){
-            WeatherData humiData = (WeatherData)humii.next();
-            List<Double> templ  = tempData.getData();
-            List<Date>  tempd   = tempData.getDates();
-            List<Double> humil  = humiData.getData();
-            List<Date> humid    = humiData.getDates();
-            List<Double> hidxl  = new LinkedList<Double>();
-            Iterator templi = templ.iterator();  //Temp Iterator
-            Iterator humili = humil.iterator();  //Humidity Iterator
-            while(templi.hasNext()){
-               Double currentTemp = (Double)templi.next();
-               Double currentHumi = (Double)humili.next();
-               Double hindx =
-                    this.calculateHeatIndex(currentTemp, currentHumi);
-               hidxl.add(hindx);
-            }
-            WeatherData hindxData = new WeatherData(Types.HEATINDEX,
-                                                    Units.METRIC,
-                                                    hidxl, tempd);
-            heatIndex.add(hindxData);
-            hindxData = new WeatherData(Types.HEATINDEX, Units.ENGLISH,
-                                        hidxl, tempd);
-            heatIndex.add(hindxData);
-            hindxData = new WeatherData(Types.HEATINDEX,
-                                        Units.ABSOLUTE, hidxl, tempd);
-            heatIndex.add(hindxData);
-         }
-      }
-      return heatIndex;
-   }
-   
-   /**
+   /*
    */
    private Units getNewMissionTempAlarmUnits(){
       return this.newMissionTempAlarmUnits;
+   }
+   
+   /*
+   */
+   private boolean getRolloverEnabled(){
+      return this.isRolloverEnabled;
+   }
+   
+   /*
+   */
+   private int getSampleRate(){
+      return this.sampleRate;
+   }
+   
+   /*
+   */
+   private int getStartDelay(){
+      return this.startDelay;
+   }
+   
+   /*
+   */
+   private boolean getSynchronizedClock(){
+      return this.isClockSynchronized;
+   }
+   
+   /*
+   */
+   private boolean getTemperatureChannelEnabled(){
+      return this.isTemperatureChannelEnabled;
    }
    
    /*
@@ -1454,48 +1152,7 @@ public class IButton{
       }
    }
    
-   /**
-   */
-   private boolean isMissionRunning(){
-      boolean isRunning = false;
-      try{
-         MissionLog ml = this.getMissionLog();
-         isRunning = ml.isMissionRunning();
-      }
-      catch(MissionException me){
-         isRunning = false;
-      }
-      catch(NullPointerException npe){
-         isRunning = false;
-      }
-      finally{
-         return isRunning;
-      }
-   }
-   
-   /**
-   */
-   private void publishDewpointEvent
-   (
-      String eventString,
-      List   list
-   ){
-      LogEvent evt = new LogEvent(this, eventString, list);
-      try{
-         Iterator<LogListener> i = this.log_List.iterator();
-         while(i.hasNext()){
-            (i.next()).onDewpointLogEvent(evt);
-         }
-      }
-      //If this exception occurs, there are no Log Listeners,
-      //regardless, so the only thing to do is alert through the
-      //"typical channels"
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }
-   }
-   
-   /**
+   /*
    */
    private void publishDewpointEvent
    (
@@ -1521,29 +1178,7 @@ public class IButton{
       }
    }
    
-   /**
-   */
-   private void publishHeatIndexEvent
-   (
-      String eventString,
-      List   list
-   ){
-      LogEvent evt = new LogEvent(this, eventString, list);
-      try{
-         Iterator<LogListener> i = this.log_List.iterator();
-         while(i.hasNext()){
-            (i.next()).onHeatIndexLogEvent(evt);
-         }
-      }
-      //If this exception occurs, there are no Log Listeners,
-      //regardless, so the only thing to do is alert through the
-      //"typical channels"
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }
-   }
-   
-   /**
+   /*
    */
    private void publishHeatIndexEvent
    (
@@ -1569,29 +1204,7 @@ public class IButton{
       }
    }
    
-   /**
-   */
-   private void publishHumidityLogEvent
-   (
-      String eventString,
-      List   list
-   ){
-      LogEvent evt = new LogEvent(this, eventString, list);
-      try{
-         Iterator<LogListener> i = this.log_List.iterator();
-         while(i.hasNext()){
-            (i.next()).onHumidityLogEvent(evt);
-         }
-      }
-      //If this exception occurs, there are no Log Listeners,
-      //regardless, so the only thing to do is alert through the
-      //"typical channels"
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }
-   }
-   
-   /**
+   /*
    */
    private void publishHumidityLogEvent
    (
@@ -1615,7 +1228,7 @@ public class IButton{
       }
    }
    
-   /**
+   /*
    */
    private void publishHumidityTimeLogEvent
    (
@@ -1673,29 +1286,7 @@ public class IButton{
       }
    }
    
-   /**
-   */
-   private void publishTemperatureLogEvent
-   (
-      String eventString,
-      List   list
-   ){
-      LogEvent evt = new LogEvent(this, eventString, list);
-      try{
-         Iterator<LogListener> i = this.log_List.iterator();
-         while(i.hasNext()){
-            (i.next()).onTemperatureLogEvent(evt);
-         }
-      }
-      //If this exception occurs, there are no Log Listeners,
-      //regardless, so the only thing to do is alert through the
-      //"typical channels"
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }      
-   }
-   
-   /**
+   /*
    */
    private void publishTemperatureLogEvent
    (
@@ -1708,7 +1299,7 @@ public class IButton{
                                                    this.getUnits());
    }
    
-   /**
+   /*
    */
    private void publishTemperatureLogEvent
    (
@@ -1734,7 +1325,7 @@ public class IButton{
       }
    }
    
-   /**
+   /*
    */
    private void publishTemperatureTimeLogEvent
    (
@@ -1756,7 +1347,44 @@ public class IButton{
       }      
    }
    
-   /**
+   /*
+   */
+   private void requestHumidityData(){
+      this.humidityList = new LinkedList<Double>();
+      String les        = new String();
+      double min        = Double.NaN;
+      double max        = Double.NaN;
+      try{
+         if(this.getHumidityChannelEnabled()){
+            MissionLog ml  = this.getMissionLog();
+            humidityList   = ml.requestHumidityLog();
+            les = new String("Humidity Log Data Received");
+            les = les.concat(" and sent to the listeners");
+            min = this.findMin(this.humidityList);
+            max = this.findMax(this.humidityList);
+         }
+         else
+            les = new String("Humidity Not Currently Enabled");
+      }
+      catch(MissionException me){
+         me.printStackTrace();
+         les = new String(me.getMessage());
+         //Indicate there was a problem
+         humidityList.add(new Double(Double.NaN));
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         les = new String(npe.getMessage());
+         //Indicate there was a problem
+         humidityList.add(new Double(Double.NaN));
+      }
+      finally{
+         this.publishHumidityLogEvent(les,this.humidityList,min,max);
+      }
+   }
+   
+   /*
+   */
    private void requestHumidityTimeData(){
       this.humidityTimeList = new LinkedList<Date>();
       //Log Event String
@@ -1778,9 +1406,9 @@ public class IButton{
          this.publishHumidityTimeLogEvent(les, humidityTimeList);
       }
    }
-   */
 
-   /**
+   /*
+   */
    private void requestTemperatureTimeData(){
       this.tempTimeList = new LinkedList<Date>();
       //Log Event String
@@ -1802,7 +1430,6 @@ public class IButton{
          this.publishTemperatureTimeLogEvent(les,tempTimeList);
       }
    }
-   */
    
    /*
    */
@@ -1810,198 +1437,19 @@ public class IButton{
       this.address = new String(address);
    }
    
-   /**
-   */
-   private void setHighHumidityAlarm(String alarm){
-      double humidity = 0.;
-      try{
-         humidity = Double.parseDouble(alarm);
-         if(humidity < 0. || humidity > 100.){
-            humidity = Double.NaN;
-         }
-      }
-      catch(NullPointerException npe){
-         humidity = Double.NaN;
-      }
-      catch(NumberFormatException nfe){
-         humidity = Double.NaN;
-      }
-      finally{
-         this.highHumidityAlarm = humidity;
-      }
-   }
-   
-   /**
-   */
-   private void setHighTemperatureAlarm(String alarm){
-      try{
-         this.highTemperatureAlarm = Double.parseDouble(alarm);
-      }
-      catch(NullPointerException npe){
-         this.highTemperatureAlarm = Double.NaN;
-      }
-      catch(NumberFormatException nfe){
-         this.highTemperatureAlarm = Double.NaN;
-      }
-   }
-   
-   /**
-   */
-   private void setLowHumidityAlarm(String alarm){
-      double humidity = 0.;
-      try{
-         humidity = Double.parseDouble(alarm);
-         if(humidity < 0. || humidity > 100.){
-            humidity = Double.NaN;
-         }
-      }
-      catch(NullPointerException npe){
-         humidity = Double.NaN;
-      }
-      catch(NumberFormatException nfe){
-         humidity = Double.NaN;
-      }
-      finally{
-         this.lowHumidityAlarm = humidity;
-      }
-   }
-   
-   /**
-   */
-   private void setHumidityChannelEnabled(boolean isEnabled){
-      this.isHumidityChannelEnabled = isEnabled;
-   }
-   
-   /**
-   */
-   private void setLowTemperatureAlarm(String alarm){
-      try{
-         this.lowTemperatureAlarm = Double.parseDouble(alarm);
-      }
-      catch(NullPointerException npe){
-         this.lowTemperatureAlarm = Double.NaN;
-      }
-      catch(NumberFormatException nfe){
-         this.lowTemperatureAlarm = Double.NaN;
-      }
-   }
-   
-   /**
+   /*
    */
    private void setName(String name){
       this.name = new String(name);
    }
    
-   /**
+   /*
    */
-   private void setNewMissionTempAlarmUnits(String type){
-      this.setUnits(type);
-      if(type.contains("Celsius") || type.contains("celsius")){
-         this.newMissionTempAlarmUnits = Units.METRIC;
-      }
-      else if(type.contains("Fahrenheit") ||
-              type.contains("fahrenheit")){
-         this.newMissionTempAlarmUnits = Units.ENGLISH;
-      }
-      else if(type.contains("Kelvin") || type.contains("kelvin")){
-         this.newMissionTempAlarmUnits = Units.ABSOLUTE;
-      }
-      //The Default setting...go ahead and set to Metric
-      else{
-         this.newMissionTempAlarmUnits = Units.METRIC;
-      }
+   private void setUnits(Units units){
+      this.units = units;
    }
    
-   /**
-   */
-   private void setRolloverEnabled(boolean isEnabled){
-      this.isRolloverEnabled = isEnabled;
-   }
-      
-   /**
-   */
-   public void setTemperatureChannelEnabled(boolean isEnabled){
-      this.isTemperatureChannelEnabled = isEnabled;
-   }
-   
-   /**
-   Set the sample rate for the IButton...the number is entered in
-   minutes, but the IButton device requires seconds, so the number
-   must be converted to seconds:  hence, the MINSTOSECS convert
-   constant...
-   Set in seconds, entered in minutes
-   */
-   private void setSampleRate(String rate){
-      final int MINSTOSECS = 60;
-      int sampleRate = 1;
-      try{
-         sampleRate = Integer.parseInt(rate);
-         if(sampleRate < 1){
-            sampleRate = DEFAULT_LOGGING_RATE;
-         }
-         else{
-            //Set the value in terms of seconds
-            sampleRate *= MINSTOSECS;
-         }
-      }
-      catch(NullPointerException npe){
-         sampleRate = DEFAULT_LOGGING_RATE;
-      }
-      catch(NumberFormatException nfe){
-         sampleRate = DEFAULT_LOGGING_RATE;
-      }
-      finally{
-         this.sampleRate = sampleRate;
-      }
-   }
-   
-   /**
-   */
-   private void setStartDelay(String delay){
-      int delayTime = DEFAULT_DELAY;
-      try{
-         delayTime = Integer.parseInt(delay);
-         if(delayTime < 1){
-            delayTime = DEFAULT_DELAY;
-         }
-      }
-      catch(NullPointerException npe){
-         delayTime = DEFAULT_DELAY;
-      }
-      catch(NumberFormatException nfe){
-         delayTime = DEFAULT_DELAY;
-      }
-      finally{
-         this.startDelay = delayTime;
-      }
-   }
-   
-   /**
-   */
-   private void setSynchronizedClock(boolean isSynchronized){
-      this.isClockSynchronized = isSynchronized;
-   }
-   
-   /**
-   */
-   private void setUnits(String type){
-      if(type.contains("Celsius") || type.contains("celsius")){
-         this.units = Units.METRIC;
-      }
-      else if(type.contains("Fahrenheit") ||
-              type.contains("fahrenheit")){
-         this.units = Units.ENGLISH;
-      }
-      else if(type.contains("Kelvin") || type.contains("kelvin")){
-         this.units = Units.ABSOLUTE;
-      }
-      //The Default setting...go ahead and set to Metric
-      else{
-         this.units = Units.METRIC;
-      }
-   }
-   
-   /**
+   /*
    */
    private void setUpMissionLog
    (
@@ -2022,5 +1470,45 @@ public class IButton{
       catch(OneWireException owe){
          owe.printStackTrace();
       }
+   }
+
+   /*
+   */
+   private NewMissionData setUpNewMissionData(){
+      NewMissionData nmd = new NewMissionData();
+      nmd.setSampleRate(this.getSampleRate());
+      nmd.setStartDelay(this.getStartDelay());
+      nmd.setHumidityHighAlarm(this.getHighHumidityAlarm());
+      nmd.setHumidityLowAlarm(this.getLowHumidityAlarm());
+      Units units = this.getNewMissionTempAlarmUnits();
+      double hitemp = this.getHighTemperatureAlarm();
+      double lotemp = this.getLowTemperatureAlarm();
+      //For the temperature alarms, need to convert to celsius
+      if(units == Units.ENGLISH){
+         if(hitemp != Double.NaN){
+            hitemp = WeatherConvert.fahrenheitToCelsius(hitemp);
+         }
+         if(lotemp != Double.NaN){
+            lotemp = WeatherConvert.fahrenheitToCelsius(lotemp);
+         }
+      }
+      else if(units == Units.ABSOLUTE){
+         if(hitemp != Double.NaN){
+            hitemp = WeatherConvert.kelvinToCelsius(hitemp);
+         }
+         if(lotemp != Double.NaN){
+            lotemp = WeatherConvert.kelvinToCelsius(lotemp);
+         }
+      }
+      //At the moment, will not do anything, but set up the
+      //infrastructure, regardless
+      nmd.setTemperatureLowAlarm(lotemp);
+      nmd.setTemperatureHighAlarm(hitemp);
+      nmd.setRolloverEnabled(this.getRolloverEnabled());
+      nmd.setSynchClock(this.getSynchronizedClock());
+      nmd.setEnableTemperatureChannel(
+                               this.getTemperatureChannelEnabled());
+      nmd.setEnableHumidityChannel(this.getHumidityChannelEnabled());
+      return nmd;
    }
 }
