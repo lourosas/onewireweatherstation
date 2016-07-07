@@ -12,7 +12,7 @@ import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 
 public class Barometer extends Sensor{
-   public static final double DEFAULTPRESSURE = -99.9;
+   public static final double DEFAULTPRESSURE = -999.9;
    
    private double inHg;
    private double mmHg;
@@ -55,20 +55,27 @@ public class Barometer extends Sensor{
    */
    public double getBarometricPressure(Units units){
       double returnPressure = DEFAULTPRESSURE;
-      switch(units){
-         case METRIC:
-            returnPressure = this.getBarometricPressuremmHg();
-            break;
-         case ENGLISH:
-            returnPressure = this.getBarometricPressureinHg();
-            break;
-         case ABSOLUTE:
-            returnPressure = this.getBarometricPressuremillibars();
-            break;
-         default:
-            returnPressure = this.getBarometricPressuremmHg();
+      try{
+         switch(units){
+            case METRIC:
+               returnPressure = this.getBarometricPressuremmHg();
+               break;
+            case ENGLISH:
+               returnPressure = this.getBarometricPressureinHg();
+               break;
+            case ABSOLUTE:
+               returnPressure=this.getBarometricPressuremillibars();
+               break;
+            default:
+               returnPressure = this.getBarometricPressuremmHg();
+         }
       }
-      return returnPressure;
+      catch(NullPointerException npe){
+         returnPressure = DEFAULTPRESSURE;
+      }
+      finally{
+         return returnPressure;
+      }
    }
    
    /*
@@ -115,8 +122,8 @@ public class Barometer extends Sensor{
    temperature in Metric  
    */
    public double measure(Units units){
-      this.setUnits(units);
       try{
+         this.setUnits(units);
          byte [] state = this.barometricSensor.readDevice();
          //perform the A to D output for the output voltage
          this.barometricSensor.doADConvert(
@@ -152,6 +159,11 @@ public class Barometer extends Sensor{
          this.setBarometricPressuremillibars(DEFAULTPRESSURE);
       }
       catch(OneWireException we){
+         this.setBarometricPressureinHg(DEFAULTPRESSURE);
+         this.setBarometricPressuremmHg(DEFAULTPRESSURE);
+         this.setBarometricPressuremillibars(DEFAULTPRESSURE);
+      }
+      catch(NullPointerException npe){
          this.setBarometricPressureinHg(DEFAULTPRESSURE);
          this.setBarometricPressuremmHg(DEFAULTPRESSURE);
          this.setBarometricPressuremillibars(DEFAULTPRESSURE);

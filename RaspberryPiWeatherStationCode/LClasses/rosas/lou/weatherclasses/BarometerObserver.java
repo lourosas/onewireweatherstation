@@ -10,4 +10,5 @@ import rosas.lou.weatherclasses.Units;
 
 public interface BarometerObserver{
    public void updatePressure(WeatherEvent event);
+   public void updatePressure(WeatherStorage store);
 }

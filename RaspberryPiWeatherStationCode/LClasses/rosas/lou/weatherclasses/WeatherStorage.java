@@ -69,7 +69,11 @@ public class WeatherStorage{
    */
    public List<WeatherEvent> getLatestData(String type){
       List<WeatherEvent> event = null;
-      if(type.toLowerCase().equals("pressure")){}
+      if(type.toLowerCase().equals("pressure")){
+         int size     = this.pressureDates.size();
+         Calendar cal = this.pressureDates.get(size - 1);
+         event        = this.pressureHash.get(cal);
+      }
       else if(type.toLowerCase().equals("humidity")){
          int size     = this.humidityDates.size();
          Calendar cal = this.humidityDates.get(size - 1);
@@ -112,7 +116,9 @@ public class WeatherStorage{
       else if(type.toLowerCase().equals("heatindex")){
          e = this.heatIndexHash.elements();
       }
-      else if(type.toLowerCase().equals("pressure")){}
+      else if(type.toLowerCase().equals("pressure")){
+         e = this.pressureHash.elements();
+      }
       while(e.hasMoreElements()){
          List<WeatherEvent>     list     = e.nextElement();
          Iterator<WeatherEvent> iterator = list.iterator();
@@ -162,7 +168,9 @@ public class WeatherStorage{
       else if(type.toLowerCase().equals("heatindex")){
          e = this.heatIndexHash.elements();
       }
-      else if(type.toLowerCase().equals("pressure")){}
+      else if(type.toLowerCase().equals("pressure")){
+         e = this.pressureHash.elements();
+      }
       while(e.hasMoreElements()){
          List<WeatherEvent>     list     = e.nextElement();
          Iterator<WeatherEvent> iterator = list.iterator();
@@ -213,7 +221,9 @@ public class WeatherStorage{
       else if(type.equals("Heat Index")){
          this.storeHeatIndexData(event);
       }
-      else if(type.equals("Barometer")){}
+      else if(type.equals("Barometer")){
+         this.storePressureData(event);
+      }
    }
    
    /**
@@ -311,7 +321,7 @@ public class WeatherStorage{
       this.saveHumidityData();
       this.saveData("dewpoint");
       this.saveData("heatindex");
-      //this.saveData("pressure");
+      this.saveData("pressure");
    }
 
    /**
@@ -586,6 +596,33 @@ public class WeatherStorage{
       finally{
          humids.add(event);
          this.humidityHash.put(cal, humids);
+      }
+   }
+
+   /*
+   */
+   private void storePressureData(WeatherEvent event){
+      Calendar cal                = null;
+      List<WeatherEvent> pressure = null;
+      try{
+         cal = event.getCalendar();
+         if(this.pressureHash.containsKey(cal)){
+            pressure = this.pressureHash.get(cal);
+         }
+         else{
+            pressure = new LinkedList<WeatherEvent>();
+            this.pressureDates.add(cal);
+         }
+      }
+      catch(NullPointerException npe){
+         this.pressureHash = new Hashtable<Calendar, List>();
+         pressure = new LinkedList<WeatherEvent>();
+         this.pressureDates = new LinkedList<Calendar>();
+         this.pressureDates.add(cal);
+      }
+      finally{
+         pressure.add(event);
+         this.pressureHash.put(cal, pressure);
       }
    }
 

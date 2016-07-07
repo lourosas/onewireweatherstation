@@ -82,16 +82,16 @@ public class WeatherEvent{
       String type = this.getPropertyName();
       if(type.equals("Barometer")){
          if(this.getUnits() == Units.METRIC) {
-            returnString = returnString.concat(" mmHg");
+            returnString = returnString.concat("mmHg");
          }
          else if(this.getUnits() == Units.ENGLISH){
-            returnString = returnString.concat(" inHg");
+            returnString = returnString.concat("inHg");
          }
          else if(this.getUnits() == Units.ABSOLUTE){
-            returnString = returnString.concat(" MB");
+            returnString = returnString.concat("MB");
          }
          else{
-            returnString = returnString.concat(" mmHg");
+            returnString = returnString.concat("mmHg");
          }
       }
       else if(!(type.equals("Hygrometer"))){
@@ -127,18 +127,19 @@ public class WeatherEvent{
    public String toStringValue(){
       String type = this.getPropertyName();
       String returnString = String.format("%.2f", this.getValue());
+      returnString = returnString.concat(", ");
       if(type.equals("Barometer")){
          if(this.getUnits() == Units.METRIC) {
-            returnString = returnString.concat(" mmHg");
+            returnString = returnString.concat("mmHg");
          }
          else if(this.getUnits() == Units.ENGLISH){
-            returnString = returnString.concat(" inHg");
+            returnString = returnString.concat("inHg");
          }
          else if(this.getUnits() == Units.ABSOLUTE){
-            returnString = returnString.concat(" MB");
+            returnString = returnString.concat("MB");
          }
          else{
-            returnString = returnString.concat(" mmHg");
+            returnString = returnString.concat("mmHg");
          }
       }
       else if(!(type.equals("Hygrometer"))){
