@@ -110,6 +110,10 @@ ExtremeObserver{
       min = ws.getMin("HeatIndex");
       this.updateHeatIndexMax(max);
       this.updateHeatIndexMin(min);
+      max = ws.getMax("Pressure");
+      min = ws.getMin("Pressure");
+      this.updatePressureMax(max);
+      this.updatePressureMin(min);
    }
    
    //Implementation of the HumidityObserver Interface
@@ -137,6 +141,19 @@ ExtremeObserver{
       System.out.println(evt.getUnits());
    }
    
+   //Implementation of the BarometerObserver Interface
+   public void updatePressure(WeatherStorage data){
+      try{
+         List<WeatherEvent> list = data.getLatestData("pressure");
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Pressure:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
    //Implementation of the TemperatureObserver Interface
    public void updateTemperature(WeatherEvent evt){
       System.out.println("Temperature:  " + evt);
@@ -344,6 +361,33 @@ ExtremeObserver{
       }
    }
 
+   /*
+   */
+   private void updatePressureMax(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Pressure Max:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /*
+   */
+   private void updatePressureMin(List<WeatherEvent> list){
+      try{
+         Iterator<WeatherEvent> it = list.iterator();
+         while(it.hasNext()){
+            System.out.println("Pressure Min:  " + it.next());
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
    /*
    */
    private void updateTemperatureMax(WeatherEvent evt){
