@@ -1,0 +1,67 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S6:  Detailed Description}\\\\
+Use Case Name:  Save Meteorological Data\\
+Scenario:  Save Temperature Data to a Database\\
+Brief Description:  With the System running, and the database server
+working, the system sends the Temperature Data to the database for
+archiving--including the current minimum and maximum.\\
+Primary Actor:  System\\
+Secondary Actor:  Database\\
+Related Use Cases:  \textbf{Use Case S1:  }
+\emph{The System Shall Monitor Temperature Data}\\
+\textbf{Use Case S6 Scenario 1:  }
+\emph{The System Shall Save Temperature Data}\\
+\textbf{Stakeholders:  }Local and National Weather Buereaus and
+individuals desiring to archive temperature data.\\Climatoligists
+interested in archived temperature data.\\\\
+\textbf{Preconditions:  }The System is running, the temperature is
+monitored, the database server is running the System is logged
+in/accessing the database.\\\\
+\textbf{Postconditions:  }The data is archived to the database.\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{Database}\\\hline
+1.  Send Temperature Data to &\\
+Database &\\\hline
+& 2.  Parse the Date into Month, Year, Day\\
+& fields\\\hline
+& 3.  Place the Time data in the perspective\\
+& Day field.\\\hline
+& 4.  Parse the temperature data into Metric,\\
+& English and Absolute\\\hline
+& 5.  Place the Metric Temp Data in the\\
+&  Metric Field, the English Temp Data in\\
+&  the English Field, the Absolute Temp\\
+&  Data in the Absolute Field\\\hline
+6.  Send the Max/Min Temperature data &\\
+to the Database with the Date. &\\\hline
+& 7.  Parse the Date into Month, Year, Day\\
+& fields\\\hline
+& 8.  Plase the Time data in the perspective\\
+& Day field.\\\hline
+& 9.  Parse the max/min temperature into the\\
+& appropriate units\\\hline
+& 10.  Place the Max/Min temperature data into\\
+& the appropriate Max/Min with the appropriate\\
+& units.\\\hline
+\end{tabular}
+\\\textbf{Exception Conditions}\\
+1a, 6a.  If the Database Server is not running, then the System
+cannot save the data to the Database and alerts.\\\\
+*a. At anytime, if the fields do not contain the current data for
+saving, then the Database creates the data:  placing that data in
+the appropriate Entity for the Database.\\\\
+*b. At anytime, if the data cannot be saved in the Database, then the
+Database alerts the System, the System alerts.\\\\
+\textbf{Technology and Data Variations List}\\
+*a.  The Database Could be one of several different types:
+preferably an SQL type Database.
+*b.  Querrying of the database via GUI interaction (if not already
+implemented) to be developed within 6 months.
+\end{document}

@@ -1,0 +1,51 @@
+\documentclass[letterpaper]{article}
+\usepackage{latexsym}
+\usepackage{amsbsy}
+\usepackage{graphicx}
+\begin{document}
+\noindent
+\textbf{Use Case S6:  Detailed Description}\\\\
+Use Case Name:  Save Meteorological Data\\
+Scenrio:  Save Temperature Data\\
+Brief Description:  With the System running, the System saves the
+daily temperature data--including the Extreme data (minium and
+maximum).\\
+Actors:  System.\\
+Related Use Cases:\\
+\textbf{Use Case S1:  }\emph{The System Shall Monitor Temperature
+Data}\\
+\textbf{Stakeholders:  }Local and National Weather Bureaus and
+individuals monitoring local weather data.\\
+\textbf{Preconditions:  }The System is running, the temperature data
+is saved periodically in System Memory.\\
+\textbf{Postconditions:  }The Data is saved off in the appropriate
+format (.csv, .txt):  all three units are saved off (Celsius,
+Fahrenheit, Kelvin).\\\\
+\textbf{Flow of Events}\\
+\begin{tabular}{|l|l|}\hline
+\textbf{System} & \textbf{One Wire Temperature Sensor}\\\hline
+&1.  Return requested temperature\\
+&    data (See \emph{Use Case S1--}\\
+&    \emph{Request Temperature Data})\\\hline
+2.  Stores the data in memory & \\\hline
+3.  Grabs the Month and Day  of the stored &\\
+    data and compares to the Month and Day &\\
+    of the current date. &\\\hline
+4.  From \#3, if the Compared Month and Day &\\
+    are diffent, save off all the temperature &\\
+    data and the date recorded. & \\\hline
+5.  From \#3, save off the Temperature Extremes &\\
+    including the Date and Time of the Extreme &\\\hline
+\end{tabular}\\\\
+\textbf{Exception Conditions}\\
+4a.  If the One Wire Temperature Sensor stops working and
+the System Records the default temperature, then the System does not
+save the entry for that record.\\\\
+5a.  If the Extreme Temperature is recorded as the default Etreme
+temperatures (-999.9 for maximum, 999.9 for minimum), the the System
+does not save the extreme data for that date, indicating no extreme
+temperature data was recorded for that date.\\
+\textbf{Note:  }This would be an indication the Temperature sensor
+stopped working completely for that date.
+indication the 
+\end{document}
