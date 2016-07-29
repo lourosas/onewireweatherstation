@@ -21,7 +21,7 @@ public class WeatherEvent{
    private Units  units; //METRIC, ENGLISH, ABSOLUTE
    private Calendar calendar; //Store the time of the event
    
-   //*********************Constructors******************************
+   //*********************Constructors*******************************
    /*
    Constructor intitializing all the data related to an event
    */
@@ -40,7 +40,7 @@ public class WeatherEvent{
       this.calendar  = date;
    }
    
-   //*********************Public Methods****************************
+   //*********************Public Methods*****************************
    /*
    */
    public String getPropertyName(){

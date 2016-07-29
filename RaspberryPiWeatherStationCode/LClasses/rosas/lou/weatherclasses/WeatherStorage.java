@@ -1,8 +1,12 @@
-/*********************************************************************
+/********************************************************************
 <GNU Stuff to go here>
 
 The pupose of the WeatherStorage Class is to store all WeatherEvent
-data for a given date.  In addition, the purpose of the
+data for a given date.  
+
+To appropriately store all the weather data for a given date.
+
+In addition, the purpose of the
 WeatherStorage class is to save all that WeatherEvent data for a
 given date in a given file.
 *********************************************************************/
@@ -28,8 +32,8 @@ public class WeatherStorage{
    private List<Calendar>            heatIndexDates;
    private Hashtable<Calendar, List> pressureHash;
    private List<Calendar>            pressureDates;
-   private WeatherExtreme extremeData;
-   private Calendar currentDate;
+   private WeatherExtreme            extremeData;
+   private Calendar                  currentDate;
 
    {
       instance        = null;
@@ -98,7 +102,7 @@ public class WeatherStorage{
    }
 
    /**
-   */
+   **/
    public List<WeatherEvent> getMax(String type){
       List<WeatherEvent> maxList = null;
       WeatherEvent maxEvent      = null;
@@ -341,7 +345,7 @@ public class WeatherStorage{
          fileWriter    = new FileWriter(fileName,    true);
          printWriter   = new PrintWriter(fileWriter, true);
          String header = null;
-         if(!(type.toLowerCase().equals("humidty"))){
+         if((type.toLowerCase().equals("humidty"))){
             header = new String("Time, Humidity");
          }
          else{
@@ -631,6 +635,10 @@ public class WeatherStorage{
    private void storeTemperatureData(WeatherEvent event){
       Calendar cal = event.getCalendar();
       List<WeatherEvent> temps = null;
+      //Go ahead and get the Singleton and populate the latest
+      //temperature data
+      Database database = Database.getInstance();
+      database.store(event);
       try{
          if(this.temperatureHash.containsKey(cal)){
             temps = this.temperatureHash.get(cal);
