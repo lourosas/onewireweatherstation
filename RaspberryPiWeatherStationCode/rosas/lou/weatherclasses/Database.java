@@ -11,6 +11,12 @@ import java.sql.*;
 
 public class Database{
    static Database instance;
+   double dewptc;
+   double dewptf;
+   double dewptk;
+   double heatidxc;
+   double heatidxf;
+   double heatidxk;
    double humidity;
    double press_in;
    double press_mm;
@@ -18,10 +24,22 @@ public class Database{
    double tempc;
    double tempf;
    double tempk;
+   private int dpArchiveCounter;
+   private int hiArchiveCounter;
+   private int presArchiveCounter;
    private int tempArchiveCounter;
    {
       instance           = null;
+      dpArchiveCounter   = 0;
+      hiArchiveCounter   = 0;
       tempArchiveCounter = 0;
+      presArchiveCounter = 0;
+      dewptc   = Thermometer.DEFAULTTEMP;
+      dewptf   = Thermometer.DEFAULTTEMP;
+      dewptk   = Thermometer.DEFAULTTEMP;
+      heatidxc = Thermometer.DEFAULTTEMP;
+      heatidxf = Thermometer.DEFAULTTEMP;
+      heatidxk = Thermometer.DEFAULTTEMP;
       humidity = Hygrometer.DEFAULTHUMIDITY;
       press_mm = Barometer.DEFAULTPRESSURE;
       press_in = Barometer.DEFAULTPRESSURE;
@@ -80,6 +98,15 @@ public class Database{
          else if(propertyName.equals("Hygrometer")){
             this.archiveHumidity(event);
          }
+         else if(propertyName.equals("Barometer")){
+            this.archiveBarometricPressure(event);
+         }
+         else if(propertyName.equals("Dewpoint")){
+            this.archiveDewpoint(event);
+         }
+         else if(propertyName.equals("Heat Index")){
+            this.archiveHeatIndex(event);
+         }
          else{ System.out.println(propertyName); }
       }
       catch(SQLException sqe){
@@ -96,6 +123,181 @@ public class Database{
    }
 
    //////////////////////////Private Methods/////////////////////////
+   /**
+   **/
+   private void archiveBarometricPressure(WeatherEvent event){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      final int MAX_TIMES = 3;
+      Connection conn   = null;
+      Statement  stmt   = null;
+      Calendar cal      = event.getCalendar();
+      String  time      = String.format("%tT", cal.getTime());
+      time += String.format(" %tZ", cal.getTime());
+      String month = String.format("%tB", cal.getTime());
+      String day   = String.format("%td", cal.getTime());
+      String year  = String.format("%tY", cal.getTime());
+      System.out.println(month+", "+day+", "+year+", "+time);
+      try{
+         if(event.getUnits() == Units.METRIC){
+            this.press_mm = event.getValue();
+            ++presArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ENGLISH){
+            this.press_in = event.getValue();
+            ++presArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ABSOLUTE){
+            this.press_mb = event.getValue();
+            ++presArchiveCounter;
+         }
+         if(presArchiveCounter >= MAX_TIMES){
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String insert = "INSERT INTO pressuredata ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"', "+press_mm+", "+press_in+", ";
+            insert += press_mb + ")";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            insert = "INSERT INTO has_pressure_data ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"')";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            this.presArchiveCounter = 0;
+         }
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){}
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+      }
+   }
+
+   /**
+   **/
+   private void archiveDewpoint(WeatherEvent event){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      final int MAX_TIMES = 3;
+      Connection conn   = null;
+      Statement  stmt   = null;
+      Calendar cal      = event.getCalendar();
+      String  time      = String.format("%tT", cal.getTime());
+      time += String.format(" %tZ", cal.getTime());
+      String month = String.format("%tB", cal.getTime());
+      String day   = String.format("%td", cal.getTime());
+      String year  = String.format("%tY", cal.getTime());
+      try{
+         if(event.getUnits() == Units.METRIC){
+            this.dewptc =  event.getValue();
+            ++dpArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ENGLISH){
+            this.dewptf = event.getValue();
+            ++dpArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ABSOLUTE){
+            this.dewptk = event.getValue();
+            ++dpArchiveCounter;
+         }
+         if(dpArchiveCounter >= MAX_TIMES){
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String insert = "INSERT INTO dewpointdata ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"', "+dewptc+", "+dewptf+", "+dewptk+")";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            insert = "INSERT INTO has_dewpoint_data ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"')";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            dpArchiveCounter = 0;
+         }
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){}
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+      }
+   }
+
+   /**
+   **/
+   private void archiveHeatIndex(WeatherEvent event){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      final int MAX_TIMES = 3;
+      Connection conn   = null;
+      Statement  stmt   = null;
+      Calendar cal      = event.getCalendar();
+      String  time      = String.format("%tT", cal.getTime());
+      time += String.format(" %tZ", cal.getTime());
+      String month = String.format("%tB", cal.getTime());
+      String day   = String.format("%td", cal.getTime());
+      String year  = String.format("%tY", cal.getTime());
+      System.out.println(month+", "+day+", "+year+", "+time);
+      try{
+         if(event.getUnits() == Units.METRIC){
+            this.heatidxc =  event.getValue();
+            ++this.hiArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ENGLISH){
+            this.heatidxf = event.getValue();
+            ++this.hiArchiveCounter;
+         }
+         else if(event.getUnits() == Units.ABSOLUTE){
+            this.heatidxk = event.getValue();
+            ++this.hiArchiveCounter;
+         }
+         if(this.hiArchiveCounter >= MAX_TIMES){
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+            stmt = conn.createStatement();
+            String insert = "INSERT INTO heatindexdata ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"', " + heatidxc + ", " +heatidxf + ", ";
+            insert += heatidxk + ")";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            insert = "INSERT INTO has_heatindex_data ";
+            insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+            insert += time+"')";
+            System.out.println(insert);
+            stmt.executeUpdate(insert);
+            this.hiArchiveCounter = 0;
+         }
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){}
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+      }
+   }
+
    /**
    **/
    private void archiveHumidity(WeatherEvent event){
@@ -288,8 +490,8 @@ public class Database{
          this.setUpTemperatureTables();
          this.setUpHumidityTables();
          this.setUpBarometerTables();
-         //this.setUpDewpointTables();
-         //this.setUpHeatIndexTables();
+         this.setUpDewpointTables();
+         this.setUpHeatIndexTables();
       }
       catch(SQLException sqe){ sqe.printStackTrace(); }
       catch(Exception e){}
@@ -322,8 +524,8 @@ public class Database{
          stmt.executeUpdate(table);
          table =  "CREATE TABLE pressuredata(";
          table += "month char(15), day char(15), year char(5), ";
-         table += "time char(15), mmHg decimal(5,2), ";
-         table += "inHg decimal(5,2), mB decimal(5,2), ";
+         table += "time char(15), mmHg decimal(6,2), ";
+         table += "inHg decimal(6,2), mB decimal(6,2), ";
          table += "PRIMARY KEY(month, day, year, time), ";
          table += "FOREIGN KEY(month, day, year) REFERENCES ";
          table += "missiondata(month, day, year) ON DELETE CASCADE)";
@@ -348,6 +550,123 @@ public class Database{
          stmt  = conn.createStatement();
          stmt.executeUpdate(table);
          System.out.println("has_pressure_data table created");
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+      }
+      catch(Exception e){}
+      finally{
+         try{ 
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+      }
+   }
+
+   /**
+   **/
+   private void setUpDewpointTables(){
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER  = "root";
+      final String PASS  = "password";
+      Connection conn    = null;
+      Statement  stmt    = null;
+      try{
+         String table = "DROP TABLE IF EXISTS has_dewpoint_data";
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "DROP TABLE IF EXISTS dewpointdata";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table =  "CREATE TABLE dewpointdata(";
+         table += "month char(15), day char(15), year char(5), ";
+         table += "time char(15), dewptc decimal(5,2), ";
+         table += "dewptf decimal(5,2), dewptk decimal(5,2), ";
+         table += "PRIMARY KEY(month, day, year, time), ";
+         table += "FOREIGN KEY(month, day, year) REFERENCES ";
+         table += "missiondata(month, day, year) ON DELETE CASCADE)";
+         stmt  = conn.createStatement();
+         stmt.executeUpdate(table);
+         System.out.println("dewpointdata table created");
+         table =  "CREATE INDEX IX_SOMEDPDATA ON missiondata(month,";
+         table += " day, year)";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "CREATE INDEX IX_SOMEDPDATA ON dewpointdata(time)";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "CREATE TABLE has_dewpoint_data(";
+         table += "month char(15), day char(15), year char(5), ";
+         table += "time char(15), ";
+         table += "PRIMARY KEY(month, day, year, time), ";
+         table += "FOREIGN KEY(month, day, year) REFERENCES ";
+         table += "missiondata(month, day, year) ON DELETE CASCADE,";
+         table += " FOREIGN KEY(time) REFERENCES dewpointdata(";
+         table += "time) ON DELETE CASCADE)ENGINE=INNODB";
+         stmt  = conn.createStatement();
+         stmt.executeUpdate(table);
+         System.out.println("has_dewpoint_data table created");
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+      }
+      catch(Exception e){}
+      finally{
+         try{ 
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+      }
+   }
+
+   /**
+   **/
+   private void setUpHeatIndexTables(){
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER  = "root";
+      final String PASS  = "password";
+      Connection conn    = null;
+      Statement  stmt    = null;
+      try{
+         String table = "DROP TABLE IF EXISTS has_heatindex_data";
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "DROP TABLE IF EXISTS heatindexdata";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table =  "CREATE TABLE heatindexdata(";
+         table += "month char(15), day char(15), year char(5), ";
+         table += "time char(15), heatindexc decimal(5,2), ";
+         table += "heatindexf decimal(5,2), ";
+         table += "heatindexk decimal(5,2), ";
+         table += "PRIMARY KEY(month, day, year, time), ";
+         table += "FOREIGN KEY(month, day, year) REFERENCES ";
+         table += "missiondata(month, day, year) ON DELETE CASCADE)";
+         stmt  = conn.createStatement();
+         stmt.executeUpdate(table);
+         System.out.println("heatindexdata table created");
+         table =  "CREATE INDEX IX_SOMEHIDATA ON missiondata(month,";
+         table += " day, year)";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "CREATE INDEX IX_SOMEHIDATA ON heatindexdata(time)";
+         stmt = conn.createStatement();
+         stmt.executeUpdate(table);
+         table = "CREATE TABLE has_heatindex_data(";
+         table += "month char(15), day char(15), year char(5), ";
+         table += "time char(15), ";
+         table += "PRIMARY KEY(month, day, year, time), ";
+         table += "FOREIGN KEY(month, day, year) REFERENCES ";
+         table += "missiondata(month, day, year) ON DELETE CASCADE,";
+         table += " FOREIGN KEY(time) REFERENCES heatindexdata(";
+         table += "time) ON DELETE CASCADE)ENGINE=INNODB";
+         stmt  = conn.createStatement();
+         stmt.executeUpdate(table);
+         System.out.println("has_heatindex_data table created");
       }
       catch(SQLException sqe){
          sqe.printStackTrace();

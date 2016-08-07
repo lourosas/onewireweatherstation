@@ -530,6 +530,10 @@ public class WeatherStorage{
    private void storeDewpointData(WeatherEvent event){
       Calendar cal          = event.getCalendar();
       List<WeatherEvent> dp = null;
+      //Go ahead and get the Singleton and populate the latest
+      //temperature data
+      Database database = Database.getInstance();
+      database.store(event);
       try{
          if(this.dewpointHash.containsKey(cal)){
             dp = this.dewpointHash.get(cal);
@@ -556,6 +560,10 @@ public class WeatherStorage{
    private void storeHeatIndexData(WeatherEvent event){
       Calendar cal = event.getCalendar();
       List<WeatherEvent> heatIndices = null;
+      //Go ahead and get the Singleton and populate the latest
+      //temperature data
+      Database database = Database.getInstance();
+      database.store(event);
       try{
          if(this.heatIndexHash.containsKey(cal)){
             heatIndices = this.heatIndexHash.get(cal);
