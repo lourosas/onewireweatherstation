@@ -2,6 +2,8 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import rosas.lou.weatherclasses.Database;
 
 public class ASimpleServer2{
@@ -13,7 +15,7 @@ public class ASimpleServer2{
 
    public ASimpleServer2(){
       try{
-         this.socket = new DatagramSocket(9302);//Set the port high
+         this.socket = new DatagramSocket(9312);//Set the port high
          this.waitForPackets();
       }
       catch(Exception e){
@@ -51,5 +53,13 @@ public class ASimpleServer2{
       final String PASS = "password";
       String select = new String("SELECT * from temperaturedata;");
       System.out.println(select);
+      Database database = Database.getInstance();
+      List<String> data = database.requestData("temperature");
+      Iterator<String> it = data.iterator();
+      while(it.hasNext()){
+         System.out.println(it.next());
+      }
+      System.out.println("Size:  " + data.size());
+      System.out.println("database:  " + database);
    }
 }
