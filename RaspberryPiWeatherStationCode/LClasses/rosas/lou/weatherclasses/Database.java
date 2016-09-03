@@ -71,25 +71,25 @@ public class Database{
    This is a real simple:  get the ResultSet for the temperaturedata
    table in the weatherdata database
    **/
-   public ResultSet requestData(String theRequest){
-      ResultSet resultSet = null;
-      if(theRequest.toUpperCase().equals("TEMPERAUTURE")){
-         resultSet = this.requestTemperatureData();
+   public List<String> requestData(String theRequest){
+      List<String> returnList = null;
+      if(theRequest.toUpperCase().equals("TEMPERATURE")){
+         returnList = this.requestTemperatureData();
       }
-      else if(theRequest.toUpperCase.equals("HUMIDIY")){
-         resultSet = this.requestHumidityData();
+      else if(theRequest.toUpperCase().equals("HUMIDIY")){
+         returnList = this.requestHumidityData();
       }
-      else if(theRequest.toUpperCase.equals("PRESSURE")){
-         resutlSet = this.requestBarometricPressureData();
+      else if(theRequest.toUpperCase().equals("PRESSURE")){
+         returnList = this.requestBarometricPressureData();
       }
-      else if(theRequest.toUpperCase.equals("HEATINDEX")){
-         resultSet = this.requestHeatIndexData();
+      else if(theRequest.toUpperCase().equals("HEATINDEX")){
+         returnList = this.requestHeatIndexData();
       }
-      else if(theRequest.toUpperCase.equals("DEWPOINT")){
-         resultSet = this.requestDewPointData();
+      else if(theRequest.toUpperCase().equals("DEWPOINT")){
+         returnList = this.requestDewPointData();
       }
 
-      return resultSet;
+      return returnList;
    }
 
    /**
@@ -495,7 +495,43 @@ public class Database{
 
    /**
    **/
-   private ResultSet requestTemperatureData(){
+   private List<String>  requestBarometricPressureData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String>  requestDewPointData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestHeatIndexData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestHumidityData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestTemperatureData(){
       final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
       final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
       final String USER = "root";
@@ -503,7 +539,8 @@ public class Database{
       Connection conn   = null;
       Statement  stmt   = null;
 
-      ResultSet resultSet = null;
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
 
       try{
          Class.forName(JDBC_DRIVER);
@@ -514,6 +551,20 @@ public class Database{
                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
                                   ResultSet.CONCUR_UPDATABLE);
          resultSet = stmt.executeQuery(request);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String month = resultSet.getString("month");
+            String day   = resultSet.getString("day");
+            String year  = resultSet.getString("year");
+            String time  = resultSet.getString("time");
+            double tempc = resultSet.getDouble("tempc");
+            double tempf = resultSet.getDouble("tempf");
+            double tempk = resultSet.getDouble("tempk");
+            String indexdata = new String(month + ", " + day + ", ");
+            indexdata += year + ", " + time + ", " + tempc + ", ";
+            indexdata += tempf + ", " + tempk;
+            returnList.add(indexdata);
+         }
       }
       catch(SQLException sqe){
          sqe.printStackTrace();
@@ -529,7 +580,7 @@ public class Database{
             conn.close();
          }
          catch(SQLException sqe2){}
-         return resultSet;
+         return returnList;
       }
    }
 
