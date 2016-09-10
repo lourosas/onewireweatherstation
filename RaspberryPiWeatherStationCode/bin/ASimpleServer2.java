@@ -15,7 +15,7 @@ public class ASimpleServer2{
 
    public ASimpleServer2(){
       try{
-         this.socket = new DatagramSocket(9312);//Set the port high
+         this.socket = new DatagramSocket(9313);//Set the port high
          this.waitForPackets();
       }
       catch(Exception e){
@@ -41,6 +41,7 @@ public class ASimpleServer2{
             if(received.toUpperCase().equals("TEMPERATURE")){
                this.findTemperatureData();
             }
+            this.printASystemCommand();
          }
          catch(IOException ioe){ ioe.printStackTrace(); }
       }
@@ -61,5 +62,23 @@ public class ASimpleServer2{
       }
       System.out.println("Size:  " + data.size());
       System.out.println("database:  " + database);
+   }
+
+   public void printASystemCommand(){
+      try{
+         System.out.println("This should print");
+         Process p = 
+            Runtime.getRuntime().exec("ls /home/pi/bin/");
+         BufferedReader input = new BufferedReader(
+                          new InputStreamReader(p.getInputStream()));
+         String s = input.readLine();
+         while(s != null){
+            if(s.contains(".csv")){
+               System.out.println(s);
+            }
+            s = input.readLine();
+         }
+      }
+      catch(IOException ioe){ ioe.printStackTrace(); }
    }
 }

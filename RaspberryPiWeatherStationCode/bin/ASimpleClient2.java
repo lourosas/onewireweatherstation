@@ -19,7 +19,7 @@ public class ASimpleClient2{
                              {(byte)192,(byte)168,(byte)1,(byte)119};
          InetAddress iNetAddr = InetAddress.getByAddress(addr);
          DatagramPacket sendPacket = new DatagramPacket(data,
-            data.length, iNetAddr, 9312);
+            data.length, iNetAddr, 9313);
          socket.send(sendPacket);
          System.out.println("Poop");
       }
