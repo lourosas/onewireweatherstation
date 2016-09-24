@@ -15,7 +15,7 @@ public class ASimpleServer2{
 
    public ASimpleServer2(){
       try{
-         this.socket = new DatagramSocket(9313);//Set the port high
+         this.socket = new DatagramSocket(9301);//Set the port high
          this.waitForPackets();
       }
       catch(Exception e){
@@ -25,12 +25,15 @@ public class ASimpleServer2{
    }
 
    public void waitForPackets(){
+      List<String> receiveData = null;
       while(true){
          try{
             byte data[] = new byte[500];
             DatagramPacket receivePacket =
                                 new DatagramPacket(data, data.length);
             this.socket.receive(receivePacket);
+            InetAddress addr = receivePacket.getAddress();
+            int port         = receivePacket.getPort();
             System.out.println(receivePacket.getAddress());
             System.out.println(receivePacket.getPort());
             System.out.println(receivePacket.getLength());
@@ -39,29 +42,41 @@ public class ASimpleServer2{
                                          receivePacket.getLength());
             System.out.println(received);
             if(received.toUpperCase().equals("TEMPERATURE")){
-               this.findTemperatureData();
+               receiveData = this.findTemperatureData();
+               String dataSize = "" + receiveData.size();
+               data = dataSize.getBytes();
+               DatagramPacket sendPacket =
+                                   new DatagramPacket(data,
+                                                     data.length,
+                                                     addr,
+                                                     port);
+               this.socket.send(sendPacket);
+               Iterator<String> it = receiveData.iterator();
+               while(it.hasNext()){
+                  data = it.next().getBytes();
+                  sendPacket.setData(data, 0, data.length);
+                  sendPacket.setAddress(addr);
+                  sendPacket.setPort(port);
+                  //System.out.println(it.next());
+                  this.socket.send(sendPacket);
+               }
             }
-            this.printASystemCommand();
+            //this.printASystemCommand();
          }
          catch(IOException ioe){ ioe.printStackTrace(); }
       }
    }
 
-   public void findTemperatureData(){
+   public List<String> findTemperatureData(){
       final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
       final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
       final String USER = "root";
       final String PASS = "password";
-      String select = new String("SELECT * from temperaturedata;");
-      System.out.println(select);
       Database database = Database.getInstance();
       List<String> data = database.requestData("temperature");
-      Iterator<String> it = data.iterator();
-      while(it.hasNext()){
-         System.out.println(it.next());
-      }
       System.out.println("Size:  " + data.size());
       System.out.println("database:  " + database);
+      return data;
    }
 
    public void printASystemCommand(){
