@@ -129,6 +129,12 @@ public class WeatherStation implements TimeListener{
       this.publishBarometricPressure();
       this.publishExtremes();
    }
+
+   /**
+   Request the current Temperature Data...
+   **/
+   public List<String> requestCurrentData(String weatherType){
+   }
    
    /**
    */
@@ -553,8 +559,6 @@ public class WeatherStation implements TimeListener{
       
       try{
          Iterator<TemperatureObserver> i = this.t_o_List.iterator();
-         //data  = evt1.getValue();
-         //units = evt1.getUnits();
          WeatherStorage ws = WeatherStorage.getInstance();
          ws.store(evt1);
          ws.store(evt2);
