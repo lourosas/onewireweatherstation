@@ -68,6 +68,53 @@ public class Database{
    }
 
    /**
+   This is a real simple:  get the ResultSet for the temperaturedata
+   table in the weatherdata database
+   **/
+   public List<String> requestData(String theRequest){
+      List<String> returnList = null;
+      if(theRequest.toUpperCase().equals("TEMPERATURE")){
+         returnList = this.requestTemperatureData();
+      }
+      else if(theRequest.toUpperCase().equals("HUMIDIY")){
+         returnList = this.requestHumidityData();
+      }
+      else if(theRequest.toUpperCase().equals("PRESSURE")){
+         returnList = this.requestBarometricPressureData();
+      }
+      else if(theRequest.toUpperCase().equals("HEATINDEX")){
+         returnList = this.requestHeatIndexData();
+      }
+      else if(theRequest.toUpperCase().equals("DEWPOINT")){
+         returnList = this.requestDewPointData();
+      }
+      else if(theRequest.toUpperCase().equals("MISSIONDATA")){
+         returnList = this.requestMissionData();
+      }
+
+      return returnList;
+   }
+
+   /**
+   **/
+   public List<String> requestData
+   (
+      String type,
+      String[] data,
+      String[] modifiers
+   ){
+      List<String> returnList = null;
+      if(type.toUpperCase().equals("TEMPERATURE")){
+         returnList = this.requestTemperatureData(data, modifiers);
+      }
+      else if(type.toUpperCase().equals("HUMIDITY")){}
+      else if(type.toUpperCase().equals("PRESSURE")){}
+      else if(type.toUpperCase().equals("HEATINDEX")){}
+      else if(type.toUpperCase().equals("DEWPOINT")){}
+      return returnList;
+   }
+
+   /**
    **/
    public void store(WeatherEvent event){
       String propertyName = event.getPropertyName();
@@ -465,6 +512,218 @@ public class Database{
             }
          }
          catch(SQLException sqe2){}//Nothing to be done
+      }
+   }
+
+   /**
+   **/
+   private List<String>  requestBarometricPressureData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String>  requestDewPointData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestHeatIndexData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestHumidityData(){
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestMissionData(){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+      
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String request = "SELECT * from missiondata ";
+         stmt = conn.createStatement(
+                                  ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                  ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(request);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String month = resultSet.getString("month");
+            String day   = resultSet.getString("day");
+            String year  = resultSet.getString("year");
+            String indexdata = new String(month + ", " + day + ", ");
+            indexdata += year;
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+
+   /**
+   **/
+   private List<String> requestTemperatureData(){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String request = "SELECT * from temperaturedata ";
+         request += "ORDER BY month DESC LIMIT 1";
+         stmt = conn.createStatement(
+                                  ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                  ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(request);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String month = resultSet.getString("month");
+            String day   = resultSet.getString("day");
+            String year  = resultSet.getString("year");
+            String time  = resultSet.getString("time");
+            double tempc = resultSet.getDouble("tempc");
+            double tempf = resultSet.getDouble("tempf");
+            double tempk = resultSet.getDouble("tempk");
+            String indexdata = new String(month + ", " + day + ", ");
+            indexdata += year + ", " + time + ", " + tempc + ", ";
+            indexdata += tempf + ", " + tempk;
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+
+   
+   /**
+   **/
+   private List<String> requestTemperatureData
+   (
+      String[] data, 
+      String[] modifiers
+   ){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String request = "SELECT ";
+         for(int i = 0; i < data.length; i++){
+            request += data[i];
+            if(i < data.length - 1){
+               request += ",";
+            }
+         }
+         request += " from temperaturedata ";
+         if(modifiers.length > 0){
+            request += "WHERE ";
+         }
+         stmt = conn.createStatement(
+                                  ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                  ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(request);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String month = resultSet.getString("month");
+            String day   = resultSet.getString("day");
+            String year  = resultSet.getString("year");
+            String time  = resultSet.getString("time");
+            double tempc = resultSet.getDouble("tempc");
+            double tempf = resultSet.getDouble("tempf");
+            double tempk = resultSet.getDouble("tempk");
+            String indexdata = new String(month + ", " + day + ", ");
+            indexdata += year + ", " + time + ", " + tempc + ", ";
+            indexdata += tempf + ", " + tempk;
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
       }
    }
 
