@@ -15,7 +15,7 @@ public class ASimpleServer2{
 
    public ASimpleServer2(){
       try{
-         this.socket = new DatagramSocket(9301);//Set the port high
+         this.socket = new DatagramSocket(9307);//Set the port high
          this.waitForPackets();
       }
       catch(Exception e){
