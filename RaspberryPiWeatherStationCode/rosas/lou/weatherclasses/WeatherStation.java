@@ -24,13 +24,14 @@ public class WeatherStation implements TimeListener{
    private Units units;
    private DSPortAdapter dspa        = null;
    private StopWatch     stopWatch   = null;
-   private String        currentDate = null;
+   private Calendar      currentDate = null;
    //put into a list to handle multiple observers
    private List<TemperatureObserver> t_o_List  = null;
    private List<HumidityObserver>    h_o_List  = null;
    private List<BarometerObserver>   b_o_List  = null;
    private List<CalculatedObserver>  c_o_List  = null;
    private List<TimeObserver>        ti_o_List = null;
+   private List<ExtremeObserver>     ex_o_List = null;
 
    //************************Constructors*****************************
    /*
@@ -45,7 +46,7 @@ public class WeatherStation implements TimeListener{
    */
    public WeatherStation(Units units){
       final int DEFAULTUPDATERATE = 5; //5 minutes
-      this.currentDate = new String();
+      this.currentDate = Calendar.getInstance();
       this.setUpDSPA();
       this.setUpdateRate(DEFAULTUPDATERATE);
    }
@@ -69,6 +70,17 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          this.c_o_List = new Vector<CalculatedObserver>();
          this.c_o_List.add(co);
+      }
+   }
+   
+   /***/
+   public void addExtremeObserver(ExtremeObserver eo){
+      try{
+         this.ex_o_List.add(eo);
+      }
+      catch(NullPointerException npe){
+         this.ex_o_List = new Vector<ExtremeObserver>();
+         this.ex_o_List.add(eo);
       }
    }
    
@@ -113,8 +125,9 @@ public class WeatherStation implements TimeListener{
       this.publishHumidity();
       this.publishDewpoint();
       this.publishHeatIndex();
+      //Until I can handle null exceptions better
       this.publishBarometricPressure();
-      this.findTempExtremes();
+      this.publishExtremes();
    }
    
    /**
@@ -317,31 +330,42 @@ public class WeatherStation implements TimeListener{
       WeatherEvent evt1     = null;
       WeatherEvent evt2     = null;
       WeatherEvent evt3     = null;
-      Units  units          = Units.METRIC;
-      Sensor barometer      = Barometer.getInstance();
-      String type           = barometer.getType();
-      double data1          = barometer.measure();
-      evt1 = new WeatherEvent(barometer, type, data1, units);
-
-      units = Units.ENGLISH;
-      data1 = ((Barometer)barometer).getBarometricPressure(units);
-      evt2  = new WeatherEvent(barometer, type, data1, units);
-
-      units = Units.ABSOLUTE;
-      data1 = ((Barometer)barometer).getBarometricPressure(units);
-      evt3  = new WeatherEvent(barometer, type, data1, units);
-      
       try{
-         Iterator<BarometerObserver> i = this.b_o_List.iterator();
-         while(i.hasNext()){
-            BarometerObserver bo = (BarometerObserver)i.next();
-            bo.updatePressure(evt1);
-            bo.updatePressure(evt2);
-            bo.updatePressure(evt3);
-         }
+         Units  units          = Units.METRIC;
+         Sensor barometer      = Barometer.getInstance();
+         String type           = barometer.getType();
+         double data1          = barometer.measure();
+         evt1 = new WeatherEvent(barometer, type, data1, units,
+                                                   this.currentDate);
+
+         units = Units.ENGLISH;
+         data1 = ((Barometer)barometer).getBarometricPressure(units);
+         evt2  = new WeatherEvent(barometer, type, data1, units,
+                                                   this.currentDate);
+         units = Units.ABSOLUTE;
+         data1 = ((Barometer)barometer).getBarometricPressure(units);
+         evt3  = new WeatherEvent(barometer, type, data1, units,
+                                                   this.currentDate);
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+         ws.store(evt2);
+         ws.store(evt3);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
+         evt1 = new WeatherEvent(null, "Barometer", evt1.getValue(),
+                                             null, this.currentDate);
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+      }
+      finally{
+         WeatherStorage ws = WeatherStorage.getInstance();
+         Iterator<BarometerObserver> i = this.b_o_List.iterator();
+         while(i.hasNext()){
+            BarometerObserver bo = (BarometerObserver)i.next();
+            bo.updatePressure(ws);
+         }
+      
       }
    }
 
@@ -351,75 +375,116 @@ public class WeatherStation implements TimeListener{
       WeatherEvent evt1 = null;
       WeatherEvent evt2 = null;
       WeatherEvent evt3 = null;
-      Units units       = Units.METRIC;
-      //Dewpoint calculation will return in Metric Units, will need to
-      //convert to other units.
-      double dewpoint   = this.calculateDewpoint();
-      double dewpointF  = Thermometer.DEFAULTTEMP;
-      double dewpointK  = Thermometer.DEFAULTTEMP;
-      evt1 = new WeatherEvent(null, "Dewpoint", dewpoint, units);
-
-      if(dewpoint > Thermometer.DEFAULTTEMP){
-         dewpointF = WeatherConvert.celsiusToFahrenheit(dewpoint);
-         dewpointK = WeatherConvert.celsiusToKelvin(dewpoint);
-      }
-
-      units = Units.ENGLISH;
-      evt2 = new WeatherEvent(null, "Dewpoint", dewpointF, units);
-
-      units = Units.ABSOLUTE;
-      evt3 = new WeatherEvent(null, "Dewpoint", dewpointK, units);
-
       try{
+         Units units       = Units.METRIC;
+         //Dewpoint calculation will return in Metric Units, will
+         //need to
+         //convert to other units.
+         double dewpoint   = this.calculateDewpoint();
+         double dewpointF  = Thermometer.DEFAULTTEMP;
+         double dewpointK  = Thermometer.DEFAULTTEMP;
+         evt1 = new WeatherEvent(null, "Dewpoint", dewpoint,
+                                            units, this.currentDate);
+
+         if(dewpoint > Thermometer.DEFAULTTEMP){
+            dewpointF = WeatherConvert.celsiusToFahrenheit(dewpoint);
+            dewpointK = WeatherConvert.celsiusToKelvin(dewpoint);
+         }
+
+         units = Units.ENGLISH;
+         evt2 = new WeatherEvent(null, "Dewpoint", dewpointF, 
+                                            units, this.currentDate);
+
+         units = Units.ABSOLUTE;
+         evt3 = new WeatherEvent(null, "Dewpoint", dewpointK, 
+                                            units, this.currentDate);
+
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+         ws.store(evt2);
+         ws.store(evt3);
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         evt1 = new WeatherEvent(null,"Dewpoint",-999.9,
+                                             null, this.currentDate);
+         ws.store(evt1);
+      }
+      finally{
+         WeatherStorage ws = WeatherStorage.getInstance();
          Iterator<CalculatedObserver> i = this.c_o_List.iterator();
          while(i.hasNext()){
             CalculatedObserver co = (CalculatedObserver)i.next();
-            co.updateDewpoint(evt1);
-            co.updateDewpoint(evt2);
-            co.updateDewpoint(evt3);
+            co.updateDewpoint(ws);
+         }
+      }
+   }
+
+   /*
+   */
+   private void publishExtremes(){
+      try{
+         WeatherStorage ws = WeatherStorage.getInstance();
+         Iterator<ExtremeObserver> i = this.ex_o_List.iterator();
+         while(i.hasNext()){
+            ExtremeObserver eo = (ExtremeObserver)i.next();
+            eo.updateExtremes(ws);
          }
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
    }
-
    /**
    */
    private void publishHeatIndex(){
       WeatherEvent evt1 = null;
       WeatherEvent evt2 = null;
       WeatherEvent evt3 = null;
-      Units units       = Units.ENGLISH;
-      //Heat Index calculation will return in English Units, will need
-      //to convert to other units
-      double heatIndexF = this.calculateHeatIndex();
-      double heatIndex  = Thermometer.DEFAULTTEMP;
-      double heatIndexK = Thermometer.DEFAULTTEMP;
-      evt2 = new WeatherEvent(null, "Heat Index", heatIndexF, units);
-
-      if(heatIndexF > Thermometer.DEFAULTTEMP){
-         heatIndex  = WeatherConvert.fahrenheitToCelsius(heatIndexF);
-         heatIndexK = WeatherConvert.fahrenheitToKelvin(heatIndexF);
-      }
-
-      units = Units.METRIC;
-      evt1 = new WeatherEvent(null, "Heat Index", heatIndex, units);
-
-      units = Units.ABSOLUTE;
-      evt3 = new WeatherEvent(null, "Heat Index", heatIndexK, units);
-
       try{
-         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
-         while(i.hasNext()){
-            CalculatedObserver co = (CalculatedObserver)i.next();
-            co.updateHeatIndex(evt1);
-            co.updateHeatIndex(evt2);
-            co.updateHeatIndex(evt3);
+         Units units       = Units.ENGLISH;
+         //Heat Index calculation will return in English Units,
+         //will need
+         //to convert to other units
+         double heatIndexF = this.calculateHeatIndex();
+         double heatIndex  = Thermometer.DEFAULTTEMP;
+         double heatIndexK = Thermometer.DEFAULTTEMP;
+         evt2 = new WeatherEvent(null,"Heat Index",heatIndexF,units,
+                                                   this.currentDate);
+
+         if(heatIndexF > Thermometer.DEFAULTTEMP){
+            heatIndex=WeatherConvert.fahrenheitToCelsius(heatIndexF);
+            heatIndexK=WeatherConvert.fahrenheitToKelvin(heatIndexF);
          }
+
+         units = Units.METRIC;
+         evt1 = new WeatherEvent(null,"Heat Index",heatIndex,units,
+                                                  this.currentDate);
+
+         units = Units.ABSOLUTE;
+         evt3 = new WeatherEvent(null,"Heat Index",heatIndexK,units,
+                                                   this.currentDate);
+
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+         ws.store(evt2);
+         ws.store(evt3);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         evt1 = new WeatherEvent(null, "Heat Index", -999.9,
+                                             null, this.currentDate);
+         ws.store(evt1);
+      }
+      finally{
+         WeatherStorage ws = WeatherStorage.getInstance();
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = (CalculatedObserver)i.next();
+            co.updateHeatIndex(ws);
+         }
       }
    }
    
@@ -434,19 +499,32 @@ public class WeatherStation implements TimeListener{
       double     data1      = hygrometer.measure();
       double     data2      = hyg.getCalculatedHumidity();
       
-      evt1 = new WeatherEvent(hygrometer, type, data1, Units.METRIC);
-      evt2 = new WeatherEvent(hyg, type, data2, Units.METRIC);
+      evt1 = new WeatherEvent(hygrometer, type, data1, Units.METRIC,
+                                                   this.currentDate);
+      evt2 = new WeatherEvent(hyg, type, data2, Units.METRIC,
+                                                   this.currentDate);
       
       try{
-         Iterator<HumidityObserver> i = this.h_o_List.iterator();
-         while(i.hasNext()){
-            HumidityObserver ho = (HumidityObserver)i.next();
-            ho.updateHumidity(evt1);
-            ho.updateHumidity(evt2);
-         }
+         WeatherExtreme we = WeatherExtreme.getInstance();
+         data1  = evt1.getValue();
+         units  = evt1.getUnits();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         evt1 = new WeatherEvent(null, "Hygrometer", evt1.getValue(),
+                                             null, this.currentDate);
+         ws.store(evt1);
+      }
+      finally{
+         WeatherStorage ws = WeatherStorage.getInstance();
+         Iterator<HumidityObserver> i = this.h_o_List.iterator();
+         while(i.hasNext()){
+            HumidityObserver ho = (HumidityObserver)i.next();
+            ho.updateHumidity(ws);
+         }
       }
    }
    
@@ -460,23 +538,30 @@ public class WeatherStation implements TimeListener{
       Sensor thermometer = Thermometer.getInstance();
       String type        = thermometer.getType();
       double data        = thermometer.measure(units);
-      evt1 = new WeatherEvent(thermometer, type, data, units);
+      evt1 = new WeatherEvent(thermometer, type, data, units,
+                                                   this.currentDate);
       
       units = Units.ENGLISH;
       data  = ((Thermometer)thermometer).getTemperature(units);
-      evt2  = new WeatherEvent(thermometer, type, data, units);
+      evt2  = new WeatherEvent(thermometer, type, data, units,
+                                                   this.currentDate);
       
       units = Units.ABSOLUTE;
       data  = ((Thermometer)thermometer).getTemperature(units);
-      evt3  = new WeatherEvent(thermometer, type, data, units);
+      evt3  = new WeatherEvent(thermometer, type, data, units,
+                                                   this.currentDate);
       
       try{
          Iterator<TemperatureObserver> i = this.t_o_List.iterator();
+         //data  = evt1.getValue();
+         //units = evt1.getUnits();
+         WeatherStorage ws = WeatherStorage.getInstance();
+         ws.store(evt1);
+         ws.store(evt2);
+         ws.store(evt3);
          while(i.hasNext()){
             TemperatureObserver to = (TemperatureObserver)i.next();
-            to.updateTemperature(evt1);
-            to.updateTemperature(evt2);
-            to.updateTemperature(evt3);
+            to.updateTemperature(ws);
          }
       }
       catch(NullPointerException npe){
@@ -487,12 +572,12 @@ public class WeatherStation implements TimeListener{
    /**
    */
    private void publishTimeEvent(){
-      Calendar cal = Calendar.getInstance();
-      this.currentDate = String.format("%tc", cal.getTime());
+      this.currentDate = Calendar.getInstance();
+      String date = String.format("%tc", this.currentDate.getTime());
       try{
          Iterator<TimeObserver> i = this.ti_o_List.iterator();
          while(i.hasNext()){
-            (i.next()).updateTime(this.currentDate);
+            (i.next()).updateTime(date);
          }
       }
       catch(NullPointerException npe){

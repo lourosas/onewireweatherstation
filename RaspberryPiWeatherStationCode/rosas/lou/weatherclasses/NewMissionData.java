@@ -1,0 +1,148 @@
+////////////////////////////////////////////////////////////////////
+//Copyright (C) 2011 Lou Rosas
+//This file is part of many applications registered with
+//the GNU General Public License as published
+//by the Free Software Foundation; either version 3 of the License,
+//or (at your option) any later version.
+//PaceCalculator is distributed in the hope that it will be
+//useful, but WITHOUT ANY WARRANTY; without even the implied
+//warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//See the GNU General Public License for more details.
+//You should have received a copy of the GNU General Public License
+//along with this program.
+//If not, see <http://www.gnu.org/licenses/>.
+////////////////////////////////////////////////////////////////////
+
+package rosas.lou.weatherclasses;
+
+import java.lang.*;
+import java.util.*;
+import java.io.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import rosas.lou.weatherclasses.*;
+
+public class NewMissionData{
+   //A Default logging rate of 600 seconds = 10 min
+   private static final int DEFAULT_LOGGING_RATE = 600;
+   //A Default Delay of 10 seconds
+   private static final int DEFAULT_START_DELAY  = 10;
+   
+   private int     sampleRate;
+   private int     startDelay;
+   private boolean rolloverEnabled;
+   private boolean synchClock;
+   private boolean enableTemperatureChannel;
+   private boolean enableHumidityChannel;
+   private double  temperatureLowAlarm;
+   private double  temperatureHighAlarm;
+   private double  humidityLowAlarm;
+   private double  humidityHighAlarm;
+   
+   //Initializer
+   {
+      this.setSampleRate(DEFAULT_LOGGING_RATE);
+      this.setStartDelay(DEFAULT_START_DELAY);
+      this.setRolloverEnabled(false);
+      this.setSynchClock(false);
+      this.setEnableTemperatureChannel(true);
+      this.setEnableHumidityChannel(true);
+      this.setTemperatureLowAlarm(Double.NaN);
+      this.setTemperatureHighAlarm(Double.NaN);
+      this.setHumidityLowAlarm(Double.NaN);
+      this.setHumidityHighAlarm(Double.NaN);
+   }
+   
+   ///////////////////////Constructors//////////////////////////////
+   //
+   //Constructor of no arguments
+   //Set the "Default" of all the data
+   //
+   public NewMissionData(){}
+   
+   ///////////////////Public Methods////////////////////////////////
+   public int getSampleRate(){ return this.sampleRate; }
+   
+   public int getStartDelay(){ return this.startDelay; }
+   
+   public boolean getRolloverEnabled(){
+      return this.rolloverEnabled; 
+   }
+   
+   public boolean getSynchClock(){ return this.synchClock; }
+   
+   public boolean getEnableTemperatureChannel(){
+      return this.enableTemperatureChannel;
+   }
+   
+   public boolean getEnableHumidityChannel(){
+      return this.enableHumidityChannel;
+   }
+   
+   public double getTemperatureLowAlarm(){
+      return this.temperatureLowAlarm;
+   }
+   
+   public double getTemperatureHighAlarm(){
+      return this.temperatureHighAlarm;
+   }
+   
+   public double getHumidityLowAlarm(){
+      return this.humidityLowAlarm;
+   }
+   public double getHumidityHighAlarm(){
+      return this.humidityHighAlarm;
+   }
+   
+   public void setSampleRate(int rate){ this.sampleRate = rate; }
+   
+   public void setStartDelay(int delay){ this.startDelay = delay; }
+   
+   public void setRolloverEnabled(boolean enabled){
+      this.rolloverEnabled = enabled;
+   }
+   
+   public void setSynchClock(boolean synch){
+      this.synchClock = synch;
+   }
+   
+   public void setEnableTemperatureChannel(boolean enable){
+      this.enableTemperatureChannel = enable;
+   }
+   
+   public void setEnableHumidityChannel(boolean enable){
+      this.enableHumidityChannel = enable;
+   }
+   
+   public void setTemperatureLowAlarm(double temp){
+      this.temperatureLowAlarm = temp;
+   }
+   
+   public void setTemperatureHighAlarm(double temp){
+      this.temperatureHighAlarm = temp;
+   }
+   
+   public void setHumidityLowAlarm(double humidity){
+      this.humidityLowAlarm = humidity;
+   }
+   
+   public void setHumidityHighAlarm(double humidity){
+      this.humidityHighAlarm = humidity;
+   }
+   
+   /**/
+   public String toString(){
+      String rs = new String(this.sampleRate + "\n");
+      rs = rs.concat(this.startDelay + "\n");
+      rs = rs.concat(this.rolloverEnabled + "\n");
+      rs = rs.concat(this.synchClock + "\n");
+      rs = rs.concat(this.enableTemperatureChannel + "\n");
+      rs = rs.concat(this.enableHumidityChannel + "\n");
+      rs = rs.concat(this.temperatureLowAlarm + "\n");
+      rs = rs.concat(this.temperatureHighAlarm + "\n");
+      rs = rs.concat(this.humidityLowAlarm + "\n");
+      rs = rs.concat(this.humidityHighAlarm + "\n");
+      return rs;
+   }
+}
