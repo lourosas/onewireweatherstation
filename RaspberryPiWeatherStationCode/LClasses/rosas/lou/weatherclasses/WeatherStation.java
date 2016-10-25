@@ -129,6 +129,22 @@ public class WeatherStation implements TimeListener{
       this.publishBarometricPressure();
       this.publishExtremes();
    }
+
+   /**
+   **/
+   public List<String> requestData(String request){
+      List<String> returnList = null;
+      try{
+        WeatherStorage ws = WeatherStorage.getInstance();
+        returnList        = ws.requestData(request); 
+        System.out.println(request);
+        System.out.println(returnList);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return returnList;
+      }
+   }
    
    /**
    */

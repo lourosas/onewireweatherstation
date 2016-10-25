@@ -203,6 +203,21 @@ public class WeatherStorage{
       return minList;
    }
 
+   /**
+   **/
+   public List<String> requestData(String request){
+      List<String> returnData = null;
+      try{
+         Database database = Database.getInstance();
+
+         returnData = database.requestData(request);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return returnData;
+      }
+   }
+
    /*****************************************************************
    Store the Current Weather Data
    *****************************************************************/
