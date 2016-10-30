@@ -72,30 +72,23 @@ public class Database{
    table in the weatherdata database
    **/
    public List<String> requestData(String theRequest){
+      System.out.println(theRequest);
       List<String> returnList = null;
       if(theRequest.toUpperCase().contains("MISSIONDATA")){
          returnList = this.requestMissionData(theRequest);
       }
       else if(theRequest.toUpperCase().contains("HUMIDITYDATA")){
-         returnList = this.requestHumdityData(theRequest);
+         returnList = this.requestHumidityData(theRequest);
       }
-      /*
-      else if(theRequest.toUpperCase().equals("HUMIDIY")){
-         returnList = this.requestHumidityData();
+      else if(theRequest.toUpperCase().contains("PRESSUREDATA")){
+         returnList = this.requestBarometricPressureData(theRequest);
       }
-      else if(theRequest.toUpperCase().equals("PRESSURE")){
-         returnList = this.requestBarometricPressureData();
+      else if(theRequest.toUpperCase().contains("DEWPOINTDATA")){
+         returnList = this.requestDewpointData(theRequest);
       }
-      else if(theRequest.toUpperCase().equals("HEATINDEX")){
-         returnList = this.requestHeatIndexData();
+      else if(theRequest.toUpperCase().contains("HEATINDEXDATA")){
+         returnList = this.requestHeatIndexData(theRequest);
       }
-      else if(theRequest.toUpperCase().equals("DEWPOINT")){
-         returnList = this.requestDewPointData();
-      }
-      else if(theRequest.toUpperCase().equals("MISSIONDATA")){
-         returnList = this.requestMissionData();
-      }
-      */
       else if(theRequest.toUpperCase().contains("TEMPERATUREDATA")){
          returnList = this.requestTemperatureData(theRequest);
       }
@@ -599,11 +592,192 @@ public class Database{
 
    /**
    **/
-   private List<String>  requestDewPointData(){
+   private List<String> requestBarometricPressureData
+   (
+      String command
+   ){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn         = null;
+      Statement  stmt         = null;
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") || command.contains("mmHg")){
+               double metric = resultSet.getDouble("mmHg");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") || command.contains("inHg")){
+               double english = resultSet.getDouble("inHg");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") || command.contains("mB")){
+               double absolute = resultSet.getDouble("mB");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            }
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+
+   /**
+   **/
+   private List<String>  requestDewpointData(){
       ResultSet    resultSet  = null;
       List<String> returnList = null;
 
       return returnList;
+   }
+   
+   /**
+   **/
+   private List<String> requestDewpointData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn         = null;
+      Statement  stmt         = null;
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") || command.contains("dewptc")){
+               double metric = resultSet.getDouble("dewptc");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") || command.contains("dewptf")){
+               double english = resultSet.getDouble("dewptf");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") || command.contains("dewptk")){
+               double absolute = resultSet.getDouble("dewptk");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            }
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
    }
 
    /**
@@ -614,6 +788,98 @@ public class Database{
 
       return returnList;
    }
+   
+   /**
+   **/
+   private List<String> requestHeatIndexData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn         = null;
+      Statement  stmt         = null;
+      ResultSet    resultSet  = null;
+      List<String> returnList = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") ||
+                                      command.contains("heatindexc")){
+               double metric = resultSet.getDouble("heatindexc");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") ||
+                                      command.contains("heatindexf")){
+               double english = resultSet.getDouble("heatindexf");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") ||
+                                      command.contains("heatindexk")){
+               double absolute = resultSet.getDouble("heatindexk");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            }
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }   
+   }
 
    /**
    **/
@@ -623,13 +889,80 @@ public class Database{
 
       return returnList;
    }
-   
+
    /**
    **/
-   private List<String> requestHumdityData(String request){
+   private List<String> requestHumidityData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn         = null;
+      Statement  stmt         = null;
       List<String> returnList = null;
-      
-      return returnList;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }
+            if(command.contains("*") || command.contains("humidity")){
+               double humidity = resultSet.getDouble("humidity");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + humidity;
+            }
+            returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
    }
 
    /**
