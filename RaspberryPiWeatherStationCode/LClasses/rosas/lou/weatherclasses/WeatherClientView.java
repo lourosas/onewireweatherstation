@@ -1,6 +1,6 @@
-/**
+/********************************************************************
 <GNU Stuff to go here>
-*/
+********************************************************************/
 package rosas.lou.weatherclasses;
 
 import java.lang.*;
@@ -85,9 +85,230 @@ public class WeatherClientView extends GenericJFrame{
                  null,
                  this.setUpTemperaturePanel(),
                  "Viewing Temperature Data");
+      jtp.addTab("Humidiy",
+                 null,
+                 this.setUpHumidityPanel(),
+                 "Viewing Humidity Data");
+      jtp.addTab("Dew Point",
+                 null,
+                 this.setUpDewpointPanel(),
+                 "Viewing Dew Point Data");
       this.getContentPane().add(jtp);
       //this.pack();
       this.setVisible(true);
+   }
+
+   /**
+   **/
+   private JPanel setUpDewpointPanel(){
+      JPanel dewpointPanel = new JPanel();
+      dewpointPanel.setLayout(new BorderLayout());
+      JPanel northPanel  = this.setUpDewpointNorthPanel();
+      JPanel centerPanel = this.setUpDewpointCenterPanel();
+      JPanel southPanel  = this.setUpDewpointSouthPanel();
+
+      dewpointPanel.add(northPanel,  BorderLayout.NORTH);
+      dewpointPanel.add(centerPanel, BorderLayout.CENTER);
+      dewpointPanel.add(southPanel,  BorderLayout.SOUTH);
+
+      return dewpointPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpDewpointCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      return centerPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpDewpointNorthPanel(){
+      JPanel northPanel      = new JPanel();
+      ButtonGroup unitsGroup = new ButtonGroup();
+      ButtonGroup dataGroup  = new ButtonGroup();
+      northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel unitsPanel = new JPanel();
+
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("DPCelsius");
+      unitsGroup.add(celsius);
+      //Set up the Item Listener
+      //celsius.addItemListener(this.itemListener);
+      unitsPanel.add(celsius);
+
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("DPFahrenheit");
+      unitsGroup.add(fahrenheit);
+      //Set up the Item Listener
+      //fahrenheit.addItemListener(this.itemListener);
+      unitsPanel.add(fahrenheit);
+
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("DPKelvin");
+      unitsGroup.add(kelvin);
+      //Set up the Item Listener
+      //kelvin.addItemListener(this.itemListener);
+      unitsPanel.add(kelvin);
+
+      northPanel.add(unitsPanel);
+
+      JPanel dataPanel = new JPanel();
+
+      JRadioButton graph = new JRadioButton("Graph");
+      //Somehow, set the display state...worry about that later
+      //Add the Item Listener
+      //graph.addItemListner(this.itemListener);
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+
+      JRadioButton data  = new JRadioButton("Data", true);
+      dataGroup.add(data);
+      //data.addItemListener(this.itemListener);
+      dataPanel.add(data);
+
+      northPanel.add(dataPanel);
+
+      String dates[] = {"All Days"};
+      JComboBox dewPointComboBox = new JComboBox(dates);
+      dewPointComboBox.setActionCommand("Dewpoint Combo Box");
+      dewPointComboBox.setName("Dewpoint");
+      //Figure out what to do with this.
+      dewPointComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDayDewpoint(e);
+         }
+      });
+      northPanel.add(dewPointComboBox);
+      return northPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpDewpointSouthPanel(){
+      JPanel southPanel = new JPanel();
+      southPanel.setBorder(BorderFactory.createEtchedBorder());
+      
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("DP Refresh");
+      //refresh.addActionListener(this.actionListener);
+      //refresh.addKeyListener(this.keyListener);
+      southPanel.add(refresh);
+
+      JButton save = new JButton("Save Dewpoint data");
+      save.setActionCommand("DP Save");
+      //save.addActionListener(this.actionListener);
+      //save.addKeyListener(this.keyListener);
+      southPanel.add(save);
+
+      JButton quit = new JButton("Quit");
+      quit.setActionCommand("DP Quit");
+      quit.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            System.out.println(e.getSource());
+            System.out.println(e.getActionCommand());
+            setVisible(false);
+            System.exit(0);
+         }
+      });
+      southPanel.add(quit);
+
+      return southPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHumidityPanel(){
+      JPanel humidityPanel = new JPanel();
+      humidityPanel.setLayout(new BorderLayout());
+      JPanel northPanel  = this.setUpHumidityNorthPanel();
+      JPanel centerPanel = this.setUpHumidityCenterPanel(); 
+      JPanel southPanel  = this.setUpHumiditySouthPanel();
+
+      humidityPanel.add(northPanel,  BorderLayout.NORTH);
+      humidityPanel.add(centerPanel, BorderLayout.CENTER);
+      humidityPanel.add(southPanel,  BorderLayout.SOUTH);
+      return humidityPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHumidityCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      return centerPanel;
+   } 
+
+   /**
+   **/
+   private JPanel setUpHumidityNorthPanel(){
+      JPanel northPanel     = new JPanel();
+      ButtonGroup dataGroup = new ButtonGroup();
+      northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JRadioButton graph = new JRadioButton("Graph");
+      graph.setActionCommand("HGraph");
+      //Set up the Item Listener
+      //graph.addItemListener(this.itemListener);
+      dataGroup.add(graph);
+      northPanel.add(graph);
+
+      JRadioButton data = new JRadioButton("Data", true);
+      data.setActionCommand("HData");
+      //Set up the Item Listener
+      //data.addItemListener(this.itemListener);
+      dataGroup.add(data);
+      northPanel.add(data);
+
+      //Humidity Combo Box Data
+      String dates[] = {"All Days"};
+      JComboBox humidityComboBox = new JComboBox(dates);
+      humidityComboBox.setName("Humidity");
+      humidityComboBox.setActionCommand("Humidity Combo Box");
+      humidityComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDayHumidity(e);
+         }
+      });
+      northPanel.add(humidityComboBox);
+      return northPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHumiditySouthPanel(){
+      JPanel southPanel = new JPanel();
+      southPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("Humidity Refresh");
+      //Add Action Listener
+      //refresh.addActionListener(this.actionListener);
+      //Add Key Listener
+      //refresh.addKeyListener(this.keyListener);
+      southPanel.add(refresh);
+
+      JButton save = new JButton("Save Humidity Data");
+      save.setActionCommand("Humidity Save");
+      //Add Action Listener
+      //save.addActionListner(this.actionListener);
+      //Add Key Listener
+      //save.addKeyListener(this.keyListener);
+      southPanel.add(save);
+
+      JButton quit  = new JButton("Quit");
+      quit.setActionCommand("Humidity Quit");
+      //add the ActionListener
+      quit.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setVisible(false);
+            System.exit(0);
+         }
+      });
+      southPanel.add(quit);
+      return southPanel;
    }
    
    /**
@@ -161,11 +382,12 @@ public class WeatherClientView extends GenericJFrame{
       
       String dates[] = {"All Days"};
       JComboBox tempComboBox = new JComboBox(dates);
+      tempComboBox.setActionCommand("Temperature Combo Box");
+      tempComboBox.setName("Temperature");
       //Figure out what to do with this.
       tempComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
+            setTheDayTemperature(e);
          }
       });
       northPanel.add(tempComboBox);
@@ -210,5 +432,31 @@ public class WeatherClientView extends GenericJFrame{
       southPanel.add(quit);
       
       return southPanel;
+   }
+
+   /**
+   **/
+   private void setTheDayDewpoint(ActionEvent e){
+      System.out.println(e.getSource());
+      System.out.println(e.getActionCommand());
+      //Somehow, need to go and figure out how to request the data
+      //from the server and populate accordingly
+   }
+
+   /**
+   **/
+   private void setTheDayHumidity(ActionEvent e){
+      System.out.println(e.getSource());
+      System.out.println(e.getActionCommand());
+      //Somehow, need to go and figure out how to request the data
+      //from the server and populate accordingly  
+   }
+   /**
+   **/
+   private void setTheDayTemperature(ActionEvent e){
+      System.out.println(e.getSource());
+      System.out.println(e.getActionCommand());
+      //Now, somehow need to go and figure out how to request the
+      //data from the server and populate accordingly
    }
 }
