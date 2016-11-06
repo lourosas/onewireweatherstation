@@ -16,6 +16,7 @@ import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
 
+//Need to implement a Subscriber...for the Publish-Subscribe pattern
 public class WeatherClientView extends GenericJFrame{
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 500;
@@ -45,6 +46,11 @@ public class WeatherClientView extends GenericJFrame{
    **/
    public WeatherClientView(String title){
       super(title);
+      WeatherClientController wcc = 
+                              new WeatherClientController(this,null);
+      this.addActionListener(wcc);
+      this.addItemListener(wcc);
+      this.addKeyListener(wcc);
       this.setUpGUI();
    }
    
@@ -85,7 +91,7 @@ public class WeatherClientView extends GenericJFrame{
                  null,
                  this.setUpTemperaturePanel(),
                  "Viewing Temperature Data");
-      jtp.addTab("Humidiy",
+      jtp.addTab("Humidity",
                  null,
                  this.setUpHumidityPanel(),
                  "Viewing Humidity Data");
@@ -93,6 +99,10 @@ public class WeatherClientView extends GenericJFrame{
                  null,
                  this.setUpDewpointPanel(),
                  "Viewing Dew Point Data");
+      jtp.addTab("Heat Index",
+                 null,
+                 this.setUpHeatIndexPanel(),
+                 "Viewing Heat Index Data");
       this.getContentPane().add(jtp);
       //this.pack();
       this.setVisible(true);
@@ -213,6 +223,134 @@ public class WeatherClientView extends GenericJFrame{
             System.exit(0);
          }
       });
+      southPanel.add(quit);
+
+      return southPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHeatIndexPanel(){
+      JPanel heatIndexPanel = new JPanel();
+      heatIndexPanel.setLayout(new BorderLayout());
+
+      JPanel northPanel  = this.setUpHeatIndexNorthPanel();
+      JPanel centerPanel = this.setUpHeatIndexCenterPanel();
+      JPanel southPanel  = this.setUpHeatIndexSouthPanel();
+
+      heatIndexPanel.add(northPanel,  BorderLayout.NORTH);
+      heatIndexPanel.add(centerPanel, BorderLayout.CENTER);
+      heatIndexPanel.add(southPanel,  BorderLayout.SOUTH);
+
+      return heatIndexPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHeatIndexCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      return centerPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHeatIndexNorthPanel(){
+      JPanel northPanel      = new JPanel();
+      ButtonGroup unitsGroup = new ButtonGroup();
+      ButtonGroup dataGroup  = new ButtonGroup();
+      northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel unitsPanel = new JPanel();
+
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("HICelsius");
+      unitsGroup.add(celsius);
+      //Set up the Item Listener
+      //celsius.addItemListener(this.itemListener);
+      unitsPanel.add(celsius);
+
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("HIFahrenheit");
+      unitsGroup.add(fahrenheit);
+      //set up the Item Listener
+      //fahrenheit.addItemListener(this.itemListener);
+      unitsPanel.add(fahrenheit);
+
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("HIKelvin");
+      unitsGroup.add(kelvin);
+      //set up the Item Listener
+      //kelvin.addItemListener(this.itemListener);
+      unitsPanel.add(kelvin);
+
+      northPanel.add(unitsPanel);
+
+      JPanel dataPanel = new JPanel();
+
+      JRadioButton graph = new JRadioButton("Graph");
+      //Somehow, need to set the display state...worry later
+      //Add the Item Listener
+      //graph.addItemListener(this.itemListener);
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+
+      JRadioButton data = new JRadioButton("Data", true);
+      dataGroup.add(data);
+      //data.addItemListener(this.itemListener);
+      dataPanel.add(data);
+
+      northPanel.add(dataPanel);
+
+      String dates[] = {"Dates"};
+      JComboBox heatIndexComboBox = new JComboBox(dates);
+      heatIndexComboBox.setActionCommand("Heat Index Combo Box");
+      heatIndexComboBox.setName("HeatIndex");
+      //Figure out what to do this this.
+      heatIndexComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDayHeatIndex(e);
+         }
+      });
+      northPanel.add(heatIndexComboBox);
+      return northPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpHeatIndexSouthPanel(){
+      JPanel southPanel = new JPanel();
+      southPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("HI Refresh");
+      //Add Action Listener
+      //refresh.addActionListener(this.actionListener);
+      //Add Key Listener
+      //reshresh.addKeyListener(this.keyListener);
+      southPanel.add(refresh);
+
+      JButton save = new JButton("Save Heat Index Data");
+      //Add Action Listern
+      //save.addActionListener(this.actionListener);
+      //Add Key Listener
+      //save.addKeyListener(this.keyListener);
+      southPanel.add(save);
+
+      JButton quit = new JButton("Quit");
+      quit.setActionCommand("HeatIndex Quit");
+      //Add Action Listener
+      quit.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            System.out.println(e.getSource());
+            System.out.println(e.getActionCommand());
+            setVisible(false);
+            System.exit(0);
+         }
+      });
+
+      //Add the Key Listener (Eventually)
+      //quit.addKeyListener(....)
       southPanel.add(quit);
 
       return southPanel;
@@ -345,21 +483,21 @@ public class WeatherClientView extends GenericJFrame{
       celsius.setActionCommand("TCelsius");
       temperatureGroup.add(celsius);
       //Set up the Item Listener
-      //celsius.addItemListener(this.itemListener);
+      celsius.addItemListener(this.itemListener);
       tempPanel.add(celsius);
       
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("TFahrenheit");
       temperatureGroup.add(fahrenheit);
       //Set up the Item Listener
-      //fahrenheit.addItemListener(this.itemListener);
+      fahrenheit.addItemListener(this.itemListener);
       tempPanel.add(fahrenheit);
       
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("TKelvin");
       temperatureGroup.add(kelvin);
       //Set up the Item Listener
-      //kelvin.addItemListener(this.itemListener);
+      kelvin.addItemListener(this.itemListener);
       tempPanel.add(kelvin);
       
       northPanel.add(tempPanel);
@@ -367,20 +505,22 @@ public class WeatherClientView extends GenericJFrame{
       JPanel dataPanel = new JPanel();
       
       JRadioButton graph = new JRadioButton("Graph");
+      graph.setActionCommand("TGraph");
       //Somehow set the display state...will worry about that later
       dataGroup.add(graph);
-      //graph.addItemListener(this.itemListener);
+      graph.addItemListener(this.itemListener);
       dataPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data", true);
+      data.setActionCommand("TData");
       dataGroup.add(data);
       //Somehow, set up the display state..will worry about that later
-      //data.addItemListener(this.itemListener);
+      data.addItemListener(this.itemListener);
       dataPanel.add(data);
       
       northPanel.add(dataPanel);
       
-      String dates[] = {"All Days"};
+      String dates[] = {"Dates"};
       JComboBox tempComboBox = new JComboBox(dates);
       tempComboBox.setActionCommand("Temperature Combo Box");
       tempComboBox.setName("Temperature");
@@ -421,8 +561,6 @@ public class WeatherClientView extends GenericJFrame{
       //add the Action Listener
       quit.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
             setVisible(false);
             System.exit(0);
          }
@@ -441,6 +579,13 @@ public class WeatherClientView extends GenericJFrame{
       System.out.println(e.getActionCommand());
       //Somehow, need to go and figure out how to request the data
       //from the server and populate accordingly
+   }
+
+   /****/
+   private void setTheDayHeatIndex(ActionEvent e){
+      System.out.println(e.getSource());
+      System.out.println(e.getActionCommand());
+      //Somehow, need to go and figure out what is next...
    }
 
    /**

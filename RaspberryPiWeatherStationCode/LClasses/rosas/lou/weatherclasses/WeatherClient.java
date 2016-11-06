@@ -1,14 +1,20 @@
-/**
-<GNU Stuff Goes Here>
-**/
-
+/********************************************************************
+<GNU Stuff to go here>
+********************************************************************/
 package rosas.lou.weatherclasses;
 
 import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import rosas.lou.weatherclasses.*;
 
-public interface WeatherClient{
-   public connectToServer(byte[] address, int port){}
+public class WeatherClient{
+   private DatagramSocket socket;
+
+   {
+      socket = null;
+   }
+
+   public WeatherClient(){}
 }
