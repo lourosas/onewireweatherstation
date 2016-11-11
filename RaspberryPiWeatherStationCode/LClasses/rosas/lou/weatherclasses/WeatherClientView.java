@@ -17,14 +17,16 @@ import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
 
 //Need to implement a Subscriber...for the Publish-Subscribe pattern
-public class WeatherClientView extends GenericJFrame{
+public class WeatherClientView extends GenericJFrame  implements
+WeatherClientObserver{
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 500;
    
    Object controller;
-   ActionListener actionListener;
-   ItemListener   itemListener;
-   KeyListener    keyListener;
+   ActionListener           actionListener;
+   ItemListener             itemListener;
+   KeyListener              keyListener;
+   java.util.List<String>   missionData;
    
    //Initializer stuff here
    {
@@ -32,6 +34,7 @@ public class WeatherClientView extends GenericJFrame{
       actionListener = null;
       itemListener   = null;
       keyListener    = null;
+      missionData    = null;
    }
    
    /**
@@ -46,14 +49,34 @@ public class WeatherClientView extends GenericJFrame{
    **/
    public WeatherClientView(String title){
       super(title);
-      WeatherClientController wcc = 
-                              new WeatherClientController(this,null);
+      WeatherClientController wcc = new WeatherClientController(this,
+                                            new WeatherClient(this));
+      wcc.requestMissionData();
       this.addActionListener(wcc);
       this.addItemListener(wcc);
       this.addKeyListener(wcc);
       this.setUpGUI();
    }
-   
+
+   //////////////////////////Public Methods//////////////////////////
+   ////////////////WeatherClientObserver implementation//////////////
+   /**
+   **/
+   public void updateMissionData(java.util.List<String> missionData){
+      try{
+         this.missionData = new LinkedList<String>(missionData);
+      }
+      catch(NullPointerException npe){
+         //TBD...try to put something here to indicate NO DATA
+         npe.printStackTrace();
+      }
+   }
+
+   /**
+   **/
+   public void updateTemperatureData(java.util.List<String> tempData){
+   }
+
    /**
    **/
    public void addController(Object controller){
@@ -77,9 +100,7 @@ public class WeatherClientView extends GenericJFrame{
    public void addKeyListener(KeyListener keyListener){
       this.keyListener = keyListener;
    }
-   
-   //////////////////////////Public Methods///////////////////////////
-   
+
    /////////////////////////Private Methods///////////////////////////
    /**
    **/
@@ -181,7 +202,7 @@ public class WeatherClientView extends GenericJFrame{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {"All Days"};
+      String dates[] = {"Dates"};
       JComboBox dewPointComboBox = new JComboBox(dates);
       dewPointComboBox.setActionCommand("Dewpoint Combo Box");
       dewPointComboBox.setName("Dewpoint");

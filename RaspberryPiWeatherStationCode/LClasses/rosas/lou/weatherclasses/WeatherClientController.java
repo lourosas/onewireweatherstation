@@ -68,10 +68,15 @@ ActionListener, KeyListener, ItemListener{
    **/
    public void keyTyped(KeyEvent k){}
 
+   /**
+   **/
+   public void requestMissionData(){
+   }
+
    ///////////////////////Private Methods////////////////////////////
    /**
    **/
-   public void handleJRadioButton(JRadioButton jrb){
+   private void handleJRadioButton(JRadioButton jrb){
       if(jrb.isSelected()){
          System.out.println(jrb.getActionCommand());
       }
