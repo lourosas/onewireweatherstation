@@ -71,6 +71,7 @@ ActionListener, KeyListener, ItemListener{
    /**
    **/
    public void requestMissionData(){
+      this.client.requestMissionData();
    }
 
    ///////////////////////Private Methods////////////////////////////

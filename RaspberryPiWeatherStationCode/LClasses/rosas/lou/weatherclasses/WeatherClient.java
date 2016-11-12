@@ -10,7 +10,8 @@ import java.net.*;
 import rosas.lou.weatherclasses.*;
 
 public class WeatherClient{
-   private int localPort;
+   private final static int PORT = 19000;
+
    private DatagramSocket socket;
    private List<WeatherClientObserver> observers;
    private byte[] addr;
@@ -21,7 +22,6 @@ public class WeatherClient{
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)112};
    }
 
-   private static int port;
    /**
    **/
    public WeatherClient(){
@@ -38,9 +38,6 @@ public class WeatherClient{
          this.observers = new LinkedList<WeatherClientObserver>();
          this.observers.add(wco);
       }
-      finally{
-         setPortNumber();
-      }
    }
    
    /**
@@ -55,11 +52,54 @@ public class WeatherClient{
       }
    }
 
-   //////////////////////Private Methods/////////////////////////////
    /**
    **/
-   private static void setPortNumber(){
-      ++WeatherClient.port;
-      System.out.println(WeatherClient.port);
+   public void requestMissionData(){
+      String message = new String("SELECT * FROM missiondata");
+      this.requestMissionData(message);
+   }
+
+   public void requestMissionData(String message){
+      DatagramPacket sendPacket    = null;
+      DatagramPacket receivePacket = null;
+      List<String> missionData     = new LinkedList();
+      try{
+         this.socket = new DatagramSocket();
+         byte data[] = message.getBytes();
+         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         byte[] receiveData = new byte[64];
+         sendPacket = new DatagramPacket(data,
+                                         data.length,
+                                         iNetAddr,
+                                         PORT);
+         this.socket.send(sendPacket);
+         receivePacket =
+                 new DatagramPacket(receiveData, receiveData.length);
+         this.socket.receive(receivePacket);
+         String output = new String(receivePacket.getData());
+         int size = Integer.parseInt(output.trim());
+         for(int i = 0; i < size; i++){
+            this.socket.receive(receivePacket);
+            output = new String(receivePacket.getData());
+            System.out.println(output.trim());
+            missionData.add(output);
+            receivePacket.setData(new byte[64]);
+         }
+      }
+      catch(Exception e){
+         //TBD...but for now, print the Exception!!!
+         e.printStackTrace();
+         missionData = null;
+      }
+      this.publishMissionData(missionData);
+   }
+
+   //////////////////////Private Methods/////////////////////////////
+   private void publishMissionData(List<String> missionData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco = it.next();
+         wco.updateMissionData(missionData);
+      }
    }
 }

@@ -27,14 +27,22 @@ WeatherClientObserver{
    ItemListener             itemListener;
    KeyListener              keyListener;
    java.util.List<String>   missionData;
+   JComboBox                tempComboBox;
+   JComboBox                humidityComboBox;
+   JComboBox                heatIndexComboBox;
+   JComboBox                dewPointComboBox;
    
    //Initializer stuff here
    {
-      controller     = null;
-      actionListener = null;
-      itemListener   = null;
-      keyListener    = null;
-      missionData    = null;
+      controller        = null;
+      actionListener    = null;
+      itemListener      = null;
+      keyListener       = null;
+      missionData       = null;
+      tempComboBox      = null;
+      humidityComboBox  = null;
+      dewPointComboBox  = null;
+      heatIndexComboBox = null;
    }
    
    /**
@@ -49,13 +57,14 @@ WeatherClientObserver{
    **/
    public WeatherClientView(String title){
       super(title);
-      WeatherClientController wcc = new WeatherClientController(this,
-                                            new WeatherClient(this));
-      wcc.requestMissionData();
+      WeatherClient wc = new WeatherClient(this);
+      WeatherClientController wcc =
+                                new WeatherClientController(this,wc);
       this.addActionListener(wcc);
       this.addItemListener(wcc);
       this.addKeyListener(wcc);
       this.setUpGUI();
+      wcc.requestMissionData();
    }
 
    //////////////////////////Public Methods//////////////////////////
@@ -65,9 +74,18 @@ WeatherClientObserver{
    public void updateMissionData(java.util.List<String> missionData){
       try{
          this.missionData = new LinkedList<String>(missionData);
+         Iterator<String> it = this.missionData.iterator();
+         while(it.hasNext()){
+            String date = it.next();
+            this.tempComboBox.addItem(date);
+            this.humidityComboBox.addItem(date);
+            this.dewPointComboBox.addItem(date);
+            this.heatIndexComboBox.addItem(date);
+         }
       }
       catch(NullPointerException npe){
          //TBD...try to put something here to indicate NO DATA
+         //A Dialog box
          npe.printStackTrace();
       }
    }
@@ -202,17 +220,17 @@ WeatherClientObserver{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {"Dates"};
-      JComboBox dewPointComboBox = new JComboBox(dates);
-      dewPointComboBox.setActionCommand("Dewpoint Combo Box");
-      dewPointComboBox.setName("Dewpoint");
+      String dates[] = {""};
+      this.dewPointComboBox = new JComboBox(dates);
+      this.dewPointComboBox.setActionCommand("Dewpoint Combo Box");
+      this.dewPointComboBox.setName("Dewpoint");
       //Figure out what to do with this.
-      dewPointComboBox.addActionListener(new ActionListener(){
+      this.dewPointComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             setTheDayDewpoint(e);
          }
       });
-      northPanel.add(dewPointComboBox);
+      northPanel.add(this.dewPointComboBox);
       return northPanel;
    }
 
@@ -323,17 +341,17 @@ WeatherClientObserver{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {"Dates"};
-      JComboBox heatIndexComboBox = new JComboBox(dates);
-      heatIndexComboBox.setActionCommand("Heat Index Combo Box");
-      heatIndexComboBox.setName("HeatIndex");
+      String dates[] = {""};
+      this.heatIndexComboBox = new JComboBox(dates);
+      this.heatIndexComboBox.setActionCommand("Heat Index Combo Box");
+      this.heatIndexComboBox.setName("HeatIndex");
       //Figure out what to do this this.
-      heatIndexComboBox.addActionListener(new ActionListener(){
+      this.heatIndexComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             setTheDayHeatIndex(e);
          }
       });
-      northPanel.add(heatIndexComboBox);
+      northPanel.add(this.heatIndexComboBox);
       return northPanel;
    }
 
@@ -422,16 +440,16 @@ WeatherClientObserver{
       northPanel.add(data);
 
       //Humidity Combo Box Data
-      String dates[] = {"All Days"};
-      JComboBox humidityComboBox = new JComboBox(dates);
-      humidityComboBox.setName("Humidity");
-      humidityComboBox.setActionCommand("Humidity Combo Box");
-      humidityComboBox.addActionListener(new ActionListener(){
+      String dates[] = {""};
+      this.humidityComboBox = new JComboBox(dates);
+      this.humidityComboBox.setName("Humidity");
+      this.humidityComboBox.setActionCommand("Humidity Combo Box");
+      this.humidityComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             setTheDayHumidity(e);
          }
       });
-      northPanel.add(humidityComboBox);
+      northPanel.add(this.humidityComboBox);
       return northPanel;
    }
 
@@ -541,17 +559,17 @@ WeatherClientObserver{
       
       northPanel.add(dataPanel);
       
-      String dates[] = {"Dates"};
-      JComboBox tempComboBox = new JComboBox(dates);
-      tempComboBox.setActionCommand("Temperature Combo Box");
-      tempComboBox.setName("Temperature");
+      String dates[] = {""};
+      this.tempComboBox = new JComboBox(dates);
+      this.tempComboBox.setActionCommand("Temperature Combo Box");
+      this.tempComboBox.setName("Temperature");
       //Figure out what to do with this.
-      tempComboBox.addActionListener(new ActionListener(){
+      this.tempComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             setTheDayTemperature(e);
          }
       });
-      northPanel.add(tempComboBox);
+      northPanel.add(this.tempComboBox);
       return northPanel;
    }
    
