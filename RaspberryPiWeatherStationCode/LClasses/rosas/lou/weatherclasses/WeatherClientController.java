@@ -37,7 +37,8 @@ ActionListener, KeyListener, ItemListener{
    Implementation of the actionPerformed method from the
    ActionListener Interface
    **/
-   public void actionPerformed(ActionEvent e){}
+   public void actionPerformed(ActionEvent e){
+   }
 
    /**
    Implementation of the itemStateChanged method of the ItemListener
@@ -79,7 +80,13 @@ ActionListener, KeyListener, ItemListener{
    **/
    private void handleJRadioButton(JRadioButton jrb){
       if(jrb.isSelected()){
-         System.out.println(jrb.getActionCommand());
+         String command = jrb.getActionCommand();
+         if(command.equals("TCelsius") ||
+            command.equals("TFahrenheit") ||
+            command.equals("TKelvin")){
+            ViewState state = view.requestTemperatureState();
+            this.client.requestTemperatureData(state);
+         }
       }
    }
 }

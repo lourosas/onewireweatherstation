@@ -31,6 +31,9 @@ WeatherClientObserver{
    JComboBox                humidityComboBox;
    JComboBox                heatIndexComboBox;
    JComboBox                dewPointComboBox;
+   JComboBox                pressureComboBox;
+   ButtonGroup              temperatureGroup;
+   ButtonGroup              tempDataGroup;
    
    //Initializer stuff here
    {
@@ -43,6 +46,9 @@ WeatherClientObserver{
       humidityComboBox  = null;
       dewPointComboBox  = null;
       heatIndexComboBox = null;
+      pressureComboBox  = null;
+      temperatureGroup  = null;
+      tempDataGroup     = null;
    }
    
    /**
@@ -64,6 +70,8 @@ WeatherClientObserver{
       this.addItemListener(wcc);
       this.addKeyListener(wcc);
       this.setUpGUI();
+      //Request the Mission Data:  which holds the current dates of
+      //data recorded
       wcc.requestMissionData();
    }
 
@@ -81,6 +89,7 @@ WeatherClientObserver{
             this.humidityComboBox.addItem(date);
             this.dewPointComboBox.addItem(date);
             this.heatIndexComboBox.addItem(date);
+            this.pressureComboBox.addItem(date);
          }
       }
       catch(NullPointerException npe){
@@ -119,6 +128,34 @@ WeatherClientObserver{
       this.keyListener = keyListener;
    }
 
+   /**
+   **/
+   public ViewState requestTemperatureState(){
+      ViewState returnState = new ViewState();
+      Enumeration<AbstractButton> e =
+                                 this.temperatureGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb =(JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Celsius")){
+               returnState.units = Units.METRIC;
+            }
+            else if(jrb.getText().equals("Fahrenheit")){
+               returnState.units = Units.ENGLISH;
+            }
+            else{
+               returnState.units = Units.ABSOLUTE;
+            }
+         }
+      }
+      String date = (String)tempComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
+   }
+
    /////////////////////////Private Methods///////////////////////////
    /**
    **/
@@ -134,6 +171,10 @@ WeatherClientObserver{
                  null,
                  this.setUpHumidityPanel(),
                  "Viewing Humidity Data");
+      jtp.addTab("Barometric Pressure",
+                 null,
+                 this.setUpPressurePanel(),
+                 "Viewing Barometric Pressure Data");
       jtp.addTab("Dew Point",
                  null,
                  this.setUpDewpointPanel(),
@@ -145,6 +186,123 @@ WeatherClientObserver{
       this.getContentPane().add(jtp);
       //this.pack();
       this.setVisible(true);
+   }
+
+   /**
+   **/
+   private JPanel setUpPressurePanel(){
+      JPanel pressurePanel = new JPanel();
+      pressurePanel.setLayout(new BorderLayout());
+      JPanel northPanel  = this.setUpPressureNorthPanel();
+      JPanel centerPanel = this.setUpPressureCenterPanel();
+      JPanel southPanel  = this.setUpPressureSouthPanel();
+
+      pressurePanel.add(northPanel,  BorderLayout.NORTH);
+      pressurePanel.add(centerPanel, BorderLayout.CENTER);
+      pressurePanel.add(southPanel,  BorderLayout.SOUTH);
+
+      return pressurePanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpPressureCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      return centerPanel;
+   }
+
+   /**
+   **/
+   private JPanel setUpPressureNorthPanel(){
+      JPanel northPanel      = new JPanel();
+      ButtonGroup unitsGroup = new ButtonGroup();
+      ButtonGroup dataGroup  = new ButtonGroup();
+      northPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel unitsPanel = new JPanel();
+
+      JRadioButton mmHg = new JRadioButton("mmHg", true);
+      mmHg.setActionCommand("PMetric");
+      unitsGroup.add(mmHg);
+      //Set up the Item Listener
+      //mmHg.addItemListener(this.itemListener);
+      unitsPanel.add(mmHg);
+
+      JRadioButton inHg = new JRadioButton("inHg");
+      inHg.setActionCommand("PEnglish");
+      unitsGroup.add(inHg);
+      //Set up the Item Listener
+      //inHg.addItemListener(this.itemListener);
+      unitsPanel.add(inHg);
+
+      JRadioButton milliBars = new JRadioButton("milliBars");
+      milliBars.setActionCommand("PAbsolute");
+      unitsGroup.add(milliBars);
+      //Set up the Item Listener
+      //milliBars.addItemListener(this.itemListener);
+      unitsPanel.add(milliBars);
+
+      northPanel.add(unitsPanel);
+
+      JPanel dataPanel = new JPanel();
+
+      JRadioButton graph = new JRadioButton("Graph");
+      //Somehow, set the display state...
+      //Add the Item Listener
+      //graph.addItemListener(this.itemListener);
+      dataPanel.add(graph);
+      dataGroup.add(graph);
+
+      JRadioButton data = new JRadioButton("Data", true);
+      //data.addItemListner(this.itemListener);
+      dataPanel.add(data);
+      dataGroup.add(data);
+
+      northPanel.add(dataPanel);
+
+      String dates[] = {""};
+      this.pressureComboBox = new JComboBox(dates);
+      this.pressureComboBox.setActionCommand("Pressure Combo Box");
+      this.pressureComboBox.setName("Pressure");
+      this.pressureComboBox.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setTheDayPressure(e);
+         }
+      });
+      northPanel.add(this.pressureComboBox);
+      return northPanel;
+
+   }
+
+   /**
+   **/
+   private JPanel setUpPressureSouthPanel(){
+      JPanel southPanel = new JPanel();
+      southPanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("P Refresh");
+      //refresh.addActionListener(this.actionListener);
+      //refresh.addKeyListener(this.keyListener);
+      southPanel.add(refresh);
+
+      JButton save = new JButton("Save Pressure Data");
+      save.setActionCommand("P Save");
+      //save.addActionListener(this.actionListener);
+      //save.addKeyListener(this.keyListener);
+      southPanel.add(save);
+
+      JButton quit = new JButton("Quit");
+      quit.setActionCommand("P Quit");
+      quit.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setVisible(false);
+            System.exit(0);
+         }
+      });
+      southPanel.add(quit);
+      return southPanel;
    }
 
    /**
@@ -209,7 +367,7 @@ WeatherClientObserver{
       JRadioButton graph = new JRadioButton("Graph");
       //Somehow, set the display state...worry about that later
       //Add the Item Listener
-      //graph.addItemListner(this.itemListener);
+      //graph.addItemListener(this.itemListener);
       dataGroup.add(graph);
       dataPanel.add(graph);
 
@@ -246,7 +404,7 @@ WeatherClientObserver{
       //refresh.addKeyListener(this.keyListener);
       southPanel.add(refresh);
 
-      JButton save = new JButton("Save Dewpoint data");
+      JButton save = new JButton("Save Dewpoint Data");
       save.setActionCommand("DP Save");
       //save.addActionListener(this.actionListener);
       //save.addKeyListener(this.keyListener);
@@ -511,30 +669,30 @@ WeatherClientObserver{
    }
    
    private JPanel setUpTempNorthPanel(){
-      JPanel northPanel            = new JPanel();
-      ButtonGroup temperatureGroup = new ButtonGroup();
-      ButtonGroup dataGroup        = new ButtonGroup();
+      JPanel northPanel     = new JPanel();
+      this.temperatureGroup = new ButtonGroup();
+      this.tempDataGroup    = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
       //Set up the temperature panel
       JPanel tempPanel = new JPanel();
       
       JRadioButton celsius = new JRadioButton("Celsius", true);
       celsius.setActionCommand("TCelsius");
-      temperatureGroup.add(celsius);
+      this.temperatureGroup.add(celsius);
       //Set up the Item Listener
       celsius.addItemListener(this.itemListener);
       tempPanel.add(celsius);
       
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("TFahrenheit");
-      temperatureGroup.add(fahrenheit);
+      this.temperatureGroup.add(fahrenheit);
       //Set up the Item Listener
       fahrenheit.addItemListener(this.itemListener);
       tempPanel.add(fahrenheit);
       
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("TKelvin");
-      temperatureGroup.add(kelvin);
+      this.temperatureGroup.add(kelvin);
       //Set up the Item Listener
       kelvin.addItemListener(this.itemListener);
       tempPanel.add(kelvin);
@@ -546,13 +704,13 @@ WeatherClientObserver{
       JRadioButton graph = new JRadioButton("Graph");
       graph.setActionCommand("TGraph");
       //Somehow set the display state...will worry about that later
-      dataGroup.add(graph);
+      this.tempDataGroup.add(graph);
       graph.addItemListener(this.itemListener);
       dataPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data", true);
       data.setActionCommand("TData");
-      dataGroup.add(data);
+      this.tempDataGroup.add(data);
       //Somehow, set up the display state..will worry about that later
       data.addItemListener(this.itemListener);
       dataPanel.add(data);
@@ -635,12 +793,19 @@ WeatherClientObserver{
       //Somehow, need to go and figure out how to request the data
       //from the server and populate accordingly  
    }
+
+   /**
+   **/
+   private void setTheDayPressure(ActionEvent e){
+      System.out.println(e.getSource());
+      System.out.println(e.getActionCommand());
+      //Somehow, need to go and figure out what is next...
+   }
+
    /**
    **/
    private void setTheDayTemperature(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
-      //Now, somehow need to go and figure out how to request the
-      //data from the server and populate accordingly
+      JComboBox box = (JComboBox)e.getSource();
+      String date = (String)box.getSelectedItem();
    }
 }
