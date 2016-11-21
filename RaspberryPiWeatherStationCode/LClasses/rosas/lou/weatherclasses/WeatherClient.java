@@ -83,7 +83,7 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output);
+            //System.out.println(output);
             missionData.add(output);
             receivePacket.setData(new byte[64]);
          }
@@ -131,11 +131,12 @@ public class WeatherClient{
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
       List<String> temperatureData = new LinkedList();
+      System.out.println(message);
       try{
          this.socket = new DatagramSocket();
          byte data[] = message.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
-         byte[] receiveData = new byte[64];
+         byte[] receiveData = new byte[128];
          sendPacket = new DatagramPacket(data,
                                          data.length,
                                          iNetAddr,
@@ -151,7 +152,7 @@ public class WeatherClient{
             output = new String(receivePacket.getData());
             System.out.println(output);
             temperatureData.add(output);
-            receivePacket.setData(new byte[64]);
+            receivePacket.setData(new byte[128]);
          }
       }
       catch(Exception e){
@@ -159,7 +160,7 @@ public class WeatherClient{
          e.printStackTrace();
          temperatureData = null;
       }
-      //this.publishTemperatureData(temperatureData);
+      this.publishTemperatureData(temperatureData);
    }
 
    //////////////////////Private Methods/////////////////////////////
@@ -170,6 +171,16 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateMissionData(missionData);
+      }
+   }
+
+   /**
+   **/
+   private void publishTemperatureData(List<String> tempData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.updateTemperatureData(tempData);
       }
    }
 }
