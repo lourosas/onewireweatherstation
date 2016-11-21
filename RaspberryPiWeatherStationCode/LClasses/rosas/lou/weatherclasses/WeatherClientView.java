@@ -85,11 +85,11 @@ WeatherClientObserver{
          Iterator<String> it = this.missionData.iterator();
          while(it.hasNext()){
             String date = it.next();
-            this.tempComboBox.addItem(date);
-            this.humidityComboBox.addItem(date);
-            this.dewPointComboBox.addItem(date);
-            this.heatIndexComboBox.addItem(date);
-            this.pressureComboBox.addItem(date);
+            this.tempComboBox.addItem(date.trim());
+            this.humidityComboBox.addItem(date.trim());
+            this.dewPointComboBox.addItem(date.trim());
+            this.heatIndexComboBox.addItem(date.trim());
+            this.pressureComboBox.addItem(date.trim());
          }
       }
       catch(NullPointerException npe){
@@ -102,6 +102,15 @@ WeatherClientObserver{
    /**
    **/
    public void updateTemperatureData(java.util.List<String> tempData){
+      Enumeration<AbstractButton> e =
+                                 this.temperatureGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            jrb.requestFocus();
+         }
+      }
+      System.out.println(tempData);
    }
 
    /**
