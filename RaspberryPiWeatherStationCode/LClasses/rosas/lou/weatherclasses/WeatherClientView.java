@@ -83,7 +83,7 @@ WeatherClientObserver{
       try{
          this.missionData = new LinkedList<String>(missionData);
          Iterator<String> it = this.missionData.iterator();
-         while(it.hasNext()){
+         while(it.hasNext()){            
             String date = it.next();
             this.tempComboBox.addItem(date.trim());
             this.humidityComboBox.addItem(date.trim());
@@ -102,14 +102,6 @@ WeatherClientObserver{
    /**
    **/
    public void updateTemperatureData(java.util.List<String> tempData){
-      Enumeration<AbstractButton> e =
-                                 this.temperatureGroup.getElements();
-      while(e.hasMoreElements()){
-         JRadioButton jrb = (JRadioButton)e.nextElement();
-         if(jrb.isSelected()){
-            jrb.requestFocus();
-         }
-      }
       System.out.println(tempData);
    }
 
@@ -677,6 +669,8 @@ WeatherClientObserver{
       return centerPanel;
    }
    
+   /**
+   **/
    private JPanel setUpTempNorthPanel(){
       JPanel northPanel     = new JPanel();
       this.temperatureGroup = new ButtonGroup();
@@ -736,6 +730,8 @@ WeatherClientObserver{
             setTheDayTemperature(e);
          }
       });
+      this.tempComboBox.addActionListener(this.actionListener);
+      this.tempComboBox.addKeyListener(this.keyListener);
       northPanel.add(this.tempComboBox);
       return northPanel;
    }
@@ -787,7 +783,8 @@ WeatherClientObserver{
       //from the server and populate accordingly
    }
 
-   /****/
+   /**
+   **/
    private void setTheDayHeatIndex(ActionEvent e){
       System.out.println(e.getSource());
       System.out.println(e.getActionCommand());
@@ -815,6 +812,8 @@ WeatherClientObserver{
    **/
    private void setTheDayTemperature(ActionEvent e){
       JComboBox box = (JComboBox)e.getSource();
-      String date = (String)box.getSelectedItem();
+      if(e.getModifiers() == java.awt.event.InputEvent.BUTTON1_MASK){
+         String date = (String)box.getSelectedItem();
+      }
    }
 }

@@ -38,6 +38,13 @@ ActionListener, KeyListener, ItemListener{
    ActionListener Interface
    **/
    public void actionPerformed(ActionEvent e){
+      Object o = e.getSource();
+      if(o instanceof JComboBox){
+         int mask = java.awt.event.InputEvent.BUTTON1_MASK;
+         if(e.getModifiers() == mask){
+            this.handleJComboBox((JComboBox)o);
+         }
+      }
    }
 
    /**
@@ -55,7 +62,13 @@ ActionListener, KeyListener, ItemListener{
    Implementation of the keyPressed method of the KeyListener
    Interface
    **/
-   public void keyPressed(KeyEvent k){}
+   public void keyPressed(KeyEvent k){
+      Object o = k.getSource();
+      int code = k.getKeyCode();
+      if(o instanceof JComboBox && code == KeyEvent.VK_ENTER){
+         this.handleJComboBox((JComboBox)o);
+      }
+   }
 
    /**
    Implementation of the keyReleased method of the KeyListener
@@ -76,6 +89,16 @@ ActionListener, KeyListener, ItemListener{
    }
 
    ///////////////////////Private Methods////////////////////////////
+   /**
+   **/
+   private void handleJComboBox(JComboBox jcb){
+      String command = jcb.getActionCommand();
+      if(command.equals("Temperature Combo Box")){
+         ViewState state = view.requestTemperatureState();
+         this.client.requestTemperatureData(state);
+      }
+   }
+   
    /**
    **/
    private void handleJRadioButton(JRadioButton jrb){

@@ -10,7 +10,8 @@ import java.net.*;
 import rosas.lou.weatherclasses.*;
 
 public class WeatherClient{
-   private final static int PORT = 19000;
+   private final static int PORT    = 19000;
+   private final static int TIMEOUT = 20000;
 
    private DatagramSocket socket;
    private List<WeatherClientObserver> observers;
@@ -67,6 +68,11 @@ public class WeatherClient{
       List<String> missionData     = new LinkedList();
       try{
          this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
          byte data[] = message.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
          byte[] receiveData = new byte[64];
@@ -88,12 +94,18 @@ public class WeatherClient{
             receivePacket.setData(new byte[64]);
          }
       }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         System.out.println(ste);
+      }
       catch(Exception e){
          //TBD...but for now, print the Exception!!!
          e.printStackTrace();
          missionData = null;
       }
-      this.publishMissionData(missionData);
+      finally{
+         this.publishMissionData(missionData);
+      }
    }
 
    /**
@@ -134,6 +146,11 @@ public class WeatherClient{
       System.out.println(message);
       try{
          this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
          byte data[] = message.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
          byte[] receiveData = new byte[128];
@@ -150,17 +167,23 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output);
-            temperatureData.add(output);
+            System.out.println(output.trim());
+            temperatureData.add(output.trim());
             receivePacket.setData(new byte[128]);
          }
+      }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         ste.printStackTrace();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception
          e.printStackTrace();
          temperatureData = null;
       }
-      this.publishTemperatureData(temperatureData);
+      finally{
+         this.publishTemperatureData(temperatureData);
+      }
    }
 
    //////////////////////Private Methods/////////////////////////////
