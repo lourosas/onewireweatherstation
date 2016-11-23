@@ -102,7 +102,20 @@ WeatherClientObserver{
    /**
    **/
    public void updateTemperatureData(java.util.List<String> tempData){
-      System.out.println(tempData);
+      Enumeration<AbstractButton> e =
+                                    this.tempDataGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){ 
+            if(jrb.getText().equals("Data")){
+               this.setUpTemperatureData(tempData);
+            }
+            else if(jrb.getText().equals("Graph")){
+               this.setUpTemperatureGraph(tempData);
+            }
+         }
+      }
+      //System.out.println(tempData);
    }
 
    /**
@@ -646,6 +659,37 @@ WeatherClientObserver{
       southPanel.add(quit);
       return southPanel;
    }
+   
+   /**
+   **/
+   private void setUpTemperatureData(java.util.List<String> data){
+      try{
+         JTabbedPane jtp =
+                  (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).equals("Temperature"){
+               jtp.setSelectedIndex(i);
+            }
+         }
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         //Get the middle component
+         JPanel dataPanel = (JPanel)tempPanel.getComponent(1);
+         //Remove Everything and redraw
+         if(dataPanel.getComponentCount() > 0){
+            dataPanel.removeAll();
+         }
+         dataPanel.setLayout(new BorderLayout());
+         JScrollPane jsp = 
+      }
+      catch(NullPointerException npe){
+         //TBD...may need to come up with something other than this
+         npe.printStackTrace();
+      }
+   }
+   
+   /**
+   **/
+   private void setUpTemperatureGraph(java.util.List<String> data){}
    
    /**
    **/
