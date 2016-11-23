@@ -22,6 +22,9 @@ WeatherClientObserver{
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 500;
    
+   //This is subject to change
+   private static final short TOTAL_PANELS = 5;
+   
    Object controller;
    ActionListener           actionListener;
    ItemListener             itemListener;
@@ -115,7 +118,6 @@ WeatherClientObserver{
             }
          }
       }
-      //System.out.println(tempData);
    }
 
    /**
@@ -171,6 +173,35 @@ WeatherClientObserver{
    }
 
    /////////////////////////Private Methods///////////////////////////
+   /**
+   **/
+   private JScrollPane printHeatRelatedText
+   (
+      java.util.List<String> data
+   ){
+      JScrollPane pane = null;
+      try{
+         String delimeter = "";
+         //Check to see the units by looking at the Temperature
+         //Button Group
+         JTextArea textArea = new JTextArea(28,35);
+         textArea.setEditable(false);
+         Iterator<String> i = data.iterator();
+         while(i.hasNext()){
+            String currentData = (String)i.next();
+            currentData += "\n";
+            textArea.append(currentData);
+         }
+         pane = new JScrollPane(textArea);
+      }
+      catch(NullPointerException npe){
+         //TBD:  need to figure this out at a different time:  where
+         //to handle this exception
+      }
+      finally{
+         return pane;
+      }
+   }
    /**
    **/
    private void setUpGUI(){
@@ -664,11 +695,13 @@ WeatherClientObserver{
    **/
    private void setUpTemperatureData(java.util.List<String> data){
       try{
+         int tempPanelIndex = -1;
          JTabbedPane jtp =
                   (JTabbedPane)this.getContentPane().getComponent(0);
          for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals("Temperature"){
+            if(jtp.getTitleAt(i).equals("Temperature")){
                jtp.setSelectedIndex(i);
+               tempPanelIndex = i;
             }
          }
          JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
@@ -679,7 +712,11 @@ WeatherClientObserver{
             dataPanel.removeAll();
          }
          dataPanel.setLayout(new BorderLayout());
-         JScrollPane jsp = 
+         JScrollPane jsp = this.printHeatRelatedText(data);
+         dataPanel.add(jsp, BorderLayout.CENTER);
+         //A "cheesey" way to get the GUI to redraw the data.
+         jtp.setSelectedIndex((tempPanelIndex + 1) % TOTAL_PANELS);
+         jtp.setSelectedIndex(tempPanelIndex);
       }
       catch(NullPointerException npe){
          //TBD...may need to come up with something other than this
