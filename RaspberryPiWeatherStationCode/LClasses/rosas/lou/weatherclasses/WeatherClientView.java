@@ -4,6 +4,7 @@
 package rosas.lou.weatherclasses;
 
 import java.lang.*;
+import java.text.ParseException;
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
@@ -30,6 +32,7 @@ WeatherClientObserver{
    ItemListener             itemListener;
    KeyListener              keyListener;
    java.util.List<String>   missionData;
+   java.util.List<String>   currentTempData;
    JComboBox                tempComboBox;
    JComboBox                humidityComboBox;
    JComboBox                heatIndexComboBox;
@@ -52,6 +55,7 @@ WeatherClientObserver{
       pressureComboBox  = null;
       temperatureGroup  = null;
       tempDataGroup     = null;
+      currentTempData   = null;
    }
    
    /**
@@ -182,6 +186,22 @@ WeatherClientObserver{
       JScrollPane pane = null;
       try{
          String delimeter = "";
+         Enumeration<AbstractButton> e =
+                                 this.temperatureGroup.getElements();
+         while(e.hasMoreElements()){
+            JRadioButton jrb = (JRadioButton)e.nextElement();
+            if(jrb.isSelected()){
+               if(jrb.getText().equals("Celsius")){
+                  delimeter = new String("\u00B0C");
+               }
+               else if(jrb.getText().equals("Fahrenheit")){
+                  delimeter = new String("\u00B0F");
+               }
+               else if(jrb.getText().equals("Kelvin")){
+                  delimeter = new String("K");
+               }
+            }
+         }
          //Check to see the units by looking at the Temperature
          //Button Group
          JTextArea textArea = new JTextArea(28,35);
@@ -189,8 +209,14 @@ WeatherClientObserver{
          Iterator<String> i = data.iterator();
          while(i.hasNext()){
             String currentData = (String)i.next();
-            currentData += "\n";
-            textArea.append(currentData);
+            String[] currentDataArray = currentData.split(",");
+            String publishedText = new String(currentDataArray[0]);
+            publishedText += " " + currentDataArray[1] + ", ";
+            publishedText += currentDataArray[2] + "; ";
+            publishedText += currentDataArray[3] + ":  ";
+            publishedText += currentDataArray[4];
+            publishedText += delimeter + "\n";
+            textArea.append(publishedText);
          }
          pane = new JScrollPane(textArea);
       }
@@ -696,6 +722,7 @@ WeatherClientObserver{
    private void setUpTemperatureData(java.util.List<String> data){
       try{
          int tempPanelIndex = -1;
+         this.currentTempData = new LinkedList<String>(data);
          JTabbedPane jtp =
                   (JTabbedPane)this.getContentPane().getComponent(0);
          for(int i = 0; i < jtp.getTabCount(); i++){
@@ -726,7 +753,18 @@ WeatherClientObserver{
    
    /**
    **/
-   private void setUpTemperatureGraph(java.util.List<String> data){}
+   private void setUpTemperatureGraph(java.util.List<String> data){
+      try{
+         int tempPanelIndex = -1;
+         DateFormat df = new SimpleDateFormat("MMMM, dd, yyyy, kk:mm:ss z", Locale.US);
+         System.out.println(df.parse("November, 23, 2016, 16:59:41 MST"));
+      }
+      catch(NullPointerException npe){
+         //TBD...may need to come up with something other than this
+         npe.printStackTrace();
+      }
+      catch(Exception e){ e.printStackTrace(); }
+   }
    
    /**
    **/
@@ -795,7 +833,7 @@ WeatherClientObserver{
       JRadioButton data = new JRadioButton("Data", true);
       data.setActionCommand("TData");
       this.tempDataGroup.add(data);
-      //Somehow, set up the display state..will worry about that later
+      //Somehow,set up the display state..will worry about that later
       data.addItemListener(this.itemListener);
       dataPanel.add(data);
       
