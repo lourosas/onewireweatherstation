@@ -124,6 +124,7 @@ WeatherClientObserver{
       }
    }
 
+   ///////////////////////////Public Methods/////////////////////////
    /**
    **/
    public void addController(Object controller){
@@ -756,8 +757,41 @@ WeatherClientObserver{
    private void setUpTemperatureGraph(java.util.List<String> data){
       try{
          int tempPanelIndex = -1;
-         DateFormat df = new SimpleDateFormat("MMMM, dd, yyyy, kk:mm:ss z", Locale.US);
-         System.out.println(df.parse("November, 23, 2016, 16:59:41 MST"));
+         LinkedList<Date>   dates = new LinkedList();
+         LinkedList<Object> meas  = new LinkedList();
+         JTabbedPane jtp =
+               (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).equals("Temperature")){
+               jtp.setSelectedIndex(i);
+               tempPanelIndex = i;
+            }
+         }
+         DateFormat df = new SimpleDateFormat(
+                            "MMMM dd yyyy kk:mm:ss z", Locale.US);
+         Iterator it = data.iterator();
+         while(it.hasNext()){
+            String allValue = (String)it.next();
+            String[] values = allValue.split(",");
+            String getDates = values[0] + " " + values[1] + " " +
+                              values[2] + " " + values[3];
+            Date date = df.parse(getDates);
+            double value = Double.parseDouble(values[4]);
+            dates.add(date);
+            meas.add(new Double(value));
+         }
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         //Get the middle component
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(1);
+         //Basic Idea:  remove everything and redraw
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(meas,dates),
+                                                BorderLayout.CENTER);
+         jtp.setSelectedIndex((tempPanelIndex + 1) % TOTAL_PANELS);
+         jtp.setSelectedIndex(tempPanelIndex);
       }
       catch(NullPointerException npe){
          //TBD...may need to come up with something other than this
