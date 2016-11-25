@@ -4,6 +4,7 @@
 package rosas.lou.weatherclasses;
 
 import java.lang.*;
+import java.text.ParseException;
 import java.util.*;
 import java.io.*;
 import java.net.*;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
@@ -109,19 +111,21 @@ WeatherClientObserver{
    public void updateTemperatureData(java.util.List<String> tempData){
       Enumeration<AbstractButton> e =
                                     this.tempDataGroup.getElements();
+      this.currentTempData = tempData;
       while(e.hasMoreElements()){
          JRadioButton jrb = (JRadioButton)e.nextElement();
          if(jrb.isSelected()){ 
             if(jrb.getText().equals("Data")){
-               this.setUpTemperatureData(tempData);
+               this.setUpData("temperature", tempData);
             }
             else if(jrb.getText().equals("Graph")){
-               this.setUpTemperatureGraph(tempData);
+               this.setUpGraph("temperature", tempData);
             }
          }
       }
    }
 
+   ///////////////////////////Public Methods/////////////////////////
    /**
    **/
    public void addController(Object controller){
@@ -717,14 +721,13 @@ WeatherClientObserver{
    
    /**
    **/
-   private void setUpTemperatureData(java.util.List<String> data){
+   private void setUpData(String type, java.util.List<String> data){
       try{
          int tempPanelIndex = -1;
-         this.currentTempData = new LinkedList<String>(data);
          JTabbedPane jtp =
                   (JTabbedPane)this.getContentPane().getComponent(0);
          for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals("Temperature")){
+            if(jtp.getTitleAt(i).toLowerCase().equals(type)){
                jtp.setSelectedIndex(i);
                tempPanelIndex = i;
             }
@@ -751,16 +754,54 @@ WeatherClientObserver{
    
    /**
    **/
-   private void setUpTemperatureGraph(java.util.List<String> data){
+   private void setUpGraph
+   (
+      String type,
+      java.util.List<String> data
+   ){
       try{
          int tempPanelIndex = -1;
-         this.currentTempData = new LinkedList<String>(data);
-         
+         LinkedList<Date>   dates = new LinkedList();
+         LinkedList<Object> meas  = new LinkedList();
+         JTabbedPane jtp =
+               (JTabbedPane)this.getContentPane().getComponent(0);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toLowerCase().equals(type)){
+               jtp.setSelectedIndex(i);
+               tempPanelIndex = i;
+            }
+         }
+         DateFormat df = new SimpleDateFormat(
+                            "MMMM dd yyyy kk:mm:ss z", Locale.US);
+         Iterator it = data.iterator();
+         while(it.hasNext()){
+            String allValue = (String)it.next();
+            String[] values = allValue.split(",");
+            String getDates = values[0] + " " + values[1] + " " +
+                              values[2] + " " + values[3];
+            Date date = df.parse(getDates);
+            double value = Double.parseDouble(values[4]);
+            dates.add(date);
+            meas.add(new Double(value));
+         }
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         //Get the middle component
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(1);
+         //Basic Idea:  remove everything and redraw
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new TestPanel2(meas,dates),
+                                                BorderLayout.CENTER);
+         jtp.setSelectedIndex((tempPanelIndex + 1) % TOTAL_PANELS);
+         jtp.setSelectedIndex(tempPanelIndex);
       }
       catch(NullPointerException npe){
          //TBD...may need to come up with something other than this
          npe.printStackTrace();
       }
+      catch(Exception e){ e.printStackTrace(); }
    }
    
    /**
@@ -824,14 +865,30 @@ WeatherClientObserver{
       graph.setActionCommand("TGraph");
       //Somehow set the display state...will worry about that later
       this.tempDataGroup.add(graph);
-      graph.addItemListener(this.itemListener);
+      //graph.addItemListener(this.itemListener);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateTemperatureData(currentTempData);
+            } 
+         }
+      });
       dataPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data", true);
       data.setActionCommand("TData");
       this.tempDataGroup.add(data);
-      //Somehow, set up the display state..will worry about that later
-      data.addItemListener(this.itemListener);
+      //Somehow,set up the display state..will worry about that later
+      //data.addItemListener(this.itemListener);
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateTemperatureData(currentTempData);
+            }
+         }
+      });
       dataPanel.add(data);
       
       northPanel.add(dataPanel);
