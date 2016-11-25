@@ -31,6 +31,11 @@ public class TestPanel2 extends JPanel{
    ){
       this.data = new LinkedList(data);
       this.time = new LinkedList(time);
+      //this(data, this.findMax(data), this.findMin(data), time);
+      this.min = (int)this.findMin(data) - 1;
+      this.max = (int)this.findMax(data) + 1;
+      this.count = counter;
+      ++counter;
    }
    
    /*
@@ -51,7 +56,7 @@ public class TestPanel2 extends JPanel{
    }
    
    public void paintComponent(Graphics g){
-      System.out.println("This:  " + this.count);
+      //System.out.println("This:  " + this.count);
       super.paintComponent(g);
       this.setBackground(Color.WHITE);
       Graphics2D g2 = (Graphics2D)g;
@@ -216,5 +221,38 @@ public class TestPanel2 extends JPanel{
             g2.drawString(s, sx, sy); 
          }
       }
+   }
+
+   ////////////////////////Private Methods///////////////////////////
+   //
+   //
+   //
+   private double findMax(LinkedList<Object> data){
+      Iterator it = data.iterator();
+      double max = Double.MIN_VALUE;
+
+      while(it.hasNext()){
+         double temp = ((Double)it.next()).doubleValue();
+         if(temp >= max){
+            max = temp;
+         }
+      }
+      return max;
+   }
+
+   //
+   //
+   //
+   private double findMin(LinkedList<Object> data){
+      Iterator it = data.iterator();
+      double min  = Double.MAX_VALUE;
+
+      while(it.hasNext()){
+         double temp = ((Double)it.next()).doubleValue();
+         if(temp <= min){
+            min = temp;
+         }
+      }
+      return min;
    }
 }
