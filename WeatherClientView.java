@@ -152,6 +152,21 @@ WeatherClientObserver{
 
    /**
    **/
+   public ViewState requestHumidityState(){
+      ViewState returnState = new ViewState();
+      
+      returnState.units = Units.NULL;
+
+      String date = (String)humidityComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
+   }
+
+   /**
+   **/
    public ViewState requestTemperatureState(){
       ViewState returnState = new ViewState();
       Enumeration<AbstractButton> e =
@@ -680,6 +695,8 @@ WeatherClientObserver{
             setTheDayHumidity(e);
          }
       });
+      this.humidityComboBox.addActionListener(this.actionListener);
+      this.humidityComboBox.addKeyListener(this.keyListener);
       northPanel.add(this.humidityComboBox);
       return northPanel;
    }
@@ -967,10 +984,12 @@ WeatherClientObserver{
    /**
    **/
    private void setTheDayHumidity(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
       //Somehow, need to go and figure out how to request the data
       //from the server and populate accordingly  
+      JComboBox box = (JComboBox)e.getSource();
+      if(e.getModifiers() == java.awt.event.InputEvent.BUTTON1_MASK){
+         String date = (String)box.getSelectedItem();
+      }
    }
 
    /**
