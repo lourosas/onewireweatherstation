@@ -115,10 +115,10 @@ WeatherClientObserver{
          JRadioButton jrb = (JRadioButton)e.nextElement();
          if(jrb.isSelected()){ 
             if(jrb.getText().equals("Data")){
-               this.setUpTemperatureData(tempData);
+               this.setUpData("temperature", tempData);
             }
             else if(jrb.getText().equals("Graph")){
-               this.setUpTemperatureGraph(tempData);
+               this.setUpGraph("temperature", tempData);
             }
          }
       }
@@ -720,14 +720,14 @@ WeatherClientObserver{
    
    /**
    **/
-   private void setUpTemperatureData(java.util.List<String> data){
+   private void setUpData(String type, java.util.List<String> data){
       try{
-         int tempPanelIndex = -1;
+         int tempPanelIndex   = -1;
          this.currentTempData = new LinkedList<String>(data);
          JTabbedPane jtp =
                   (JTabbedPane)this.getContentPane().getComponent(0);
          for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals("Temperature")){
+            if(jtp.getTitleAt(i).toLowerCase().equals(type)){
                jtp.setSelectedIndex(i);
                tempPanelIndex = i;
             }
@@ -754,15 +754,16 @@ WeatherClientObserver{
    
    /**
    **/
-   private void setUpTemperatureGraph(java.util.List<String> data){
+   private void setUpGraph(String type, java.util.List<String> data){
       try{
-         int tempPanelIndex = -1;
+         int tempPanelIndex   = -1;
+         this.currentTempData = new LinkedList<String>(data);
          LinkedList<Date>   dates = new LinkedList();
          LinkedList<Object> meas  = new LinkedList();
          JTabbedPane jtp =
                (JTabbedPane)this.getContentPane().getComponent(0);
          for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).equals("Temperature")){
+            if(jtp.getTitleAt(i).toLowerCase().equals(type)){
                jtp.setSelectedIndex(i);
                tempPanelIndex = i;
             }
@@ -862,6 +863,14 @@ WeatherClientObserver{
       //Somehow set the display state...will worry about that later
       this.tempDataGroup.add(graph);
       graph.addItemListener(this.itemListener);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateTemperatureData(currentTempData);
+            }
+         }
+      });
       dataPanel.add(graph);
       
       JRadioButton data = new JRadioButton("Data", true);
@@ -869,6 +878,14 @@ WeatherClientObserver{
       this.tempDataGroup.add(data);
       //Somehow,set up the display state..will worry about that later
       data.addItemListener(this.itemListener);
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateTemperatureData(currentTempData);
+            }
+         }
+      });
       dataPanel.add(data);
       
       northPanel.add(dataPanel);
