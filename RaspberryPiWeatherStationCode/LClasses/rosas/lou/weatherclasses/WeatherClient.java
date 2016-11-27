@@ -62,6 +62,80 @@ public class WeatherClient{
 
    /**
    **/
+   public void requestHumidityData(ViewState state){
+      String command = "SELECT ";
+      String where   = new String();
+      if(!state.month.isEmpty()){
+         command += "month, ";
+         where += "month = '" + state.month + "'";
+      }
+      if(!state.day.isEmpty()){
+         command += "day, ";
+         if(!state.month.isEmpty()){ where += " AND "; }
+         where += "day = '" + state.day + "'";
+      }
+      if(!state.year.isEmpty()){
+         command += "year, ";
+         if(!state.month.isEmpty() || !state.day.isEmpty()){
+            where += " AND ";
+         }
+         where += "year = '" + state.year + "'";
+      }
+      command += "time, humidity FROM humiditydata WHERE " + where;
+      this.requestHumidityData(command);
+   }
+
+   /**
+   **/
+   public void requestHumidityData(String message){
+      DatagramPacket sendPacket    = null;
+      DatagramPacket receivePacket = null;
+      List<String> humidityData     = new LinkedList();
+      System.out.println(message);
+      try{
+         this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
+         byte data[] = message.getBytes();
+         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         byte[] receiveData = new byte[128];
+         sendPacket = new DatagramPacket(data,
+                                         data.length,
+                                         iNetAddr,
+                                         PORT);
+         this.socket.send(sendPacket);
+         receivePacket =
+                 new DatagramPacket(receiveData, receiveData.length);
+         this.socket.receive(receivePacket);
+         String output = new String(receivePacket.getData());
+         int size = Integer.parseInt(output.trim());
+         for(int i = 0; i < size; i++){
+            this.socket.receive(receivePacket);
+            output = new String(receivePacket.getData());
+            System.out.println(output.trim());
+            humidityData.add(output.trim());
+            receivePacket.setData(new byte[128]);
+         }
+      }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         ste.printStackTrace();
+      }
+      catch(Exception e){
+         //TBD...but for now, print the Exception
+         e.printStackTrace();
+         humidityData = null;
+      }
+      finally{
+         this.publishHumidityData(humidityData);
+      }      
+   }
+
+   /**
+   **/
    public void requestMissionData(String message){
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
@@ -187,6 +261,16 @@ public class WeatherClient{
    }
 
    //////////////////////Private Methods/////////////////////////////
+   /**
+   **/
+   private void publishHumidityData(List<String> humidityData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco = it.next();
+         wco.updateHumidityData(humidityData);
+      }
+   }
+
    /**
    **/
    private void publishMissionData(List<String> missionData){

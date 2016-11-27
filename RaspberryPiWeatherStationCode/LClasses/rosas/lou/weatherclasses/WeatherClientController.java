@@ -92,8 +92,13 @@ ActionListener, KeyListener, ItemListener{
    /**
    **/
    private void handleJComboBox(JComboBox jcb){
-      String command = jcb.getActionCommand();
-      if(command.equals("Temperature Combo Box")){
+      String command = jcb.getActionCommand(); 
+      System.out.println(command);
+      if(command.equals("Humidity Combo Box")){
+         ViewState state = view.requestHumidityState();
+         this.client.requestHumidityData(state);
+      }
+      else if(command.equals("Temperature Combo Box")){
          ViewState state = view.requestTemperatureState();
          this.client.requestTemperatureData(state);
       }

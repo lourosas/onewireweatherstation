@@ -33,6 +33,7 @@ WeatherClientObserver{
    KeyListener              keyListener;
    java.util.List<String>   missionData;
    java.util.List<String>   currentTempData;
+   java.util.List<String>   currentHumidityData;
    JComboBox                tempComboBox;
    JComboBox                humidityComboBox;
    JComboBox                heatIndexComboBox;
@@ -40,6 +41,7 @@ WeatherClientObserver{
    JComboBox                pressureComboBox;
    ButtonGroup              temperatureGroup;
    ButtonGroup              tempDataGroup;
+   ButtonGroup              humidityDataGroup;
    
    //Initializer stuff here
    {
@@ -48,6 +50,8 @@ WeatherClientObserver{
       itemListener      = null;
       keyListener       = null;
       missionData       = null;
+      currentTempData   = null;
+      currentHumidityData = null;
       tempComboBox      = null;
       humidityComboBox  = null;
       dewPointComboBox  = null;
@@ -56,6 +60,7 @@ WeatherClientObserver{
       temperatureGroup  = null;
       tempDataGroup     = null;
       currentTempData   = null;
+      humidityDataGroup = null;
    }
    
    /**
@@ -86,6 +91,25 @@ WeatherClientObserver{
    ////////////////WeatherClientObserver implementation//////////////
    /**
    **/
+   public void updateHumidityData(java.util.List<String> humidData){
+      Enumeration<AbstractButton> e =
+                                this.humidityDataGroup.getElements();
+      this.currentHumidityData = new LinkedList<String>(humidData);
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Data")){
+               this.setUpData("humidity", humidData);
+            }
+            else if(jrb.getText().equals("Graph")){
+               this.setUpGraph("humidity", humidData);
+            }
+         }
+      }
+   }
+
+   /**
+   **/
    public void updateMissionData(java.util.List<String> missionData){
       try{
          this.missionData = new LinkedList<String>(missionData);
@@ -111,6 +135,7 @@ WeatherClientObserver{
    public void updateTemperatureData(java.util.List<String> tempData){
       Enumeration<AbstractButton> e =
                                     this.tempDataGroup.getElements();
+      this.currentTempData = new LinkedList<String>(tempData);
       while(e.hasMoreElements()){
          JRadioButton jrb = (JRadioButton)e.nextElement();
          if(jrb.isSelected()){ 
@@ -147,6 +172,19 @@ WeatherClientObserver{
    **/
    public void addKeyListener(KeyListener keyListener){
       this.keyListener = keyListener;
+   }
+
+   /**
+   **/
+   public ViewState requestHumidityState(){
+      ViewState returnState = new ViewState();
+      returnState.units = Units.NULL;
+      String date = (String)humidityComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
    }
 
    /**
@@ -213,7 +251,7 @@ WeatherClientObserver{
             String[] currentDataArray = currentData.split(",");
             String publishedText = new String(currentDataArray[0]);
             publishedText += " " + currentDataArray[1] + ", ";
-            publishedText += currentDataArray[2] + "; ";
+            publishedText += currentDataArray[2] + ";  ";
             publishedText += currentDataArray[3] + ":  ";
             publishedText += currentDataArray[4];
             publishedText += delimeter + "\n";
@@ -229,6 +267,38 @@ WeatherClientObserver{
          return pane;
       }
    }
+
+   /**
+   **/
+   private JScrollPane printHumidityRelatedText
+   (
+      java.util.List<String> data
+   ){
+      JScrollPane pane = null;
+      try{
+         JTextArea textArea = new JTextArea(28,35);
+         textArea.setEditable(false);
+         Iterator<String> i = data.iterator();
+         while(i.hasNext()){
+            String currentData        = (String)i.next();
+            String[] currentDataArray = currentData.split(",");
+            String publishedText = new String(currentDataArray[0]);
+            publishedText += " " + currentDataArray[1] + ", ";
+            publishedText += currentDataArray[2] + ";  ";
+            publishedText += currentDataArray[3] + ":  ";
+            publishedText += currentDataArray[4] + "%\n";
+            textArea.append(publishedText);
+         }
+         pane = new JScrollPane(textArea);
+      }
+      catch(NullPointerException npe){
+         //TBD
+      }
+      finally{
+         return pane;
+      }
+   }
+
    /**
    **/
    private void setUpGUI(){
@@ -651,22 +721,39 @@ WeatherClientObserver{
    /**
    **/
    private JPanel setUpHumidityNorthPanel(){
-      JPanel northPanel     = new JPanel();
-      ButtonGroup dataGroup = new ButtonGroup();
+      JPanel northPanel      = new JPanel();
+      this.humidityDataGroup = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JRadioButton graph = new JRadioButton("Graph");
       graph.setActionCommand("HGraph");
       //Set up the Item Listener
-      //graph.addItemListener(this.itemListener);
-      dataGroup.add(graph);
+      graph.addItemListener(this.itemListener);
+      this.humidityDataGroup.add(graph);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateHumidityData(currentHumidityData);
+            }
+         }
+      });
       northPanel.add(graph);
 
       JRadioButton data = new JRadioButton("Data", true);
       data.setActionCommand("HData");
       //Set up the Item Listener
-      //data.addItemListener(this.itemListener);
-      dataGroup.add(data);
+      data.addItemListener(this.itemListener);
+      this.humidityDataGroup.add(data);
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateHumidityData(currentHumidityData);
+            }
+         }
+      });
+
       northPanel.add(data);
 
       //Humidity Combo Box Data
@@ -674,6 +761,8 @@ WeatherClientObserver{
       this.humidityComboBox = new JComboBox(dates);
       this.humidityComboBox.setName("Humidity");
       this.humidityComboBox.setActionCommand("Humidity Combo Box");
+      this.humidityComboBox.addActionListener(this.actionListener);
+      this.humidityComboBox.addKeyListener(this.keyListener);
       this.humidityComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             setTheDayHumidity(e);
@@ -723,9 +812,9 @@ WeatherClientObserver{
    private void setUpData(String type, java.util.List<String> data){
       try{
          int tempPanelIndex   = -1;
-         this.currentTempData = new LinkedList<String>(data);
          JTabbedPane jtp =
                   (JTabbedPane)this.getContentPane().getComponent(0);
+         JScrollPane jsp = null;
          for(int i = 0; i < jtp.getTabCount(); i++){
             if(jtp.getTitleAt(i).toLowerCase().equals(type)){
                jtp.setSelectedIndex(i);
@@ -740,7 +829,13 @@ WeatherClientObserver{
             dataPanel.removeAll();
          }
          dataPanel.setLayout(new BorderLayout());
-         JScrollPane jsp = this.printHeatRelatedText(data);
+         if(!type.toLowerCase().equals("humidity")){
+            jsp = this.printHeatRelatedText(data);
+         }
+         else{
+            jsp = this.printHumidityRelatedText(data);
+         }
+         
          dataPanel.add(jsp, BorderLayout.CENTER);
          //A "cheesey" way to get the GUI to redraw the data.
          jtp.setSelectedIndex((tempPanelIndex + 1) % TOTAL_PANELS);
@@ -757,7 +852,6 @@ WeatherClientObserver{
    private void setUpGraph(String type, java.util.List<String> data){
       try{
          int tempPanelIndex   = -1;
-         this.currentTempData = new LinkedList<String>(data);
          LinkedList<Date>   dates = new LinkedList();
          LinkedList<Object> meas  = new LinkedList();
          JTabbedPane jtp =
@@ -964,10 +1058,10 @@ WeatherClientObserver{
    /**
    **/
    private void setTheDayHumidity(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
-      //Somehow, need to go and figure out how to request the data
-      //from the server and populate accordingly  
+      JComboBox box = (JComboBox)e.getSource();
+      if(e.getModifiers() == java.awt.event.InputEvent.BUTTON1_MASK){
+         String date = (String)box.getSelectedItem();
+      }
    }
 
    /**
