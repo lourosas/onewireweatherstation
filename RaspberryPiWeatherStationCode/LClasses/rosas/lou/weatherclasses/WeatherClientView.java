@@ -27,13 +27,14 @@ WeatherClientObserver{
    //This is subject to change
    private static final short TOTAL_PANELS = 5;
    
-   Object controller;
-   ActionListener           actionListener;
-   ItemListener             itemListener;
-   KeyListener              keyListener;
+   private Object controller;
+   private ActionListener           actionListener;
+   private ItemListener             itemListener;
+   private KeyListener              keyListener;
    java.util.List<String>   missionData;
    java.util.List<String>   currentTempData;
    java.util.List<String>   currentHumidityData;
+   java.util.List<String>   currentPressureData;
    JComboBox                tempComboBox;
    JComboBox                humidityComboBox;
    JComboBox                heatIndexComboBox;
@@ -54,6 +55,7 @@ WeatherClientObserver{
       missionData       = null;
       currentTempData   = null;
       currentHumidityData = null;
+      currentPressureData = null;
       tempComboBox      = null;
       humidityComboBox  = null;
       dewPointComboBox  = null;
@@ -132,6 +134,26 @@ WeatherClientObserver{
          //A Dialog box
          npe.printStackTrace();
       }
+   }
+
+   /**
+   **/
+   public void updatePressureData(java.util.List<String> bpData){
+      Enumeration<AbstractButton> e =
+                                this.pressureDataGroup.getElements();
+      this.currentPressureData = new LinkedList<String>(bpData);
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Data")){
+               this.setUpData("barometric pressure", bpData);
+            }
+            else if(jrb.getText().equals("Graph")){
+               this.setUpGraph("barometric pressure", bpData);
+            }
+         }
+      }
+
    }
 
    /**
@@ -302,6 +324,68 @@ WeatherClientObserver{
 
    /**
    **/
+   private JScrollPane printPressureRelatedText
+   (
+      java.util.List<String> data
+   ){
+      JScrollPane pane = null;
+      String delimeter = new String("");
+      try{
+         Enumeration<AbstractButton> e =
+                                    this.pressureGroup.getElements();
+         while(e.hasMoreElements()){
+            JRadioButton jrb = (JRadioButton)e.nextElement();
+            if(jrb.isSelected()){
+               if(jrb.getText().equals("mmHg")){
+                  delimeter = new String(" millimeters Mercury");
+               }
+               else if(jrb.getText().equals("inHg")){
+                  delimeter = new String(" inches Mercury");
+               }
+               else if(jrb.getText().equals("milliBars")){
+                  delimeter = new String(" milliBars");
+               }
+            }
+         }
+         JTextArea textArea = new JTextArea(28,35);
+         textArea.setEditable(false);
+         Iterator<String> it = data.iterator();
+         while(it.hasNext()){
+            String   currentData      = (String)it.next();
+            String[] currentDataArray = currentData.split(",");
+            String publishedText = null;
+            if(currentDataArray.length >= 1){
+               publishedText = new String(currentDataArray[0]);
+            }
+            if(currentDataArray.length >= 2){
+               publishedText += " " + currentDataArray[1];
+            }
+            if(currentDataArray.length >= 3){
+               publishedText += ", " + currentDataArray[2];
+            }
+            if(currentDataArray.length >= 4){
+               publishedText += ";  " + currentDataArray[3];
+            }
+            if(currentDataArray.length >= 5){
+               publishedText += ":  " + currentDataArray[4];
+               publishedText += delimeter + "\n";
+            }
+            if(publishedText != null){
+               textArea.append(publishedText);
+            }
+         }
+         pane = new JScrollPane(textArea);
+      }
+      catch(NullPointerException npe){
+         //TBD...read ALL THE OTHER NOTES related to this
+      }
+      finally{
+         return pane;
+      }
+   }
+
+   /**
+   **/
    private JScrollPane printHumidityRelatedText
    (
       java.util.List<String> data
@@ -427,11 +511,27 @@ WeatherClientObserver{
       //graph.addItemListener(this.itemListener);
       dataPanel.add(graph);
       this.pressureDataGroup.add(graph);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updatePressureData(currentPressureData);
+            }
+         }
+      });
 
       JRadioButton data = new JRadioButton("Data", true);
       //data.addItemListner(this.itemListener);
       dataPanel.add(data);
       this.pressureDataGroup.add(data);
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updatePressureData(currentPressureData);
+            }
+         }
+      });
 
       northPanel.add(dataPanel);
 
@@ -863,11 +963,15 @@ WeatherClientObserver{
             dataPanel.removeAll();
          }
          dataPanel.setLayout(new BorderLayout());
-         if(!type.toLowerCase().equals("humidity")){
-            jsp = this.printHeatRelatedText(data);
+         if(type.toLowerCase().equals("humidity")){
+            jsp = this.printHumidityRelatedText(data);
+         }
+         else if(type.toLowerCase().equals("barometric pressure")){
+            System.out.println(type);
+            jsp = this.printPressureRelatedText(data);
          }
          else{
-            jsp = this.printHumidityRelatedText(data);
+            jsp = this.printHeatRelatedText(data);
          }
          
          dataPanel.add(jsp, BorderLayout.CENTER);

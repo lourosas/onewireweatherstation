@@ -214,7 +214,49 @@ public class WeatherClient{
    /**
    **/
    public void requestPressureData(String message){
+      DatagramPacket sendPacket    = null;
+      DatagramPacket receivePacket = null;
+      List<String> pressureData = new LinkedList();
       System.out.println(message);
+      try{
+         this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
+         byte data[] = message.getBytes();
+         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         byte[] receiveData = new byte[128];
+         sendPacket = new DatagramPacket(data,
+                                         data.length,
+                                         iNetAddr,
+                                         PORT);
+         this.socket.send(sendPacket);
+         receivePacket =
+                 new DatagramPacket(receiveData, receiveData.length);
+         this.socket.receive(receivePacket);
+         String output = new String(receivePacket.getData());
+         int size = Integer.parseInt(output.trim());
+         for(int i = 0; i < size; i++){
+            this.socket.receive(receivePacket);
+            output = new String(receivePacket.getData());
+            pressureData.add(output.trim());
+            receivePacket.setData(new byte[128]);
+         }
+      }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         ste.printStackTrace();
+      }
+      catch(Exception e){
+         //TBD...see all the OTHER notes
+         e.printStackTrace();
+         pressureData = null;
+      }
+      finally{
+         this.publishPressureData(pressureData);
+      }
    }
 
    /**
@@ -303,6 +345,16 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateHumidityData(humidityData);
+      }
+   }
+
+   /**
+   **/
+   private void publishPressureData(List<String> pressureData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco = it.next();
+         wco.updatePressureData(pressureData);
       }
    }
 
