@@ -102,6 +102,10 @@ ActionListener, KeyListener, ItemListener{
          ViewState state = view.requestTemperatureState();
          this.client.requestTemperatureData(state);
       }
+      else if(command.equals("Pressure Combo Box")){
+         ViewState state = view.requestPressureState();
+         this.client.requestPressureData(state);
+      }
    }
    
    /**
@@ -114,6 +118,12 @@ ActionListener, KeyListener, ItemListener{
             command.equals("TKelvin")){
             ViewState state = view.requestTemperatureState();
             this.client.requestTemperatureData(state);
+         }
+         else if(command.equals("PMetric")  ||
+                 command.equals("PEnglish") ||
+                 command.equals("PAbsolute")){
+            ViewState state = view.requestPressureState();
+            this.client.requestPressureData(state);
          }
       }
    }

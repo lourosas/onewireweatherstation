@@ -184,6 +184,41 @@ public class WeatherClient{
 
    /**
    **/
+   public void requestPressureData(ViewState state){
+      String command = "SELECT ";
+      String where   = new String();
+      if(!state.month.isEmpty()){
+         command += "month, ";
+         where += "month = '" + state.month + "'";
+      }
+      if(!state.day.isEmpty()){
+         command += "day, ";
+         if(!state.month.isEmpty()){ where += " AND "; }
+         where += "day = '" + state.day + "'";
+      }
+      if(!state.year.isEmpty()){
+         command += "year, ";
+         if(!state.month.isEmpty() || !state.day.isEmpty()){
+            where += " AND ";
+         }
+         where += "year = '" + state.year + "'";
+      }
+      command += "time, ";
+      if(state.units ==      Units.METRIC){ command += "mmHg "; }
+      else if(state.units == Units.ENGLISH){ command += "inHg "; }
+      else if(state.units == Units.ABSOLUTE){command +="mB ";}
+      command += "FROM pressuredata WHERE " + where;
+      this.requestPressureData(command);
+   }
+
+   /**
+   **/
+   public void requestPressureData(String message){
+      System.out.println(message);
+   }
+
+   /**
+   **/
    public void requestTemperatureData(ViewState state){
       String command = "SELECT ";
       String where   = new String();

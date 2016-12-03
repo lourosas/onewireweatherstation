@@ -42,6 +42,8 @@ WeatherClientObserver{
    ButtonGroup              temperatureGroup;
    ButtonGroup              tempDataGroup;
    ButtonGroup              humidityDataGroup;
+   ButtonGroup              pressureGroup;
+   ButtonGroup              pressureDataGroup;
    
    //Initializer stuff here
    {
@@ -61,6 +63,8 @@ WeatherClientObserver{
       tempDataGroup     = null;
       currentTempData   = null;
       humidityDataGroup = null;
+      pressureGroup     = null;
+      pressureDataGroup = null;
    }
    
    /**
@@ -180,6 +184,34 @@ WeatherClientObserver{
       ViewState returnState = new ViewState();
       returnState.units = Units.NULL;
       String date = (String)humidityComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
+   }
+
+   /**
+   **/
+   public ViewState requestPressureState(){
+      ViewState returnState = new ViewState();
+      Enumeration<AbstractButton> e =
+                                    this.pressureGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("mmHg")){
+               returnState.units = Units.METRIC;
+            }
+            else if(jrb.getText().equals("inHg")){
+               returnState.units = Units.ENGLISH;
+            }
+            else if(jrb.getText().equals("milliBars")){
+               returnState.units = Units.ABSOLUTE;
+            }
+         }
+      }
+      String date = (String)this.pressureComboBox.getSelectedItem();
       String[] values = date.split(",");
       returnState.month = values[0].trim();
       returnState.day   = values[1].trim();
@@ -357,32 +389,32 @@ WeatherClientObserver{
    /**
    **/
    private JPanel setUpPressureNorthPanel(){
-      JPanel northPanel      = new JPanel();
-      ButtonGroup unitsGroup = new ButtonGroup();
-      ButtonGroup dataGroup  = new ButtonGroup();
+      JPanel northPanel       = new JPanel();
+      this.pressureGroup      = new ButtonGroup();
+      this.pressureDataGroup  = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JPanel unitsPanel = new JPanel();
 
       JRadioButton mmHg = new JRadioButton("mmHg", true);
       mmHg.setActionCommand("PMetric");
-      unitsGroup.add(mmHg);
+      this.pressureGroup.add(mmHg);
       //Set up the Item Listener
-      //mmHg.addItemListener(this.itemListener);
+      mmHg.addItemListener(this.itemListener);
       unitsPanel.add(mmHg);
 
       JRadioButton inHg = new JRadioButton("inHg");
       inHg.setActionCommand("PEnglish");
-      unitsGroup.add(inHg);
+      this.pressureGroup.add(inHg);
       //Set up the Item Listener
-      //inHg.addItemListener(this.itemListener);
+      inHg.addItemListener(this.itemListener);
       unitsPanel.add(inHg);
 
       JRadioButton milliBars = new JRadioButton("milliBars");
       milliBars.setActionCommand("PAbsolute");
-      unitsGroup.add(milliBars);
+      this.pressureGroup.add(milliBars);
       //Set up the Item Listener
-      //milliBars.addItemListener(this.itemListener);
+      milliBars.addItemListener(this.itemListener);
       unitsPanel.add(milliBars);
 
       northPanel.add(unitsPanel);
@@ -394,12 +426,12 @@ WeatherClientObserver{
       //Add the Item Listener
       //graph.addItemListener(this.itemListener);
       dataPanel.add(graph);
-      dataGroup.add(graph);
+      this.pressureDataGroup.add(graph);
 
       JRadioButton data = new JRadioButton("Data", true);
       //data.addItemListner(this.itemListener);
       dataPanel.add(data);
-      dataGroup.add(data);
+      this.pressureDataGroup.add(data);
 
       northPanel.add(dataPanel);
 
@@ -412,6 +444,8 @@ WeatherClientObserver{
             setTheDayPressure(e);
          }
       });
+      this.pressureComboBox.addActionListener(this.actionListener);
+      this.pressureComboBox.addKeyListener(this.keyListener);
       northPanel.add(this.pressureComboBox);
       return northPanel;
 
@@ -1067,9 +1101,10 @@ WeatherClientObserver{
    /**
    **/
    private void setTheDayPressure(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
-      //Somehow, need to go and figure out what is next...
+      JComboBox box = (JComboBox)e.getSource();
+      if(e.getModifiers() == java.awt.event.InputEvent.BUTTON1_MASK){
+         String date = (String)box.getSelectedItem();
+      }
    }
 
    /**
