@@ -32,9 +32,11 @@ WeatherClientObserver{
    private ItemListener             itemListener;
    private KeyListener              keyListener;
    java.util.List<String>   missionData;
+   java.util.List<String>   currentDewpointData;
    java.util.List<String>   currentTempData;
    java.util.List<String>   currentHumidityData;
    java.util.List<String>   currentPressureData;
+   java.util.List<String>   currentHeatIndexData;
    JComboBox                tempComboBox;
    JComboBox                humidityComboBox;
    JComboBox                heatIndexComboBox;
@@ -45,6 +47,10 @@ WeatherClientObserver{
    ButtonGroup              humidityDataGroup;
    ButtonGroup              pressureGroup;
    ButtonGroup              pressureDataGroup;
+   private ButtonGroup      dewpointGroup;
+   private ButtonGroup      dewpointDataGroup;
+   private ButtonGroup      heatIndexGroup;
+   private ButtonGroup      heatIndexDataGroup;
    
    //Initializer stuff here
    {
@@ -54,6 +60,7 @@ WeatherClientObserver{
       keyListener       = null;
       missionData       = null;
       currentTempData   = null;
+      currentDewpointData = null;
       currentHumidityData = null;
       currentPressureData = null;
       tempComboBox      = null;
@@ -67,6 +74,11 @@ WeatherClientObserver{
       humidityDataGroup = null;
       pressureGroup     = null;
       pressureDataGroup = null;
+      dewpointGroup     = null;
+      dewpointDataGroup = null;
+      heatIndexGroup    = null;
+      heatIndexDataGroup = null;
+      currentHeatIndexData = null;
    }
    
    /**
@@ -95,6 +107,45 @@ WeatherClientObserver{
 
    //////////////////////////Public Methods//////////////////////////
    ////////////////WeatherClientObserver implementation//////////////
+   /**
+   **/
+   public void updateDewpointData(java.util.List<String> dpData){
+      Enumeration<AbstractButton> e =
+                                this.dewpointDataGroup.getElements();
+      this.currentDewpointData = new LinkedList<String>(dpData);
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Data")){
+               this.setUpData("dew point", dpData);
+            }
+            else if(jrb.getText().equals("Graph")){
+               this.setUpGraph("dew point", dpData);
+            }
+         }
+      }      
+   }
+
+   /**
+   **/
+   public void updateHeatIndexData(java.util.List<String> hiData){
+      Enumeration<AbstractButton> e =
+                               this.heatIndexDataGroup.getElements();
+      this.currentHeatIndexData = new LinkedList<String>(hiData);
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Data")){
+               this.setUpData("heat index", hiData);
+            }
+            else if(jrb.getText().equals("Graph")){
+               this.setUpGraph("heat index", hiData);
+            }
+         }
+      }
+   }
+
+
    /**
    **/
    public void updateHumidityData(java.util.List<String> humidData){
@@ -202,6 +253,61 @@ WeatherClientObserver{
 
    /**
    **/
+   public ViewState requestDewpointState(){
+      ViewState returnState = new ViewState();
+      Enumeration<AbstractButton> e=this.dewpointGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Celsius")){
+               returnState.units = Units.METRIC;
+            }
+            else if(jrb.getText().equals("Fahrenheit")){
+               returnState.units = Units.ENGLISH;
+            }
+            else{
+               returnState.units = Units.ABSOLUTE;
+            }
+         }
+      }
+      String date = (String)this.dewPointComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
+   }
+
+   /**
+   **/
+   public ViewState requestHeatIndexState(){
+      ViewState returnState = new ViewState();
+      Enumeration<AbstractButton> e =
+                                   this.heatIndexGroup.getElements();
+      while(e.hasMoreElements()){
+         JRadioButton jrb = (JRadioButton)e.nextElement();
+         if(jrb.isSelected()){
+            if(jrb.getText().equals("Celsius")){
+               returnState.units = Units.METRIC;
+            }
+            else if(jrb.getText().equals("Fahrenheit")){
+               returnState.units = Units.ENGLISH;
+            }
+            else{
+               returnState.units = Units.ABSOLUTE;
+            }
+         }
+      }
+      String date = (String)this.heatIndexComboBox.getSelectedItem();
+      String[] values = date.split(",");
+      returnState.month = values[0].trim();
+      returnState.day   = values[1].trim();
+      returnState.year  = values[2].trim();
+      return returnState;
+   }
+
+   /**
+   **/
    public ViewState requestHumidityState(){
       ViewState returnState = new ViewState();
       returnState.units = Units.NULL;
@@ -274,13 +380,22 @@ WeatherClientObserver{
    **/
    private JScrollPane printHeatRelatedText
    (
+      String type,
       java.util.List<String> data
    ){
       JScrollPane pane = null;
       try{
          String delimeter = "";
-         Enumeration<AbstractButton> e =
-                                 this.temperatureGroup.getElements();
+         Enumeration<AbstractButton> e = null;
+         if(type.toLowerCase().equals("temperature")){
+            e = this.temperatureGroup.getElements();
+         }
+         else if(type.toLowerCase().equals("dew point")){
+            e = this.dewpointGroup.getElements();
+         }
+         else if(type.toLowerCase().equals("heat index")){
+            e = this.heatIndexGroup.getElements();
+         }
          while(e.hasMoreElements()){
             JRadioButton jrb = (JRadioButton)e.nextElement();
             if(jrb.isSelected()){
@@ -609,31 +724,33 @@ WeatherClientObserver{
    **/
    private JPanel setUpDewpointNorthPanel(){
       JPanel northPanel      = new JPanel();
-      ButtonGroup unitsGroup = new ButtonGroup();
-      ButtonGroup dataGroup  = new ButtonGroup();
+      this.dewpointGroup     = new ButtonGroup();
+      //ButtonGroup unitsGroup = new ButtonGroup();
+      //ButtonGroup dataGroup  = new ButtonGroup();
+      this.dewpointDataGroup = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JPanel unitsPanel = new JPanel();
 
       JRadioButton celsius = new JRadioButton("Celsius", true);
       celsius.setActionCommand("DPCelsius");
-      unitsGroup.add(celsius);
+      this.dewpointGroup.add(celsius);
       //Set up the Item Listener
-      //celsius.addItemListener(this.itemListener);
+      celsius.addItemListener(this.itemListener);
       unitsPanel.add(celsius);
 
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("DPFahrenheit");
-      unitsGroup.add(fahrenheit);
+      this.dewpointGroup.add(fahrenheit);
       //Set up the Item Listener
-      //fahrenheit.addItemListener(this.itemListener);
+      fahrenheit.addItemListener(this.itemListener);
       unitsPanel.add(fahrenheit);
 
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("DPKelvin");
-      unitsGroup.add(kelvin);
+      this.dewpointGroup.add(kelvin);
       //Set up the Item Listener
-      //kelvin.addItemListener(this.itemListener);
+      kelvin.addItemListener(this.itemListener);
       unitsPanel.add(kelvin);
 
       northPanel.add(unitsPanel);
@@ -644,12 +761,28 @@ WeatherClientObserver{
       //Somehow, set the display state...worry about that later
       //Add the Item Listener
       //graph.addItemListener(this.itemListener);
-      dataGroup.add(graph);
+      this.dewpointDataGroup.add(graph);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateDewpointData(currentDewpointData);
+            }
+         }
+      });
       dataPanel.add(graph);
 
       JRadioButton data  = new JRadioButton("Data", true);
-      dataGroup.add(data);
+      this.dewpointDataGroup.add(data);
       //data.addItemListener(this.itemListener);
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateDewpointData(currentDewpointData);
+            }
+         }
+      });
       dataPanel.add(data);
 
       northPanel.add(dataPanel);
@@ -658,6 +791,8 @@ WeatherClientObserver{
       this.dewPointComboBox = new JComboBox(dates);
       this.dewPointComboBox.setActionCommand("Dewpoint Combo Box");
       this.dewPointComboBox.setName("Dewpoint");
+      this.dewPointComboBox.addActionListener(this.actionListener);
+      this.dewPointComboBox.addKeyListener(this.keyListener);
       //Figure out what to do with this.
       this.dewPointComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
@@ -729,32 +864,34 @@ WeatherClientObserver{
    /**
    **/
    private JPanel setUpHeatIndexNorthPanel(){
-      JPanel northPanel      = new JPanel();
-      ButtonGroup unitsGroup = new ButtonGroup();
-      ButtonGroup dataGroup  = new ButtonGroup();
+      JPanel northPanel       = new JPanel();
+      this.heatIndexGroup     = new ButtonGroup();
+      this.heatIndexDataGroup = new ButtonGroup();
+      //ButtonGroup unitsGroup  = new ButtonGroup();
+      //ButtonGroup dataGroup   = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JPanel unitsPanel = new JPanel();
 
       JRadioButton celsius = new JRadioButton("Celsius", true);
       celsius.setActionCommand("HICelsius");
-      unitsGroup.add(celsius);
+      this.heatIndexGroup.add(celsius);
       //Set up the Item Listener
-      //celsius.addItemListener(this.itemListener);
+      celsius.addItemListener(this.itemListener);
       unitsPanel.add(celsius);
 
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("HIFahrenheit");
-      unitsGroup.add(fahrenheit);
+      this.heatIndexGroup.add(fahrenheit);
       //set up the Item Listener
-      //fahrenheit.addItemListener(this.itemListener);
+      fahrenheit.addItemListener(this.itemListener);
       unitsPanel.add(fahrenheit);
 
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("HIKelvin");
-      unitsGroup.add(kelvin);
+      this.heatIndexGroup.add(kelvin);
       //set up the Item Listener
-      //kelvin.addItemListener(this.itemListener);
+      kelvin.addItemListener(this.itemListener);
       unitsPanel.add(kelvin);
 
       northPanel.add(unitsPanel);
@@ -764,13 +901,28 @@ WeatherClientObserver{
       JRadioButton graph = new JRadioButton("Graph");
       //Somehow, need to set the display state...worry later
       //Add the Item Listener
-      //graph.addItemListener(this.itemListener);
-      dataGroup.add(graph);
+      graph.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateHeatIndexData(currentHeatIndexData);
+            }
+         }
+      });
+      this.heatIndexDataGroup.add(graph);
       dataPanel.add(graph);
 
       JRadioButton data = new JRadioButton("Data", true);
-      dataGroup.add(data);
-      //data.addItemListener(this.itemListener);
+      //Add the Item Listener
+      data.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            JRadioButton jrb = (JRadioButton)e.getItem();
+            if(jrb.isSelected()){
+               updateHeatIndexData(currentHeatIndexData);
+            }
+         }
+      });
+      this.heatIndexDataGroup.add(data);
       dataPanel.add(data);
 
       northPanel.add(dataPanel);
@@ -779,6 +931,8 @@ WeatherClientObserver{
       this.heatIndexComboBox = new JComboBox(dates);
       this.heatIndexComboBox.setActionCommand("Heat Index Combo Box");
       this.heatIndexComboBox.setName("HeatIndex");
+      this.heatIndexComboBox.addActionListener(this.actionListener);
+      this.heatIndexComboBox.addKeyListener(this.keyListener);
       //Figure out what to do this this.
       this.heatIndexComboBox.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
@@ -967,11 +1121,10 @@ WeatherClientObserver{
             jsp = this.printHumidityRelatedText(data);
          }
          else if(type.toLowerCase().equals("barometric pressure")){
-            System.out.println(type);
             jsp = this.printPressureRelatedText(data);
          }
          else{
-            jsp = this.printHeatRelatedText(data);
+            jsp = this.printHeatRelatedText(type, data);
          }
          
          dataPanel.add(jsp, BorderLayout.CENTER);
@@ -1179,8 +1332,6 @@ WeatherClientObserver{
    /**
    **/
    private void setTheDayDewpoint(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
       //Somehow, need to go and figure out how to request the data
       //from the server and populate accordingly
    }
@@ -1188,8 +1339,6 @@ WeatherClientObserver{
    /**
    **/
    private void setTheDayHeatIndex(ActionEvent e){
-      System.out.println(e.getSource());
-      System.out.println(e.getActionCommand());
       //Somehow, need to go and figure out what is next...
    }
 

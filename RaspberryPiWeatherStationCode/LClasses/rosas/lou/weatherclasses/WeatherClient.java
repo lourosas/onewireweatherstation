@@ -20,7 +20,7 @@ public class WeatherClient{
    {
       socket    = null;
       observers = null;
-      addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)112};
+      addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
    }
 
    /**
@@ -58,6 +58,167 @@ public class WeatherClient{
    public void requestMissionData(){
       String message = new String("SELECT * FROM missiondata");
       this.requestMissionData(message);
+   }
+
+   /**
+   **/
+   public void requestDewpointData(ViewState state){
+      String command = "SELECT ";
+      String where   = new String();
+      if(!state.month.isEmpty()){
+         command += "month, ";
+         where += "month = '" + state.month + "'";
+      }
+      if(!state.day.isEmpty()){
+         command += "day, ";
+         if(!state.month.isEmpty()){ where += " AND "; }
+         where += "day = '" + state.day + "'";
+      }
+      if(!state.year.isEmpty()){
+         command += "year, ";
+         if(!state.month.isEmpty() || !state.day.isEmpty()){
+            where += " AND ";
+         }
+         where += "year = '" + state.year + "'";
+      }
+      command += "time, ";
+      if(state.units == Units.METRIC){ command += "dewptc "; }
+      if(state.units == Units.ENGLISH){ command += "dewptf "; }
+      if(state.units == Units.ABSOLUTE){ command += "dewptk "; }
+      command += "FROM dewpointdata WHERE " + where;
+      this.requestDewpointData(command);
+   }
+
+   /**
+   **/
+   public void requestDewpointData(String message){
+      DatagramPacket sendPacket    = null;
+      DatagramPacket receivePacket = null;
+      List<String> dewpointData = new LinkedList();
+      try{
+         this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
+         byte data[] = message.getBytes();
+         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         byte[] receiveData = new byte[128];
+         sendPacket = new DatagramPacket(data,
+                                         data.length,
+                                         iNetAddr,
+                                         PORT);
+         this.socket.send(sendPacket);
+         receivePacket =
+                 new DatagramPacket(receiveData, receiveData.length);
+         this.socket.receive(receivePacket);
+         String output = new String(receivePacket.getData());
+         int size = Integer.parseInt(output.trim());
+         for(int i = 0; i < size; i++){
+            this.socket.receive(receivePacket);
+            output = new String(receivePacket.getData());
+            System.out.println(output.trim());
+            dewpointData.add(output.trim());
+            receivePacket.setData(new byte[128]);
+         }
+      }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         ste.printStackTrace();
+      }
+      catch(Exception e){
+         //TBD...but for now, print the Exception
+         e.printStackTrace();
+         dewpointData = null;
+      }
+      finally{
+         this.publishDewpointData(dewpointData);
+      }
+   }
+
+   /**
+   **/
+   public void requestHeatIndexData(ViewState state){
+      String command = "SELECT ";
+      String where   = new String();
+      if(!state.month.isEmpty()){
+         command += "month, ";
+         where += "month = '" + state.month + "'";
+      }
+      if(!state.day.isEmpty()){
+         command += "day, ";
+         if(!state.month.isEmpty()){ where += " AND "; }
+         where += "day = '" + state.day + "'";
+      }
+      if(!state.year.isEmpty()){
+         command += "year, ";
+         if(!state.month.isEmpty() || !state.day.isEmpty()){
+            where += " AND ";
+         }
+         where += "year = '" + state.year + "'";
+      }
+      command += "time, ";
+      if(state.units == Units.METRIC){
+         command += "heatindexc ";
+      }
+      else if(state.units == Units.ENGLISH){
+         command += "heatindexf ";
+      }
+      else if(state.units == Units.ABSOLUTE){
+         command += "heatindexk ";
+      }
+      command += "FROM heatindexdata WHERE " + where;
+      this.requestHeatIndexData(command);
+   }
+
+   /**
+   **/
+   public void requestHeatIndexData(String message){
+      DatagramPacket sendPacket    = null;
+      DatagramPacket receivePacket = null;
+      List<String> heatIndexData = new LinkedList();
+      System.out.println(message);
+      try{
+         this.socket = new DatagramSocket();
+         //Set a receive timeout for a given time, if a packet is
+         //NOT received within a given amount of time, Throw a
+         //SocketTimeoutException and GET OUT!!!  Don't "sit there
+         //and spin" waiting for packets that are never comming!! 
+         this.socket.setSoTimeout(TIMEOUT);
+         byte data[] = message.getBytes();
+         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         byte[] receiveData = new byte[128];
+         sendPacket = new DatagramPacket(data,
+                                         data.length,
+                                         iNetAddr,
+                                         PORT);
+         this.socket.send(sendPacket);
+         receivePacket =
+                 new DatagramPacket(receiveData, receiveData.length);
+         this.socket.receive(receivePacket);
+         String output = new String(receivePacket.getData());
+         int size = Integer.parseInt(output.trim());
+         for(int i = 0; i < size; i++){
+            this.socket.receive(receivePacket);
+            output = new String(receivePacket.getData());
+            System.out.println(output.trim());
+            heatIndexData.add(output.trim());
+            receivePacket.setData(new byte[128]);
+         }
+      }
+      catch(SocketTimeoutException ste){
+         //Figure out what else to do here...need to alert the user
+         ste.printStackTrace();
+      }
+      catch(Exception e){
+         //TBD...but for now, print the Exception
+         e.printStackTrace();
+         heatIndexData = null;
+      }
+      finally{
+         this.publishHeatIndexData(heatIndexData);
+      }
    }
 
    /**
@@ -338,6 +499,26 @@ public class WeatherClient{
    }
 
    //////////////////////Private Methods/////////////////////////////
+   /**
+   **/
+   private void publishDewpointData(List<String> dewpointData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco = it.next();
+         wco.updateDewpointData(dewpointData);
+      }
+   }
+
+   /**
+   **/
+   public void publishHeatIndexData(List<String> heatIndexData){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco = it.next();
+         wco.updateHeatIndexData(heatIndexData);
+      }
+   }
+
    /**
    **/
    private void publishHumidityData(List<String> humidityData){

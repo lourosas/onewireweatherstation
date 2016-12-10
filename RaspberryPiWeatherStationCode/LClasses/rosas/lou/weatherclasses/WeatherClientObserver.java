@@ -8,6 +8,8 @@ import java.util.*;
 import rosas.lou.weatherclasses.*;
 
 public interface WeatherClientObserver{
+   public void updateDewpointData(List<String> dewpointData);
+   public void updateHeatIndexData(List<String> heatIndexData);
    public void updateHumidityData(List<String> humidityData);
    public void updateMissionData(List<String> missionData);
    public void updatePressureData(List<String> pressureData);

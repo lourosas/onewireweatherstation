@@ -95,16 +95,24 @@ ActionListener, KeyListener, ItemListener{
       String command = jcb.getActionCommand(); 
       System.out.println(command);
       if(command.equals("Humidity Combo Box")){
-         ViewState state = view.requestHumidityState();
+         ViewState state = this.view.requestHumidityState();
          this.client.requestHumidityData(state);
       }
       else if(command.equals("Temperature Combo Box")){
-         ViewState state = view.requestTemperatureState();
+         ViewState state = this.view.requestTemperatureState();
          this.client.requestTemperatureData(state);
       }
       else if(command.equals("Pressure Combo Box")){
-         ViewState state = view.requestPressureState();
+         ViewState state = this.view.requestPressureState();
          this.client.requestPressureData(state);
+      }
+      else if(command.equals("Dewpoint Combo Box")){
+         ViewState state = this.view.requestDewpointState();
+         this.client.requestDewpointData(state);
+      }
+      else if(command.equals("Heat Index Combo Box")){
+         ViewState state = this.view.requestHeatIndexState();
+         this.client.requestHeatIndexData(state);
       }
    }
    
@@ -116,14 +124,26 @@ ActionListener, KeyListener, ItemListener{
          if(command.equals("TCelsius") ||
             command.equals("TFahrenheit") ||
             command.equals("TKelvin")){
-            ViewState state = view.requestTemperatureState();
+            ViewState state = this.view.requestTemperatureState();
             this.client.requestTemperatureData(state);
          }
          else if(command.equals("PMetric")  ||
                  command.equals("PEnglish") ||
                  command.equals("PAbsolute")){
-            ViewState state = view.requestPressureState();
+            ViewState state = this.view.requestPressureState();
             this.client.requestPressureData(state);
+         }
+         else if(command.equals("DPCelsius")    ||
+                 command.equals("DPFahrenheit") ||
+                 command.equals("DPKelvin")){
+            ViewState state = this.view.requestDewpointState();
+            this.client.requestDewpointData(state);
+         }
+         else if(command.equals("HICelsius")    ||
+                 command.equals("HIFahrenheit") ||
+                 command.equals("HIKelvin")){
+            ViewState state = this.view.requestHeatIndexState();
+            this.client.requestHeatIndexData(state);
          }
       }
    }
