@@ -232,9 +232,12 @@ public class TestPanel2 extends JPanel{
       double max = Double.MIN_VALUE;
 
       while(it.hasNext()){
-         double temp = ((Double)it.next()).doubleValue();
-         if(temp >= max){
-            max = temp;
+         Double value = (Double)it.next();
+         if(!value.isNaN()){
+            double temp = value.doubleValue();
+            if(temp >= max){
+               max = temp;
+            }
          }
       }
       return max;
@@ -248,9 +251,12 @@ public class TestPanel2 extends JPanel{
       double min  = Double.MAX_VALUE;
 
       while(it.hasNext()){
-         double temp = ((Double)it.next()).doubleValue();
-         if(temp <= min){
-            min = temp;
+         Double value = (Double)it.next();
+         if(!value.isNaN()){
+            double temp = value.doubleValue();
+            if(temp <= min){
+               min = temp;
+            }
          }
       }
       return min;
