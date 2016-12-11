@@ -27,10 +27,10 @@ WeatherClientObserver{
    //This is subject to change
    private static final short TOTAL_PANELS = 5;
    
-   private Object controller;
-   private ActionListener           actionListener;
-   private ItemListener             itemListener;
-   private KeyListener              keyListener;
+   private Object           controller;
+   private ActionListener   actionListener;
+   private ItemListener     itemListener;
+   private KeyListener      keyListener;
    java.util.List<String>   missionData;
    java.util.List<String>   currentDewpointData;
    java.util.List<String>   currentTempData;
@@ -1164,6 +1164,12 @@ WeatherClientObserver{
             Date date = df.parse(getDates);
             double value = Double.parseDouble(values[4]);
             dates.add(date);
+            if(type.toLowerCase().equals("humidity") && value < 0.){
+               value = Double.NaN;
+            }
+            else if(value < -900.){
+               value = Double.NaN;
+            }
             meas.add(new Double(value));
          }
          JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
