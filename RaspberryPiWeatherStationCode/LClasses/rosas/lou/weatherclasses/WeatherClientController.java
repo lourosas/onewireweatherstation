@@ -45,6 +45,30 @@ ActionListener, KeyListener, ItemListener{
             this.handleJComboBox((JComboBox)o);
          }
       }
+      else if(o instanceof JButton){
+         JButton jb = (JButton)o;
+         String command = jb.getActionCommand();
+         if(command.equals("Temp Refresh")){
+            ViewState state = this.view.requestTemperatureState();
+            this.client.requestTemperatureData(state);
+         }
+         else if(command.equals("Humidity Refresh")){
+            ViewState state = this.view.requestHumidityState();
+            this.client.requestHumidityData(state);
+         }
+         else if(command.equals("P Refresh")){
+            ViewState state = this.view.requestPressureState();
+            this.client.requestPressureData(state);
+         }
+         else if(command.equals("DP Refresh")){
+            ViewState state = this.view.requestDewpointState();
+            this.client.requestDewpointData(state);
+         }
+         else if(command.equals("HI Refresh")){
+            ViewState state = this.view.requestHeatIndexState();
+            this.client.requestHeatIndexData(state);
+         }
+      }
    }
 
    /**
@@ -67,6 +91,9 @@ ActionListener, KeyListener, ItemListener{
       int code = k.getKeyCode();
       if(o instanceof JComboBox && code == KeyEvent.VK_ENTER){
          this.handleJComboBox((JComboBox)o);
+      }
+      else if(o instanceof JButton && code == KeyEvent.VK_ENTER){
+         ((JButton)o).doClick();
       }
    }
 

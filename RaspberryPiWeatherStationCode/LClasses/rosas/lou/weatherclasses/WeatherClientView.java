@@ -54,30 +54,30 @@ WeatherClientObserver{
    
    //Initializer stuff here
    {
-      controller        = null;
-      actionListener    = null;
-      itemListener      = null;
-      keyListener       = null;
-      missionData       = null;
-      currentTempData   = null;
-      currentDewpointData = null;
-      currentHumidityData = null;
-      currentPressureData = null;
-      tempComboBox      = null;
-      humidityComboBox  = null;
-      dewPointComboBox  = null;
-      heatIndexComboBox = null;
-      pressureComboBox  = null;
-      temperatureGroup  = null;
-      tempDataGroup     = null;
-      currentTempData   = null;
-      humidityDataGroup = null;
-      pressureGroup     = null;
-      pressureDataGroup = null;
-      dewpointGroup     = null;
-      dewpointDataGroup = null;
-      heatIndexGroup    = null;
-      heatIndexDataGroup = null;
+      controller           = null;
+      actionListener       = null;
+      itemListener         = null;
+      keyListener          = null;
+      missionData          = null;
+      currentTempData      = null;
+      currentDewpointData  = null;
+      currentHumidityData  = null;
+      currentPressureData  = null;
+      tempComboBox         = null;
+      humidityComboBox     = null;
+      dewPointComboBox     = null;
+      heatIndexComboBox    = null;
+      pressureComboBox     = null;
+      temperatureGroup     = null;
+      tempDataGroup        = null;
+      currentTempData      = null;
+      humidityDataGroup    = null;
+      pressureGroup        = null;
+      pressureDataGroup    = null;
+      dewpointGroup        = null;
+      dewpointDataGroup    = null;
+      heatIndexGroup       = null;
+      heatIndexDataGroup   = null;
       currentHeatIndexData = null;
    }
    
@@ -107,6 +107,67 @@ WeatherClientObserver{
 
    //////////////////////////Public Methods//////////////////////////
    ////////////////WeatherClientObserver implementation//////////////
+   /**
+   **/
+   public void alertDewpointTimeout(){
+      String exception = new String("Not All Dewpoint Data ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Dewpoint Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertHeatIndexTimeout(){
+      String exception = new String("Not All Heat Index Data ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Heat Index Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertHumidityTimeout(){
+      String exception = new String("Not All Humidity Data ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Humidity Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertMissionTimeout(){
+      String exception = new String("Not All Dates ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Date Request Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+
+   }
+
+   /**
+   **/
+   public void alertPressureTimeout(){
+      String exception = new String("Not All Pressure Data ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Pressure Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertTemperatureTimeout(){
+      String exception = new String("Not All Temperature Data ");
+      exception += "Displayed!\nHit 'Refresh' button as needed";
+      String error = new String("Temperature Timeout!!\n");
+      JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
    /**
    **/
    public void updateDewpointData(java.util.List<String> dpData){
@@ -674,8 +735,8 @@ WeatherClientObserver{
 
       JButton refresh = new JButton("Refresh");
       refresh.setActionCommand("P Refresh");
-      //refresh.addActionListener(this.actionListener);
-      //refresh.addKeyListener(this.keyListener);
+      refresh.addActionListener(this.actionListener);
+      refresh.addKeyListener(this.keyListener);
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Pressure Data");
@@ -811,8 +872,8 @@ WeatherClientObserver{
       
       JButton refresh = new JButton("Refresh");
       refresh.setActionCommand("DP Refresh");
-      //refresh.addActionListener(this.actionListener);
-      //refresh.addKeyListener(this.keyListener);
+      refresh.addActionListener(this.actionListener);
+      refresh.addKeyListener(this.keyListener);
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Dewpoint Data");
@@ -952,16 +1013,16 @@ WeatherClientObserver{
       JButton refresh = new JButton("Refresh");
       refresh.setActionCommand("HI Refresh");
       //Add Action Listener
-      //refresh.addActionListener(this.actionListener);
+      refresh.addActionListener(this.actionListener);
       //Add Key Listener
-      //reshresh.addKeyListener(this.keyListener);
+      refresh.addKeyListener(this.keyListener);
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Heat Index Data");
       //Add Action Listern
-      //save.addActionListener(this.actionListener);
+      save.addActionListener(this.actionListener);
       //Add Key Listener
-      //save.addKeyListener(this.keyListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit = new JButton("Quit");
@@ -1069,9 +1130,9 @@ WeatherClientObserver{
       JButton refresh = new JButton("Refresh");
       refresh.setActionCommand("Humidity Refresh");
       //Add Action Listener
-      //refresh.addActionListener(this.actionListener);
+      refresh.addActionListener(this.actionListener);
       //Add Key Listener
-      //refresh.addKeyListener(this.keyListener);
+      refresh.addKeyListener(this.keyListener);
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Humidity Data");

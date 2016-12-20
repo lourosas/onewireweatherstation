@@ -16,11 +16,13 @@ public class WeatherClient{
    private DatagramSocket socket;
    private List<WeatherClientObserver> observers;
    private byte[] addr;
+   private Calendar calendar;
 
    {
       socket    = null;
       observers = null;
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
+      calendar  = null;
    }
 
    /**
@@ -38,6 +40,9 @@ public class WeatherClient{
       catch(NullPointerException npe){
          this.observers = new LinkedList<WeatherClientObserver>();
          this.observers.add(wco);
+      }
+      finally{
+         this.calendar = Calendar.getInstance();
       }
    }
    
@@ -63,6 +68,7 @@ public class WeatherClient{
    /**
    **/
    public void requestDewpointData(ViewState state){
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -118,14 +124,12 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output.trim());
             dewpointData.add(output.trim());
             receivePacket.setData(new byte[128]);
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         ste.printStackTrace();
+         this.publishDewpointRequestTimeout();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception
@@ -140,6 +144,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHeatIndexData(ViewState state){
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -208,8 +213,7 @@ public class WeatherClient{
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         ste.printStackTrace();
+         this.publishHeatIndexRequestTimeout();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception
@@ -224,6 +228,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHumidityData(ViewState state){
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -282,8 +287,7 @@ public class WeatherClient{
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         ste.printStackTrace();
+         this.publishHumidityRequestTimeout();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception
@@ -330,8 +334,7 @@ public class WeatherClient{
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         System.out.println(ste);
+         this.publishMissionTimeout();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception!!!
@@ -346,6 +349,7 @@ public class WeatherClient{
    /**
    **/
    public void requestPressureData(ViewState state){
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -407,8 +411,7 @@ public class WeatherClient{
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         ste.printStackTrace();
+         this.publishPressureRequestTimeout();
       }
       catch(Exception e){
          //TBD...see all the OTHER notes
@@ -423,6 +426,7 @@ public class WeatherClient{
    /**
    **/
    public void requestTemperatureData(ViewState state){
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -485,8 +489,7 @@ public class WeatherClient{
          }
       }
       catch(SocketTimeoutException ste){
-         //Figure out what else to do here...need to alert the user
-         ste.printStackTrace();
+         this.publishTemperatureRequestTimeout();
       }
       catch(Exception e){
          //TBD...but for now, print the Exception
@@ -511,11 +514,31 @@ public class WeatherClient{
 
    /**
    **/
-   public void publishHeatIndexData(List<String> heatIndexData){
+   private void publishDewpointRequestTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertDewpointTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void publishHeatIndexData(List<String> heatIndexData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateHeatIndexData(heatIndexData);
+      }
+   }
+
+   /**
+   **/
+   private void publishHeatIndexRequestTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertHeatIndexTimeout();
       }
    }
 
@@ -531,6 +554,16 @@ public class WeatherClient{
 
    /**
    **/
+   private void publishHumidityRequestTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertHumidityTimeout();
+      }
+   }
+
+   /**
+   **/
    private void publishPressureData(List<String> pressureData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
       while(it.hasNext()){
@@ -538,6 +571,17 @@ public class WeatherClient{
          wco.updatePressureData(pressureData);
       }
    }
+
+   /**
+   **/
+   private void publishPressureRequestTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertPressureTimeout();
+      }
+   }
+
 
    /**
    **/
@@ -551,11 +595,53 @@ public class WeatherClient{
 
    /**
    **/
+   private void publishMissionTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertMissionTimeout();
+      }
+   }
+
+   /**
+   **/
    private void publishTemperatureData(List<String> tempData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.updateTemperatureData(tempData);
+      }
+   }
+
+   /**
+   **/
+   private void publishTemperatureRequestTimeout(){
+      Iterator<WeatherClientObserver> it = this.observers.iterator();
+      while(it.hasNext()){
+         WeatherClientObserver wco=(WeatherClientObserver)it.next();
+         wco.alertTemperatureTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void updateMissionData(){
+      Calendar current = Calendar.getInstance();
+      int currentMonth = current.get(Calendar.MONTH);
+      int theMonth     = this.calendar.get(Calendar.MONTH);
+      int currentDay   = current.get(Calendar.DATE);
+      int theDay       = this.calendar.get(Calendar.DATE);
+      int currentYear  = current.get(Calendar.YEAR);
+      int theYear      = this.calendar.get(Calendar.YEAR);
+
+      if(currentMonth != theMonth ||
+         currentDay   != theDay   ||
+         currentYear  != theYear){
+         System.out.println("Date Changed");
+         //Update the mission data for all the Observers
+         //(Subscribers)
+         this.requestMissionData();
+         this.calendar = Calendar.getInstance();
       }
    }
 }
