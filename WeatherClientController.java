@@ -45,6 +45,37 @@ ActionListener, KeyListener, ItemListener{
             this.handleJComboBox((JComboBox)o);
          }
       }
+      else if(o instanceof JButton){
+         JButton jb = (JButton)o;
+         String command = jb.getActionCommand();
+         if(command.equals("Temp Refresh")){
+            ViewState state = this.view.requestTemperatureState();
+            this.client.requestTemperatureData(state);
+         }
+         else if(command.equals("Humidity Refresh")){
+            ViewState state = this.view.requestHumidityState();
+            this.client.requestHumidityData(state);
+         }
+         else if(command.equals("P Refresh")){
+            ViewState state = this.view.requestPressureState();
+            this.client.requestPressureData(state);
+         }
+         else if(command.equals("DP Refresh")){
+            ViewState state = this.view.requestDewpointState();
+            this.client.requestDewpointData(state);
+         }
+         else if(command.equals("HI Refresh")){
+            ViewState state = this.view.requestHeatIndexState();
+            this.client.requestHeatIndexData(state);
+         }
+         else if(command.equals("Temp Save")){
+            this.view.requestTemperatureJFileChooser();
+         }
+      }
+      else if(o instanceof JFileChooser){
+         JFileChooser jfc = (JFileChooser)o;
+         System.out.println(e.getActionCommand());
+      }
    }
 
    /**
@@ -67,6 +98,9 @@ ActionListener, KeyListener, ItemListener{
       int code = k.getKeyCode();
       if(o instanceof JComboBox && code == KeyEvent.VK_ENTER){
          this.handleJComboBox((JComboBox)o);
+      }
+      else if(o instanceof JButton && code == KeyEvent.VK_ENTER){
+         ((JButton)o).doClick();
       }
    }
 
@@ -92,14 +126,27 @@ ActionListener, KeyListener, ItemListener{
    /**
    **/
    private void handleJComboBox(JComboBox jcb){
-      String command = jcb.getActionCommand();
+      String command = jcb.getActionCommand(); 
+      System.out.println(command);
       if(command.equals("Humidity Combo Box")){
-         ViewState state = view.requestHumidityState();
+         ViewState state = this.view.requestHumidityState();
          this.client.requestHumidityData(state);
       }
-      if(command.equals("Temperature Combo Box")){
-         ViewState state = view.requestTemperatureState();
+      else if(command.equals("Temperature Combo Box")){
+         ViewState state = this.view.requestTemperatureState();
          this.client.requestTemperatureData(state);
+      }
+      else if(command.equals("Pressure Combo Box")){
+         ViewState state = this.view.requestPressureState();
+         this.client.requestPressureData(state);
+      }
+      else if(command.equals("Dewpoint Combo Box")){
+         ViewState state = this.view.requestDewpointState();
+         this.client.requestDewpointData(state);
+      }
+      else if(command.equals("Heat Index Combo Box")){
+         ViewState state = this.view.requestHeatIndexState();
+         this.client.requestHeatIndexData(state);
       }
    }
    
@@ -111,8 +158,26 @@ ActionListener, KeyListener, ItemListener{
          if(command.equals("TCelsius") ||
             command.equals("TFahrenheit") ||
             command.equals("TKelvin")){
-            ViewState state = view.requestTemperatureState();
+            ViewState state = this.view.requestTemperatureState();
             this.client.requestTemperatureData(state);
+         }
+         else if(command.equals("PMetric")  ||
+                 command.equals("PEnglish") ||
+                 command.equals("PAbsolute")){
+            ViewState state = this.view.requestPressureState();
+            this.client.requestPressureData(state);
+         }
+         else if(command.equals("DPCelsius")    ||
+                 command.equals("DPFahrenheit") ||
+                 command.equals("DPKelvin")){
+            ViewState state = this.view.requestDewpointState();
+            this.client.requestDewpointData(state);
+         }
+         else if(command.equals("HICelsius")    ||
+                 command.equals("HIFahrenheit") ||
+                 command.equals("HIKelvin")){
+            ViewState state = this.view.requestHeatIndexState();
+            this.client.requestHeatIndexData(state);
          }
       }
    }
