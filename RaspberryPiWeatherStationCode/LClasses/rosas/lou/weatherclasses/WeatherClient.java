@@ -16,13 +16,17 @@ public class WeatherClient{
    private DatagramSocket socket;
    private List<WeatherClientObserver> observers;
    private byte[] addr;
-   private Calendar calendar;
+   private int month;
+   private int day;
+   private int year;
 
    {
       socket    = null;
       observers = null;
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
-      calendar  = null;
+      month     = 0;
+      day       = 0;
+      year      = 0;
    }
 
    /**
@@ -42,7 +46,10 @@ public class WeatherClient{
          this.observers.add(wco);
       }
       finally{
-         this.calendar = Calendar.getInstance();
+         Calendar cal = Calendar.getInstance();
+         this.month = cal.get(Calendar.MONTH);
+         this.day   = cal.get(Calendar.DAY_OF_MONTH);
+         this.year  = cal.get(Calendar.YEAR);
       }
    }
    
@@ -628,20 +635,17 @@ public class WeatherClient{
    private void updateMissionData(){
       Calendar current = Calendar.getInstance();
       int currentMonth = current.get(Calendar.MONTH);
-      int theMonth     = this.calendar.get(Calendar.MONTH);
       int currentDay   = current.get(Calendar.DATE);
-      int theDay       = this.calendar.get(Calendar.DATE);
       int currentYear  = current.get(Calendar.YEAR);
-      int theYear      = this.calendar.get(Calendar.YEAR);
-
-      if(currentMonth != theMonth ||
-         currentDay   != theDay   ||
-         currentYear  != theYear){
-         System.out.println("Date Changed");
+      if(currentMonth != this.month ||
+         currentDay   != this.day   ||
+         currentYear  != this.year){
          //Update the mission data for all the Observers
          //(Subscribers)
          this.requestMissionData();
-         this.calendar = Calendar.getInstance();
+         this.month = currentMonth;
+         this.day   = currentDay;
+         this.year  = currentYear;
       }
    }
 }

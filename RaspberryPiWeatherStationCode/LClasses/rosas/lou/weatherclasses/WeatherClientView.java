@@ -9,6 +9,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
+import javax.swing.filechooser.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
@@ -230,6 +231,11 @@ WeatherClientObserver{
    **/
    public void updateMissionData(java.util.List<String> missionData){
       try{
+         //Since the Combo Boxes are to be updated upon startup
+         //OR when a date has changed, if the Combo Boxes are already
+         //setup, clear them out, so as to prevent the doubling of
+         //previous dates.
+         this.clearComboBoxesFirst();
          this.missionData = new LinkedList<String>(missionData);
          Iterator<String> it = this.missionData.iterator();
          while(it.hasNext()){            
@@ -408,6 +414,25 @@ WeatherClientObserver{
       return returnState;
    }
 
+
+   /**
+   **/
+   public void requestTemperatureJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      //int selectMode = JFileChooser.DIRECTORIES_ONLY;
+      JFileChooser tempChooser = new JFileChooser();
+      FileNameExtensionFilter filter =
+            new FileNameExtensionFilter("*.csv, *.txt","csv", "txt");
+      tempChooser.setFileFilter(filter);
+      tempChooser.setFileSelectionMode(selectMode);
+      tempChooser.setApproveButtonToolTipText("Save Temperature");
+      tempChooser.addActionListener(this.actionListener);
+      //tempChooser.addKeyListener(this.keyListener);
+      tempChooser.showSaveDialog(this);
+      File file = tempChooser.getSelectedFile();
+      System.out.println(file);
+   }
+
    /**
    **/
    public ViewState requestTemperatureState(){
@@ -437,6 +462,26 @@ WeatherClientObserver{
    }
 
    /////////////////////////Private Methods///////////////////////////
+   /**
+   **/
+   private void clearComboBoxesFirst(){
+      if(this.tempComboBox.getItemCount() > 0){
+         this.tempComboBox.removeAllItems();
+      }
+      if(this.humidityComboBox.getItemCount() > 0){
+         this.humidityComboBox.removeAllItems();
+      }
+      if(this.dewPointComboBox.getItemCount() > 0){
+         this.dewPointComboBox.removeAllItems();
+      }
+      if(this.heatIndexComboBox.getItemCount() > 0){
+         this.heatIndexComboBox.removeAllItems();
+      }
+      if(this.pressureComboBox.getItemCount() > 0){
+         this.pressureComboBox.removeAllItems();
+      }
+   }
+
    /**
    **/
    private JScrollPane printHeatRelatedText
@@ -711,8 +756,7 @@ WeatherClientObserver{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {""};
-      this.pressureComboBox = new JComboBox(dates);
+      this.pressureComboBox = new JComboBox();
       this.pressureComboBox.setActionCommand("Pressure Combo Box");
       this.pressureComboBox.setName("Pressure");
       this.pressureComboBox.addActionListener(new ActionListener(){
@@ -848,8 +892,7 @@ WeatherClientObserver{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {""};
-      this.dewPointComboBox = new JComboBox(dates);
+      this.dewPointComboBox = new JComboBox();
       this.dewPointComboBox.setActionCommand("Dewpoint Combo Box");
       this.dewPointComboBox.setName("Dewpoint");
       this.dewPointComboBox.addActionListener(this.actionListener);
@@ -988,8 +1031,7 @@ WeatherClientObserver{
 
       northPanel.add(dataPanel);
 
-      String dates[] = {""};
-      this.heatIndexComboBox = new JComboBox(dates);
+      this.heatIndexComboBox = new JComboBox();
       this.heatIndexComboBox.setActionCommand("Heat Index Combo Box");
       this.heatIndexComboBox.setName("HeatIndex");
       this.heatIndexComboBox.addActionListener(this.actionListener);
@@ -1106,8 +1148,7 @@ WeatherClientObserver{
       northPanel.add(data);
 
       //Humidity Combo Box Data
-      String dates[] = {""};
-      this.humidityComboBox = new JComboBox(dates);
+      this.humidityComboBox = new JComboBox();
       this.humidityComboBox.setName("Humidity");
       this.humidityComboBox.setActionCommand("Humidity Combo Box");
       this.humidityComboBox.addActionListener(this.actionListener);
@@ -1342,8 +1383,7 @@ WeatherClientObserver{
       
       northPanel.add(dataPanel);
       
-      String dates[] = {""};
-      this.tempComboBox = new JComboBox(dates);
+      this.tempComboBox = new JComboBox();
       this.tempComboBox.setActionCommand("Temperature Combo Box");
       this.tempComboBox.setName("Temperature");
       //Figure out what to do with this.

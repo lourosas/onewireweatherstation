@@ -68,6 +68,13 @@ ActionListener, KeyListener, ItemListener{
             ViewState state = this.view.requestHeatIndexState();
             this.client.requestHeatIndexData(state);
          }
+         else if(command.equals("Temp Save")){
+            this.view.requestTemperatureJFileChooser();
+         }
+      }
+      else if(o instanceof JFileChooser){
+         JFileChooser jfc = (JFileChooser)o;
+         System.out.println(e.getActionCommand());
       }
    }
 
