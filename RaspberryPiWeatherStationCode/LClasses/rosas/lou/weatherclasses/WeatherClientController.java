@@ -73,8 +73,15 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       else if(o instanceof JFileChooser){
+         ViewState state;
          JFileChooser jfc = (JFileChooser)o;
-         System.out.println(e.getActionCommand());
+         if(e.getActionCommand().equals("ApproveSelection")){
+            String from = jfc.getApproveButtonToolTipText();
+            if(from.toUpperCase().contains("TEMPERATURE")){
+               File tempFile = jfc.getSelectedFile();
+               System.out.println(tempFile);
+            }
+         }
       }
    }
 

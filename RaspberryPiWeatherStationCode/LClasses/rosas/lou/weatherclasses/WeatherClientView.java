@@ -429,8 +429,6 @@ WeatherClientObserver{
       tempChooser.addActionListener(this.actionListener);
       //tempChooser.addKeyListener(this.keyListener);
       tempChooser.showSaveDialog(this);
-      File file = tempChooser.getSelectedFile();
-      System.out.println(file);
    }
 
    /**
