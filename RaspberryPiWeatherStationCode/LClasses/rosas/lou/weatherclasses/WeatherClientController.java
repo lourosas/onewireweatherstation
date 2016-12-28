@@ -78,8 +78,7 @@ ActionListener, KeyListener, ItemListener{
          if(e.getActionCommand().equals("ApproveSelection")){
             String from = jfc.getApproveButtonToolTipText();
             if(from.toUpperCase().contains("TEMPERATURE")){
-               File tempFile = jfc.getSelectedFile();
-               System.out.println(tempFile);
+               this.handleTemperatureSave(jfc);
             }
          }
       }
@@ -186,6 +185,30 @@ ActionListener, KeyListener, ItemListener{
             ViewState state = this.view.requestHeatIndexState();
             this.client.requestHeatIndexData(state);
          }
+      }
+   }
+
+   /**
+   **/
+   private void handleTemperatureSave(JFileChooser jfc){
+      File tempFile = jfc.getSelectedFile();
+      if(tempFile.isDirectory()){
+         //Alert the user of the issue
+         this.view.alertTemperatureSaveError("Directory");
+      }
+      else if(tempFile.exists()){
+         int overwrite =
+                       this.view.alertTemperatureSaveError("exists");
+         if(overwrite == JOptionPane.YES_OPTION){
+            //Save Data
+         }
+         else{
+            //Start over
+            this.view.requestTemperatureJFileChooser();
+         }
+      }
+      else if(!tempFile.exists()){
+         System.out.println("NEW FILE!!!");
       }
    }
 }

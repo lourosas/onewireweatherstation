@@ -161,6 +161,29 @@ WeatherClientObserver{
 
    /**
    **/
+   public int alertTemperatureSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to overwrite ");
+         exception += "existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
    public void alertTemperatureTimeout(){
       String exception = new String("Not All Temperature Data ");
       exception += "Displayed!\nHit 'Refresh' button as needed";
