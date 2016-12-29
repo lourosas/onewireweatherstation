@@ -195,12 +195,14 @@ ActionListener, KeyListener, ItemListener{
       if(tempFile.isDirectory()){
          //Alert the user of the issue
          this.view.alertTemperatureSaveError("Directory");
+         this.view.requestTemperatureJFileChooser();
       }
       else if(tempFile.exists()){
          int overwrite =
                        this.view.alertTemperatureSaveError("exists");
          if(overwrite == JOptionPane.YES_OPTION){
             //Save Data
+            this.client.saveTemperatureData(tempFile);
          }
          else{
             //Start over
@@ -208,7 +210,8 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       else if(!tempFile.exists()){
-         System.out.println("NEW FILE!!!");
+         //Save Data
+         this.client.saveTemperatureData(tempFile);
       }
    }
 }

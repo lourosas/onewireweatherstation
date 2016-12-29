@@ -14,6 +14,7 @@ public class WeatherClient{
    private final static int TIMEOUT = 20000;
 
    private DatagramSocket socket;
+   private List<String>   currentTemperatureData;
    private List<WeatherClientObserver> observers;
    private byte[] addr;
    private int month;
@@ -21,12 +22,13 @@ public class WeatherClient{
    private int year;
 
    {
-      socket    = null;
-      observers = null;
+      socket                 = null;
+      currentTemperatureData = null;
+      observers              = null;
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
-      month     = 0;
-      day       = 0;
-      year      = 0;
+      month                  = 0;
+      day                    = 0;
+      year                   = 0;
    }
 
    /**
@@ -508,6 +510,37 @@ public class WeatherClient{
       }
    }
 
+   /**
+   Going to make this simple:  nothing real complex about this part
+   **/
+   public void saveTemperatureData(File file){
+      FileWriter  fileWriter  = null;
+      PrintWriter printWriter = null;
+      try{
+         fileWriter  = new FileWriter(file, true);
+         printWriter = new PrintWriter(fileWriter, true);
+         Iterator<String> it=this.currentTemperatureData.iterator();
+         while(it.hasNext()){
+            String line = it.next();
+            printWriter.println(line);
+         }
+      }
+      //somehow, need to alert the clients of "bad things"...
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(IOException ioe){
+         ioe.printStackTrace();
+      }
+      finally{
+         try{
+            fileWriter.close();
+            printWriter.close();
+         }
+         catch(IOException ioe){} //nothing to really do
+      }
+   }
+
    //////////////////////Private Methods/////////////////////////////
    /**
    **/
@@ -614,6 +647,7 @@ public class WeatherClient{
    **/
    private void publishTemperatureData(List<String> tempData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
+      this.currentTemperatureData        = tempData;
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.updateTemperatureData(tempData);
