@@ -16,12 +16,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
+import rosas.lou.IOObserver;
 import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
 
 //Need to implement a Subscriber...for the Publish-Subscribe pattern
 public class WeatherClientView extends GenericJFrame  implements
-WeatherClientObserver{
+WeatherClientObserver, IOObserver{
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 500;
    
@@ -94,7 +95,7 @@ WeatherClientObserver{
    **/
    public WeatherClientView(String title){
       super(title);
-      WeatherClient wc = new WeatherClient(this);
+      WeatherClient wc = new WeatherClient(this,this);
       WeatherClientController wcc =
                                 new WeatherClientController(this,wc);
       this.addActionListener(wcc);
@@ -107,6 +108,30 @@ WeatherClientObserver{
    }
 
    //////////////////////////Public Methods//////////////////////////
+   //////////////////IOObserver implementation///////////////////////
+   /**
+   **/
+   public void alertGeneralIOError(File f, Exception e){}
+
+   /**
+   **/
+   public void alertNoDataError(File f){
+      String exception = new String("No Data Found to be saved!\n");
+      exception += "Please select Weather Data to save";
+      String error = new String("Data Needed For Saving!");
+      JOptionPane.showMessageDialog(this,exception,error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertIOExceptionError(File f){
+      String exception = new String("Could not save data to:  " + f);
+      String error = new String("I/O Error!!");
+      JOptionPane.showMessageDialog(this,exception,error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
    ////////////////WeatherClientObserver implementation//////////////
    /**
    **/

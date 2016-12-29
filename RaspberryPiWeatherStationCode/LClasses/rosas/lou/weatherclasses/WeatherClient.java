@@ -7,6 +7,7 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import rosas.lou.IOObserver;
 import rosas.lou.weatherclasses.*;
 
 public class WeatherClient{
@@ -16,6 +17,7 @@ public class WeatherClient{
    private DatagramSocket socket;
    private List<String>   currentTemperatureData;
    private List<WeatherClientObserver> observers;
+   private List<IOObserver> ioobservers;
    private byte[] addr;
    private int month;
    private int day;
@@ -25,6 +27,7 @@ public class WeatherClient{
       socket                 = null;
       currentTemperatureData = null;
       observers              = null;
+      ioobservers            = null;
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
       month                  = 0;
       day                    = 0;
@@ -34,7 +37,7 @@ public class WeatherClient{
    /**
    **/
    public WeatherClient(){
-      this(null);
+      this(null, null);
    }
 
    /**
@@ -54,6 +57,24 @@ public class WeatherClient{
          this.year  = cal.get(Calendar.YEAR);
       }
    }
+
+   /**
+   **/
+   public WeatherClient(WeatherClientObserver wco, IOObserver ioo){
+      this(wco);
+      try{
+         this.ioobservers.add(ioo);
+      }
+      catch(NullPointerException npe){
+         this.ioobservers = new LinkedList<IOObserver>();
+         this.ioobservers.add(ioo);
+      }
+   }
+
+   /**
+   **/
+   public void addIOObserver(IOObserver ioo){
+   }
    
    /**
    **/
@@ -66,6 +87,7 @@ public class WeatherClient{
          this.observers.add(wco);
       }
    }
+
 
    /**
    **/
@@ -527,10 +549,10 @@ public class WeatherClient{
       }
       //somehow, need to alert the clients of "bad things"...
       catch(NullPointerException npe){
-         npe.printStackTrace();
+         this.publishTemperatureSaveException(file, npe);
       }
       catch(IOException ioe){
-         ioe.printStackTrace();
+         this.publishTemperatureSaveException(file, ioe);
       }
       finally{
          try{
@@ -661,6 +683,21 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.alertTemperatureTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void publishTemperatureSaveException(File f, Exception e){
+      Iterator<IOObserver> it = this.ioobservers.iterator();
+      while(it.hasNext()){
+         IOObserver ioo = (IOObserver)it.next();
+         if(e instanceof NullPointerException){
+            ioo.alertNoDataError(f);
+         }
+         else if(e instanceof IOException){
+            ioo.alertIOExceptionError(f);
+         }
       }
    }
 
