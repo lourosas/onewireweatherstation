@@ -184,6 +184,27 @@ WeatherClientObserver, IOObserver{
                                           JOptionPane.ERROR_MESSAGE);
    }
 
+   public int alertHumiditySaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
    /**
    **/
    public int alertTemperatureSaveError(String type){
@@ -460,6 +481,20 @@ WeatherClientObserver, IOObserver{
       returnState.day   = values[1].trim();
       returnState.year  = values[2].trim();
       return returnState;
+   }
+
+   /**
+   **/
+   public void requestHumidityJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser humidityChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      humidityChooser.setFileFilter(filter);
+      humidityChooser.setFileSelectionMode(selectMode);
+      humidityChooser.setApproveButtonToolTipText("Save Humidity");
+      humidityChooser.addActionListener(this.actionListener);
+      humidityChooser.showSaveDialog(this);
    }
 
 
@@ -1225,9 +1260,9 @@ WeatherClientObserver, IOObserver{
       JButton save = new JButton("Save Humidity Data");
       save.setActionCommand("Humidity Save");
       //Add Action Listener
-      //save.addActionListner(this.actionListener);
+      save.addActionListener(this.actionListener);
       //Add Key Listener
-      //save.addKeyListener(this.keyListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit  = new JButton("Quit");

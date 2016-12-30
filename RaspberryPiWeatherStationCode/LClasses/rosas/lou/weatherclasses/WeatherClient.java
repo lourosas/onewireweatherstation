@@ -15,6 +15,7 @@ public class WeatherClient{
    private final static int TIMEOUT = 20000;
 
    private DatagramSocket socket;
+   private List<String>   currentHumidityData;
    private List<String>   currentTemperatureData;
    private List<WeatherClientObserver> observers;
    private List<IOObserver> ioobservers;
@@ -25,6 +26,7 @@ public class WeatherClient{
 
    {
       socket                 = null;
+      currentHumidityData    = null;
       currentTemperatureData = null;
       observers              = null;
       ioobservers            = null;
@@ -533,6 +535,35 @@ public class WeatherClient{
    }
 
    /**
+   **/
+   public void saveHumidityData(File file){
+      FileWriter  fileWriter  = null;
+      PrintWriter printWriter = null;
+      try{
+         fileWriter  = new FileWriter(file, true);
+         printWriter = new PrintWriter(fileWriter, true);
+         Iterator<String> it = this.currentHumidityData.iterator();
+         while(it.hasNext()){
+            String line = it.next();
+            printWriter.println(line);
+         }
+      }
+      catch(NullPointerException npe){
+         this.publishHumiditySaveException(file, npe);
+      }
+      catch(IOException ioe){
+         this.publishHumiditySaveException(file, ioe);
+      }
+      finally{
+         try{
+            fileWriter.close();
+            printWriter.close();
+         }
+         catch(IOException ioe){}
+      }
+   }
+
+   /**
    Going to make this simple:  nothing real complex about this part
    **/
    public void saveTemperatureData(File file){
@@ -563,7 +594,9 @@ public class WeatherClient{
       }
    }
 
-   //////////////////////Private Methods/////////////////////////////
+
+   
+//////////////////////Private Methods/////////////////////////////
    /**
    **/
    private void publishDewpointData(List<String> dewpointData){
@@ -608,6 +641,7 @@ public class WeatherClient{
    **/
    private void publishHumidityData(List<String> humidityData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
+      this.currentHumidityData           = humidityData;
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateHumidityData(humidityData);
@@ -621,6 +655,21 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.alertHumidityTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void publishHumiditySaveException(File f, Exception e){
+      Iterator<IOObserver> it = this.ioobservers.iterator();
+      while(it.hasNext()){
+         IOObserver ioo = (IOObserver)it.next();
+         if(e instanceof NullPointerException){
+            ioo.alertNoDataError(f);
+         }
+         else if(e instanceof IOException){
+            ioo.alertIOExceptionError(f);
+         }
       }
    }
 

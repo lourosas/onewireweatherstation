@@ -71,6 +71,9 @@ ActionListener, KeyListener, ItemListener{
          else if(command.equals("Temp Save")){
             this.view.requestTemperatureJFileChooser();
          }
+         else if(command.equals("Humidity Save")){
+            this.view.requestHumidityJFileChooser();
+         }
       }
       else if(o instanceof JFileChooser){
          ViewState state;
@@ -79,6 +82,9 @@ ActionListener, KeyListener, ItemListener{
             String from = jfc.getApproveButtonToolTipText();
             if(from.toUpperCase().contains("TEMPERATURE")){
                this.handleTemperatureSave(jfc);
+            }
+            if(from.toUpperCase().contains("HUMIDITY")){
+               this.handleHumiditySave(jfc);
             }
          }
       }
@@ -185,6 +191,31 @@ ActionListener, KeyListener, ItemListener{
             ViewState state = this.view.requestHeatIndexState();
             this.client.requestHeatIndexData(state);
          }
+      }
+   }
+
+   /**
+   **/
+   private void handleHumiditySave(JFileChooser jfc){
+      File humidityFile = jfc.getSelectedFile();
+      if(humidityFile.isDirectory()){
+         this.view.alertHumiditySaveError("Directory");
+         this.view.requestHumidityJFileChooser();
+      }
+      else if(humidityFile.exists()){
+         int overwrite = this.view.alertHumiditySaveError("exists");
+         if(overwrite == JOptionPane.YES_OPTION){
+            //Save Data
+            this.client.saveHumidityData(humidityFile);
+         }
+         else{
+            //Start Over
+            this.view.requestHumidityJFileChooser();
+         }
+      }
+      else{
+         //Save Data
+         this.client.saveHumidityData(humidityFile);
       }
    }
 
