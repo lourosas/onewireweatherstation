@@ -74,6 +74,12 @@ ActionListener, KeyListener, ItemListener{
          else if(command.equals("Humidity Save")){
             this.view.requestHumidityJFileChooser();
          }
+         else if(command.equals("P Save")){
+            this.view.requestPressureJFileChooser();
+         }
+         else if(command.equals("DP Save")){
+            this.view.requestDewpointJFileChooser();
+         }
       }
       else if(o instanceof JFileChooser){
          ViewState state;
@@ -83,8 +89,14 @@ ActionListener, KeyListener, ItemListener{
             if(from.toUpperCase().contains("TEMPERATURE")){
                this.handleTemperatureSave(jfc);
             }
-            if(from.toUpperCase().contains("HUMIDITY")){
+            else if(from.toUpperCase().contains("HUMIDITY")){
                this.handleHumiditySave(jfc);
+            }
+            else if(from.toUpperCase().contains("PRESSURE")){
+               this.handlePressureSave(jfc);
+            }
+            else if(from.toUpperCase().contains("DEWPOINT")){
+               this.handleDewpointSave(jfc);
             }
          }
       }
@@ -196,6 +208,31 @@ ActionListener, KeyListener, ItemListener{
 
    /**
    **/
+   private void handleDewpointSave(JFileChooser jfc){
+      File dewpointFile = jfc.getSelectedFile();
+      if(dewpointFile.isDirectory()){
+         this.view.alertDewpointSaveError("Directory");
+         this.view.requestDewpointJFileChooser();
+      }
+      else if(dewpointFile.exists()){
+         int overwrite = this.view.alertyDewpointSaveError("exists");
+         if(overwrite == JOptionPane.YES_OPTION){
+            //Save Data
+            this.client.saveDewpointData(dewpointFile);
+         }
+         else{
+            //Start Over
+            this.view.requestDewpointJFileChooser();
+         }
+      }
+      else{
+         //Save Data
+         this.client.saveDewpointData(dewpoinFile);
+      }
+   }
+
+   /**
+   **/
    private void handleHumiditySave(JFileChooser jfc){
       File humidityFile = jfc.getSelectedFile();
       if(humidityFile.isDirectory()){
@@ -216,6 +253,32 @@ ActionListener, KeyListener, ItemListener{
       else{
          //Save Data
          this.client.saveHumidityData(humidityFile);
+      }
+   }
+
+   //
+   //
+   //
+   private void handlePressureSave(JFileChooser jfc){
+      File pressureFile = jfc.getSelectedFile();
+      if(pressureFile.isDirectory()){
+         this.view.alertPressureSaveError("Directory");
+         this.view.requestPressureJFileChooser(); 
+      }
+      else if(pressureFile.exists()){
+         int overwrite = this.view.alertPressureSaveError("exists");
+         if(overwrite == JOptionPane.YES_OPTION){
+            //Save Data
+            this.client.savePressureData(pressureFile);
+         }
+         else{
+            //Start Over
+            this.view.requestPressureJFileChooser();
+         }
+      }
+      else{
+         //Save Data
+         this.client.savePressureData(pressureFile);
       }
    }
 

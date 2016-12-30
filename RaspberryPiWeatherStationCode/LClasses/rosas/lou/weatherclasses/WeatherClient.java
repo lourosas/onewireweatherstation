@@ -15,8 +15,10 @@ public class WeatherClient{
    private final static int TIMEOUT = 20000;
 
    private DatagramSocket socket;
+   private List<String>   currentDewpointData;
    private List<String>   currentHumidityData;
    private List<String>   currentTemperatureData;
+   private List<String>   currentPressureData;
    private List<WeatherClientObserver> observers;
    private List<IOObserver> ioobservers;
    private byte[] addr;
@@ -28,6 +30,7 @@ public class WeatherClient{
       socket                 = null;
       currentHumidityData    = null;
       currentTemperatureData = null;
+      currentPressureData    = null;
       observers              = null;
       ioobservers            = null;
       addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
@@ -88,14 +91,6 @@ public class WeatherClient{
          this.observers = new LinkedList<WeatherClientObserver>();
          this.observers.add(wco);
       }
-   }
-
-
-   /**
-   **/
-   public void requestMissionData(){
-      String message = new String("SELECT * FROM missiondata");
-      this.requestMissionData(message);
    }
 
    /**
@@ -334,6 +329,13 @@ public class WeatherClient{
 
    /**
    **/
+   public void requestMissionData(){
+      String message = new String("SELECT * FROM missiondata");
+      this.requestMissionData(message);
+   }
+
+   /**
+   **/
    public void requestMissionData(String message){
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
@@ -564,6 +566,35 @@ public class WeatherClient{
    }
 
    /**
+   **/
+   public void savePressureData(File file){
+      FileWriter  fileWriter  = null;
+      PrintWriter printWriter = null;
+      try{
+         fileWriter  = new FileWriter(file, true);
+         printWriter = new PrintWriter(fileWriter, true);
+         Iterator<String> it = this.currentPressureData.iterator();
+         while(it.hasNext()){
+            String line = it.next();
+            printWriter.println(line);
+         }
+      }
+      catch(NullPointerException npe){
+         this.publishPressureSaveException(file, npe);
+      }
+      catch(IOException ioe){
+         this.publishPressureSaveException(file, ioe);
+      }
+      finally{
+         try{
+            fileWriter.close();
+            printWriter.close();
+         }
+         catch(IOException ioe){}
+      }
+   }
+
+   /**
    Going to make this simple:  nothing real complex about this part
    **/
    public void saveTemperatureData(File file){
@@ -677,9 +708,25 @@ public class WeatherClient{
    **/
    private void publishPressureData(List<String> pressureData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
+      this.currentPressureData           = pressureData;
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updatePressureData(pressureData);
+      }
+   }
+
+   /**
+   **/
+   private void publishPressureSaveException(File f, Exception e){
+      Iterator<IOObserver> it = this.ioobservers.iterator();
+      while(it.hasNext()){
+         IOObserver ioo = (IOObserver)it.next();
+         if(e instanceof NullPointerException){
+            ioo.alertNoDataError(f);
+         }
+         else if(e instanceof IOException){
+            ioo.alertIOExceptionError(f);
+         }
       }
    }
 
@@ -753,6 +800,7 @@ public class WeatherClient{
    /**
    **/
    private void updateMissionData(){
+      final int ONE_SEC= 1000;
       Calendar current = Calendar.getInstance();
       int currentMonth = current.get(Calendar.MONTH);
       int currentDay   = current.get(Calendar.DATE);
@@ -762,7 +810,16 @@ public class WeatherClient{
          currentYear  != this.year){
          //Update the mission data for all the Observers
          //(Subscribers)
-         this.requestMissionData();
+         //Do not do this just yet, to determine the issue as related
+         //To the null pointer exception
+         //this.requestMissionData();
+         //Sleep for a second to get mission data "set" on the views
+         //try{
+         //   Thread.sleep(ONE_SEC);
+         //}
+         //catch(InterruptedException ie){}
+         //Test Print for now-->Something is wrong!!!
+         System.out.println("Date Changed!!!");
          this.month = currentMonth;
          this.day   = currentDay;
          this.year  = currentYear;

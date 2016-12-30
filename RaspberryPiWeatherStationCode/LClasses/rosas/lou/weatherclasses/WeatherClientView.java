@@ -176,6 +176,52 @@ WeatherClientObserver, IOObserver{
 
    /**
    **/
+   public int alertDewpointSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }   
+
+   /**
+   **/
+   public int alertPressureSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
    public void alertPressureTimeout(){
       String exception = new String("Not All Pressure Data ");
       exception += "Displayed!\nHit 'Refresh' button as needed";
@@ -184,6 +230,8 @@ WeatherClientObserver, IOObserver{
                                           JOptionPane.ERROR_MESSAGE);
    }
 
+   /**
+   **/
    public int alertHumiditySaveError(String type){
       int output = JOptionPane.YES_OPTION;
       if(type.toUpperCase().contains("DIRECTORY")){
@@ -485,6 +533,20 @@ WeatherClientObserver, IOObserver{
 
    /**
    **/
+   public void requestDewpointJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser dewpointChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      dewpointChooser.setFileFilter(filter);
+      dewpointChooser.setFileSelectionMode(selectMode);
+      dewpointChooser.setApproveButtonToolTipText("Save Dewpoint");
+      dewpointChooser.addActionListener(this.actionListener);
+      dewpointChooser.showSaveDialog(this);
+   }
+
+   /**
+   **/
    public void requestHumidityJFileChooser(){
       int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
       JFileChooser humidityChooser = new JFileChooser();
@@ -497,6 +559,19 @@ WeatherClientObserver, IOObserver{
       humidityChooser.showSaveDialog(this);
    }
 
+   /**
+   **/
+   public void requestPressureJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser pressureChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      pressureChooser.setFileFilter(filter);
+      pressureChooser.setFileSelectionMode(selectMode);
+      pressureChooser.setApproveButtonToolTipText("Save Pressure");
+      pressureChooser.addActionListener(this.actionListener);
+      pressureChooser.showSaveDialog(this);
+   }
 
    /**
    **/
@@ -866,8 +941,8 @@ WeatherClientObserver, IOObserver{
 
       JButton save = new JButton("Save Pressure Data");
       save.setActionCommand("P Save");
-      //save.addActionListener(this.actionListener);
-      //save.addKeyListener(this.keyListener);
+      save.addActionListener(this.actionListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit = new JButton("Quit");
@@ -1002,8 +1077,8 @@ WeatherClientObserver, IOObserver{
 
       JButton save = new JButton("Save Dewpoint Data");
       save.setActionCommand("DP Save");
-      //save.addActionListener(this.actionListener);
-      //save.addKeyListener(this.keyListener);
+      save.addActionListener(this.actionListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit = new JButton("Quit");
