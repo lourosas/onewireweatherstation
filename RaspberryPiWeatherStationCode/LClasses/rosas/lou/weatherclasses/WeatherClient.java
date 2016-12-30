@@ -28,6 +28,7 @@ public class WeatherClient{
 
    {
       socket                 = null;
+      currentDewpointData    = null;
       currentHumidityData    = null;
       currentTemperatureData = null;
       currentPressureData    = null;
@@ -538,6 +539,35 @@ public class WeatherClient{
 
    /**
    **/
+   public void saveDewpointData(File file){
+      FileWriter  fileWriter  = null;
+      PrintWriter printWriter = null;
+      try{
+         fileWriter  = new FileWriter(file, true);
+         printWriter = new PrintWriter(fileWriter, true);
+         Iterator<String> it = this.currentDewpointData.iterator();
+         while(it.hasNext()){
+            String line = it.next();
+            printWriter.println(line);
+         }
+      }
+      catch(NullPointerException npe){
+         this.publishDewpointSaveException(file, npe);
+      }
+      catch(IOException ioe){
+         this.publishDewpointSaveException(file, ioe);
+      }
+      finally{
+         try{
+            fileWriter.close();
+            printWriter.close();
+         }
+         catch(IOException ioe){}
+      }
+   }
+
+   /**
+   **/
    public void saveHumidityData(File file){
       FileWriter  fileWriter  = null;
       PrintWriter printWriter = null;
@@ -632,6 +662,7 @@ public class WeatherClient{
    **/
    private void publishDewpointData(List<String> dewpointData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
+      this.currentDewpointData           = dewpointData;
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateDewpointData(dewpointData);
@@ -645,6 +676,21 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.alertDewpointTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void publishDewpointSaveException(File f, Exception e){
+      Iterator<IOObserver> it = this.ioobservers.iterator();
+      while(it.hasNext()){
+         IOObserver ioo = (IOObserver)it.next();
+         if(e instanceof NullPointerException){
+            ioo.alertNoDataError(f);
+         }
+         else if(e instanceof IOException){
+            ioo.alertIOExceptionError(f);
+         }
       }
    }
 

@@ -215,7 +215,7 @@ ActionListener, KeyListener, ItemListener{
          this.view.requestDewpointJFileChooser();
       }
       else if(dewpointFile.exists()){
-         int overwrite = this.view.alertyDewpointSaveError("exists");
+         int overwrite = this.view.alertDewpointSaveError("exists");
          if(overwrite == JOptionPane.YES_OPTION){
             //Save Data
             this.client.saveDewpointData(dewpointFile);
@@ -227,7 +227,7 @@ ActionListener, KeyListener, ItemListener{
       }
       else{
          //Save Data
-         this.client.saveDewpointData(dewpoinFile);
+         this.client.saveDewpointData(dewpointFile);
       }
    }
 
