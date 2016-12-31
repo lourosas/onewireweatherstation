@@ -80,6 +80,9 @@ ActionListener, KeyListener, ItemListener{
          else if(command.equals("DP Save")){
             this.view.requestDewpointJFileChooser();
          }
+         else if(command.equals("HI Save")){
+            this.view.requestHeatIndexJFileChooser();
+         }
       }
       else if(o instanceof JFileChooser){
          ViewState state;
@@ -97,6 +100,9 @@ ActionListener, KeyListener, ItemListener{
             }
             else if(from.toUpperCase().contains("DEWPOINT")){
                this.handleDewpointSave(jfc);
+            }
+            else if(from.toUpperCase().contains("HEAT INDEX")){
+               this.handleHeatIndexSave(jfc);
             }
          }
       }
@@ -228,6 +234,31 @@ ActionListener, KeyListener, ItemListener{
       else{
          //Save Data
          this.client.saveDewpointData(dewpointFile);
+      }
+   }
+
+   /**
+   **/
+   private void handleHeatIndexSave(JFileChooser jfc){
+      File hiFile = jfc.getSelectedFile();
+      if(hiFile.isDirectory()){
+         this.view.alertHeatIndexSaveError("Directory");
+         this.view.requestHeatIndexJFileChooser();
+      }
+      else if(hiFile.exists()){
+         //That is what is acutally happening:  appending the file
+         int append = this.view.alertHeatIndexSaveError("exists");
+         if(append == JOptionPane.YES_OPTION){
+            //Save Data
+            this.client.saveHeatIndexData(hiFile);
+         }
+         else{
+            //Start Over
+            this.view.requestHeatIndexJFileChooser();
+         }
+      }
+      else{
+         this.client.saveHeatIndexData(hiFile);
       }
    }
 

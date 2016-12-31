@@ -16,6 +16,7 @@ public class WeatherClient{
 
    private DatagramSocket socket;
    private List<String>   currentDewpointData;
+   private List<String>   currentHeatIndexData;
    private List<String>   currentHumidityData;
    private List<String>   currentTemperatureData;
    private List<String>   currentPressureData;
@@ -29,6 +30,7 @@ public class WeatherClient{
    {
       socket                 = null;
       currentDewpointData    = null;
+      currentHeatIndexData   = null;
       currentHumidityData    = null;
       currentTemperatureData = null;
       currentPressureData    = null;
@@ -568,6 +570,35 @@ public class WeatherClient{
 
    /**
    **/
+   public void saveHeatIndexData(File file){
+      FileWriter  fileWriter  = null;
+      PrintWriter printWriter = null;
+      try{
+         fileWriter  = new FileWriter(file, true);
+         printWriter = new PrintWriter(fileWriter, true);
+         Iterator<String> it = this.currentHeatIndexData.iterator();
+         while(it.hasNext()){
+            String line = it.next();
+            printWriter.println(line);
+         }
+      }
+      catch(NullPointerException npe){
+         this.publishHeatIndexSaveException(file, npe);
+      }
+      catch(IOException ioe){
+         this.publishHeatIndexSaveException(file, ioe);
+      }
+      finally{
+         try{
+            fileWriter.close();
+            printWriter.close();
+         }
+         catch(IOException ioe){}
+      }
+   }
+
+   /**
+   **/
    public void saveHumidityData(File file){
       FileWriter  fileWriter  = null;
       PrintWriter printWriter = null;
@@ -698,6 +729,7 @@ public class WeatherClient{
    **/
    private void publishHeatIndexData(List<String> heatIndexData){
       Iterator<WeatherClientObserver> it = this.observers.iterator();
+      this.currentHeatIndexData          = heatIndexData;
       while(it.hasNext()){
          WeatherClientObserver wco = it.next();
          wco.updateHeatIndexData(heatIndexData);
@@ -711,6 +743,21 @@ public class WeatherClient{
       while(it.hasNext()){
          WeatherClientObserver wco=(WeatherClientObserver)it.next();
          wco.alertHeatIndexTimeout();
+      }
+   }
+
+   /**
+   **/
+   private void publishHeatIndexSaveException(File f, Exception e){
+      Iterator<IOObserver> it = this.ioobservers.iterator();
+      while(it.hasNext()){
+         IOObserver ioo = (IOObserver)it.next();
+         if(e instanceof NullPointerException){
+            ioo.alertNoDataError(f);
+         }
+         else if(e instanceof IOException){
+            ioo.alertIOExceptionError(f);
+         }
       }
    }
 

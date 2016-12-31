@@ -165,6 +165,29 @@ WeatherClientObserver, IOObserver{
 
    /**
    **/
+   public int alertHeatIndexSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
    public void alertMissionTimeout(){
       String exception = new String("Not All Dates ");
       exception += "Displayed!\nHit 'Refresh' button as needed";
@@ -543,6 +566,20 @@ WeatherClientObserver, IOObserver{
       dewpointChooser.setApproveButtonToolTipText("Save Dewpoint");
       dewpointChooser.addActionListener(this.actionListener);
       dewpointChooser.showSaveDialog(this);
+   }
+
+   /**
+   **/
+   public void requestHeatIndexJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser heatIndexChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      heatIndexChooser.setFileFilter(filter);
+      heatIndexChooser.setFileSelectionMode(selectMode);
+      heatIndexChooser.setApproveButtonToolTipText("Save Heat Index");
+      heatIndexChooser.addActionListener(this.actionListener);
+      heatIndexChooser.showSaveDialog(this);
    }
 
    /**
@@ -1127,8 +1164,6 @@ WeatherClientObserver, IOObserver{
       JPanel northPanel       = new JPanel();
       this.heatIndexGroup     = new ButtonGroup();
       this.heatIndexDataGroup = new ButtonGroup();
-      //ButtonGroup unitsGroup  = new ButtonGroup();
-      //ButtonGroup dataGroup   = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JPanel unitsPanel = new JPanel();
@@ -1217,6 +1252,7 @@ WeatherClientObserver, IOObserver{
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Heat Index Data");
+      save.setActionCommand("HI Save");
       //Add Action Listern
       save.addActionListener(this.actionListener);
       //Add Key Listener
