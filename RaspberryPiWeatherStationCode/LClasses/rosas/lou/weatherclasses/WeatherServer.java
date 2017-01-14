@@ -1,21 +1,5 @@
 /*********************************************************************
-//******************************************************************
-//Weather Server Class
-//Copyright (C) 2017 by Lou Rosas
-//This file is part of onewireweatherstation application.
-//onewireweatherstation is free software; you can redistribute it
-//and/or modify
-//it under the terms of the GNU General Public License as published
-//by the Free Software Foundation; either version 3 of the License,
-//or (at your option) any later version.
-//PaceCalculator is distributed in the hope that it will be
-//useful, but WITHOUT ANY WARRANTY; without even the implied
-//warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-//See the GNU General Public License for more details.
-//You should have received a copy of the GNU General Public License
-//along with this program.
-//If not, see <http://www.gnu.org/licenses/>.
-//*******************************************************************
+<GNU Stuff goes here>
 *********************************************************************/
 
 package rosas.lou.weatherclasses;
@@ -87,7 +71,6 @@ Runnable{
    public void run(){
       while(true){
          try{
-            //System.out.println("poop");
             //wait for a client to request data
             this.waitForPackets();
             Thread.sleep(1000);
@@ -223,6 +206,22 @@ Runnable{
             String received  = new String(receivePacket.getData(), 0,
                                           receivePacket.getLength());
             receiveData = this.station.requestData(received);
+            String dataSize = "" + receiveData.size();
+            data = dataSize.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(
+                                                          data,
+                                                          data.length,
+                                                          addr,
+                                                          port);
+            this.socket.send(sendPacket);
+            Iterator<String> it = receiveData.iterator();
+            while(it.hasNext()){
+               data = it.next().getBytes();
+               sendPacket.setData(data, 0, data.length);
+               sendPacket.setAddress(addr);
+               sendPacket.setPort(port);
+               this.socket.send(sendPacket);
+            }
          }
          catch(IOException ioe){
             ioe.printStackTrace();
