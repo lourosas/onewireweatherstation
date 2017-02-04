@@ -1,20 +1,4 @@
-//******************************************************************
-//Weather Station Class
-//Copyright (C) 2017 by Lou Rosas
-//This file is part of onewireweatherstation application.
-//onewireweatherstation is free software; you can redistribute it
-//and/or modify
-//it under the terms of the GNU General Public License as published
-//by the Free Software Foundation; either version 3 of the License,
-//or (at your option) any later version.
-//PaceCalculator is distributed in the hope that it will be
-//useful, but WITHOUT ANY WARRANTY; without even the implied
-//warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-//See the GNU General Public License for more details.
-//You should have received a copy of the GNU General Public License
-//along with this program.
-//If not, see <http://www.gnu.org/licenses/>.
-//*******************************************************************
+/**/
 
 package rosas.lou.weatherclasses;
 
@@ -153,7 +137,6 @@ public class WeatherStation implements TimeListener{
       try{
         WeatherStorage ws = WeatherStorage.getInstance();
         returnList        = ws.requestData(request); 
-        System.out.println(request);
         System.out.println(returnList);
       }
       catch(NullPointerException npe){}
@@ -439,7 +422,10 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         evt1 = new WeatherEvent(null,"Dewpoint",-999.9,
+         //evt1 = new WeatherEvent(null,"Dewpoint",-999.9,
+         //                                    null, this.currentDate);
+         evt1 = new WeatherEvent(null,"Dewpoint",
+                                             Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
          ws.store(evt1);
       }
@@ -506,7 +492,10 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         evt1 = new WeatherEvent(null, "Heat Index", -999.9,
+         //evt1 = new WeatherEvent(null, "Heat Index", -999.9,
+         //                                    null, this.currentDate);
+         evt1 = new WeatherEvent(null, "Heat Index",
+                                            Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
          ws.store(evt1);
       }
