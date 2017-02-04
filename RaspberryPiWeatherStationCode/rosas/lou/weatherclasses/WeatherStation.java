@@ -131,9 +131,18 @@ public class WeatherStation implements TimeListener{
    }
 
    /**
-   Request the current Temperature Data...
    **/
-   public List<String> requestCurrentData(String weatherType){
+   public List<String> requestData(String request){
+      List<String> returnList = null;
+      try{
+        WeatherStorage ws = WeatherStorage.getInstance();
+        returnList        = ws.requestData(request); 
+        System.out.println(returnList);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return returnList;
+      }
    }
    
    /**
@@ -413,7 +422,10 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         evt1 = new WeatherEvent(null,"Dewpoint",-999.9,
+         //evt1 = new WeatherEvent(null,"Dewpoint",-999.9,
+         //                                    null, this.currentDate);
+         evt1 = new WeatherEvent(null,"Dewpoint",
+                                             Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
          ws.store(evt1);
       }
@@ -480,7 +492,10 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         evt1 = new WeatherEvent(null, "Heat Index", -999.9,
+         //evt1 = new WeatherEvent(null, "Heat Index", -999.9,
+         //                                    null, this.currentDate);
+         evt1 = new WeatherEvent(null, "Heat Index",
+                                            Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
          ws.store(evt1);
       }
@@ -559,6 +574,8 @@ public class WeatherStation implements TimeListener{
       
       try{
          Iterator<TemperatureObserver> i = this.t_o_List.iterator();
+         //data  = evt1.getValue();
+         //units = evt1.getUnits();
          WeatherStorage ws = WeatherStorage.getInstance();
          ws.store(evt1);
          ws.store(evt2);
