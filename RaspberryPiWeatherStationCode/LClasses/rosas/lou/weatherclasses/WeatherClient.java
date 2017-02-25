@@ -115,7 +115,7 @@ public class WeatherClient{
    /**
    **/
    public void requestDewpointData(ViewState state){
-      this.updateMissionData();
+      //this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -191,7 +191,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHeatIndexData(ViewState state){
-      this.updateMissionData();
+      //this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -230,7 +230,6 @@ public class WeatherClient{
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
       List<String> heatIndexData = new LinkedList();
-      System.out.println(message);
       try{
          this.socket = new DatagramSocket();
          //Set a receive timeout for a given time, if a packet is
@@ -254,7 +253,6 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output.trim());
             heatIndexData.add(output.trim());
             receivePacket.setData(new byte[128]);
          }
@@ -275,7 +273,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHumidityData(ViewState state){
-      this.updateMissionData();
+      //this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -304,7 +302,6 @@ public class WeatherClient{
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
       List<String> humidityData     = new LinkedList();
-      System.out.println(message);
       try{
          this.socket = new DatagramSocket();
          //Set a receive timeout for a given time, if a packet is
@@ -328,7 +325,6 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output.trim());
             humidityData.add(output.trim());
             receivePacket.setData(new byte[128]);
          }
@@ -382,7 +378,6 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            //System.out.println(output);
             missionData.add(output);
             receivePacket.setData(new byte[64]);
          }
@@ -403,7 +398,7 @@ public class WeatherClient{
    /**
    **/
    public void requestPressureData(ViewState state){
-      this.updateMissionData();
+      //this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -436,7 +431,6 @@ public class WeatherClient{
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
       List<String> pressureData = new LinkedList();
-      System.out.println(message);
       try{
          this.socket = new DatagramSocket();
          //Set a receive timeout for a given time, if a packet is
@@ -513,7 +507,6 @@ public class WeatherClient{
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
       List<String> temperatureData = new LinkedList();
-      System.out.println(message);
       try{
          this.socket = new DatagramSocket();
          //Set a receive timeout for a given time, if a packet is
@@ -537,7 +530,6 @@ public class WeatherClient{
          for(int i = 0; i < size; i++){
             this.socket.receive(receivePacket);
             output = new String(receivePacket.getData());
-            System.out.println(output.trim());
             temperatureData.add(output.trim());
             receivePacket.setData(new byte[128]);
          }
@@ -909,11 +901,11 @@ public class WeatherClient{
    /**
    **/
    private void updateMissionData(){
-      final int ONE_SEC= 1000;
-      Calendar current = Calendar.getInstance();
-      int currentMonth = current.get(Calendar.MONTH);
-      int currentDay   = current.get(Calendar.DATE);
-      int currentYear  = current.get(Calendar.YEAR);
+      final int ONE_SEC = 1000;
+      Calendar current  = Calendar.getInstance();
+      int currentMonth  = current.get(Calendar.MONTH);
+      int currentDay    = current.get(Calendar.DATE);
+      int currentYear   = current.get(Calendar.YEAR);
       if(currentMonth != this.month ||
          currentDay   != this.day   ||
          currentYear  != this.year){
@@ -921,12 +913,12 @@ public class WeatherClient{
          //(Subscribers)
          //Do not do this just yet, to determine the issue as related
          //To the null pointer exception
-         //this.requestMissionData();
+         this.requestMissionData();
          //Sleep for a second to get mission data "set" on the views
-         //try{
-         //   Thread.sleep(ONE_SEC);
-         //}
-         //catch(InterruptedException ie){}
+         try{
+            Thread.sleep(ONE_SEC);
+         }
+         catch(InterruptedException ie){}
          //Test Print for now-->Something is wrong!!!
          System.out.println("Date Changed!!!");
          this.month = currentMonth;

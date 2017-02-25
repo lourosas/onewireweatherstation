@@ -58,6 +58,11 @@ ActionListener, KeyListener, ItemListener{
       if(o instanceof JComboBox){
          int mask = java.awt.event.InputEvent.BUTTON1_MASK;
          if(e.getModifiers() == mask){
+            //Needing to do this for the sake of investigation
+            System.out.println(o);
+            System.out.println();
+            System.out.println(e);
+            System.out.println(((JComboBox)o).getSelectedItem());
             this.handleJComboBox((JComboBox)o);
          }
       }
@@ -173,7 +178,6 @@ ActionListener, KeyListener, ItemListener{
    **/
    private void handleJComboBox(JComboBox jcb){
       String command = jcb.getActionCommand(); 
-      System.out.println(command);
       if(command.equals("Humidity Combo Box")){
          ViewState state = this.view.requestHumidityState();
          this.client.requestHumidityData(state);

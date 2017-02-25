@@ -391,16 +391,49 @@ WeatherClientObserver, IOObserver{
          //OR when a date has changed, if the Combo Boxes are already
          //setup, clear them out, so as to prevent the doubling of
          //previous dates.
-         this.clearComboBoxesFirst();
+         //this.clearComboBoxesFirst();
          this.missionData = new LinkedList<String>(missionData);
          Iterator<String> it = this.missionData.iterator();
-         while(it.hasNext()){            
-            String date = it.next();
-            this.tempComboBox.addItem(date.trim());
-            this.humidityComboBox.addItem(date.trim());
-            this.dewPointComboBox.addItem(date.trim());
-            this.heatIndexComboBox.addItem(date.trim());
-            this.pressureComboBox.addItem(date.trim());
+         if(this.tempComboBox.getItemCount() == 0){
+            while(it.hasNext()){            
+               String date = it.next();
+               this.tempComboBox.addItem(date.trim());
+               this.humidityComboBox.addItem(date.trim());
+               this.dewPointComboBox.addItem(date.trim());
+               this.heatIndexComboBox.addItem(date.trim());
+               this.pressureComboBox.addItem(date.trim());
+            }
+         }
+         else{
+            Object sTemp = this.tempComboBox.getSelectedItem();
+            Object sHumi = this.humidityComboBox.getSelectedItem();
+            Object sPres = this.pressureComboBox.getSelectedItem();
+            Object sDp   = this.dewPointComboBox.getSelectedItem();
+            Object sHi   = this.heatIndexComboBox.getSelectedItem();
+            int total    = this.tempComboBox.getItemCount();
+            while(it.hasNext()){
+               int i         = 0;
+               boolean found = false;
+               String date   = it.next();
+               do{
+                  String curDate =
+                              (String)this.tempComboBox.getItemAt(i);
+                  if(curDate.equals(date.trim())){
+                     found = true;
+                  }
+                  ++i;
+               }while(!found && i < total);
+               if(!found){
+                  System.out.println(date.trim());
+                  //Just out of curriosity, I want to see what this
+                  //would look like
+                  System.out.println(sTemp);
+                  //Now, find out where in the LinkedList the
+                  //uncommon date is--eventually, want to insert into
+                  //the Combo Box(es)
+                  System.out.println(this.missionData.indexOf(date));
+               }
+            }
          }
       }
       catch(NullPointerException npe){
@@ -1138,8 +1171,6 @@ WeatherClientObserver, IOObserver{
       quit.setActionCommand("DP Quit");
       quit.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
             setVisible(false);
             System.exit(0);
          }
@@ -1280,8 +1311,6 @@ WeatherClientObserver, IOObserver{
       //Add Action Listener
       quit.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
             setVisible(false);
             System.exit(0);
          }
@@ -1595,11 +1624,11 @@ WeatherClientObserver, IOObserver{
       this.tempComboBox.setActionCommand("Temperature Combo Box");
       this.tempComboBox.setName("Temperature");
       //Figure out what to do with this.
-      this.tempComboBox.addActionListener(new ActionListener(){
-         public void actionPerformed(ActionEvent e){
-            setTheDayTemperature(e);
-         }
-      });
+      //this.tempComboBox.addActionListener(new ActionListener(){
+      //   public void actionPerformed(ActionEvent e){
+      //      setTheDayTemperature(e);
+      //   }
+      //});
       this.tempComboBox.addActionListener(this.actionListener);
       this.tempComboBox.addKeyListener(this.keyListener);
       northPanel.add(this.tempComboBox);
