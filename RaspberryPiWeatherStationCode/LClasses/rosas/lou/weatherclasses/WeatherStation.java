@@ -454,6 +454,7 @@ public class WeatherStation implements TimeListener{
          npe.printStackTrace();
       }
    }
+
    /**
    */
    private void publishHeatIndex(){
@@ -492,8 +493,6 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         //evt1 = new WeatherEvent(null, "Heat Index", -999.9,
-         //                                    null, this.currentDate);
          evt1 = new WeatherEvent(null, "Heat Index",
                                             Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
