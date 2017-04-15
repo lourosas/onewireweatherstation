@@ -162,6 +162,7 @@ public class WeatherStorage{
 
       if(type.toLowerCase().equals("temperature")){
          e = this.temperatureHash.elements();
+         this.getMinTemperatureFromDatabase();
       }
       else if(type.toLowerCase().equals("humidity")){
          e = this.humidityHash.elements();
@@ -201,6 +202,30 @@ public class WeatherStorage{
          }
       }
       return minList;
+   }
+
+   /**
+   **/
+   private List<WeatherEvent> getMinTemperatureFromDatabase(){
+      List<String> returnData    = null;
+      List<WeatherEvent> tempMin = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(tempc), min(tempf), min(tempk) FROM ";
+         request += "temperaturedata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         System.out.println(returnData);
+      }
+      catch(NullPointerException npe){
+         System.out.println("That did not work!!!");
+      }
+      finally{
+         return tempMin;
+      }
    }
 
    /**

@@ -74,6 +74,7 @@ public class Database{
    public List<String> requestData(String theRequest){
       System.out.println(theRequest);
       List<String> returnList = null;
+      String upcase = theRequest.toUpperCase();
       if(theRequest.toUpperCase().contains("MISSIONDATA")){
          returnList = this.requestMissionData(theRequest);
       }
@@ -89,8 +90,21 @@ public class Database{
       else if(theRequest.toUpperCase().contains("HEATINDEXDATA")){
          returnList = this.requestHeatIndexData(theRequest);
       }
+      /*
       else if(theRequest.toUpperCase().contains("TEMPERATUREDATA")){
          returnList = this.requestTemperatureData(theRequest);
+      }
+      */
+      else if(upcase.contains("TEMPERATUREDATA")){
+         if(upcase.contains("MIN")){
+            returnList = this.requestMinTemperatureData(theRequest);
+         }
+         else if(upcase.contains("MAX")){
+            returnList = this.requestMaxTemperatureData(theRequest);
+         }
+         else{
+            returnList = this.requestTemperatureData(theRequest);
+         }
       }
       return returnList;
    }
@@ -1116,6 +1130,112 @@ public class Database{
             indexdata += year + ", " + time + ", " + tempc + ", ";
             indexdata += tempf + ", " + tempk;
             returnList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+
+   /**
+   **/
+   private List<String> requestMaxTemperatureData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+
+      return returnList;
+   }
+
+   /**
+   **/
+   private List<String> requestMinTemperatureData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         System.out.println("Database: " + command);
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MIN(tempc)")){
+               double tempc = resultSet.getDouble("MIN(tempc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempc;
+            }
+            else if(command.contains("min(tempc)")){
+               double tempc = resultSet.getDouble("min(tempc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempc;
+            }
+            if(command.contains("MIN(tempf)")){
+               double tempf = resultSet.getDouble("MIN(tempf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempf;
+            }
+            else if(command.contains("min(tempf)")){
+               double tempf = resultSet.getDouble("min(tempf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempf;
+            }
+            if(command.contains("MIN(tempk)")){
+               double tempk = resultSet.getDouble("MIN(tempk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempk;
+            }
+            if(command.contains("min(tempk)")){
+               double tempk = resultSet.getDouble("min(tempk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempk;
+            }
+            returnList.add(indexData);
          }
       }
       catch(SQLException sqe){
