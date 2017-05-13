@@ -35,7 +35,7 @@ public class TestWeatherServer{
          //Set up the HTTP Server
          HttpServer httpserver  =
                   HttpServer.create(new InetSocketAddress(8000),100);
-         httpserver.createContext("/weather",wdh);
+         httpserver.createContext("/",wdh);
          httpserver.setExecutor(null);
          httpserver.start();
       }

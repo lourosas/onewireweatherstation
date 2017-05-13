@@ -15,7 +15,7 @@ public class ASimpleServer2{
 
    public ASimpleServer2(){
       try{
-         this.socket = new DatagramSocket(9307);//Set the port high
+         this.socket = new DatagramSocket(9300);//Set the port high
          this.waitForPackets();
       }
       catch(Exception e){
@@ -61,6 +61,44 @@ public class ASimpleServer2{
                   this.socket.send(sendPacket);
                }
             }
+            else if(received.toUpperCase().equals(
+                                             "DESCRIBETEMPERATURE")){
+               receiveData = this.findTemperatureDescription();
+               String dataSize = "" + receiveData.size();
+               data = dataSize.getBytes();
+               DatagramPacket sendPacket =
+                    new DatagramPacket(data, data.length, addr, port);
+               this.socket.send(sendPacket);
+               Iterator<String> it = receiveData.iterator();
+               while(it.hasNext()){
+                  data = it.next().getBytes();
+                  sendPacket.setData(data, 0, data.length);
+                  sendPacket.setAddress(addr);
+                  sendPacket.setPort(port);
+                  this.socket.send(sendPacket);
+               }
+            }
+            else if(
+                 received.toUpperCase().contains("TEMPERATUREDATA")){
+               receiveData = this.findTemperatureData(received);
+               String dataSize = "" + receiveData.size();
+               data = dataSize.getBytes();
+               DatagramPacket sendPacket =
+                                   new DatagramPacket(data,
+                                                     data.length,
+                                                     addr,
+                                                     port);
+               this.socket.send(sendPacket);
+               Iterator<String> it = receiveData.iterator();
+               while(it.hasNext()){
+                  data = it.next().getBytes();
+                  sendPacket.setData(data, 0, data.length);
+                  sendPacket.setAddress(addr);
+                  sendPacket.setPort(port);
+                  //System.out.println(it.next());
+                  this.socket.send(sendPacket);
+               }
+            }
             //this.printASystemCommand();
          }
          catch(IOException ioe){ ioe.printStackTrace(); }
@@ -76,6 +114,23 @@ public class ASimpleServer2{
       List<String> data = database.requestData("temperature");
       System.out.println("Size:  " + data.size());
       System.out.println("database:  " + database);
+      return data;
+   }
+
+   public List<String> findTemperatureData(String command){
+      Database database = Database.getInstance();
+      List<String> data = database.requestData(command);
+      System.out.println("Size:  " + data.size());
+      System.out.println("Database: " + database);
+      return data;
+   }
+
+   public List<String> findTemperatureDescription(){
+      Database database = Database.getInstance();
+      List<String> data = 
+                  database.requestDescription("describetemperature");
+      System.out.println("Size:  " + data.size());
+      System.out.println("Database:  " + database);
       return data;
    }
 
