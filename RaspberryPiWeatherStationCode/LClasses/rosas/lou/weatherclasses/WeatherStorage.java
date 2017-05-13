@@ -162,10 +162,13 @@ public class WeatherStorage{
 
       if(type.toLowerCase().equals("temperature")){
          e = this.temperatureHash.elements();
-         this.getMinTemperatureFromDatabase();
+         minList = this.getMinTemperatureFromDatabase();
+         return minList; //TEMPORARY!!!!
       }
       else if(type.toLowerCase().equals("humidity")){
          e = this.humidityHash.elements();
+         minList = this.getMinHumidityFromDatabase();
+         System.out.println(minList);
       }
       else if(type.toLowerCase().equals("dewpoint")){
          e = this.dewpointHash.elements();
@@ -190,7 +193,7 @@ public class WeatherStorage{
                      }
                   }
                }
-               else if(event.getValue() <= minEvent.getValue()){
+              else if(event.getValue() <= minEvent.getValue()){
                   minList  = list;
                   minEvent = event;
                }
@@ -206,9 +209,51 @@ public class WeatherStorage{
 
    /**
    **/
+   private List<WeatherEvent> getMinHumidityFromDatabase(){
+      List<String>       returnData  = null;
+      List<WeatherEvent> humidityMin = null;
+      WeatherEvent       event       = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(humidity) FROM ";
+         request += "humiditydata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         humidityMin = new LinkedList<WeatherEvent>();
+         event = new WeatherEvent(null,
+                                  "Humidity",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         humidityMin.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         System.out.println("Humidity:  that did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return humidityMin;
+      }
+   }
+
+   /**
+   **/
    private List<WeatherEvent> getMinTemperatureFromDatabase(){
-      List<String> returnData    = null;
-      List<WeatherEvent> tempMin = null;
+      List<String>       returnData = null;
+      List<WeatherEvent> tempMin    = null;
+      WeatherEvent       event      = null;
       try{
          String request = new String("SELECT month, day, year, ");
          request += "min(tempc), min(tempf), min(tempk) FROM ";
@@ -218,10 +263,41 @@ public class WeatherStorage{
          request += "month = '" + month + "' and day = '" + day +"'";
          request += " GROUP BY month, day";
          returnData = this.requestData(request);
-         System.out.println(returnData);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         tempMin = new LinkedList<WeatherEvent>();
+         //Create Three Different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Temperature",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[4].trim());
+        event = new WeatherEvent(null,
+                                 "Temperature",
+                                 value,
+                                 Units.ENGLISH,
+                                 cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[5].trim());
+        event = new WeatherEvent(null,
+                                 "Temperature",
+                                 value,
+                                 Units.ABSOLUTE,
+                                 cal);
+        tempMin.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace(); 
       }
       catch(NullPointerException npe){
          System.out.println("That did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
       }
       finally{
          return tempMin;

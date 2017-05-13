@@ -90,11 +90,6 @@ public class Database{
       else if(theRequest.toUpperCase().contains("HEATINDEXDATA")){
          returnList = this.requestHeatIndexData(theRequest);
       }
-      /*
-      else if(theRequest.toUpperCase().contains("TEMPERATUREDATA")){
-         returnList = this.requestTemperatureData(theRequest);
-      }
-      */
       else if(upcase.contains("TEMPERATUREDATA")){
          if(upcase.contains("MIN")){
             returnList = this.requestMinTemperatureData(theRequest);
