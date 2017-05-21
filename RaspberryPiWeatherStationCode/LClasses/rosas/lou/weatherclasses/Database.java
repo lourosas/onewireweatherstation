@@ -79,16 +79,50 @@ public class Database{
          returnList = this.requestMissionData(theRequest);
       }
       else if(theRequest.toUpperCase().contains("HUMIDITYDATA")){
-         returnList = this.requestHumidityData(theRequest);
+         if(upcase.contains("MAX")){
+            returnList = this.requestMaxHumidityData(theRequest);
+         }
+         else if(upcase.contains("MIN")){
+            returnList = this.requestMinHumidityData(theRequest);
+         }
+         else{
+            returnList = this.requestHumidityData(theRequest);
+         }
       }
       else if(theRequest.toUpperCase().contains("PRESSUREDATA")){
-         returnList = this.requestBarometricPressureData(theRequest);
+         if(upcase.contains("MAX")){
+            returnList =
+                    this.requestMaxBarometricPressureData(theRequest);
+         }
+         else if(upcase.contains("MIN")){
+            returnList =
+                    this.requestMinBarometricPressureData(theRequest);
+         }
+         else{
+            returnList=this.requestBarometricPressureData(theRequest);
+         }
       }
       else if(theRequest.toUpperCase().contains("DEWPOINTDATA")){
-         returnList = this.requestDewpointData(theRequest);
+         if(upcase.contains("MAX")){
+            returnList = this.requestMaxDewpointData(theRequest);
+         }
+         else if(upcase.contains("MIN")){
+            returnList = this.requestMinDewpointData(theRequest);
+         }
+         else{
+            returnList = this.requestDewpointData(theRequest);
+         }
       }
       else if(theRequest.toUpperCase().contains("HEATINDEXDATA")){
-         returnList = this.requestHeatIndexData(theRequest);
+         if(upcase.contains("MIN")){
+            returnList = this.requestMinHeatIndexData(theRequest);
+         }
+         else if(upcase.contains("MAX")){
+            returnList = this.requestMaxHeatIndexData(theRequest);
+         }
+         else{
+            returnList = this.requestHeatIndexData(theRequest);
+         }
       }
       else if(upcase.contains("TEMPERATUREDATA")){
          if(upcase.contains("MIN")){
@@ -1144,6 +1178,678 @@ public class Database{
          return returnList;
       }
    }
+   
+   /**
+   **/
+   private List<String> requestMaxBarometricPressureData
+   (
+      String command
+   ){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MAX(mmHg)")){
+               double minp = resultSet.getDouble("MAX(mmHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            else if(command.contains("max(mmHg)")){
+               double minp = resultSet.getDouble("MAX(mmHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("MAX(inHg)")){
+               double minp = resultSet.getDouble("MAX(inHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            else if(command.contains("max(inHg)")){
+               double minp = resultSet.getDouble("MAX(inHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("MAX(mB)")){
+               double minp = resultSet.getDouble("MAX(mB)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("max(mB)")){
+               double dpk = resultSet.getDouble("MAX(mB)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      } 
+   }
+   
+   /**
+   **/
+   private List<String> requestMinBarometricPressureData
+   (
+      String command
+   ){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MIN(mmHg)")){
+               double minp = resultSet.getDouble("MIN(mmHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            else if(command.contains("min(mmHg)")){
+               double minp = resultSet.getDouble("min(mmHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("MIN(inHg)")){
+               double minp = resultSet.getDouble("MIN(inHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            else if(command.contains("min(inHg)")){
+               double minp = resultSet.getDouble("min(inHg)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("MIN(mB)")){
+               double minp = resultSet.getDouble("MIN(mB)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + minp;
+            }
+            if(command.contains("min(mB)")){
+               double dpk = resultSet.getDouble("min(mB)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }      
+   }
+   
+   /**
+   **/
+   private List<String> requestMaxDewpointData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MAX(dewptc)")){
+               double dpc = resultSet.getDouble("MAX(dewptc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpc;
+            }
+            else if(command.contains("max(dewptc)")){
+               double dpc = resultSet.getDouble("MAX(dewptc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpc;
+            }
+            if(command.contains("MAX(dewptf)")){
+               double dpf = resultSet.getDouble("MAX(dewptf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpf;
+            }
+            else if(command.contains("max(dewptf)")){
+               double dpf = resultSet.getDouble("MAX(dewptf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpf;
+            }
+            if(command.contains("MAX(dewptk)")){
+               double dpk = resultSet.getDouble("MAX(dewptk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            if(command.contains("max(dewptk)")){
+               double dpk = resultSet.getDouble("MAX(dewptk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      } 
+   }
+   
+   /**
+   **/
+   private List<String> requestMinDewpointData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MIN(dewptc)")){
+               double dpc = resultSet.getDouble("MIN(dewptc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpc;
+            }
+            else if(command.contains("min(dewptc)")){
+               double dpc = resultSet.getDouble("min(dewptc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpc;
+            }
+            if(command.contains("MIN(dewptf)")){
+               double dpf = resultSet.getDouble("MIN(dewptf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpf;
+            }
+            else if(command.contains("min(dewptf)")){
+               double dpf = resultSet.getDouble("min(dewptf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpf;
+            }
+            if(command.contains("MIN(dewptk)")){
+               double dpk = resultSet.getDouble("MIN(dewptk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            if(command.contains("min(dewptk)")){
+               double dpk = resultSet.getDouble("min(dewptk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + dpk;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }      
+   }
+ 
+   /**
+   **/
+   private List<String> requestMaxHeatIndexData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         System.out.println("Database: " + command);
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MAX(heatindexc)")){
+               double hic = resultSet.getDouble("MAX(heatindexc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hic;
+            }
+            else if(command.contains("max(heatindexc)")){
+               double hic = resultSet.getDouble("MAX(heatindexc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hic;
+            }
+            if(command.contains("MAX(heatindexf)")){
+               double hif = resultSet.getDouble("MAX(heatindexf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hif;
+            }
+            else if(command.contains("max(heatindexf)")){
+               double hif = resultSet.getDouble("MAX(heatindexf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hif;
+            }
+            if(command.contains("MAX(heatindexk)")){
+               double hik = resultSet.getDouble("MAX(heatindexk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hik;
+            }
+            if(command.contains("max(heatindexk)")){
+               double hik = resultSet.getDouble("MAX(heatindexk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hik;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+   
+   /**
+   **/
+   private List<String> requestMinHeatIndexData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null;
+      try{
+         System.out.println("Database: " + command);
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MIN(heatindexc)")){
+               double hic = resultSet.getDouble("MIN(heatindexc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hic;
+            }
+            else if(command.contains("min(heatindexc)")){
+               double hic = resultSet.getDouble("min(heatindexc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hic;
+            }
+            if(command.contains("MIN(heatindexf)")){
+               double hif = resultSet.getDouble("MIN(heatindexf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hif;
+            }
+            else if(command.contains("min(heatindexf)")){
+               double hif = resultSet.getDouble("min(heatindexf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hif;
+            }
+            if(command.contains("MIN(heatindexk)")){
+               double hik = resultSet.getDouble("MIN(heatindexk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hik;
+            }
+            if(command.contains("min(heatindexk)")){
+               double hik = resultSet.getDouble("min(heatindexk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + hik;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }      
+   }
+   
+   /**
+   **/
+   private List<String> requestMaxHumidityData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null; 
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MAX(humidity)")){
+               double maxHumidity =
+                                resultSet.getDouble("MAX(humidity)");
+               indexData += ", " + maxHumidity;
+            }
+            else if(command.contains("max(humidity)")){
+               double maxHumidity =
+                                resultSet.getDouble("MAX(humidity)");
+               indexData += ", " + maxHumidity;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
+   
+   /**
+   **/
+   private List<String> requestMinHumidityData(String command){
+      final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+      final String DB_URL="jdbc:mysql://localhost:3306/weatherdata";
+      final String USER = "root";
+      final String PASS = "password";
+      Connection conn   = null;
+      Statement  stmt   = null;
+      List<String> returnList = null;
+      ResultSet    resultSet  = null; 
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MIN(humidity)")){
+               double minHumidity =
+                                resultSet.getDouble("MIN(humidity)");
+               indexData += ", " + minHumidity;
+            }
+            else if(command.contains("min(humidity)")){
+               double minHumidity =
+                                resultSet.getDouble("MIN(humidity)");
+               indexData += ", " + minHumidity;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
+   }
 
    /**
    **/
@@ -1155,8 +1861,85 @@ public class Database{
       Connection conn   = null;
       Statement  stmt   = null;
       List<String> returnList = null;
-
-      return returnList;
+      ResultSet    resultSet  = null;
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         returnList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexData = new String();
+            String month = resultSet.getString("month");
+            indexData += month;
+            String day = resultSet.getString("day");
+            indexData += ", " + day;
+            String year = resultSet.getString("year");
+            indexData += ", " + year;
+            if(command.contains("MAX(tempc)")){
+               double tempc = resultSet.getDouble("MAX(tempc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempc;
+            }
+            else if(command.contains("max(tempc)")){
+               double tempc = resultSet.getDouble("max(tempc)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempc;
+            }
+            if(command.contains("MAX(tempf)")){
+               double tempf = resultSet.getDouble("MAX(tempf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempf;
+            }
+            else if(command.contains("max(tempf)")){
+               double tempf = resultSet.getDouble("max(tempf)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempf;
+            }
+            if(command.contains("MAX(tempk)")){
+               double tempk = resultSet.getDouble("MAX(tempk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempk;
+            }
+            if(command.contains("max(tempk)")){
+               double tempk = resultSet.getDouble("max(tempk)");
+               if(indexData.length() > 0){
+                  indexData += ", ";
+               }
+               indexData += "" + tempk;
+            }
+            returnList.add(indexData);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe2){}
+         return returnList;
+      }
    }
 
    /**
@@ -1171,7 +1954,6 @@ public class Database{
       List<String> returnList = null;
       ResultSet    resultSet  = null;
       try{
-         System.out.println("Database: " + command);
          Class.forName(JDBC_DRIVER);
          conn = DriverManager.getConnection(DB_URL, USER, PASS);
          stmt = conn.createStatement();
