@@ -1,5 +1,5 @@
 /********************************************************************
-//******************************************************************
+//*******************************************************************
 //Weather Client Controller Class
 //Copyright (C) 2017 by Lou Rosas
 //This file is part of onewireweatherstation application.
@@ -59,10 +59,6 @@ ActionListener, KeyListener, ItemListener{
          int mask = java.awt.event.InputEvent.BUTTON1_MASK;
          if(e.getModifiers() == mask){
             //Needing to do this for the sake of investigation
-            System.out.println(o);
-            System.out.println();
-            System.out.println(e);
-            System.out.println(((JComboBox)o).getSelectedItem());
             this.handleJComboBox((JComboBox)o);
          }
       }

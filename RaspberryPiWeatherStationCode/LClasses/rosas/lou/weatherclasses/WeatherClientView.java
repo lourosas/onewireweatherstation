@@ -411,6 +411,16 @@ WeatherClientObserver, IOObserver{
             Object sDp   = this.dewPointComboBox.getSelectedItem();
             Object sHi   = this.heatIndexComboBox.getSelectedItem();
             int total    = this.tempComboBox.getItemCount();
+            this.tempComboBox.removeActionListener(
+                                                this.actionListener);
+            this.humidityComboBox.removeActionListener(
+                                                this.actionListener);
+            this.pressureComboBox.removeActionListener(
+                                                this.actionListener);
+            this.dewPointComboBox.removeActionListener(
+                                                this.actionListener);
+            this.heatIndexComboBox.removeActionListener(
+                                                this.actionListener);
             while(it.hasNext()){
                int i         = 0;
                boolean found = false;
@@ -432,8 +442,36 @@ WeatherClientObserver, IOObserver{
                   //uncommon date is--eventually, want to insert into
                   //the Combo Box(es)
                   System.out.println(this.missionData.indexOf(date));
+                  int index = this.missionData.indexOf(date);
+                  if(index > total){
+                     index = total;
+                     ++total;
+                  }
+                  this.tempComboBox.insertItemAt(date.trim(), index);
+                  this.humidityComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.pressureComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.dewPointComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.heatIndexComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.tempComboBox.setSelectedItem(sTemp);
+                  this.humidityComboBox.setSelectedItem(sHumi);
+                  this.pressureComboBox.setSelectedItem(sPres);
+                  this.dewPointComboBox.setSelectedItem(sDp);
+                  this.heatIndexComboBox.setSelectedItem(sHi);
                }
             }
+            this.tempComboBox.addActionListener(this.actionListener);
+            this.humidityComboBox.addActionListener(
+                                                this.actionListener);
+            this.pressureComboBox.addActionListener(
+                                                this.actionListener);
+            this.dewPointComboBox.addActionListener(
+                                                this.actionListener);
+            this.heatIndexComboBox.addActionListener(
+                                                this.actionListener);
          }
       }
       catch(NullPointerException npe){

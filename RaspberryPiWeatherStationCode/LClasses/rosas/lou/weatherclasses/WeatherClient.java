@@ -52,7 +52,7 @@ public class WeatherClient{
       currentPressureData    = null;
       observers              = null;
       ioobservers            = null;
-      addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)115};
+      addr      = new byte[]{(byte)192,(byte)168,(byte)1,(byte)131};
       month                  = 0;
       day                    = 0;
       year                   = 0;
@@ -115,7 +115,7 @@ public class WeatherClient{
    /**
    **/
    public void requestDewpointData(ViewState state){
-      //this.updateMissionData();
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -191,7 +191,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHeatIndexData(ViewState state){
-      //this.updateMissionData();
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -273,7 +273,7 @@ public class WeatherClient{
    /**
    **/
    public void requestHumidityData(ViewState state){
-      //this.updateMissionData();
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
@@ -398,7 +398,7 @@ public class WeatherClient{
    /**
    **/
    public void requestPressureData(ViewState state){
-      //this.updateMissionData();
+      this.updateMissionData();
       String command = "SELECT ";
       String where   = new String();
       if(!state.month.isEmpty()){
