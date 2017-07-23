@@ -85,7 +85,142 @@ ExtremeObserver{
       finally{
          return event;
       }
-   }   
+   }
+   
+   //
+   //Grab the current max dewpoint
+   //
+   public WeatherEvent getMaxDewpoint(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.dewPointMax.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }
+   }
+   
+   //
+   //Grab the current min dewpoint
+   //
+   public WeatherEvent getMinDewpoint(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.dewPointMin.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }   
+   }
+   
+   //
+   //Grab the Heat Index
+   //
+   public WeatherEvent getHeatIndex(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase.equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase.equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.heatIndex.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }
+   }
+   
+   //
+   //Grab the Max Heat Index Value
+   //
+   public WeatherEvent getHeatIndexMax(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase.equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase.equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.heatIndexMax.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }      
+   }
+   
+   //
+   //Grab Min Heat Index Value
+   //
+   public WeatherEvent getHeatIndexMin(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase.equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase.equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.heatIndexMin.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }       
+   }
    
    //
    //Grab the current humidity data
@@ -94,6 +229,34 @@ ExtremeObserver{
       WeatherEvent event = null;
       try{
          event = this.humidity.get(METRIC);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }
+   }
+   
+   //
+   //Grab the max humidity
+   //
+   public WeatherEvent getMaxHumidity(){
+      WeatherEvent event = null;
+      try{
+         event = this.humidityMax.get(METRIC);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }
+   }
+   
+   //
+   //Grab the min humidiy
+   //
+   public WeatherEvent getMinHumidity(){
+      WeatherEvent event = null;
+      try{
+         event = this.humidityMin.get(METRIC);
       }
       catch(NullPointerException npe){}
       finally{
@@ -129,6 +292,60 @@ ExtremeObserver{
    }
    
    //
+   //Grab the Max Pressure
+   //
+   public WeatherEvent getMaxPressure(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.pressureMax.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }
+   }
+   
+   //
+   //Grab the Min Pressure
+   //
+   public WeatherEvent getMinPressure(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.pressureMin.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }      
+   }
+   
+   //
    //Grab the Current Temperature data
    //
    public WeatherEvent getTemperature(String type){
@@ -153,6 +370,60 @@ ExtremeObserver{
       finally{
          return event;
       }
+   }
+   
+   //
+   //Grab the Current Max Temperature
+   //
+   public WeatherEvent getTemperatureMax(String type){
+      WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.temperatureMax.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }      
+   }
+   
+   //
+   //Grab the Current Min Temperature
+   //
+   public WeatherEvent getTemperatureMin(String type){
+       WeatherEvent event = null;
+      try{
+         int units = -1;
+         if(type.toLowerCase().equals("english")){
+            units = ENGLISH;
+         }
+         else if(type.toLowerCase().equals("metric")){
+            units = METRIC;
+         }
+         else if(type.toLowerCase().equals("absolute")){
+            units = ABSOLUTE;
+         }
+         else{
+            throw new NullPointerException();
+         }
+         event = this.temperatureMin.get(units);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return event;
+      }      
    }
    
    //
@@ -186,13 +457,11 @@ ExtremeObserver{
    //Implementation of the Extreme Weather Interface
    //
    public void updateExtremes(WeatherStorage data){
-      /*
       this.updateTemperatureExtremes(data);
       this.updateHumidityExtremes(data);
       this.updatePressureExtremes(data);
       this.updateDewPointExtremes(data);
       this.updateHeatIndexExtremes(data);
-      */
    }
    
    //
@@ -223,7 +492,7 @@ ExtremeObserver{
    public void updateHumidity(WeatherEvent event){}
 
    //
-   //Implementatoin of the HumidityObserver Interface
+   //Implementation of the HumidityObserver Interface
    //
    public void updateHumidity(WeatherStorage data){
       this.humidity = new LinkedList<WeatherEvent>();
@@ -270,15 +539,6 @@ ExtremeObserver{
    //Implementation of the TemperatureObserver Interface
    //
    public void updateTemperature(WeatherStorage data){
-     /*
-     List<WeatherEvent> event = data.getLatestData("temperature");
-      try{
-         this.temperature = event.get(ENGLISH);        
-      }
-      catch(NullPointerException npe){
-         this.temperature = null;
-      }
-      */
       this.temperature = new LinkedList<WeatherEvent>();
       List<WeatherEvent> event = data.getLatestData("temperature");
       try{
@@ -290,5 +550,45 @@ ExtremeObserver{
       catch(NullPointerException npe){
          this.temperature = null;
       }
-   }   
+   }
+   
+   //
+   //
+   //
+   private void updateDewPointExtremes(WeatherStorage data){
+      this.dewPointMax = data.getMax("dewpoint");
+      this.dewPointMin = data.getMin("dewpoint");
+   }
+   
+   //
+   //
+   //
+   private void updateHeatIndexExtremes(WeatherStorage data){
+      this.heatIndexMax = data.getMax("heatindex");
+      this.heatIndexMin = data.getMin("heatindex");
+   }
+   
+   //
+   //
+   //
+   private void updateHumidityExtremes(WeatherStorage data){
+      this.humidityMax = data.getMax("humidity");
+      this.humidityMin = data.getMin("humidity");
+   }
+   
+   //
+   //
+   //
+   private void updatePressureExtremes(WeatherStorage data){
+      this.pressureMax = data.getMax("pressure");
+      this.pressureMin = data.getMin("pressure");
+   }
+   
+   //
+   //
+   //
+   private void updateTemperatureExtremes(WeatherStorage data){
+      this.temperatureMax = data.getMax("temperature");
+      this.temperatureMin = data.getMin("temperature");
+   }
 }
