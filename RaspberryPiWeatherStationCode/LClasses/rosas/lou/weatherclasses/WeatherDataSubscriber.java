@@ -23,7 +23,7 @@ ExtremeObserver{
    private final int ABSOLUTE = 2;
    private List<WeatherEvent> temperature;
    private List<WeatherEvent> temperatureMax;
-   private List<WeatherEventL temperatureMin;
+   private List<WeatherEvent> temperatureMin;
    private List<WeatherEvent> humidity;
    private List<WeatherEvent> humidityMax;
    private List<WeatherEvent> humidityMin;
@@ -151,10 +151,10 @@ ExtremeObserver{
          if(type.toLowerCase().equals("english")){
             units = ENGLISH;
          }
-         else if(type.toLowerCase.equals("metric")){
+         else if(type.toLowerCase().equals("metric")){
             units = METRIC;
          }
-         else if(type.toLowerCase.equals("absolute")){
+         else if(type.toLowerCase().equals("absolute")){
             units = ABSOLUTE;
          }
          else{
@@ -178,10 +178,10 @@ ExtremeObserver{
          if(type.toLowerCase().equals("english")){
             units = ENGLISH;
          }
-         else if(type.toLowerCase.equals("metric")){
+         else if(type.toLowerCase().equals("metric")){
             units = METRIC;
          }
-         else if(type.toLowerCase.equals("absolute")){
+         else if(type.toLowerCase().equals("absolute")){
             units = ABSOLUTE;
          }
          else{
@@ -205,10 +205,10 @@ ExtremeObserver{
          if(type.toLowerCase().equals("english")){
             units = ENGLISH;
          }
-         else if(type.toLowerCase.equals("metric")){
+         else if(type.toLowerCase().equals("metric")){
             units = METRIC;
          }
-         else if(type.toLowerCase.equals("absolute")){
+         else if(type.toLowerCase().equals("absolute")){
             units = ABSOLUTE;
          }
          else{
@@ -463,6 +463,11 @@ ExtremeObserver{
       this.updateDewPointExtremes(data);
       this.updateHeatIndexExtremes(data);
    }
+   
+   //
+   //Implementation of the CalculatedObserver Interface
+   //
+   public void updateHeatIndex(WeatherEvent event){}
    
    //
    //Implementation of the CalculatedObserver Interface
