@@ -20,6 +20,8 @@ implements HttpHandler{
                               "November", "December" };
    private List<Double> humidityData;
    private List<String> humidityTimes;
+   private List<Double> pressureData;
+   private List<String> pressureTimes;
    private List<Double> temperatureData;
    private List<String> temperatureTimes;
    private String []    dates;
@@ -51,6 +53,7 @@ implements HttpHandler{
          response.append(this.setUpHeader());
          response.append(this.setUpTemperature());
          response.append(this.setUpHumidity());
+         response.append(this.setUpPressure());
          response.append("\n</script>\n</head>\n");
          response.append(this.setUpBody());
          String send = response.toString();
@@ -130,6 +133,9 @@ implements HttpHandler{
       }
    }
    
+   //
+   //
+   //
    private void setDates(){
       try{
          this.dates = this.getDate().split(" ");
@@ -202,14 +208,15 @@ implements HttpHandler{
       }
       */
       body.append("\n<body>\n");
-      body.append("\n<table class=\"rows\">\n<tr>\n");
-      body.append("<td><div id = \"temp_div\" style = ");
-      body.append("\"width: 50%; height: 220px;\"></div>\n");
-      body.append("</td>\n</tr>\n<tr>");
-      body.append("<td><div id = \"humidity_div\" style = ");
-      body.append("\"width: 50%; height: 220px;\"></div>\n");
-      body.append("</td>\n</tr>");
-      body.append("</tr></table>");
+      body.append("<div id = \"humidity_div\" style = ");
+      body.append("\"width: 80%; height: 220px;\"></div>\n");
+      body.append("<br /><br />\n\n");
+      body.append("<div id = \"temp_div\" style = ");
+      body.append("\"width: 80%; height: 220px;\"></div>\n");
+      body.append("<br /><br />\n\n");
+      body.append("<div id = \"pressure_div\" style = ");
+      body.append("\"width: 80%; height: 220px;\"></div>\n");
+      body.append("<br /><br />\n\n");
       body.append("\n</body>\n</html>\n");
       return body.toString();
    }
@@ -222,23 +229,47 @@ implements HttpHandler{
       String month        = this.discernMonth(this.dates[1]);
       String display      = new String();
       this.setHumidityData(month, dates[2], dates[5]);
-      Iterator<String> times = this.humidityTimes.iterator();
+      Iterator<String> times    = this.humidityTimes.iterator();
       Iterator<Double> humidity = this.humidityData.iterator();
       while(humidity.hasNext()){
          display = display.concat("[" + times.next() + ",");
          display = display.concat(humidity.next() +"], ");         
       }
-      buffer.append("\nfunction drawHumidity() {\n");
-      buffer.append("var humiddata = new google.visualization.DataTable();");
-      buffer.append("\nhumiddata.addColumns('timeofday', 'X');");
-      buffer.append("\nhumiddata.addColumns('number','Humidity');");
-      buffer.append("\n\nhumiddata.addRows([\n"+display+"\n]);\n\n");
-      buffer.append("var options = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: '% Humidity'\n}\n");
-      //buffer.append("series:{0: {color: '#ff0000'}}\n};\n\n");
-      buffer.append("\n};\n\n");
-      buffer.append("var chart = new google.visualization.LineChart(document.getElementById('humidity_div'));");
-      buffer.append("\n\nchart.draw(humiddata, options);\n}");
+      buffer.append("\n\nfunction drawHumidity() {\n");
+      buffer.append("var humdata = new google.visualization.DataTable();");
+      buffer.append("\nhumdata.addColumn('timeofday', 'X');");
+      buffer.append("\nhumdata.addColumn('number','Humidity');\n\n");
+      buffer.append("humdata.addRows([\n"+display+"\n]);\n\n");
+      buffer.append("var humidoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("vAxis:{\ntitle: 'Humidity'\n}\n};\n\n");
+      buffer.append("var humchart = new google.visualization.LineChart(document.getElementById('humidity_div'));");
+      buffer.append("\n\nhumchart.draw(humdata, humidoptions);\n}");
+      return buffer.toString();
+   }
+   
+   //
+   //
+   //
+   private String setUpPressure(){
+      StringBuffer buffer = new StringBuffer();
+      String month        = this.discernMonth(this.dates[1]);
+      String display      = new String();
+      this.setPressureData(month, dates[2], dates[5]);
+      Iterator<String> times    = this.pressureTimes.iterator();
+      Iterator<Double> pressure = this.pressureData.iterator();
+      while(pressure.hasNext()){
+         display = display.concat("[" + times.next() + ",");
+         display = display.concat(pressure.next() +"], ");
+      }
+      buffer.append("\n\nfunction drawPressure() {\n");
+      buffer.append("var humdata = new google.visualization.DataTable();");
+      buffer.append("\nhumdata.addColumn('timeofday', 'X');");
+      buffer.append("\nhumdata.addColumn('number','Pressure');\n\n");
+      buffer.append("humdata.addRows([\n"+display+"\n]);\n\n");
+      buffer.append("var humidoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("vAxis:{\ntitle: 'Pressure'\n}\n};\n\n");
+      buffer.append("var humchart = new google.visualization.LineChart(document.getElementById('pressure_div'));");
+      buffer.append("\n\nhumchart.draw(humdata, humidoptions);\n}");  
       return buffer.toString();
    }
 
@@ -261,10 +292,10 @@ implements HttpHandler{
       buffer.append("\ntempdata.addColumn('timeofday', 'X');");
       buffer.append("\ntempdata.addColumn('number','Temp');\n\n");
       buffer.append("tempdata.addRows([\n"+display+"\n]);\n\n");
-      buffer.append("var options = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("var tempoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
       buffer.append("vAxis:{\ntitle: 'Temperature'\n}\n};\n\n");
-      buffer.append("var chart = new google.visualization.LineChart(document.getElementById('temp_div'));");
-      buffer.append("\n\nchart.draw(tempdata, options);\n}");
+      buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('temp_div'));");
+      buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");
       return buffer.toString();
    }
    
@@ -290,7 +321,6 @@ implements HttpHandler{
          this.humidityData  = new LinkedList<Double>();
          this.humidityTimes = new LinkedList<String>();
          humidData       = ws.requestData(command);
-         System.out.println(humidData);
          Iterator<String> it = humidData.iterator();
          while(it.hasNext()){
             String values = it.next();
@@ -301,6 +331,45 @@ implements HttpHandler{
             String time = new String("["+hms[0]+","+hms[1]+",");
             time = time.concat(hms[2]+"]");
             this.humidityTimes.add(time);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+   
+   //
+   //
+   //
+   private void setPressureData
+   (
+      String month,
+      String day,
+      String year
+   ){
+      Double pressure           = Double.NEGATIVE_INFINITY;
+      Integer[] hms             = null;
+      List<String> pressureData = null;
+      
+      WeatherStorage ws = WeatherStorage.getInstance();
+      String command=new String("SELECT * from");
+      command=command.concat(" pressuredata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      try{
+         this.pressureData  = new LinkedList<Double>();
+         this.pressureTimes = new LinkedList<String>();
+         pressureData        = ws.requestData(command);
+         System.out.println(pressureData);
+         Iterator<String> it = pressureData.iterator();
+         while(it.hasNext()){
+            String values = it.next();
+            hms = this.separateOutTime(values);
+            pressure = this.getValue(values, Units.ENGLISH);
+            this.pressureData.add(pressure);
+            String time = new String("["+hms[0]+","+hms[1]+",");
+            time = time.concat(hms[2]+"]");
+            this.pressureTimes.add(time);
          }
       }
       catch(NullPointerException npe){
@@ -359,7 +428,8 @@ implements HttpHandler{
       header.append("google.charts.load('current',{packages:['corechart','line']});");
       header.append("\n");
       header.append("google.charts.setOnLoadCallback(drawTemperature);");
-      header.append("google.charts.setOnLoadCallback(drawHumidity);");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawHumidity);");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawPressure);");
       return header.toString();
    }
 }
