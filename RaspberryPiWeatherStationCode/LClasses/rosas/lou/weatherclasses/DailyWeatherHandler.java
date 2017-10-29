@@ -65,6 +65,7 @@ implements HttpHandler{
          response.append(this.setUpHumidity());
          response.append(this.setUpPressure());
          response.append(this.setUpDewpoint());
+         response.append(this.setUpHeatIndex());
          response.append("\n</script>\n</head>\n");
          response.append(this.setUpBody());
          String send = response.toString();
@@ -231,6 +232,9 @@ implements HttpHandler{
       body.append("<div id = \"dp_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
+      body.append("<div id = \"hi_div\" style = ");
+      body.append("\"width: 80%; height: 220px;\"></div>\n");
+      body.append("<br /><br />\n\n");
       body.append("\n</body>\n</html>\n");
       return body.toString();
    }
@@ -268,13 +272,25 @@ implements HttpHandler{
       StringBuffer buffer = new StringBuffer();
       String month        = this.discernMonth(this.dates[1]);
       String display      = new String();
-      this.setHumidityData(month, dates[2], dates[5]);
+      this.setHeatIndexData(month, dates[2], dates[5]);
       Iterator<String> times     = this.heatIndexTimes.iterator();
       Iterator<Double> heatIndex = this.heatIndexData.iterator(); 
       while(heatIndex.hasNext()){
-         display = display.concat("[" + times.next() + ",");
-         display = display.concat(heatIndex.next() +"], ");         
-      }      
+         Double hi = heatIndex.next();
+         if(hi > Thermometer.DEFAULTTEMP){
+            display = display.concat("[" + times.next() + ",");
+            display = display.concat(hi +"], ");
+         }
+      }
+      buffer.append("\nfunction drawHeatIndex() {\n");
+      buffer.append("var tempdata = new google.visualization.DataTable();");
+      buffer.append("\ntempdata.addColumn('timeofday', 'X');");
+      buffer.append("\ntempdata.addColumn('number','Heat Index');\n\n");
+      buffer.append("tempdata.addRows([\n"+display+"\n]);\n\n");
+      buffer.append("var tempoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("vAxis:{\ntitle: 'Heat Index'\n}\n};\n\n");
+      buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('hi_div'));");
+      buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");      
       return buffer.toString();
    }
    
@@ -421,7 +437,6 @@ implements HttpHandler{
          while(it.hasNext()){
             String values = it.next();
             hms = this.separateOutTime(values);
-            //The Relative Humidity is stored in the METRIC location
             heatIndex = this.getValue(values, Units.ENGLISH);
             this.heatIndexData.add(heatIndex);
             String time = new String("["+hms[0]+","+hms[1]+",");
@@ -565,6 +580,7 @@ implements HttpHandler{
       header.append("\ngoogle.charts.setOnLoadCallback(drawHumidity);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawPressure);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawDewpoint);");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawHeatIndex);");
       return header.toString();
    }
 }
