@@ -283,14 +283,14 @@ implements HttpHandler{
          }
       }
       buffer.append("\nfunction drawHeatIndex() {\n");
-      buffer.append("var tempdata = new google.visualization.DataTable();");
-      buffer.append("\ntempdata.addColumn('timeofday', 'X');");
-      buffer.append("\ntempdata.addColumn('number','Heat Index');\n\n");
-      buffer.append("tempdata.addRows([\n"+display+"\n]);\n\n");
-      buffer.append("var tempoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("var hidata = new google.visualization.DataTable();");
+      buffer.append("\nhidata.addColumn('timeofday', 'X');");
+      buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
+      buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
+      buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
       buffer.append("vAxis:{\ntitle: 'Heat Index'\n}\n};\n\n");
-      buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('hi_div'));");
-      buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");      
+      buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
+      buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");      
       return buffer.toString();
    }
    
