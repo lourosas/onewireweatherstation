@@ -259,7 +259,7 @@ implements HttpHandler{
       buffer.append("\ndpdata.addColumn('number','Dewpoint');\n\n");
       buffer.append("dpdata.addRows([\n"+display+"\n]);\n\n");
       buffer.append("var dpoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: 'Dewpoint'\n}\n};\n\n");
+      buffer.append("vAxis:{\ntitle: 'Dewpoint'\n},\ncolors:['green']\n};\n\n");
       buffer.append("var dpchart = new google.visualization.LineChart(document.getElementById('dp_div'));");
       buffer.append("\n\ndpchart.draw(dpdata, dpoptions);\n}");
       return buffer.toString();
@@ -289,7 +289,7 @@ implements HttpHandler{
       buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
       buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
       buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: 'Heat Index'\n}\n};\n\n");
+      buffer.append("vAxis:{\ntitle: 'Heat Index'\n},\ncolors:['black']\n};\n\n");
       buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
       buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");      
       return buffer.toString();
@@ -315,7 +315,7 @@ implements HttpHandler{
       buffer.append("\nhumdata.addColumn('number','Humidity');\n\n");
       buffer.append("humdata.addRows([\n"+display+"\n]);\n\n");
       buffer.append("var humidoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: 'Humidity'\n}\n};\n\n");
+      buffer.append("vAxis:{\ntitle: 'Humidity'\n},\ncolors:['blue']\n};\n\n");
       buffer.append("var humchart = new google.visualization.LineChart(document.getElementById('humidity_div'));");
       buffer.append("\n\nhumchart.draw(humdata, humidoptions);\n}");
       return buffer.toString();
@@ -367,7 +367,7 @@ implements HttpHandler{
       buffer.append("\ntempdata.addColumn('number','Temp');\n\n");
       buffer.append("tempdata.addRows([\n"+display+"\n]);\n\n");
       buffer.append("var tempoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: 'Temperature'\n}\n};\n\n");
+      buffer.append("vAxis:{\ntitle: 'Temperature'\n},\ncolors:['red']\n};\n\n");
       buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('temp_div'));");
       buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");
       return buffer.toString();
