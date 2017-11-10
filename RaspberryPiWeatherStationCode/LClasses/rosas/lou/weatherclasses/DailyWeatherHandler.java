@@ -276,9 +276,10 @@ implements HttpHandler{
       Iterator<String> times     = this.heatIndexTimes.iterator();
       Iterator<Double> heatIndex = this.heatIndexData.iterator(); 
       while(heatIndex.hasNext()){
-         Double hi = heatIndex.next();
+         Double hi   = heatIndex.next();
+         String time = times.next();
          if(hi > Thermometer.DEFAULTTEMP){
-            display = display.concat("[" + times.next() + ",");
+            display = display.concat("[" + time + ",");
             display = display.concat(hi +"], ");
          }
       }
