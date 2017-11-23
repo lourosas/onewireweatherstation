@@ -44,7 +44,6 @@ public class TestiButton implements TimeListener{
    }
    
    public void findSensors(Stack<String> s){
-      WeatherNetwork wn = new WeatherNetwork();
       WeatherStation ws = new WeatherStation();
       Enumeration<String> e = s.elements();
       while(e.hasMoreElements()){
@@ -224,8 +223,8 @@ public class TestiButton implements TimeListener{
    //OR the Barometer (since they use the same type sensor).
    private void setUpHydrometer(String name, String address){
       System.out.println(name + ", " + address);
-      this.hygrometer = new OneWireContainer26(this.dspa, address);
-      this.owctwosix  = new OneWireContainer26(this.dspa, address);
+      //this.hygrometer = new OneWireContainer26(this.dspa, address);
+      //this.owctwosix  = new OneWireContainer26(this.dspa, address);
    }
 
    private void setUpSensors(String name, String address){
