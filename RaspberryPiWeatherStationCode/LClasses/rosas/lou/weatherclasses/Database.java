@@ -30,7 +30,67 @@ public class Database{
 
    /**
    **/
+   public List<String> dewpointFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> returnList = null;
+      return returnList;
+   }
+
+   /**
+   **/
+   public List<String> heatIndexFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> returnList = null;
+      return returnList;
+   }
+
+   /**
+   **/
+   public List<String> humdityFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> returnList = null;
+      return returnList;
+   }
+
+   /**
+   **/
+   public List<String> pressureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> returnList = null;
+      return returnList;
+   }
+
+   /**
+   **/
    public List<String> requestData(String request){
+      List<String> returnList = null;
+      return returnList;
+   }
+
+   /**
+   **/
+   public List<String> temperatureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
       List<String> returnList = null;
       return returnList;
    }

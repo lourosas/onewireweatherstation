@@ -67,6 +67,66 @@ public class MySQLWeatherDatabase extends Database{
    }
 
    /*
+   */
+   public List<String> dewpointFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      String command = new String("SELECT * from");
+      command=command.concat(" dewpointdata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      return this.dewpoint(command);
+   }
+
+   /*
+   */
+   public List<String> heatIndexFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      String command = new String("SELECT * from");
+      command=command.concat(" heatindexdata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      return this.heatIndex(command);
+   }
+
+   /*
+   */
+   public List<String> humidityFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      String command=new String("SELECT * from");
+      command=command.concat(" humiditydata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      return this.humidity(command);
+   }
+
+   /*
+   */
+   public List<String> pressureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      String command = new String("SELECT * from");
+      command=command.concat(" pressuredata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      return this.barometricPressure(command);
+   }
+
+   /*
    Override the same method from the Database class
    */
    public List<String> requestData(String request){
@@ -185,6 +245,21 @@ public class MySQLWeatherDatabase extends Database{
          }
          catch(SQLException sq){}
       }
+   }
+
+   /*
+   */
+   public List<String> temperatureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      String command = new String("SELECT * from");
+      command=command.concat(" temperaturedata where month = \'");
+      command=command.concat(month + "\' AND day = \'" + day +"\'");
+      command=command.concat(" AND year = \'" + year + "\'");
+      return this.temperature(command);
    }
 
    //////////////////////////Protected Methods///////////////////////

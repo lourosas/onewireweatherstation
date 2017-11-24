@@ -69,6 +69,29 @@ public class WeatherStorage{
       return instance;
    }
 
+   /*
+   */
+   public List<String> dewpointFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> dpData = null;
+      try{
+         //Here is the tricky part:  somehow, need to figure out
+         //WHICH Database Instance to access.  There are (going to
+         //be) several databases to access.  It all depends the
+         //Database instantiated.
+         Database database = MySQLWeatherDatabase.getInstance();
+         dpData = database.dewpointFromDatabase(month, day, year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return dpData;
+      }
+   }
+
    /**
    */
    public List<WeatherEvent> getLatestData(String type){
@@ -155,7 +178,84 @@ public class WeatherStorage{
       }
       return minList;
    }
-   
+
+   /*
+   */
+   public List<String> heatIndexFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> hiData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         hiData = database.heatIndexFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return hiData;
+      |
+   }
+
+   /*
+   */
+   public List<String> humidityFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> hData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         hData = database.humidityFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return hData;
+      }
+   }
+
+   /*
+   */
+   public List<String> pressureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> pData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         pData = database.pressureFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return pData;
+      }
+   }
+
+   /*
+   */
+   public List<String> temperatureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> tData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         tData = database.temperatureFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return tData;
+      }
+   }
+
+   /////////////////////////Private Methods//////////////////////////
    /**
    **/
    private List<WeatherEvent> getMaxDewpointFromDatabase(){
