@@ -123,35 +123,6 @@ public class WeatherStorage{
       else if(type.toLowerCase().equals("pressure")){
          maxList = this.getMaxPressureFromDatabase();
       }
-      /*
-      while(e.hasMoreElements()){
-         List<WeatherEvent>     list     = e.nextElement();
-         Iterator<WeatherEvent> iterator = list.iterator();
-         while(iterator.hasNext()){
-            WeatherEvent event = iterator.next();
-            try{
-               if(!(type.toLowerCase().equals("humidity"))){
-                  if(event.getUnits() == Units.METRIC){
-                     if(event.getValue() >= maxEvent.getValue()){
-                        maxList  = list;
-                        maxEvent = event;
-                     }
-                  }
-               }
-               else{
-                  if(event.getValue() >= maxEvent.getValue()){
-                     maxList  = list;
-                     maxEvent = event;
-                  }
-               }
-            }
-            catch(NullPointerException npe){
-               maxList  = list;
-               maxEvent = event;
-            }
-         }
-      }
-      */
       return maxList;
    }
 
