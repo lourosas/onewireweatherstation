@@ -130,9 +130,9 @@ public class MySQLWeatherDatabase extends Database{
    Override the same method from the Database class
    */
    public List<String> requestData(String request){
-      System.out.println(theRequest);
-      List<String> list = null;
-      String upcase = theRequest.toUpperCase();
+      System.out.println(request);
+      List<String> returnList = null;
+      String upcase = request.toUpperCase();
       if(request.toUpperCase().contains("MISSIONDATA")){
          returnList = this.missionData(request);
       }
@@ -185,13 +185,13 @@ public class MySQLWeatherDatabase extends Database{
             returnList = this.minTemperature(request);
          }
          else if(upcase.contains("MAX")){
-            returnList = this.maxTemperature(rquest);
+            returnList = this.maxTemperature(request);
          }
          else{
             returnList = this.temperature(request);
          }
       }
-      return list;
+      return returnList;
    }
 
    /*
@@ -1194,7 +1194,7 @@ public class MySQLWeatherDatabase extends Database{
 
    /*
    */
-   private List<String> minHumdity(String command){
+   private List<String> minHumidity(String command){
       Connection conn   = null;
       Statement  stmt   = null;
       List<String> returnList = null;

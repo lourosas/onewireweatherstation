@@ -54,7 +54,7 @@ public class Database{
 
    /**
    **/
-   public List<String> humdityFromDatabase
+   public List<String> humidityFromDatabase
    (
       String month,
       String day,

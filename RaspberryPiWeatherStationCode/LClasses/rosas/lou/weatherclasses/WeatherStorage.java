@@ -195,7 +195,7 @@ public class WeatherStorage{
       catch(NullPointerException npe){}
       finally{
          return hiData;
-      |
+      }
    }
 
    /*
