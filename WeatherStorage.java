@@ -69,6 +69,29 @@ public class WeatherStorage{
       return instance;
    }
 
+   /*
+   */
+   public List<String> dewpointFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> dpData = null;
+      try{
+         //Here is the tricky part:  somehow, need to figure out
+         //WHICH Database Instance to access.  There are (going to
+         //be) several databases to access.  It all depends the
+         //Database instantiated.
+         Database database = MySQLWeatherDatabase.getInstance();
+         dpData = database.dewpointFromDatabase(month, day, year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return dpData;
+      }
+   }
+
    /**
    */
    public List<WeatherEvent> getLatestData(String type){
@@ -106,49 +129,22 @@ public class WeatherStorage{
    public List<WeatherEvent> getMax(String type){
       List<WeatherEvent> maxList = null;
       WeatherEvent maxEvent      = null;
-      Enumeration<List> e        = null;
 
       if(type.toLowerCase().equals("temperature")){
-         e = this.temperatureHash.elements();
+         maxList = this.getMaxTemperatureFromDatabase();
       }
       else if(type.toLowerCase().equals("humidity")){
-         e = this.humidityHash.elements();
+         maxList = this.getMaxHumidityFromDatabase();
       }
       else if(type.toLowerCase().equals("dewpoint")){
-         e = this.dewpointHash.elements();
+         maxList = this.getMaxDewpointFromDatabase();
       }
       else if(type.toLowerCase().equals("heatindex")){
-         e = this.heatIndexHash.elements();
+         maxList = this.getMaxHeatIndexFromDatabase();
       }
+      
       else if(type.toLowerCase().equals("pressure")){
-         e = this.pressureHash.elements();
-      }
-      while(e.hasMoreElements()){
-         List<WeatherEvent>     list     = e.nextElement();
-         Iterator<WeatherEvent> iterator = list.iterator();
-         while(iterator.hasNext()){
-            WeatherEvent event = iterator.next();
-            try{
-               if(!(type.toLowerCase().equals("humidity"))){
-                  if(event.getUnits() == Units.METRIC){
-                     if(event.getValue() >= maxEvent.getValue()){
-                        maxList  = list;
-                        maxEvent = event;
-                     }
-                  }
-               }
-               else{
-                  if(event.getValue() >= maxEvent.getValue()){
-                     maxList  = list;
-                     maxEvent = event;
-                  }
-               }
-            }
-            catch(NullPointerException npe){
-               maxList  = list;
-               maxEvent = event;
-            }
-         }
+         maxList = this.getMaxPressureFromDatabase();
       }
       return maxList;
    }
@@ -162,45 +158,635 @@ public class WeatherStorage{
 
       if(type.toLowerCase().equals("temperature")){
          e = this.temperatureHash.elements();
+         minList = this.getMinTemperatureFromDatabase();
       }
       else if(type.toLowerCase().equals("humidity")){
          e = this.humidityHash.elements();
+         minList = this.getMinHumidityFromDatabase();
       }
       else if(type.toLowerCase().equals("dewpoint")){
          e = this.dewpointHash.elements();
+         minList = this.getMinDewpointFromDatabase();
       }
       else if(type.toLowerCase().equals("heatindex")){
          e = this.heatIndexHash.elements();
+         minList = this.getMinHeatIndexFromDatabase();
       }
       else if(type.toLowerCase().equals("pressure")){
          e = this.pressureHash.elements();
-      }
-      while(e.hasMoreElements()){
-         List<WeatherEvent>     list     = e.nextElement();
-         Iterator<WeatherEvent> iterator = list.iterator();
-         while(iterator.hasNext()){
-            WeatherEvent event = iterator.next();
-            try{
-               if(!(type.toLowerCase().equals("humidity"))){
-                  if(event.getUnits() == Units.METRIC){
-                     if(event.getValue() <= minEvent.getValue()){
-                        minList  = list;
-                        minEvent = event;
-                     }
-                  }
-               }
-               else if(event.getValue() <= minEvent.getValue()){
-                  minList  = list;
-                  minEvent = event;
-               }
-            }
-            catch(NullPointerException npe){
-               minList  = list;
-               minEvent = event;
-            }
-         }
+         minList = this.getMinPressureFromDatabase();
       }
       return minList;
+   }
+
+   /*
+   */
+   public List<String> heatIndexFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> hiData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         hiData = database.heatIndexFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return hiData;
+      }
+   }
+
+   /*
+   */
+   public List<String> humidityFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> hData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         hData = database.humidityFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return hData;
+      }
+   }
+
+   /*
+   */
+   public List<String> pressureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> pData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         pData = database.pressureFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return pData;
+      }
+   }
+
+   /*
+   */
+   public List<String> temperatureFromDatabase
+   (
+      String month,
+      String day,
+      String year
+   ){
+      List<String> tData = null;
+      try{
+         Database database = MySQLWeatherDatabase.getInstance();
+         tData = database.temperatureFromDatabase(month,day,year);
+      }
+      catch(NullPointerException npe){}
+      finally{
+         return tData;
+      }
+   }
+
+   /////////////////////////Private Methods//////////////////////////
+   /**
+   **/
+   private List<WeatherEvent> getMaxDewpointFromDatabase(){
+      List<String>     returnData = null;
+	   List<WeatherEvent>    dpMax = null;
+	   WeatherEvent          event = null;
+	   try{
+         String request = new String("SELECT month, day, year, ");
+         request += "max(dewptc), max(dewptf), max(dewptk) FROM ";
+         request += "dewpointdata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         dpMax = new LinkedList<WeatherEvent>();
+         //Create Three different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         dpMax.add(event);
+         value = Double.parseDouble(values[4].trim());
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.ENGLISH,
+                                  cal);
+         dpMax.add(event);
+         value = Double.parseDouble(values[5].trim());
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.ABSOLUTE,
+                                  cal);
+         dpMax.add(event);
+	  }
+	  catch(IndexOutOfBoundsException oobe){
+        oobe.printStackTrace();
+     }
+	  catch(NullPointerException npe){
+        npe.printStackTrace();
+     }
+	  catch(NumberFormatException nfe){
+        nfe.printStackTrace();
+     }
+	  finally{
+		  return dpMax;
+	  }            
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMaxHeatIndexFromDatabase(){
+      List<String>     returnData = null;
+	   List<WeatherEvent> hiMax    = null;
+	   WeatherEvent      event     = null;
+	   try{
+         String request = new String("SELECT month, day, year, ");
+         request += "max(heatindexc), max(heatindexf), ";
+         request += "max(heatindexk) FROM ";
+         request += "heatindexdata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         hiMax = new LinkedList<WeatherEvent>();
+         //Create Three different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         hiMax.add(event);
+         value = Double.parseDouble(values[4].trim());
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.ENGLISH,
+                                  cal);
+         hiMax.add(event);
+         value = Double.parseDouble(values[5].trim());
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.ABSOLUTE,
+                                  cal);
+         hiMax.add(event);
+	  }
+	  catch(IndexOutOfBoundsException oobe){
+        oobe.printStackTrace();
+     }
+	  catch(NullPointerException npe){
+        npe.printStackTrace();
+     }
+	  catch(NumberFormatException nfe){
+        nfe.printStackTrace();
+     }
+	  finally{
+		  return hiMax;
+	  }
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMaxHumidityFromDatabase(){
+      List<String>       returnData  = null;
+      List<WeatherEvent> humidityMax = null;
+      WeatherEvent       event       = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "max(humidity) FROM ";
+         request += "humiditydata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         humidityMax = new LinkedList<WeatherEvent>();
+         event = new WeatherEvent(null,
+                                  "Hygrometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         humidityMax.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         System.out.println("Humidity:  that did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return humidityMax;
+      }
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMaxTemperatureFromDatabase(){
+      List<String>    returnData = null;
+      List<WeatherEvent> tempMin = null;
+      WeatherEvent         event = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "max(tempc), max(tempf), max(tempk) FROM ";
+         request += "temperaturedata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         tempMin = new LinkedList<WeatherEvent>();
+         //Create Three Different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Thermometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[4].trim());
+        event = new WeatherEvent(null,
+                                 "Thermometer",
+                                 value,
+                                 Units.ENGLISH,
+                                 cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[5].trim());
+        event = new WeatherEvent(null,
+                                 "Thermometer",
+                                 value,
+                                 Units.ABSOLUTE,
+                                 cal);
+        tempMin.add(event);      
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return tempMin;
+      }
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMinDewpointFromDatabase(){
+      List<String>     returnData = null;
+	   List<WeatherEvent> dpMin    = null;
+	   WeatherEvent      event     = null;
+	   try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(dewptc), min(dewptf), min(dewptk) FROM ";
+         request += "dewpointdata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         dpMin = new LinkedList<WeatherEvent>();
+         //Create Three different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         dpMin.add(event);
+         value = Double.parseDouble(values[4].trim());
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.ENGLISH,
+                                  cal);
+         dpMin.add(event);
+         value = Double.parseDouble(values[5].trim());
+         event = new WeatherEvent(null,
+                                  "Dewpoint",
+                                  value,
+                                  Units.ABSOLUTE,
+                                  cal);
+         dpMin.add(event);
+	  }
+	  catch(IndexOutOfBoundsException oobe){
+        oobe.printStackTrace();
+     }
+	  catch(NullPointerException npe){
+        npe.printStackTrace();
+     }
+	  catch(NumberFormatException nfe){
+        nfe.printStackTrace();
+     }
+	  finally{
+		  return dpMin;
+	  }
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMinHeatIndexFromDatabase(){
+      List<String>     returnData = null;
+	   List<WeatherEvent> hiMin    = null;
+	   WeatherEvent      event     = null;
+	   try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(heatindexc), min(heatindexf), ";
+         request += "min(heatindexk) FROM ";
+         request += "heatindexdata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         hiMin = new LinkedList<WeatherEvent>();
+         //Create Three different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         hiMin.add(event);
+         value = Double.parseDouble(values[4].trim());
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.ENGLISH,
+                                  cal);
+         hiMin.add(event);
+         value = Double.parseDouble(values[5].trim());
+         event = new WeatherEvent(null,
+                                  "Heatindex",
+                                  value,
+                                  Units.ABSOLUTE,
+                                  cal);
+         hiMin.add(event);
+	  }
+	  catch(IndexOutOfBoundsException oobe){
+        oobe.printStackTrace();
+     }
+	  catch(NullPointerException npe){
+        npe.printStackTrace();
+     }
+	  catch(NumberFormatException nfe){
+        nfe.printStackTrace();
+     }
+	  finally{
+		  return hiMin;
+	  }      
+   }
+
+   /**
+   **/
+   private List<WeatherEvent> getMinHumidityFromDatabase(){
+      List<String>       returnData  = null;
+      List<WeatherEvent> humidityMin = null;
+      WeatherEvent       event       = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(humidity) FROM ";
+         request += "humiditydata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         humidityMin = new LinkedList<WeatherEvent>();
+         event = new WeatherEvent(null,
+                                  "Hygrometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+         humidityMin.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         System.out.println("Humidity:  that did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return humidityMin;
+      }
+   }
+    
+   /**
+   **/
+   private List<WeatherEvent> getMaxPressureFromDatabase(){
+      List<String>       returnData  = null;
+      List<WeatherEvent> pressureMax = null;
+      WeatherEvent       event       = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "max(mmHg), max(inHg), max(mB) FROM ";
+         request += "pressuredata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         pressureMax = new LinkedList<WeatherEvent>();
+         //Create Three Different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Barometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+        pressureMax.add(event);
+        value = Double.parseDouble(values[4].trim());
+        event = new WeatherEvent(null,
+                                 "Barometer",
+                                 value,
+                                 Units.ENGLISH,
+                                 cal);
+        pressureMax.add(event);
+        value = Double.parseDouble(values[5].trim());
+        event = new WeatherEvent(null,
+                                 "Barometer",
+                                 value,
+                                 Units.ABSOLUTE,
+                                 cal);
+        pressureMax.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace(); 
+      }
+      catch(NullPointerException npe){
+         System.out.println("That did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return pressureMax;
+      }   
+   }
+   
+   /**
+   **/
+   private List<WeatherEvent> getMinPressureFromDatabase(){
+      List<String>       returnData = null;
+      List<WeatherEvent> pressureMin    = null;
+      WeatherEvent       event      = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(mmHg), min(inHg), min(mB) FROM ";
+         request += "pressuredata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         pressureMin = new LinkedList<WeatherEvent>();
+         //Create Three Different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Barometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+        pressureMin.add(event);
+        value = Double.parseDouble(values[4].trim());
+        event = new WeatherEvent(null,
+                                 "Barometer",
+                                 value,
+                                 Units.ENGLISH,
+                                 cal);
+        pressureMin.add(event);
+        value = Double.parseDouble(values[5].trim());
+        event = new WeatherEvent(null,
+                                 "Barometer",
+                                 value,
+                                 Units.ABSOLUTE,
+                                 cal);
+        pressureMin.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace(); 
+      }
+      catch(NullPointerException npe){
+         System.out.println("That did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return pressureMin;
+      }      
+   }
+
+
+   /**
+   **/
+   private List<WeatherEvent> getMinTemperatureFromDatabase(){
+      List<String>       returnData = null;
+      List<WeatherEvent> tempMin    = null;
+      WeatherEvent       event      = null;
+      try{
+         String request = new String("SELECT month, day, year, ");
+         request += "min(tempc), min(tempf), min(tempk) FROM ";
+         request += "temperaturedata where ";
+         String month=String.format("%tB",this.currentDate.getTime());
+         String day = String.format("%td",this.currentDate.getTime());
+         request += "month = '" + month + "' and day = '" + day +"'";
+         request += " GROUP BY month, day";
+         returnData = this.requestData(request);
+         Calendar cal = Calendar.getInstance();
+         String data = returnData.get(0);
+         String values[] = data.split(",");
+         double value = Double.parseDouble(values[3].trim());
+         tempMin = new LinkedList<WeatherEvent>();
+         //Create Three Different Weather Events for storage
+         event = new WeatherEvent(null,
+                                  "Thermometer",
+                                  value,
+                                  Units.METRIC,
+                                  cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[4].trim());
+        event = new WeatherEvent(null,
+                                 "Thermometer",
+                                 value,
+                                 Units.ENGLISH,
+                                 cal);
+        tempMin.add(event);
+        value = Double.parseDouble(values[5].trim());
+        event = new WeatherEvent(null,
+                                 "Thermometer",
+                                 value,
+                                 Units.ABSOLUTE,
+                                 cal);
+        tempMin.add(event);
+      }
+      catch(IndexOutOfBoundsException oobe){
+         oobe.printStackTrace(); 
+      }
+      catch(NullPointerException npe){
+         System.out.println("That did not work!!!");
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return tempMin;
+      }
    }
 
    /**
@@ -208,7 +794,8 @@ public class WeatherStorage{
    public List<String> requestData(String request){
       List<String> returnData = null;
       try{
-         Database database = Database.getInstance();
+         //Database database = Database.getInstance();
+         Database database = MySQLWeatherDatabase.getInstance();
 
          returnData = database.requestData(request);
       }
