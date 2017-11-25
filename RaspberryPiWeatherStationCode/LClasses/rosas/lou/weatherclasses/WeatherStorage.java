@@ -794,7 +794,8 @@ public class WeatherStorage{
    public List<String> requestData(String request){
       List<String> returnData = null;
       try{
-         Database database = Database.getInstance();
+         //Database database = Database.getInstance();
+         Database database = MySQLWeatherDatabase.getInstance();
 
          returnData = database.requestData(request);
       }
