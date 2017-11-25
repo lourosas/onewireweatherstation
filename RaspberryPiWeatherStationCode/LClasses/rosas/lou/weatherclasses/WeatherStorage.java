@@ -1134,7 +1134,8 @@ public class WeatherStorage{
       List<WeatherEvent> dp = null;
       //Go ahead and get the Singleton and populate the latest
       //temperature data
-      Database database = Database.getInstance();
+      //Database database = Database.getInstance();
+      Database database = MySQLWeatherDatabase.getInstance();
       database.store(event);
       try{
          if(this.dewpointHash.containsKey(cal)){
@@ -1164,7 +1165,8 @@ public class WeatherStorage{
       List<WeatherEvent> heatIndices = null;
       //Go ahead and get the Singleton and populate the latest
       //temperature data
-      Database database = Database.getInstance();
+      //Database database = Database.getInstance();
+      Database database = MySQLWeatherDatabase.getInstance();
       database.store(event);
       try{
          if(this.heatIndexHash.containsKey(cal)){
@@ -1194,7 +1196,8 @@ public class WeatherStorage{
       List<WeatherEvent> humids = null;
       //Go ahead and get the Singleton and populate the latest
       //temperature data
-      Database database = Database.getInstance();
+      //Database database = Database.getInstance();
+      Database database = MySQLWeatherDatabase.getInstance();
       database.store(event);
       try{
          if(this.humidityHash.containsKey(cal)){
@@ -1224,7 +1227,8 @@ public class WeatherStorage{
       List<WeatherEvent> pressure = null;
       //Go ahead and get the Singleton and populate the latest
       //temperature data
-      Database database = Database.getInstance();
+      //Database database = Database.getInstance();
+      Database database = MySQLWeatherDatabase.getInstance();
       database.store(event);
       try{
          cal = event.getCalendar();
@@ -1255,7 +1259,8 @@ public class WeatherStorage{
       List<WeatherEvent> temps = null;
       //Go ahead and get the Singleton and populate the latest
       //temperature data
-      Database database = Database.getInstance();
+      //Database database = Database.getInstance();
+      Database database = MySQLWeatherDatabase.getInstance();
       database.store(event);
       try{
          if(this.temperatureHash.containsKey(cal)){
