@@ -387,14 +387,10 @@ implements HttpHandler{
       List<String> dpData = null;
       
       WeatherStorage ws = WeatherStorage.getInstance();
-      String command=new String("SELECT * from");
-      command=command.concat(" dewpointdata where month = \'");
-      command=command.concat(month + "\' AND day = \'" + day +"\'");
-      command=command.concat(" AND year = \'" + year + "\'");
       try{
          this.dewPointData  = new LinkedList<Double>();
          this.dewPointTimes = new LinkedList<String>();
-         dpData             = ws.requestData(command);
+         dpData = ws.dewpointFromDatabase(month,day,year);
          Iterator<String> it = dpData.iterator();
          while(it.hasNext()){
             String values = it.next();
@@ -426,14 +422,10 @@ implements HttpHandler{
       List<String> hiData   = null;
       
       WeatherStorage ws = WeatherStorage.getInstance();
-      String command=new String("SELECT * from");
-      command=command.concat(" heatindexdata where month = \'");
-      command=command.concat(month + "\' AND day = \'" + day +"\'");
-      command=command.concat(" AND year = \'" + year + "\'");
       try{
          this.heatIndexData  = new LinkedList<Double>();
          this.heatIndexTimes = new LinkedList<String>();
-         hiData              = ws.requestData(command);
+         hiData = ws.heatIndexFromDatabase(month,day,year);
          Iterator<String> it = hiData.iterator();
          while(it.hasNext()){
             String values = it.next();
@@ -464,14 +456,10 @@ implements HttpHandler{
       List<String> humidData    = null;
       
       WeatherStorage ws = WeatherStorage.getInstance();
-      String command=new String("SELECT * from");
-      command=command.concat(" humiditydata where month = \'");
-      command=command.concat(month + "\' AND day = \'" + day +"\'");
-      command=command.concat(" AND year = \'" + year + "\'");
       try{
          this.humidityData  = new LinkedList<Double>();
          this.humidityTimes = new LinkedList<String>();
-         humidData       = ws.requestData(command);
+         humidData = ws.humidityFromDatabase(month,day,year);
          Iterator<String> it = humidData.iterator();
          while(it.hasNext()){
             String values = it.next();
@@ -503,14 +491,11 @@ implements HttpHandler{
       List<String> pressureData = null;
       
       WeatherStorage ws = WeatherStorage.getInstance();
-      String command=new String("SELECT * from");
-      command=command.concat(" pressuredata where month = \'");
-      command=command.concat(month + "\' AND day = \'" + day +"\'");
-      command=command.concat(" AND year = \'" + year + "\'");
       try{
          this.pressureData  = new LinkedList<Double>();
          this.pressureTimes = new LinkedList<String>();
-         pressureData        = ws.requestData(command);
+         //pressureData        = ws.requestData(command);
+         pressureData = ws.pressureFromDatabase(month,day,year);
          Iterator<String> it = pressureData.iterator();
          while(it.hasNext()){
             String values = it.next();
@@ -541,14 +526,11 @@ implements HttpHandler{
       List<String> tempData = null;
 
       WeatherStorage ws = WeatherStorage.getInstance();
-      String command=new String("SELECT * from");
-      command=command.concat(" temperaturedata where month = \'");
-      command=command.concat(month + "\' AND day = \'" + day +"\'");
-      command=command.concat(" AND year = \'" + year + "\'");
       try{
          this.temperatureData  = new LinkedList<Double>();
          this.temperatureTimes = new LinkedList<String>();
-         tempData              = ws.requestData(command);
+         //tempData              = ws.requestData(command);
+         tempData = ws.temperatureFromDatabase(month,day,year);
          Iterator<String> it   = tempData.iterator();
          while(it.hasNext()){
             String values = it.next();
