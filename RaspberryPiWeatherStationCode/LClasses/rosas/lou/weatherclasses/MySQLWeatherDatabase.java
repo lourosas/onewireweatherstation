@@ -352,8 +352,8 @@ public class MySQLWeatherDatabase extends Database{
             conn.close();
          }
          catch(SQLException sqe2){}
+         catch(NullPointerException npe){}
       }
-
    }
 
    /*
@@ -524,6 +524,7 @@ public class MySQLWeatherDatabase extends Database{
             stmt.close();
             conn.close();
          }
+         catch(NullPointerException npe){}
          catch(SQLException sqe2){}
       }
    }
@@ -1531,6 +1532,7 @@ public class MySQLWeatherDatabase extends Database{
             stmt.close();
             conn.close();
          }
+         catch(NullPointerException npe){}
          catch(SQLException sqe2){}
       }
    }
@@ -2091,6 +2093,7 @@ public class MySQLWeatherDatabase extends Database{
             stmt.close();
             conn.close();
          }
+         catch(NullPointerException npe){}
          catch(SQLException sqe2){}
       }
  

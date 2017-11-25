@@ -260,9 +260,9 @@ public class WeatherStorage{
    **/
    private List<WeatherEvent> getMaxDewpointFromDatabase(){
       List<String>     returnData = null;
-	   List<WeatherEvent>    dpMax = null;
-	   WeatherEvent          event = null;
-	   try{
+      List<WeatherEvent>    dpMax = null;
+      WeatherEvent          event = null;
+      try{
          String request = new String("SELECT month, day, year, ");
          request += "max(dewptc), max(dewptf), max(dewptk) FROM ";
          request += "dewpointdata where ";
@@ -297,19 +297,19 @@ public class WeatherStorage{
                                   Units.ABSOLUTE,
                                   cal);
          dpMax.add(event);
-	  }
-	  catch(IndexOutOfBoundsException oobe){
+      }
+      catch(IndexOutOfBoundsException oobe){
         oobe.printStackTrace();
-     }
-	  catch(NullPointerException npe){
+      }
+      catch(NullPointerException npe){
         npe.printStackTrace();
-     }
-	  catch(NumberFormatException nfe){
-        nfe.printStackTrace();
-     }
-	  finally{
-		  return dpMax;
-	  }            
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      finally{
+         return dpMax;
+      }            
    }
    
    /**
