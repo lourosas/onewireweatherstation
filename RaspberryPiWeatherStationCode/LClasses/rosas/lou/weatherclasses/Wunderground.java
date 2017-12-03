@@ -318,18 +318,14 @@ ExtremeObserver, Runnable{
    //
    private void sendToWunderground(String message){
       System.out.println(message);
-      final int PORT = 80;
+      final int PORT = 443;
       final int TIMES = 100;
       try{
-         Socket socket = new Socket(this.URL, PORT);
-         //Test Print
-         System.out.println(socket);
-         PrintStream out = new PrintStream(socket.getOutputStream());
-         System.out.println("Sending:  " + message);
-         out.print(message);
+         URL url = new URL(message);
+         URLConnection conn = url.openConnection();
          BufferedReader in = new BufferedReader(
                                     new InputStreamReader(
-                                          socket.getInputStream()));
+                                          conn.getInputStream()));
          int i = 0;
          while(i < TIMES){
             if(in.ready()){
@@ -339,14 +335,9 @@ ExtremeObserver, Runnable{
             catch(InterruptedException ie){}
             ++i;
          }
-         socket.close();
       }
-      catch(UnknownHostException uhe){
-         System.out.println("Unable to connect to Wunderground");
-         System.out.println(uhe);
-      }
-      catch(NullPointerException npe){
-         System.out.println("Wunderground Socket Error:  " + npe);
+      catch (MalformedURLException me){
+         System.out.println("Wunderground URL Exception:  " + me);
       }
       catch(IOException ioe){
          System.out.println("Wunderground I/O Error:  " + ioe);
@@ -359,13 +350,11 @@ ExtremeObserver, Runnable{
    private StringBuffer setUpMessage(){
       StringBuffer message = new StringBuffer();
 
-      message.append("GET https://" + this.URL);
-      //message.append("https://" + URL);
+      message.append("https://" + URL);
       message.append("/weatherstation/updateweatherstation.php?");
       message.append("ID=" + this.USERNAME);
       message.append("&PASSWORD=" + this.PASSWORD);
-      //message.append("&dateutc="+this.findUTC());
-      message.append("&dateutc=now");
+      message.append("&dateutc="+this.findUTC());
       if(this.temperatureUpdated){
          message.append("&tempf=" + this.temp.getValue());
       }
@@ -383,7 +372,7 @@ ExtremeObserver, Runnable{
       }
       message.append("&softwaretype=tws&action=updateraw ");
       //message.append("HTTP//1.1\r\nConnection: keep-alive\r\n\r\n");
-      message.append("HTTP//1.1");
+      //message.append("HTTP//1.1");
       return message;
    }
 }
