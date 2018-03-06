@@ -11,16 +11,16 @@ public class TestWeatherServer{
    }
 
    public TestWeatherServer(){
-      //Wunderground   wg      = new Wunderground();
+      Wunderground   wg      = new Wunderground();
       WeatherStation station = new WeatherStation();
       //server.registerWithAWeatherStation(new WeatherStation());
-      //station.addBarometerObserver(wg);
-      //station.addCalculatedObserver(wg);
-      //station.addHumidityObserver(wg);
-      //station.addTemperatureObserver(wg);
-      //station.addExtremeObserver(wg);
-      //Thread nextThread = new Thread(wg);
-      //nextThread.start();
+      station.addBarometerObserver(wg);
+      station.addCalculatedObserver(wg);
+      station.addHumidityObserver(wg);
+      station.addTemperatureObserver(wg);
+      station.addExtremeObserver(wg);
+      Thread nextThread = new Thread(wg);
+      nextThread.start();
       try{
          WeatherServer  server  = new WeatherServer(19000);
          server.registerWithAWeatherStation(station);
