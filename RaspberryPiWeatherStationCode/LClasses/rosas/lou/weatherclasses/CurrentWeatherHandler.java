@@ -45,15 +45,7 @@ implements HttpHandler{
    //
    private String setUpBody(){
       StringBuffer body = new StringBuffer();
-      StringBuffer date = new StringBuffer();
-      date.append(this.getDate());
       body.append("\n<body>");
-      body.append("<table width = \"740\">");
-      body.append("<tr align = \"center\"><td><h2>Tucson, AZ<br>");
-      body.append("Rita Ranch Neighborhood<br>Weather Conditions");
-      body.append("</h2></td>");
-      body.append("<td><h2>As Of: "+ date + "</h2></td>");
-      body.append("</tr></table>");
       body.append("\n<table class=\"rows\">\n<tr>");
       body.append("\n<td><div id=\"temp_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
@@ -67,9 +59,7 @@ implements HttpHandler{
       body.append("</tr>");
       body.append("\n<tr><td><div id=\"press_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
-      body.append("\n</tr>\n</table>");
-      body.append("<br /><a href=\"http://onewireweatherstation.info/daily\"target=\"_blank\">daily</a>");
-      body.append("\n</body>\n</html>");
+      body.append("\n</tr>\n</table>\n</body>\n</html>");
       return body.toString();
    }
    
@@ -101,22 +91,24 @@ implements HttpHandler{
    private String setUpHeatIndex(){
       StringBuffer buffer = new StringBuffer();
       double hi = this.heatindex("english");
-      buffer.append("\nfunction drawHeatIndex() { \n");
-      buffer.append("var hidata = google.visualization.arrayToDataTable([ ");
-      buffer.append("\n['Label', 'Value'], ");
-      buffer.append("\n['Heat Index', 0], ");
-      buffer.append("\n ]);");
-      buffer.append("\nvar hioptions = { ");
-      buffer.append("\nmin: 70, ");
-      buffer.append("\nmax: 130, minorTicks: 3, ");
-      buffer.append("\nwidth: 240, height: 240, ");
-      buffer.append("\nredFrom: 100, redTo: 130, ");
-      buffer.append("\nyellowFrom: 85, yellowTo: 100,");
-      buffer.append("\ngreenFrom: 70, greenTo: 85 \n}; ");
-      buffer.append("\nvar hichart = new google.visualization.Gauge(document.getElementById('hi_div'));");
-      buffer.append("\nhichart.draw(hidata, hioptions);");
-      buffer.append("\nhidata.setValue(0,1,Math.round("+hi+")); ");
-      buffer.append("\nhichart.draw(hidata,hioptions);\n}");
+      if(hi > Thermometer.DEFAULTTEMP){
+         buffer.append("\nfunction drawHeatIndex() { \n");
+         buffer.append("var hidata = google.visualization.arrayToDataTable([ ");
+         buffer.append("\n['Label', 'Value'], ");
+         buffer.append("\n['Heat Index', 0], ");
+         buffer.append("\n ]);");
+         buffer.append("\nvar hioptions = { ");
+         buffer.append("\nmin: 70, ");
+         buffer.append("\nmax: 130, minorTicks: 3, ");
+         buffer.append("\nwidth: 240, height: 240, ");
+         buffer.append("\nredFrom: 100, redTo: 130, ");
+         buffer.append("\nyellowFrom: 85, yellowTo: 100,");
+         buffer.append("\ngreenFrom: 70, greenTo: 85 \n}; ");
+         buffer.append("\nvar hichart = new google.visualization.Gauge(document.getElementById('hi_div'));");
+         buffer.append("\nhichart.draw(hidata, hioptions);");
+         buffer.append("\nhidata.setValue(0,1,Math.round("+hi+")); ");
+         buffer.append("\nhichart.draw(hidata,hioptions);\n}");
+      }
       return buffer.toString();
    }
    
