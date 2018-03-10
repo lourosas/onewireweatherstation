@@ -45,7 +45,15 @@ implements HttpHandler{
    //
    private String setUpBody(){
       StringBuffer body = new StringBuffer();
+      StringBuffer date = new StringBuffer();
+      date.append(this.getDate());
       body.append("\n<body>");
+      body.append("<table width = \"740\">");
+      body.append("<tr align = \"center\"><td><h2>Tucson, AZ<br>");
+      body.append("Rita Ranch Neighborhood<br>Weather Conditions");
+      body.append("</h2></td>");
+      body.append("<td><h2>As Of: "+ date + "</h2></td>");
+      body.append("</tr></table>");
       body.append("\n<table class=\"rows\">\n<tr>");
       body.append("\n<td><div id=\"temp_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
@@ -59,7 +67,9 @@ implements HttpHandler{
       body.append("</tr>");
       body.append("\n<tr><td><div id=\"press_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
-      body.append("\n</tr>\n</table>\n</body>\n</html>");
+      body.append("\n</tr>\n</table>");
+      //body.append("<br /><a href=\"http://localhost:8000/daily \"target=\"_blank\">daily</a>");
+      body.append("\n</body>\n</html>");
       return body.toString();
    }
    
