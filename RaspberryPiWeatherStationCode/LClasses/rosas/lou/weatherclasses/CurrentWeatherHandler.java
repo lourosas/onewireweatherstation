@@ -91,22 +91,24 @@ implements HttpHandler{
    private String setUpHeatIndex(){
       StringBuffer buffer = new StringBuffer();
       double hi = this.heatindex("english");
-      buffer.append("\nfunction drawHeatIndex() { \n");
-      buffer.append("var hidata = google.visualization.arrayToDataTable([ ");
-      buffer.append("\n['Label', 'Value'], ");
-      buffer.append("\n['Heat Index', 0], ");
-      buffer.append("\n ]);");
-      buffer.append("\nvar hioptions = { ");
-      buffer.append("\nmin: 70, ");
-      buffer.append("\nmax: 130, minorTicks: 3, ");
-      buffer.append("\nwidth: 240, height: 240, ");
-      buffer.append("\nredFrom: 100, redTo: 130, ");
-      buffer.append("\nyellowFrom: 85, yellowTo: 100,");
-      buffer.append("\ngreenFrom: 70, greenTo: 85 \n}; ");
-      buffer.append("\nvar hichart = new google.visualization.Gauge(document.getElementById('hi_div'));");
-      buffer.append("\nhichart.draw(hidata, hioptions);");
-      buffer.append("\nhidata.setValue(0,1,Math.round("+hi+")); ");
-      buffer.append("\nhichart.draw(hidata,hioptions);\n}");
+      if(hi > Thermometer.DEFAULTTEMP){
+         buffer.append("\nfunction drawHeatIndex() { \n");
+         buffer.append("var hidata = google.visualization.arrayToDataTable([ ");
+         buffer.append("\n['Label', 'Value'], ");
+         buffer.append("\n['Heat Index', 0], ");
+         buffer.append("\n ]);");
+         buffer.append("\nvar hioptions = { ");
+         buffer.append("\nmin: 70, ");
+         buffer.append("\nmax: 130, minorTicks: 3, ");
+         buffer.append("\nwidth: 240, height: 240, ");
+         buffer.append("\nredFrom: 100, redTo: 130, ");
+         buffer.append("\nyellowFrom: 85, yellowTo: 100,");
+         buffer.append("\ngreenFrom: 70, greenTo: 85 \n}; ");
+         buffer.append("\nvar hichart = new google.visualization.Gauge(document.getElementById('hi_div'));");
+         buffer.append("\nhichart.draw(hidata, hioptions);");
+         buffer.append("\nhidata.setValue(0,1,Math.round("+hi+")); ");
+         buffer.append("\nhichart.draw(hidata,hioptions);\n}");
+      }
       return buffer.toString();
    }
    
