@@ -275,23 +275,25 @@ implements HttpHandler{
       this.setHeatIndexData(month, dates[2], dates[5]);
       Iterator<String> times     = this.heatIndexTimes.iterator();
       Iterator<Double> heatIndex = this.heatIndexData.iterator(); 
-      while(heatIndex.hasNext()){
-         Double hi   = heatIndex.next();
-         String time = times.next();
-         if(hi > Thermometer.DEFAULTTEMP){
-            display = display.concat("[" + time + ",");
-            display = display.concat(hi +"], ");
+      if(this.heatIndexData.isEmpty()){
+         while(heatIndex.hasNext()){
+            Double hi   = heatIndex.next();
+            String time = times.next();
+            if(hi > Thermometer.DEFAULTTEMP){
+               display = display.concat("[" + time + ",");
+               display = display.concat(hi +"], ");
+            }
          }
+         buffer.append("\nfunction drawHeatIndex() {\n");
+         buffer.append("var hidata = new google.visualization.DataTable();");
+         buffer.append("\nhidata.addColumn('timeofday', 'X');");
+         buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
+         buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
+         buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+         buffer.append("vAxis:{\ntitle: 'Heat Index'\n},\ncolors:['black']\n};\n\n");
+         buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
+         buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");
       }
-      buffer.append("\nfunction drawHeatIndex() {\n");
-      buffer.append("var hidata = new google.visualization.DataTable();");
-      buffer.append("\nhidata.addColumn('timeofday', 'X');");
-      buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
-      buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
-      buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-      buffer.append("vAxis:{\ntitle: 'Heat Index'\n},\ncolors:['black']\n};\n\n");
-      buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
-      buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");      
       return buffer.toString();
    }
    
