@@ -275,7 +275,7 @@ implements HttpHandler{
       this.setHeatIndexData(month, dates[2], dates[5]);
       Iterator<String> times     = this.heatIndexTimes.iterator();
       Iterator<Double> heatIndex = this.heatIndexData.iterator(); 
-      if(this.heatIndexData.isEmpty()){
+      if(!(this.heatIndexData.isEmpty())){
          while(heatIndex.hasNext()){
             Double hi   = heatIndex.next();
             String time = times.next();
