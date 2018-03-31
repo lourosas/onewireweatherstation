@@ -1,0 +1,7 @@
+Database.java:   public static Database getInstance(){
+WeatherStorage.java:         Database database = Database.getInstance();
+WeatherStorage.java:      Database database = Database.getInstance();
+WeatherStorage.java:      Database database = Database.getInstance();
+WeatherStorage.java:      Database database = Database.getInstance();
+WeatherStorage.java:      Database database = Database.getInstance();
+WeatherStorage.java:      Database database = Database.getInstance();
