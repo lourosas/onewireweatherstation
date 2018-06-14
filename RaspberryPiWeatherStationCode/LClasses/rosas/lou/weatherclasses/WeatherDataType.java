@@ -1,5 +1,4 @@
-/**
-The Units Enumeration (as I think it should be in java)
+/*
 Copyright 2018 Lou Rosas
 
 This program is free software: you can redistribute it and/or modify
@@ -14,13 +13,16 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+The Different Types of Weather Data
 */
+
 package rosas.lou.weatherclasses;
 
-public enum Units{
-   METRIC ,
-   ENGLISH,
-   ABSOLUTE,
-   PERCENTAGE,
-   NULL
+public enum WeatherDataType{
+   TEMPERATURE,
+   HUMIDITY,
+   PRESSURE,
+   DEWPOINT,
+   HEATINDEX
 }
