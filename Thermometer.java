@@ -1,4 +1,19 @@
-/**/
+/*
+Copyright 2018 Lou Rosas
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package rosas.lou.weatherclasses;
 
@@ -13,15 +28,15 @@ import com.dalsemi.onewire.container.*;
 import com.dalsemi.onewire.utils.Convert;
 
 public class Thermometer extends Sensor{
-   public static final double DEFAULTTEMP = -999.9;
-   
-   TemperatureContainer thermalSensor;
-   
-   double celsius;
-   double fahrenheit;
-   double kelvin ;
-   
-   static Thermometer instance = null;
+   private TemperatureContainer thermalSensor;
+   private static Thermometer instance;
+   private static final String MAIN_NAME      = "DS1920";
+   private static final String SECONDARY_NAME = "DS18S20";
+
+   {
+      thermalSensor = null;
+      instance      = null;
+   };
    
    //********************Constructors*******************************
    /*
@@ -29,10 +44,7 @@ public class Thermometer extends Sensor{
    NOTE:  the constructor is protected
    */
    protected Thermometer(){
-      this.setTemperatureCelsius(DEFAULTTEMP);
-      this.setTemperatureFahrenheit(DEFAULTTEMP);
-      this.setTemperatureKelvin(DEFAULTTEMP);
-      this.thermalSensor = null;
+      this.initialize();
    }
    
    //**********************Public Methods***************************
@@ -47,126 +59,56 @@ public class Thermometer extends Sensor{
    }
    
    /*
-   */
-   public double getTemperature(){
-      return this.getTemperature(this.getUnits());
-   }
-   
-   /*
-   */
-   public double getTemperature(Units units){
-      double returnTemp = DEFAULTTEMP;
-      switch(units){
-         case METRIC:
-            returnTemp = this.getTemperatureCelsius();
-            break;
-         case ENGLISH:
-            returnTemp = this.getTemperatureFahrenheit();
-            break;
-         case ABSOLUTE:
-            returnTemp = this.getTemperatureKelvin();
-            break;
-         default:
-            returnTemp = this.getTemperatureCelsius();
-      }
-      return returnTemp;
-   }
-   
-   /*
-   Override the abstract initialize(...) method from the Sensor
-   Abstract class
-   */
-   public void initialize
-   (
-      Units         units,   //English, Metric, Absolute
-      String        address, //64-Bit Address as a String
-      String        name,    //DS1920, DS18S20, DS2438...
-      DSPortAdapter dspa     //The DSPortAdpater...
-   ){
-      //First, save off the attributes
-      this.setUnits(units);
-      this.setAddress(address);
-      this.setName(name);
-      this.setType("Thermometer");
-      this.setUSBAdapter(dspa);
-      
-      //Next, go ahead and set up the Thermal Sensor (the actual
-      //Dallas Semiconductor harware device communicating over the
-      //network).
-      String addr        = this.getAddress();
-      this.thermalSensor = new OneWireContainer10(this.dspa, addr);
-      //Now, go ahead and set the temperature resolution to the
-      //highest possible resolution
-      try{
-         byte [] state = this.thermalSensor.readDevice();
-         if(this.thermalSensor.hasSelectableTemperatureResolution()){
-            double[] resolution =
-                     this.thermalSensor.getTemperatureResolutions();
-            this.thermalSensor.setTemperatureResolution(
-                                  resolution[resolution.length - 1],
-                                  state);
-            this.thermalSensor.writeDevice(state);
-         }
-      }
-      catch(OneWireIOException ioe){
-         System.out.println("Error Setting Temperature Resolution");
-      }
-      catch(OneWireException owe){
-         System.out.println("Error Setting Temperature Resolution");
-      }
-   }
-   
-   /*
-   Override the abstract measure(...) method from the Sensor
+   Override the abstract measure() method from the Sensor
    Abstract class.  This method takes no attributes, which means
    to measure the temperature in the Units set in the initialize
    method.
    */
-   public double measure(){
-      return this.measure(this.getUnits());
-   }
-   
-   /*
-   Override the abstract measure(...) method from the Sensor
-   Abstract class.  This method takes the units attributes, which
-   means to measure the temperature data in the requested units:
-   Metric, English or Absolute.  If the Units attribute is NOT one
-   of the three, this method will by default return the measured
-   temperature in Metric
-   */
-   public double measure(Units units){
-      this.setUnits(units);
+   @Override
+   public WeatherData measure(){
+      String bad = new String("No Temperature Data Available:  ");
+      bad = bad.concat("default value returned");
+      WeatherData currentData;
+      //Default the data in case something bad happens, have
+      //Something to return
+      double currentTemp = WeatherData.DEFAULTMEASURE;
       try{
-         double currentTemp;
          byte [] state = this.thermalSensor.readDevice();
          //perform the temperature conversion
          this.thermalSensor.doTemperatureConvert(state);
-         //read the result of the converstion
-         state = this.thermalSensor.readDevice();
-         //get the temperature from the state data
-         //value returned is in celsius
+         //read the results of the conversion
+         this.thermalSensor.readDevice();
+         //set the current temp (which is returned by default in
+         //Celsius)
          currentTemp = this.thermalSensor.getTemperature(state);
-         //Since the temperature value returned is in celsius, go
-         //ahead and set the celsius temperature
-         this.setTemperatureCelsius(currentTemp);
-         //Convert the celsius temperature into Fahrenheit and
-         //Kelvin
-         double f = WeatherConvert.celsiusToFahrenheit(currentTemp);
-         double k = WeatherConvert.celsiusToKelvin(currentTemp);
-         this.setTemperatureFahrenheit(f);
-         this.setTemperatureKelvin(k);
+         currentData = new WeatherData();
+         currentData.data(WeatherDataType.TEMPERATURE,
+                          Units.METRIC,
+                          currentTemp,
+                          "Good Temperature Data");
       }
-      catch(OneWireIOException owe){
-         this.setTemperatureCelsius(DEFAULTTEMP);
-         this.setTemperatureFahrenheit(DEFAULTTEMP);
-         this.setTemperatureKelvin(DEFAULTTEMP);
+      catch(OneWireIOException ioe){
+         currentTemp = WeatherData.DEFAULTMEASURE;
+         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
+                                       Units.METRIC,
+                                       currentTemp,
+                                       bad);
       }
-      catch(OneWireException we){
-         this.setTemperatureCelsius(DEFAULTTEMP);
-         this.setTemperatureFahrenheit(DEFAULTTEMP);
-         this.setTemperatureKelvin(DEFAULTTEMP);
+      catch(OneWireException   owe){
+         currentTemp = WeatherData.DEFAULTMEASURE;
+         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
+                                       Units.METRIC,
+                                       currentTemp,
+                                       bad);
       }
-      return this.getTemperature();
+      catch(NullPointerException npe){
+         currentTemp = WeatherData.DEFAULTMEASURE;
+         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
+                                       Units.METRIC,
+                                       currentTemp,
+                                       bad);
+      }
+      return currentData;
    }
    
    /*
@@ -174,48 +116,101 @@ public class Thermometer extends Sensor{
    */
    public String toString(){
       String returnString = new String();
-      returnString = returnString.concat(this.getType() + ", ");
-      returnString = returnString.concat(this.getName() + ", ");
-      returnString = returnString.concat(this.getAddress() + ", ");
-      returnString = returnString.concat(this.getTemperature()+", ");
-      returnString = returnString.concat("" + this.getUnits());
+      returnString = returnString.concat(this.type() + ", ");
+      returnString = returnString.concat(this.name() + ", ");
+      returnString = returnString.concat(this.address() + ", ");
       return returnString;
    }
    
+   //**********************Protected Methods************************
+   /*
+   Override the abstract initialize() method from the WeatherSensor
+   Abstract class
+   */
+   @Override
+   protected void initialize(){
+      try{
+         //0.  Set the Type (in this case, it is a Thermometer)
+         //Very prudent in determining the WeatherSensor
+         this.type("Thermometer");
+         //1.  Set up the USB Adapter (since we are using a USB
+         //Adapter at the moment).
+         this.usbAdapter();
+         if(this._dspa == null){ 
+            throw new NullPointerException("No DSPA Adapter!");
+         }
+         //3.  Have the WeatherSensor it self determine its own
+         //Address and Name.  The Address follows the Name, so the
+         //Name of a given sensor is set up.
+         this.findSensors();
+         //4.  If everything goes well, Set up the
+         //OneWireContainer10
+         this.thermalSensor =
+                   new OneWireContainer10(this._dspa,this.address());
+         byte [] state = this.thermalSensor.readDevice();
+         if(this.thermalSensor.hasSelectableTemperatureResolution()){
+            double [] resolution =
+                      this.thermalSensor.getTemperatureResolutions();
+            this.thermalSensor.setTemperatureResolution(
+                           resolution[resolution.length - 1], state);
+            this.thermalSensor.writeDevice(state);
+         }
+         
+      }
+      catch(OneWireIOException ioe){
+         this.thermalSensor = null;
+         System.out.println("Error Setting Temperature Resolution");
+      }
+      catch(OneWireException owe){
+         this.thermalSensor = null;
+         System.out.println("Error Setting Temperature Resolution");
+      }
+      catch(NullPointerException npe){
+         this.thermalSensor = null;
+         System.out.println(npe.getMessage());
+      }
+   }
+
+   /*
+   Override the abstract findSensors() method from the WeatherSensor
+   Abstract class.
+   */
+   @Override
+   protected void findSensors() throws NullPointerException{
+      try{
+         boolean found = false;
+         Enumeration<OneWireContainer> e =
+                                 this._dspa.getAllDeviceContainers();
+         while(e.hasMoreElements() && !found){
+            OneWireContainer o = (OneWireContainer)e.nextElement();
+            if(o.getName().equals(MAIN_NAME) ||
+               o.getName().equals(SECONDARY_NAME)){
+               this.name(o.getName());
+               this.address(o.getAddressAsString());
+               found = true; //Just get the first Thermometer
+            }
+         }
+         if(!found){
+            throw new NullPointerException("\n\nNo Thermometer\n");
+         }
+      }
+      catch(OneWireIOException ioe){
+         this._address = null;
+         this._name    = null;
+         ioe.printStackTrace();
+      }
+      catch(OneWireException   owe){
+         this._address = null;
+         this._name    = null;
+         owe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         this._address = null;
+         this._name    = null;
+         npe.printStackTrace();
+         throw npe;
+      }
+   }
+
    //***********************Private Methods*************************
-   /*
-   */
-   private double getTemperatureCelsius(){
-      return this.celsius;
-   }
-   
-   /*
-   */
-   private double getTemperatureFahrenheit(){
-      return this.fahrenheit;
-   }
-   
-   /*
-   */
-   private double getTemperatureKelvin(){
-      return this.kelvin;
-   }
-   
-   /*
-   */
-   private void setTemperatureCelsius(double temp){
-      this.celsius = temp;
-   }
-   
-   /*
-   */
-   private void setTemperatureFahrenheit(double temp){
-      this.fahrenheit = temp;
-   }
-   
-   /*
-   */
-   private void setTemperatureKelvin(double temp){
-      this.kelvin = temp;
-   }
 }
