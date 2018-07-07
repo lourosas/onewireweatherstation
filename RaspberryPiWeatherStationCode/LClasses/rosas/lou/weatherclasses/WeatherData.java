@@ -80,10 +80,16 @@ public class WeatherData{
    ){
       this._type  = type;
       if(type == WeatherDataType.TEMPERATURE){
-         this.temperature(units, data);
+         this.genericThermalData(units, data);
       }
-      else if(type == WeatherData.HUMIDITY){
+      else if(type == WeatherDataType.HUMIDITY){
          this.humidity(data);
+      }
+      else if(type == WeatherDataType.PRESSURE){
+         this.barometricPressure(units, data);
+      }
+      else if(type == WeatherDataType.DEWPOINT){
+         this.genericThermalData(units, data);
       }
       try{
          this._message = new String(message);
@@ -108,7 +114,7 @@ public class WeatherData{
    the Units are non-existent or Units.NULL, this returns the
    humidity value (since percentage is not really a Unit).
    */
-   public double data(Units data){
+   public double data(Units units){
       double currentData = DEFAULTMEASURE;
       if(units == Units.METRIC){
          currentData = this._metric;
@@ -127,6 +133,66 @@ public class WeatherData{
       }
       return currentData;
    }
+   
+   /*
+   */
+   public double dewpointDataAbsolute(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.DEWPOINT){
+         data = this._absolute;
+      }
+      return data;
+   }
+   
+   /*
+   */
+   public double dewpointDataEnglish(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.DEWPOINT){
+         data = this._english;
+      }
+      return data;
+   }
+   
+   /*
+   */
+   public double dewpointDataMetric(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.DEWPOINT){
+         data = this._metric;
+      }
+      return data;
+   }
+
+   /*
+   */
+   public double pressureDataAbsolute(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.PRESSURE){
+         data = this._absolute;
+      }
+      return data;
+   }
+
+   /*
+   */
+   public double pressureDataEnglish(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.PRESSURE){
+         data = this._english;
+      }
+      return data;
+   }
+
+   /*
+   */
+   public double pressureDataMetric(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.PRESSURE){
+         data = this._metric;
+      }
+      return data;
+   }
 
    /**
    */
@@ -136,6 +202,12 @@ public class WeatherData{
          data = this._percent;
       }
       return data;
+   }
+
+   /**
+   */
+   public String message(){
+      return this._message;
    }
 
    /**
@@ -169,6 +241,27 @@ public class WeatherData{
    }
 
    /**
+   */
+   public String toString(){
+      String returnString = new String();
+
+      returnString = returnString.concat(this.weatherType() + "\n");
+      if(this.weatherType() == WeatherDataType.HUMIDITY){
+         returnString = returnString.concat(this._percent + "%\n");
+      }
+      else{
+         returnString =
+                  returnString.concat(this._metric+"\u00B0"+"C\n");
+         returnString =
+                 returnString.concat(this._english+"\u00B0"+"F\n");
+         returnString = returnString.concat(this._absolute+"K\n");
+      }
+      returnString = returnString.concat(this.message());
+
+      return returnString;
+   }
+
+   /**
    Return the current Storage type
    */
    public WeatherDataType weatherType(){
@@ -178,34 +271,65 @@ public class WeatherData{
    //***********************Private Methods**************************
    /**
    */
-   private void humidity(double data){
-      if(data >= 0.0 && data <= 100.0){
-         this._percent = data;
+   private void barometricPressure(Units units, double data){
+      if(data > DEFAULTMEASURE){
+         if(units == Units.METRIC){
+            this._metric = data;
+            this._english = WeatherConvert.millimetersToInches(data);
+            this._absolute =
+                     WeatherConvert.inchesToMillibars(this._english);
+         }
+         else if(units == Units.ENGLISH){
+            this._english = data;
+            this._metric = WeatherConvert.inchesToMillimeters(data);
+            this._absolute = WeatherConvert.inchesToMillibars(data);
+         }
+         else if(units == Units.ABSOLUTE){
+            this._absolute = data;
+            this._english = WeatherConvert.millibarsToInches(data);
+            this._metric=WeatherConvert.millibarsToMillimeters(data);
+         }
+         else{
+            this._metric = data;
+            this._english = WeatherConvert.millimetersToInches(data);
+            this._absolute =
+                     WeatherConvert.inchesToMillibars(this._english);
+         }
       }
+   }
+   
+   /**
+   */
+   private void genericThermalData(Units units, double data){
+      if(data > DEFAULTMEASURE){
+         if(units == Units.METRIC){
+            this._metric = data;
+            this._english = WeatherConvert.celsiusToFahrenheit(data);
+            this._absolute = WeatherConvert.celsiusToKelvin(data);
+         }
+         else if(units == Units.ENGLISH){
+            this._english = data;
+            this._metric  = WeatherConvert.fahrenheitToCelsius(data);
+            this._absolute = WeatherConvert.fahrenheitToKelvin(data);
+         }
+         else if(units == Units.ABSOLUTE){
+            this._absolute = data;
+            this._metric = WeatherConvert.kelvinToCelsius(data);
+            this._english = WeatherConvert.kelvinToFahrenheit(data);
+         }
+         else{
+            this._metric = data;
+            this._english = WeatherConvert.celsiusToFahrenheit(data);
+            this._absolute = WeatherConvert.celsiusToKelvin(data);
+         }
+      }      
    }
 
    /**
    */
-   private void temperature(Units units, double data){
-      if(units == Units.METRIC){
-         this._metric = data;
-         this._english = WeatherConvert.celsiusToFarhrenheit(data);
-         this._absolute = WeatherConvert.celsiusToKelvin(data);
-      }
-      else if(units == Units.ENGLISH){
-         this._english = data;
-         this._metric  = WeatherConvert.fahrenheitToCelsius(data);
-         this._absolute = WeatherConvert.fahrenheitToKelvin(data);
-      }
-      else if(units == Units.ABSOLUTE){
-         this._absolute = data;
-         this._metric = WeatherConvert.kelvinToCelsius(data);
-         this._english = WeatherConvert.kelvinToFahrenheit(data);
-      }
-      else{
-         this._metric = data;
-         this._english = WeatherConvert.celsiusToFarhrenheit(data);
-         this._absolute = WeatherConvert.celsiusToKelvin(data);
+   private void humidity(double data){
+      if(data >= 0.0 && data <= 100.0){
+         this._percent = data;
       }
    }
 }

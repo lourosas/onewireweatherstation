@@ -27,7 +27,8 @@ import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 import com.dalsemi.onewire.utils.Convert;
 
-public class Thermometer extends Sensor{
+public class Thermometer extends WeatherSensor{
+   public static final int DEFAULTTEMP = -999;
    private TemperatureContainer thermalSensor;
    private static Thermometer instance;
    private static final String MAIN_NAME      = "DS1920";
@@ -59,7 +60,7 @@ public class Thermometer extends Sensor{
    }
    
    /*
-   Override the abstract measure() method from the Sensor
+   Override the abstract measure() method from the WeatherSensor
    Abstract class.  This method takes no attributes, which means
    to measure the temperature in the Units set in the initialize
    method.
