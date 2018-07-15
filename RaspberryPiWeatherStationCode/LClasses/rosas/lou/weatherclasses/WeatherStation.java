@@ -180,6 +180,61 @@ implements TimeListener{
    public void dewpoint(){
       this.publishDewpoint(this.calculateDewpoint());
    }
+   
+   /*
+   */
+   public void dewpointAbsolute(){
+      WeatherData data = this.calculateDewpoint();
+      double dewpoint  = data.dewpointDataAbsolute();
+      this.publishDewpoint(dewpoint, Units.ABSOLUTE);
+   }
+   
+   /*
+   */
+   public void dewpointEnglish(){
+      WeatherData data = this.calculateDewpoint();
+      double dewpoint  = data.dewpointDataEnglish();
+      this.publishDewpoint(dewpoint, Units.ENGLISH);
+   }
+   
+   /*
+   */
+   public void dewpointMetric(){
+      WeatherData data = this.calculateDewpoint();
+      double dewpoint  = data.dewpointDataMetric();
+      this.publishDewpoint(dewpoint, Units.METRIC);
+   }
+   
+   /*
+   */
+   public void heatIndex(){
+      this.publishHeatIndex(this.calculateHeatIndex());
+      
+   }
+   
+   /*
+   */
+   public void heatIndexAbsolute(){
+      WeatherData data = this.calculateHeatIndex();
+      double heatIndex = data.heatIndexDataAbsolute();
+      this.publishHeatIndex(heatIndex, Units.ABSOLUTE);
+   }
+   
+   /*
+   */
+   public void heatIndexEnglish(){
+      WeatherData data = this.calculateHeatIndex();
+      double heatIndex = data.heatIndexDataEnglish();
+      this.publishHeatIndex(heatIndex, Units.ENGLISH);
+   }
+   
+   /*
+   */
+   public void heatIndexMetric(){
+      WeatherData data = this.calculateHeatIndex();
+      double heatIndex = data.heatIndexDataMetric();
+      this.publishHeatIndex(heatIndex, Units.METRIC);
+   }
 
    /*
    */
@@ -202,6 +257,8 @@ implements TimeListener{
       this.temperature();
       this.humidity();
       this.barometricPressure();
+      this.dewpoint();
+      this.heatIndex();
       /*
       this.publishTimeEvent();
       this.publishTemperature();
@@ -333,15 +390,31 @@ implements TimeListener{
 
       return dewpoint;
       */
-      double temp = this._temperature.temperatureDataMetric();
+      final double l  = 243.12;  //lambda constant
+      final double b  =  17.62;  //Beta constant
+      double temp     = this._temperature.temperatureDataMetric();
       double humidity = this._humidity.humidityDataPercentage();
-      WeatherData dewpoint = new WeatherData();
+      
+      WeatherData dewpoint = null;
+      
       if(temp     > WeatherData.DEFAULTMEASURE &&
          humidity > WeatherData.DEFAULTHUMIDITY){
-         
+         double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
+         double dp    = (l * alpha)/(b - alpha);
+         String message = new String("Good Dewpoint Data");
+         dewpoint = new WeatherData(WeatherDataType.DEWPOINT,
+                                    Units.METRIC, dp, message);
       }
-      else{}
-      return null;
+      else{
+         //If temp OR humidity did not give a good reading, the
+         //dewpoint CANNOT be calculated!
+         String message = new String("No Dewpoint Data");
+         dewpoint = new WeatherData(WeatherDataType.DEWPOINT,
+                                    Units.METRIC,
+                                    WeatherData.DEFAULTMEASURE,
+                                    message);
+      }
+      return dewpoint;
    }
 
    /*
@@ -378,7 +451,7 @@ implements TimeListener{
           System to figure out the appropriateness of the Heat Index
           data for display.
    */
-   private double calculateHeatIndex(){
+   private WeatherData calculateHeatIndex(){
       //final double MINIMUMTEMP = 70.;
       //double heatIndex = Thermometer.DEFAULTTEMP;
 
@@ -423,7 +496,56 @@ implements TimeListener{
       //   }
       //}
       //return heatIndex;
-      return WeatherData.DEFAULTMEASURE;
+      final double MINIMUMTEMP = 70.;
+      double tf = this._temperature.temperatureDataEnglish();
+      double rh = this._humidity.humidityDataPercentage();
+      
+      WeatherData heatIndex = null;
+      
+      if(tf > WeatherData.DEFAULTMEASURE &&
+         rh > WeatherData.DEFAULTHUMIDITY){
+         if(tf >= MINIMUMTEMP){
+            double heatI  = 16.923;
+            heatI += (0.185212 * tf);
+            heatI += (5.37941  * rh);
+            heatI -= ((0.100254) * tf * rh);
+            heatI += ((9.41685 * 0.001) * tf * tf);
+            heatI += ((7.28898 * 0.001) * rh * rh);
+            heatI += ((3.45372 * 0.0001) * tf * tf * rh);
+            heatI -= ((8.14971 * 0.0001) * tf * rh * rh);
+            heatI += ((1.02102 * 0.00001) * tf * tf * rh * rh);
+            heatI -= ((3.8646  * 0.00001) * tf * tf * tf);
+            heatI += ((2.91583 * 0.00001) * rh * rh * rh);
+            heatI += ((1.42721 * .000001)* tf * tf * tf *rh);
+            heatI += ((1.97483 * .0000001) * tf * rh * rh * rh);
+            heatI -= ((2.18429 * .00000001) *tf*tf*tf* rh * rh);
+            heatI += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
+            heatI -= ((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
+            String message = new String("Good HeatIndex Data");
+            heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
+                                        Units.ENGLISH,
+                                        heatI,
+                                        message);
+         }
+         else{
+            //Temperature is too low for accurate calculation
+            String message = new String("Temperature Too Low");
+            heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
+                                        Units.METRIC,
+                                        WeatherData.DEFAULTMEASURE,
+                                        message);
+         }
+      }
+      else{
+         //if temp or humidity did not give a good reading, the
+         //Heat Index CANNOT be calculated!
+         String message = new String("No Heat Index Data");
+         heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
+                                     Units.METRIC,
+                                     WeatherData.DEFAULTMEASURE,
+                                     message);
+      }
+      return heatIndex;
    }
 
    /**
@@ -561,10 +683,39 @@ implements TimeListener{
          }
       }
       */
+      try{
+         Iterator<CalculatedObserver> i = c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            co.updateDewpoint(data);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
 
    /**/
-   protected void publishDewpoint(double data, Units units){}
+   protected void publishDewpoint(double data, Units units){
+      try{
+         Iterator<CalculatedObserver> i = c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            if(units == Units.METRIC){
+               co.updateDewpointMetric(data);
+            }
+            else if(units == Units.ENGLISH){
+               co.updateDewpointEnglish(data);
+            }
+            else if(units == Units.ABSOLUTE){
+               co.updateDewpointAbsolute(data);
+            }
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
 
    /*
    */
@@ -637,11 +788,40 @@ implements TimeListener{
          }
       }
       */
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            co.updateHeatIndex(data);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
 
    /*
    */
-   protected void publishHeatIndex(double data, Units units){}
+   protected void publishHeatIndex(double data, Units units){
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            if(units == Units.METRIC){
+               co.updateHeatIndexMetric(data);
+            }
+            else if(units == Units.ENGLISH){
+               co.updateHeatIndexEnglish(data);
+            }
+            else if(units == Units.ABSOLUTE){
+               co.updateHeatIndexAbsolute(data);
+            }
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
 
    /**
    */

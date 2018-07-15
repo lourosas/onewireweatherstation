@@ -66,6 +66,30 @@ public class WeatherData{
    }
 
    //***********************Public Methods***************************
+   /*
+   */
+   public double absoluteData(){
+      return this._absolute;
+   }
+   
+   /*
+   */
+   public double englishData(){
+      return this._english;
+   }
+   
+   /*
+   */
+   public double metricData(){
+      return this._metric;
+   }
+   
+   /*
+   */
+   public double percentageData(){
+      return this._percent;
+   }
+   
    /**
    Set the current data with a given message that can be checked to
    see if further information related to the type and condition
@@ -91,6 +115,9 @@ public class WeatherData{
       else if(type == WeatherDataType.DEWPOINT){
          this.genericThermalData(units, data);
       }
+      else if(type == WeatherDataType.HEATINDEX){
+         this.genericThermalData(units, data);
+      }
       try{
          this._message = new String(message);
       }
@@ -106,7 +133,19 @@ public class WeatherData{
    public void data(WeatherDataType type, Units units, double data){
       this.data(type, units, data, null);
    }
-
+   
+   /*
+   */
+   public void data(Units, units, double data, String message){
+      this.data(WeatherDataType.TEMPERATURE, units, data, message);
+   }
+   
+   /*
+   */
+   public void data(Units units, double data){
+      this.data(WeatherDataType.TEMPERATURE, units, data, null);
+   }
+   
    /**
    Get the current data--in the respective units.
    There is no guarantee the requester will get the correct data
@@ -163,7 +202,37 @@ public class WeatherData{
       }
       return data;
    }
-
+   
+   /*
+   */
+   public double heatIndexDataAbsolute(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.HEATINDEX){
+         data = this._absolute;
+      }
+      return data;
+   }
+   
+   /*
+   */
+   public double heatIndexDataEnglish(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.HEATINDEX){
+         data = this._english;
+      }
+      return data;
+   }
+   
+   /*
+   */
+   public double heatIndexDataMetric(){
+      double data = DEFAULTMEASURE;
+      if(this.weatherType() == WeatherDataType.HEATINDEX){
+         data = this._metric;
+      }
+      return data;
+   }
+   
    /*
    */
    public double pressureDataAbsolute(){

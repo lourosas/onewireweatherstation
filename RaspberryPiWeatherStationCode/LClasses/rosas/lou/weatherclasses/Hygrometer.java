@@ -197,10 +197,12 @@ public class Hygrometer extends WeatherSensor{
       }
       catch(OneWireIOException ioe){
          this.hygrometerSensor = null;
+         ioe.printStackTrace();
          System.out.println("Error Setting up Humidity Resolutions");
       }
       catch(OneWireException owe){
          this.hygrometerSensor = null;
+         owe.printStackTrace();
          System.out.println("Error Setting up Humidity Resolutions");
       }
       catch(NullPointerException npe){
@@ -260,12 +262,18 @@ public class Hygrometer extends WeatherSensor{
          calcHum=this.convertVoltageToRelativeHumidity(vad,vdd,temp);
       }
       catch(OneWireIOException owe){
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
          calcHum = WeatherData.DEFAULTHUMIDITY;
       }
       catch(OneWireException we){
+         System.out.println(we.getStackTrace()[0].getFileName());
+         System.out.println(""+we.getStackTrace()[0].getLineNumber());
          calcHum = WeatherData.DEFAULTHUMIDITY;
       }
       catch(NullPointerException npe){
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
          calcHum = WeatherData.DEFAULTHUMIDITY;
       }
       return calcHum;

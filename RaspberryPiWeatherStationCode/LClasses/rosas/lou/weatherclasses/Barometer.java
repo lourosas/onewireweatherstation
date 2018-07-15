@@ -72,6 +72,8 @@ public class Barometer extends WeatherSensor{
                                 good);
       }
       catch(OneWireIOException ioe){
+         System.out.println(ioe.getStackTrace()[0].getFileName());
+         System.out.println(""+ioe.getStackTrace()[0].getLineNumber());
          pressureInches = WeatherData.DEFAULTMEASURE;
          data = new WeatherData(WeatherDataType.PRESSURE,
                                 Units.ENGLISH,
@@ -79,6 +81,8 @@ public class Barometer extends WeatherSensor{
                                 bad);
       }
       catch(OneWireException owe){
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
          pressureInches = WeatherData.DEFAULTMEASURE;
          data = new WeatherData(WeatherDataType.PRESSURE,
                                 Units.ENGLISH,
@@ -86,6 +90,8 @@ public class Barometer extends WeatherSensor{
                                 bad);
       }
       catch(NullPointerException npe){
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
          pressureInches = WeatherData.DEFAULTMEASURE;
          data = new WeatherData(WeatherDataType.PRESSURE,
                                 Units.ENGLISH,

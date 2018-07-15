@@ -32,5 +32,9 @@ public interface CalculatedObserver{
    public void updateDewpointMetric(double dp);
    public void updateHeatIndex(WeatherEvent event);
    public void updateHeatIndex(WeatherStorage store);
+   public void updateHeatIndex(WeatherData data);
+   public void updateHeatIndexAbsolute(double dp);
+   public void updateHeatIndexEnglish(double dp);
+   public void updateHeatIndexMetric(double dp);
    public void updateWindChill(WeatherEvent event);
 }

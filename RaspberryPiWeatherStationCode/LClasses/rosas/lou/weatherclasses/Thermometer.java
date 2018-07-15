@@ -90,6 +90,8 @@ public class Thermometer extends WeatherSensor{
       }
       catch(OneWireIOException ioe){
          currentTemp = WeatherData.DEFAULTMEASURE;
+         System.out.println(ioe.getStackTrace()[0].getFileName());
+         System.out.println(""+ioe.getStackTrace()[0].getLineNumber());
          currentData = new WeatherData(WeatherDataType.TEMPERATURE,
                                        Units.METRIC,
                                        currentTemp,
@@ -97,6 +99,8 @@ public class Thermometer extends WeatherSensor{
       }
       catch(OneWireException   owe){
          currentTemp = WeatherData.DEFAULTMEASURE;
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
          currentData = new WeatherData(WeatherDataType.TEMPERATURE,
                                        Units.METRIC,
                                        currentTemp,
@@ -104,6 +108,8 @@ public class Thermometer extends WeatherSensor{
       }
       catch(NullPointerException npe){
          currentTemp = WeatherData.DEFAULTMEASURE;
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
          currentData = new WeatherData(WeatherDataType.TEMPERATURE,
                                        Units.METRIC,
                                        currentTemp,
@@ -161,10 +167,12 @@ public class Thermometer extends WeatherSensor{
       catch(OneWireIOException ioe){
          this.thermalSensor = null;
          System.out.println("Error Setting Temperature Resolution");
+         ioe.printStackTrace();
       }
       catch(OneWireException owe){
          this.thermalSensor = null;
          System.out.println("Error Setting Temperature Resolution");
+         ioe.printStackTrace();
       }
       catch(NullPointerException npe){
          this.thermalSensor = null;
