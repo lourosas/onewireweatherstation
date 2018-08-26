@@ -152,7 +152,7 @@ implements TimeListener{
    public void barometricPressureAbsolute(){
       WeatherSensor barometer = Barometer.getInstance();
       WeatherData   data      = barometer.measure();
-      double    pressure      = data.pressureDataAbsolute();
+      double    pressure      = data.absoluteData();
       this.publishBarometricPressure(pressure, Units.ABSOLUTE);
    }
 
@@ -161,7 +161,7 @@ implements TimeListener{
    public void barometricPressureEnglish(){
       WeatherSensor barometer = Barometer.getInstance();
       WeatherData   data      = barometer.measure();
-      double    pressure      = data.pressureDataEnglish();
+      double    pressure      = data.englishData();
       this.publishBarometricPressure(pressure, Units.ENGLISH);
 
    }
@@ -171,7 +171,7 @@ implements TimeListener{
    public void barometricPressureMetric(){
       WeatherSensor barometer = Barometer.getInstance();
       WeatherData   data      = barometer.measure();
-      double    pressure      = data.pressureDataMetric();
+      double    pressure      = data.metricData();
       this.publishBarometricPressure(pressure, Units.METRIC);
    }
    
@@ -185,7 +185,7 @@ implements TimeListener{
    */
    public void dewpointAbsolute(){
       WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.dewpointDataAbsolute();
+      double dewpoint  = data.absoluteData();
       this.publishDewpoint(dewpoint, Units.ABSOLUTE);
    }
    
@@ -193,7 +193,7 @@ implements TimeListener{
    */
    public void dewpointEnglish(){
       WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.dewpointDataEnglish();
+      double dewpoint  = data.englishData();
       this.publishDewpoint(dewpoint, Units.ENGLISH);
    }
    
@@ -201,7 +201,7 @@ implements TimeListener{
    */
    public void dewpointMetric(){
       WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.dewpointDataMetric();
+      double dewpoint  = data.metricData();
       this.publishDewpoint(dewpoint, Units.METRIC);
    }
    
@@ -216,7 +216,7 @@ implements TimeListener{
    */
    public void heatIndexAbsolute(){
       WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.heatIndexDataAbsolute();
+      double heatIndex = data.absoluteData();
       this.publishHeatIndex(heatIndex, Units.ABSOLUTE);
    }
    
@@ -224,7 +224,7 @@ implements TimeListener{
    */
    public void heatIndexEnglish(){
       WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.heatIndexDataEnglish();
+      double heatIndex = data.englishData();
       this.publishHeatIndex(heatIndex, Units.ENGLISH);
    }
    
@@ -232,7 +232,7 @@ implements TimeListener{
    */
    public void heatIndexMetric(){
       WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.heatIndexDataMetric();
+      double heatIndex = data.metricData();
       this.publishHeatIndex(heatIndex, Units.METRIC);
    }
 
@@ -247,7 +247,7 @@ implements TimeListener{
    */
    public void humidityValue(){
       this.setHumidity();
-      this.publishHumidity(this._humidity.humidityDataPercentage());
+      this.publishHumidity(this._humidity.percentageData());
    }
 
    /*
@@ -259,16 +259,6 @@ implements TimeListener{
       this.barometricPressure();
       this.dewpoint();
       this.heatIndex();
-      /*
-      this.publishTimeEvent();
-      this.publishTemperature();
-      this.publishHumidity();
-      this.publishDewpoint();
-      this.publishHeatIndex();
-      //Until I can handle null exceptions better
-      this.publishBarometricPressure();
-      this.publishExtremes();
-      */
    }
 
    /*
@@ -314,7 +304,7 @@ implements TimeListener{
    */
    public void temperatureAbsolute(){
       this.setTemperature();
-      double temp = this._temperature.temperatureDataAbsolute();
+      double temp = this._temperature.absoluteData();
       this.publishTemperature(temp, Units.ABSOLUTE);
    }
 
@@ -322,7 +312,7 @@ implements TimeListener{
    */
    public void temperatureEnglish(){
       this.setTemperature();
-      double temp = this._temperature.temperatureDataEnglish();
+      double temp = this._temperature.englishData();
       this.publishTemperature(temp, Units.ENGLISH);
    }
 
@@ -330,7 +320,7 @@ implements TimeListener{
    */
    public void temperatureMetric(){
       this.setTemperature();
-      double temp = this._temperature.temperatureDataMetric();
+      double temp = this._temperature.metricData();
       this.publishTemperature(temp, Units.METRIC);
    }
    
@@ -392,27 +382,25 @@ implements TimeListener{
       */
       final double l  = 243.12;  //lambda constant
       final double b  =  17.62;  //Beta constant
-      double temp     = this._temperature.temperatureDataMetric();
-      double humidity = this._humidity.humidityDataPercentage();
+      double temp     = this._temperature.metricData();
+      double humidity = this._humidity.percentageData();
       
       WeatherData dewpoint = null;
       
-      if(temp     > WeatherData.DEFAULTMEASURE &&
+      if(temp     > WeatherData.DEFAULTVALUE &&
          humidity > WeatherData.DEFAULTHUMIDITY){
          double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
          double dp    = (l * alpha)/(b - alpha);
          String message = new String("Good Dewpoint Data");
-         dewpoint = new WeatherData(WeatherDataType.DEWPOINT,
-                                    Units.METRIC, dp, message);
+         dewpoint = new DewpointData(Units.METRIC, dp, message);
       }
       else{
          //If temp OR humidity did not give a good reading, the
          //dewpoint CANNOT be calculated!
          String message = new String("No Dewpoint Data");
-         dewpoint = new WeatherData(WeatherDataType.DEWPOINT,
-                                    Units.METRIC,
-                                    WeatherData.DEFAULTMEASURE,
-                                    message);
+         dewpoint = new DewpointData(Units.METRIC,
+                                     WeatherData.DEFAULTVALUE,
+                                     message);
       }
       return dewpoint;
    }
@@ -497,12 +485,12 @@ implements TimeListener{
       //}
       //return heatIndex;
       final double MINIMUMTEMP = 70.;
-      double tf = this._temperature.temperatureDataEnglish();
-      double rh = this._humidity.humidityDataPercentage();
+      double tf = this._temperature.englishData();
+      double rh = this._humidity.percentageData();
       
       WeatherData heatIndex = null;
       
-      if(tf > WeatherData.DEFAULTMEASURE &&
+      if(tf > WeatherData.DEFAULTVALUE &&
          rh > WeatherData.DEFAULTHUMIDITY){
          if(tf >= MINIMUMTEMP){
             double heatI  = 16.923;
@@ -522,28 +510,25 @@ implements TimeListener{
             heatI += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
             heatI -= ((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
             String message = new String("Good HeatIndex Data");
-            heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
-                                        Units.ENGLISH,
-                                        heatI,
-                                        message);
+            heatIndex = new HeatIndexData(Units.ENGLISH,
+                                          heatI,
+                                          message);
          }
          else{
             //Temperature is too low for accurate calculation
             String message = new String("Temperature Too Low");
-            heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
-                                        Units.METRIC,
-                                        WeatherData.DEFAULTMEASURE,
-                                        message);
+            heatIndex = new HeatIndexData(Units.METRIC,
+                                          WeatherData.DEFAULTVALUE,
+                                          message);
          }
       }
       else{
          //if temp or humidity did not give a good reading, the
          //Heat Index CANNOT be calculated!
          String message = new String("No Heat Index Data");
-         heatIndex = new WeatherData(WeatherDataType.HEATINDEX,
-                                     Units.METRIC,
-                                     WeatherData.DEFAULTMEASURE,
-                                     message);
+         heatIndex = new HeatIndexData(Units.METRIC,
+                                       WeatherData.DEFAULTVALUE,
+                                       message);
       }
       return heatIndex;
    }
