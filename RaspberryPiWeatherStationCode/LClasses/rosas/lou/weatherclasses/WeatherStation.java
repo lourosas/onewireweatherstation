@@ -37,6 +37,8 @@ import com.dalsemi.onewire.utils.Convert;
 
 public class WeatherStation extends WeatherDataPublisher 
 implements TimeListener{
+   private static int _id                    = -1;
+
    //put into a list to handle multiple observers
    private List<TemperatureObserver> t_o_List  = null;
    private List<HumidityObserver>    h_o_List  = null;
@@ -45,20 +47,28 @@ implements TimeListener{
    private List<TimeObserver>        ti_o_List = null;
    private List<ExtremeObserver>     ex_o_List = null;
    private List<TemperatureHumidityObserver> t_h_List = null;
-   private WeatherData               _temperature = null;
-   private WeatherData               _humidity    = null;
+   private WeatherData               _dewPoint = null;
+   private WeatherData              _heatIndex = null;
+   private WeatherData               _humidity = null;
+   private WeatherData               _pressure = null;
+   private WeatherData            _temperature = null;
+   private long            _previousTimeMillis =   -1;
+   //Save to the database (by default) every 10 minutes
+   private long             _dataBaseSaveTime = 600000;
 
    //************************Constructors*****************************
    /*
    Constructor of no arguments
    */
    public WeatherStation(){
+      ++_id;
    }
 
    /*
    Constructor initializing the Units, et. al...
    */
    public WeatherStation(Units units){
+      ++_id;
    }
 
    /**/
@@ -143,25 +153,23 @@ implements TimeListener{
    /*
    */
    public void barometricPressure(){
-      WeatherSensor barometer = Barometer.getInstance();
-      this.publishBarometricPressure(barometer.measure());
+      this.setPressure();
+      this.publishBarometricPressure(this._pressure);
    }
 
    /*
    */
    public void barometricPressureAbsolute(){
-      WeatherSensor barometer = Barometer.getInstance();
-      WeatherData   data      = barometer.measure();
-      double    pressure      = data.absoluteData();
+      this.setPressure();
+      double pressure = this._pressure.absoluteData();
       this.publishBarometricPressure(pressure, Units.ABSOLUTE);
    }
 
    /*
    */
    public void barometricPressureEnglish(){
-      WeatherSensor barometer = Barometer.getInstance();
-      WeatherData   data      = barometer.measure();
-      double    pressure      = data.englishData();
+      this.setPressure();
+      double pressure = this._pressure.englishData();
       this.publishBarometricPressure(pressure, Units.ENGLISH);
 
    }
@@ -169,70 +177,81 @@ implements TimeListener{
    /*
    */
    public void barometricPressureMetric(){
-      WeatherSensor barometer = Barometer.getInstance();
-      WeatherData   data      = barometer.measure();
-      double    pressure      = data.metricData();
+      this.setPressure();
+      double pressure = this._pressure.metricData();
       this.publishBarometricPressure(pressure, Units.METRIC);
+   }
+
+   /*
+   Pick the time (in minutes) to save off the database.
+   The default is 10 minutes
+   */
+   public void dataBaseSaveTime(int minutes){
+      final int SECONDS      = 60;   //Seconds in a minutue
+      final int MILLISECONDS = 1000; //Milli-Seconds in a second
+      this._dataBaseSaveTime = minutes*SECONDS*MILLISECONDS;
    }
    
    /*
    */
    public void dewpoint(){
-      this.publishDewpoint(this.calculateDewpoint());
+      this.setDewpoint();
+      this.publishDewpoint(this._dewPoint);
    }
    
    /*
    */
    public void dewpointAbsolute(){
-      WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.absoluteData();
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.absoluteData();
       this.publishDewpoint(dewpoint, Units.ABSOLUTE);
    }
    
    /*
    */
    public void dewpointEnglish(){
-      WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.englishData();
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.englishData();
       this.publishDewpoint(dewpoint, Units.ENGLISH);
    }
    
    /*
    */
    public void dewpointMetric(){
-      WeatherData data = this.calculateDewpoint();
-      double dewpoint  = data.metricData();
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.metricData();
       this.publishDewpoint(dewpoint, Units.METRIC);
    }
    
    /*
    */
    public void heatIndex(){
-      this.publishHeatIndex(this.calculateHeatIndex());
+      this.setHeatIndex();
+      this.publishHeatIndex(this._heatIndex);
       
    }
    
    /*
    */
    public void heatIndexAbsolute(){
-      WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.absoluteData();
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.absoluteData();
       this.publishHeatIndex(heatIndex, Units.ABSOLUTE);
    }
    
    /*
    */
    public void heatIndexEnglish(){
-      WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.englishData();
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.englishData();
       this.publishHeatIndex(heatIndex, Units.ENGLISH);
    }
    
    /*
    */
    public void heatIndexMetric(){
-      WeatherData data = this.calculateHeatIndex();
-      double heatIndex = data.metricData();
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.metricData();
       this.publishHeatIndex(heatIndex, Units.METRIC);
    }
 
@@ -251,6 +270,10 @@ implements TimeListener{
    }
 
    /*
+   */
+   public int id(){ return _id; }
+
+   /*
    Now make this real easy
    */
    public void measure(){
@@ -259,6 +282,8 @@ implements TimeListener{
       this.barometricPressure();
       this.dewpoint();
       this.heatIndex();
+      //The User needs to know if this was possible
+      this.archiveToDatabase();
    }
 
    /*
@@ -340,7 +365,27 @@ implements TimeListener{
    public void update(TimeFormater tf, ClockState cs){}
    ///////////////////////////////////////////////////////////////////
 
-   ///////////////////////////////////////////////////////////////////
+   ////////////////////////////Private Methods////////////////////////
+   /*
+   */
+   private void archiveToDatabase(){
+      Calendar cal            = Calendar.getInstance();
+      WeatherDatabase db      = MySQLWeatherDatabase.getInstance();
+      long currentTimeMillis  = cal.getTimeInMillis();
+      if((currentTimeMillis - this._previousTimeMillis) >= 
+                                             this._dataBaseSaveTime){
+         System.out.println("Archive!\n");
+         System.out.println(currentTimeMillis + "\n");
+         System.out.println(this._previousTimeMillis + "\n");
+         this._previousTimeMillis = currentTimeMillis;
+         db.temperature(this._temperature);
+         db.humidity(this._humidity);
+         db.barometricPressure(this._pressure);
+         db.dewpoint(this._dewPoint);
+         db.heatIndex(this._heatIndex);
+      }
+   }
+
    /*
    Very Simple:
    Calculate the dewpoint for a given pair of humidity and
@@ -998,12 +1043,31 @@ implements TimeListener{
       }
    }
    */
+
+   /*
+   */
+   private void setDewpoint(){
+      this._dewPoint = this.calculateDewpoint();
+   }
+
+   /*
+   */
+   private void setHeatIndex(){
+      this._heatIndex = this.calculateHeatIndex();
+   }
+
    /*
    Set the _humidity WeatherData by messaging the Hygrometer for
    data
    */
    private void setHumidity(){
       this._humidity = Hygrometer.getInstance().measure();
+   }
+
+   /*
+   */
+   private void setPressure(){
+      this._pressure = Barometer.getInstance().measure();
    }
    /*
    Set the _temperature WeatherData by messaging the Thermometer for

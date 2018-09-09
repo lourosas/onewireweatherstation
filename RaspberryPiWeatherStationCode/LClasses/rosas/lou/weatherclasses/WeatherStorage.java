@@ -83,8 +83,8 @@ public class WeatherStorage{
          //WHICH Database Instance to access.  There are (going to
          //be) several databases to access.  It all depends the
          //Database instantiated.
-         Database database = MySQLWeatherDatabase.getInstance();
-         dpData = database.dewpointFromDatabase(month, day, year);
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+         //dpData = database.dewpointFromDatabase(month, day, year);
       }
       catch(NullPointerException npe){}
       finally{
@@ -189,8 +189,8 @@ public class WeatherStorage{
    ){
       List<String> hiData = null;
       try{
-         Database database = MySQLWeatherDatabase.getInstance();
-         hiData = database.heatIndexFromDatabase(month,day,year);
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+         //hiData = database.heatIndexFromDatabase(month,day,year);
       }
       catch(NullPointerException npe){}
       finally{
@@ -208,8 +208,8 @@ public class WeatherStorage{
    ){
       List<String> hData = null;
       try{
-         Database database = MySQLWeatherDatabase.getInstance();
-         hData = database.humidityFromDatabase(month,day,year);
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+         //hData = database.humidityFromDatabase(month,day,year);
       }
       catch(NullPointerException npe){}
       finally{
@@ -227,8 +227,8 @@ public class WeatherStorage{
    ){
       List<String> pData = null;
       try{
-         Database database = MySQLWeatherDatabase.getInstance();
-         pData = database.pressureFromDatabase(month,day,year);
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+         //pData = database.pressureFromDatabase(month,day,year);
       }
       catch(NullPointerException npe){}
       finally{
@@ -246,8 +246,8 @@ public class WeatherStorage{
    ){
       List<String> tData = null;
       try{
-         Database database = MySQLWeatherDatabase.getInstance();
-         tData = database.temperatureFromDatabase(month,day,year);
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+         //tData = database.temperatureFromDatabase(month,day,year);
       }
       catch(NullPointerException npe){}
       finally{
@@ -795,9 +795,9 @@ public class WeatherStorage{
       List<String> returnData = null;
       try{
          //Database database = Database.getInstance();
-         Database database = MySQLWeatherDatabase.getInstance();
+         WeatherDatabase database=MySQLWeatherDatabase.getInstance();
 
-         returnData = database.requestData(request);
+         //returnData = database.requestData(request);
       }
       catch(NullPointerException npe){}
       finally{
@@ -1135,8 +1135,8 @@ public class WeatherStorage{
       //Go ahead and get the Singleton and populate the latest
       //temperature data
       //Database database = Database.getInstance();
-      Database database = MySQLWeatherDatabase.getInstance();
-      database.store(event);
+      WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+      //database.store(event);
       try{
          if(this.dewpointHash.containsKey(cal)){
             dp = this.dewpointHash.get(cal);
@@ -1166,8 +1166,8 @@ public class WeatherStorage{
       //Go ahead and get the Singleton and populate the latest
       //temperature data
       //Database database = Database.getInstance();
-      Database database = MySQLWeatherDatabase.getInstance();
-      database.store(event);
+      WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+      //database.store(event);
       try{
          if(this.heatIndexHash.containsKey(cal)){
             heatIndices = this.heatIndexHash.get(cal);
@@ -1197,8 +1197,8 @@ public class WeatherStorage{
       //Go ahead and get the Singleton and populate the latest
       //temperature data
       //Database database = Database.getInstance();
-      Database database = MySQLWeatherDatabase.getInstance();
-      database.store(event);
+      WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+      //database.store(event);
       try{
          if(this.humidityHash.containsKey(cal)){
             humids = this.humidityHash.get(cal);
@@ -1228,8 +1228,8 @@ public class WeatherStorage{
       //Go ahead and get the Singleton and populate the latest
       //temperature data
       //Database database = Database.getInstance();
-      Database database = MySQLWeatherDatabase.getInstance();
-      database.store(event);
+      WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+      //database.store(event);
       try{
          cal = event.getCalendar();
          if(this.pressureHash.containsKey(cal)){
@@ -1260,8 +1260,8 @@ public class WeatherStorage{
       //Go ahead and get the Singleton and populate the latest
       //temperature data
       //Database database = Database.getInstance();
-      Database database = MySQLWeatherDatabase.getInstance();
-      database.store(event);
+      WeatherDatabase database=MySQLWeatherDatabase.getInstance();
+      //database.store(event);
       try{
          if(this.temperatureHash.containsKey(cal)){
             temps = this.temperatureHash.get(cal);
