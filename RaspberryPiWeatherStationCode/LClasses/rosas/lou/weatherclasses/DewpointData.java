@@ -30,17 +30,32 @@ public class DewpointData extends ThermalData implements WeatherData{
    };
    
    //***********************Constructors******************************
-   /**/
+   /*
+   */
    public DewpointData(){}
    
-   /**/
+   /*
+   */
    public DewpointData(Units units, double data){
       this(units, data, null);
    }
    
-   /**/
+   /*
+   */
    public DewpointData(Units units, double data, String message){
       this.data(units, data, message);
+   }
+
+   /*
+   */
+   public DewpointData
+   (
+      Units units,
+      double data,
+      String message,
+      Calendar cal
+   ){
+      this.data(units, data, message, cal);
    }
    
    //******************Interface Implementation***********************
@@ -63,15 +78,31 @@ public class DewpointData extends ThermalData implements WeatherData{
    public double percentageData(){
       return super.percentageData();
    }
+
+   /**/
+   public Calendar calendar(){
+      return super.calendar();
+   }
+
+   /**/
+   public void data
+   (
+      Units units,
+      double data,
+      String message,
+      Calendar cal
+   ){
+      super.data(units, data, message, cal);
+   }
    
    /**/
    public void data(Units units, double data, String message){
-      super.data(units,data,message);
+      super.data(units,data,message,null);
    }
    
    /**/
    public void data(Units units, double data){
-      super.data(units,data,null);
+      super.data(units,data,null,null);
    }
    
    /**/
@@ -120,6 +151,11 @@ public class DewpointData extends ThermalData implements WeatherData{
          dpString = dpString.concat(" Not all Data Received, ");
          dpString = dpString.concat("data may be corrupted");
       }
+      try{
+         String cal = String.format("%tc",this.calendar());
+         dpString = dpString.concat(":  " + cal);
+      }
+      catch(NullPointerException npe){}
       return dpString;
    }
 }

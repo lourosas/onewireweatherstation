@@ -28,6 +28,7 @@ public class ThermalData implements WeatherData{
    protected double          _absolute;
    protected double          _english;
    protected double          _metric;
+   protected Calendar        _cal;
    protected WeatherDataType _type;
    protected String          _message;
    
@@ -36,6 +37,7 @@ public class ThermalData implements WeatherData{
       _english  = WeatherData.DEFAULTVALUE;
       _metric   = WeatherData.DEFAULTVALUE;
       _type     = WeatherDataType.TEMPERATURE;
+      _cal      = null;
       _message  = null;
    };
    
@@ -59,9 +61,20 @@ public class ThermalData implements WeatherData{
    public double percentageData(){
       return WeatherData.DEFAULTVALUE;
    }
+
+   /**/
+   public Calendar calendar(){
+      return this._cal;
+   }
    
    /**/
-   public void data(Units units, double data, String message){
+   public void data
+   (
+      Units units,
+      double data,
+      String message,
+      Calendar cal
+   ){
       if(data > WeatherData.DEFAULTVALUE){
          if(units == Units.ABSOLUTE){
             this._absolute = data;
@@ -90,11 +103,18 @@ public class ThermalData implements WeatherData{
       if(message != null){
          this._message = new String(message);
       }
+      this._cal = cal;
    }
+
+   /**/
+   public void data(Units units, double data, String message){
+      this.data(units, data, message, null);
+   }
+   
    
    /**/
    public void data(Units units, double data){
-      this.data(units, data, null);     
+      this.data(units, data, null, null);     
    }
    
    /**/

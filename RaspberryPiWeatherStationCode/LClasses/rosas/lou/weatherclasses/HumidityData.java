@@ -25,13 +25,15 @@ import gnu.io.*;
 import com.dalsemi.onewire.utils.Convert;
 
 public class HumidityData implements WeatherData{
-   private double _humidity;
-   private double _type;
-   private String _message;
+   private double          _humidity;
+   private WeatherDataType _type;
+   private Calendar        _cal;
+   private String          _message;
    
    {
       _humidity = WeatherData.DEFAULTHUMIDITY;
       _type     = WeatherDataType.HUMIDITY;
+      _cal      = null;
       _message  = null;
    };
    
@@ -47,8 +49,19 @@ public class HumidityData implements WeatherData{
    }
    
    /**/
-   public HumdityData(Units units, double value, String message){
+   public HumidityData(Units units, double value, String message){
       this.data(units, value, message);
+   }
+
+   /**/
+   public HumidityData
+   (
+      Units units,
+      double value,
+      String message,
+      Calendar cal
+   ){
+      this.data(units, value, message, cal);
    }
    
    //******************Interface Implementation***********************
@@ -69,16 +82,38 @@ public class HumidityData implements WeatherData{
    
    /**/
    public double percentageData(){ return this._humidity; }
-   
+
    /**/
-   public data(Units units, double humidity, String message){
-      this.humidity(humidity);
-      this.message(message);
+   public Calendar calendar(){
+      return this._cal;
    }
    
    /**/
-   public data(Units units, double humidity){
-      this.data(units, humidity, null);     
+   public void data
+   (
+      Units units,
+      double humidity,
+      String message,
+      Calendar cal
+   ){
+      this.humidity(humidity);
+      this.message(message);
+      this.calendar(cal);
+   }
+
+   /**/
+   public void data(Units units, double humidity, String message){
+      this.data(units,humidity,message,null);
+   }
+   
+   /**/
+   public void data(Units units, double humidity){
+      this.data(units, humidity, null, null);     
+   }
+   
+   /**/
+   public String message(){
+      return this._message;
    }
    
    /**/
@@ -103,15 +138,34 @@ public class HumidityData implements WeatherData{
    
    /**/
    public String toStringPercentage(){
-      return new String(this._percentage + "%");
+      return new String(this._humidity + "%");
+   }
+   
+   //********************Pubilc Methods********************************
+   public String toString(){
+      String hString = new String(this.toStringPercentage() + ", ");
+      hString = hString.concat(this.type() +", " + this.message());
+      try{
+         String cal = String.format("%tc", this.calendar());
+         hString = hString.concat(":  " + cal);
+      }
+      catch(NullPointerException npe){}
+      return hString;
+      
    }
    
    //*********************Private Methods*****************************
    /*
    */
+   private void calendar(Calendar cal){
+      this._cal = cal;
+   }
+
+   /*
+   */
    private void humidity(double value){
       if(value >= 0. && value <= 100.){
-         this._humdity = value;
+         this._humidity = value;
       }
       else{
          this._humidity = WeatherData.DEFAULTHUMIDITY;

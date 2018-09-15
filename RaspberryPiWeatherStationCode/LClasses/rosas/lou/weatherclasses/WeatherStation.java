@@ -301,7 +301,7 @@ implements TimeListener{
       TemperatureHumidityObserver tho
    ){}
 
-   /**
+   /*
    */
    public void setUpdateRate(int mins){
       final int SECONDS      = 60;   //Seconds in a minutue

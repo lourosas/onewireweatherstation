@@ -24,27 +24,32 @@ import rosas.lou.weatherclasses.*;
 import gnu.io.*;
 import com.dalsemi.onewire.utils.Convert;
 
-public class HeatIndexData extends ThermalData implements WeatherData{
+public class TemperatureData extends ThermalData
+implements WeatherData{
    {
-      _type = WeatherDataType.HEATINDEX;
+      _type = WeatherDataType.TEMPERATURE;
    };
    
    //***********************Constructors******************************
-   /**/
-   public HeatIndexData(){}
-
-   /**/
-   public HeatIndexData(Units units, double data){
+   /*
+   */
+   public TemperatureData(){}
+   
+   /*
+   */
+   public TemperatureData(Units units, double data){
       this(units, data, null);
    }
-
-   /**/
-   public HeatIndexData(Units units, double data, String message){
+   
+   /*
+   */
+   public TemperatureData(Units units, double data, String message){
       this.data(units, data, message);
    }
 
-   /**/
-   public HeatIndexData
+   /*
+   */
+   public TemperatureData
    (
       Units units,
       double data,
@@ -75,6 +80,10 @@ public class HeatIndexData extends ThermalData implements WeatherData{
       return super.percentageData();
    }
 
+   public Calendar calendar(){
+      return super.calendar();
+   }
+
    /**/
    public void data
    (
@@ -93,7 +102,7 @@ public class HeatIndexData extends ThermalData implements WeatherData{
    
    /**/
    public void data(Units units, double data){
-      super.data(units, data, null, null);
+      super.data(units, data, null, null);     
    }
    
    /**/
@@ -128,24 +137,16 @@ public class HeatIndexData extends ThermalData implements WeatherData{
    
    //******************Public Methods*********************************
    public String toString(){
-      String hiString = new String();
-      try{
-         hiString = hiString.concat(this.toStringAbsolute() + ", ");
-         hiString = hiString.concat(this.toStringEnglish() + ", ");
-         hiString = hiString.concat(this.toStringMetric() + ", ");
-         hiString = hiString.concat(this.type() + ", ");
-         hiString = hiString.concat(this.message());
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         hiString = hiString.concat(" Not all Data Received, ");
-         hiString = hiString.concat("data may be corrupted");
-      }
+      String tString = new String(this.toStringAbsolute() + ", ");
+      tString = tString.concat(this.toStringEnglish() + ", ");
+      tString = tString.concat(this.toStringMetric() + ", ");
+      tString = tString.concat(this.type() + ", ");
+      tString = tString.concat(this.message());
       try{
          String cal = String.format("%tc", this.calendar());
-         hiString = hiString.concat(":  " + cal);
+         tString = tString.concat(":  " + cal);
       }
       catch(NullPointerException npe){}
-      return hiString;
+      return tString;
    }
 }
