@@ -77,16 +77,16 @@ public class Hygrometer extends WeatherSensor{
       WeatherData data = null;
       double rh = this.measureCalculatedHumidity();
       if(rh > WeatherData.DEFAULTHUMIDITY){ //Relative Humidity Good
-         data = new WeatherData(WeatherDataType.HUMIDITY,
-                                Units.PERCENTAGE,
+         data = new HumidityData(Units.PERCENTAGE,
                                 rh,
-                                "Calculated Relative Humidity");
+                                "Calculated Relative Humidity",
+                                Calendar.getInstance());
       }
       else{
-         data = new WeatherData(WeatherDataType.HUMIDITY,
-                                Units.PERCENTAGE,
-                                rh,
-                                bad);
+         data = new HumidityData(Units.PERCENTAGE,
+                                 rh,
+                                 bad,
+                                 Calendar.getInstance());
       }
       return data;
    }

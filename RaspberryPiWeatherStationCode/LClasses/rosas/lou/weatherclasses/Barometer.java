@@ -54,7 +54,7 @@ public class Barometer extends WeatherSensor{
       bad = bad.concat("Available:  default value returned");
       String good = new String("Good");
       WeatherData data = null;
-      double pressureInches = WeatherData.DEFAULTMEASURE;
+      double pressureInches = WeatherData.DEFAULTVALUE;
       try{
          byte[] state = this.barometricSensor.readDevice();
          //Perform the AD output voltage measurement
@@ -66,37 +66,37 @@ public class Barometer extends WeatherSensor{
                                       OneWireContainer26.CHANNEL_VAD,
                                       state);
          pressureInches=this.convertVoltageToPressure(vad);
-         data = new WeatherData(WeatherDataType.PRESSURE,
-                                Units.ENGLISH,
-                                pressureInches,
-                                good);
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 good,
+                                 Calendar.getInstance());
       }
       catch(OneWireIOException ioe){
          System.out.println(ioe.getStackTrace()[0].getFileName());
          System.out.println(""+ioe.getStackTrace()[0].getLineNumber());
-         pressureInches = WeatherData.DEFAULTMEASURE;
-         data = new WeatherData(WeatherDataType.PRESSURE,
-                                Units.ENGLISH,
-                                pressureInches,
-                                bad);
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
       }
       catch(OneWireException owe){
          System.out.println(owe.getStackTrace()[0].getFileName());
          System.out.println(""+owe.getStackTrace()[0].getLineNumber());
-         pressureInches = WeatherData.DEFAULTMEASURE;
-         data = new WeatherData(WeatherDataType.PRESSURE,
-                                Units.ENGLISH,
-                                pressureInches,
-                                bad);
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
       }
       catch(NullPointerException npe){
          System.out.println(npe.getStackTrace()[0].getFileName());
          System.out.println(""+npe.getStackTrace()[0].getLineNumber());
-         pressureInches = WeatherData.DEFAULTMEASURE;
-         data = new WeatherData(WeatherDataType.PRESSURE,
-                                Units.ENGLISH,
-                                pressureInches,
-                                bad);
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
       }
       return data;
    }

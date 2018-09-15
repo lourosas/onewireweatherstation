@@ -437,7 +437,10 @@ implements TimeListener{
          double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
          double dp    = (l * alpha)/(b - alpha);
          String message = new String("Good Dewpoint Data");
-         dewpoint = new DewpointData(Units.METRIC, dp, message);
+         dewpoint = new DewpointData(Units.METRIC,
+                                     dp,
+                                     message,
+                                     Calendar.getInstance());
       }
       else{
          //If temp OR humidity did not give a good reading, the
@@ -445,7 +448,8 @@ implements TimeListener{
          String message = new String("No Dewpoint Data");
          dewpoint = new DewpointData(Units.METRIC,
                                      WeatherData.DEFAULTVALUE,
-                                     message);
+                                     message,
+                                     Calendar.getInstance());
       }
       return dewpoint;
    }
@@ -557,14 +561,16 @@ implements TimeListener{
             String message = new String("Good HeatIndex Data");
             heatIndex = new HeatIndexData(Units.ENGLISH,
                                           heatI,
-                                          message);
+                                          message,
+                                          Calendar.getInstance());
          }
          else{
             //Temperature is too low for accurate calculation
             String message = new String("Temperature Too Low");
             heatIndex = new HeatIndexData(Units.METRIC,
                                           WeatherData.DEFAULTVALUE,
-                                          message);
+                                          message,
+                                          Calendar.getInstance());
          }
       }
       else{
@@ -573,7 +579,8 @@ implements TimeListener{
          String message = new String("No Heat Index Data");
          heatIndex = new HeatIndexData(Units.METRIC,
                                        WeatherData.DEFAULTVALUE,
-                                       message);
+                                       message,
+                                       Calendar.getInstance());
       }
       return heatIndex;
    }
