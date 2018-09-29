@@ -56,6 +56,11 @@ public class HeatIndexData extends ThermalData implements WeatherData{
    
    //******************Interface Implementation***********************
    /**/
+   public Calendar calendar(){
+      return super.calendar();
+   }
+
+   /**/
    public double absoluteData(){
       return super.absoluteData();
    }

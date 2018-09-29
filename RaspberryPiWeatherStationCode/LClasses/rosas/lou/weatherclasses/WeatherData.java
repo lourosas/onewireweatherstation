@@ -32,6 +32,7 @@ public interface WeatherData{
    */
    public final double DEFAULTVALUE    = -999.9;
    public final double DEFAULTHUMIDITY = -99.9;
+   public Calendar calendar();
    public void data(Units units,double value,String message,Calendar cal);
    public void data(Units units,double value,String message);
    public void data(Units units,double value);

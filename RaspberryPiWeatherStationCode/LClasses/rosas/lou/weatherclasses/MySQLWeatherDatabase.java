@@ -431,34 +431,262 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
    }
 
+   /*
+   */
+   private void store(String month_, String day_, String year_){
+      Connection conn = null;
+      Statement  stmt = null;
+      try{
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT IGNORE INTO missiondata ";
+         insert += "(month, day, year) ";
+         insert += "VALUES( '" + month_ +"'";
+         insert += ", '" + day_ + "','" + year_ + "')";
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sql){}
+      }
+   }
+
    ////////////////Interface Implementations/////////////////////////
    /*
    */
-   public void barometricPressure(WeatherData pressure){
-      System.out.println("\n" + pressure + "\n");
+   public void barometricPressure(WeatherData pressure_){
+      Connection conn = null;
+      Statement  stmt = null;
+      Calendar cal    = pressure_.calendar();
+      String month    = null;
+      String day      = null;
+      String year     = null;
+      String time     = null;
+      if(cal != null){
+         month = String.format("%tB", cal.getTime());
+         day   = String.format("%td", cal.getTime());
+         year  = String.format("%tY", cal.getTime());
+         this.store(month, day, year);
+         time  = String.format("%tT",  cal.getTime());
+         time += String.format(" %tZ", cal.getTime());
+      }
+      try{
+         double abs = pressure_.absoluteData();
+         double met = pressure_.metricData();
+         double eng = pressure_.englishData();
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT INTO pressuredata ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"', "+met+", "+eng+", "+abs+")";
+         System.out.println(insert);
+         stmt.executeUpdate(insert);
+         insert = "INSERT INTO has_pressure_data ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"')";
+         System.out.println(insert);
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sql){ sql.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe){}
+         System.out.println("\n" + pressure_ + "\n");
+      }
    }
 
    /*
    */
-   public void dewpoint(WeatherData dpData){
-      System.out.println("\n" + dpData + "\n");
+   public void dewpoint(WeatherData dpData_){
+      Connection conn = null;
+      Statement  stmt = null;
+      Calendar cal    = dpData_.calendar();
+      String month    = null;
+      String day      = null;
+      String year     = null;
+      String time     = null;
+      if(cal != null){
+         month = String.format("%tB", cal.getTime());
+         day   = String.format("%td", cal.getTime());
+         year  = String.format("%tY", cal.getTime());
+         this.store(month, day, year);
+         time  = String.format("%tT",  cal.getTime());
+         time += String.format(" %tZ", cal.getTime());
+      }      
+      try{
+         double dewpk = dpData_.absoluteData();
+         double dewpc = dpData_.metricData();
+         double dewpf = dpData_.englishData();
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT INTO dewpointdata ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"', "+dewpc+", "+dewpf+", "+dewpk+")";
+         System.out.println(insert);
+         stmt.executeUpdate(insert);
+         insert = "INSERT INTO has_dewpoint_data ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"')";
+         System.out.println(insert);
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+         System.out.println("\n" + dpData_ + "\n");
+      }
    }
 
    /*
    */
-   public void heatIndex(WeatherData hiData){
-      System.out.println("\n" + hiData + "\n");
+   public void heatIndex(WeatherData hiData_){
+      Connection conn = null;
+      Statement  stmt = null;
+      Calendar cal    = hiData_.calendar();
+      String month    = null;
+      String day      = null;
+      String year     = null;
+      String time     = null;
+      if(cal != null){
+         month = String.format("%tB", cal.getTime());
+         day   = String.format("%td", cal.getTime());
+         year  = String.format("%tY", cal.getTime());
+         this.store(month, day, year);
+         time  = String.format("%tT",  cal.getTime());
+         time += String.format(" %tZ", cal.getTime());
+      }
+      try{
+         double hindxk = hiData_.absoluteData();
+         double hindxc = hiData_.metricData();
+         double hindxf = hiData_.englishData();
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT INTO heatindexdata ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"', "+hindxc+", "+hindxf+", "+hindxk+")";
+         System.out.println(insert);
+         stmt.executeUpdate(insert);
+         insert = "INSERT INTO has_heatindex_data ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"')";
+         System.out.println(insert);
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sqe){ sqe.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+         System.out.println("\n" + hiData_ + "\n");
+      }
    }
 
    /*
    */
-   public void humidity(WeatherData humidity){
-      System.out.println("\n" + humidity + "\n");
+   public void humidity(WeatherData humidity_){
+      Connection conn = null;
+      Statement  stmt = null;
+      Calendar cal    = humidity_.calendar();
+      String month    = null;
+      String day      = null;
+      String year     = null;
+      String time     = null;
+      if(cal != null){
+         month = String.format("%tB", cal.getTime());
+         day   = String.format("%td", cal.getTime());
+         year  = String.format("%tY", cal.getTime());
+         this.store(month, day, year);
+         time  = String.format("%tT",  cal.getTime());
+         time += String.format(" %tZ", cal.getTime());
+      }
+      try{
+         double humidity = humidity_.percentageData();
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT INTO humiditydata ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"', "+ humidity +")";
+         System.out.println(insert);
+         stmt.executeUpdate(insert);
+         insert = "INSERT INTO has_humidity_data ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"')";
+         System.out.println(insert);
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sql){ sql.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe){}
+         System.out.println("\n" + humidity_ + "\n");
+      }
    }
 
    /*
    */
-   public void temperature(WeatherData temperature){
-      System.out.println("\n" + temperature + "\n");
+   public void temperature(WeatherData temperature_){
+      Connection conn = null;
+      Statement  stmt = null;
+      Calendar cal    = temperature_.calendar();
+      String month    = null;
+      String day      = null;
+      String year     = null;
+      String time     = null;
+      if(cal != null){
+         month = String.format("%tB", cal.getTime());
+         day   = String.format("%td", cal.getTime());
+         year  = String.format("%tY", cal.getTime());
+         this.store(month, day, year);
+         time  = String.format("%tT",  cal.getTime());
+         time += String.format(" %tZ", cal.getTime());
+      }
+      try{
+         double tempk = temperature_.absoluteData();
+         double tempc = temperature_.metricData();
+         double tempf = temperature_.englishData();
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         String insert = "INSERT INTO temperaturedata ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"', "+tempc+", "+tempf+", "+tempk+")";
+         System.out.println(insert);
+         stmt.executeUpdate(insert);
+         insert = "INSERT INTO has_temperature_data ";
+         insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
+         insert += time+"')";
+         System.out.println(insert);
+         stmt.executeUpdate(insert); 
+      }
+      catch(SQLException sql){ sql.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqe){}
+         System.out.println("\n" + temperature_ + "\n");
+      }
    }
 }
