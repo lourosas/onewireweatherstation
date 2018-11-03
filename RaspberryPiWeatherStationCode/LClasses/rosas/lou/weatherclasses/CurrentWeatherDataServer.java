@@ -28,11 +28,12 @@ public class CurrentWeatherDataServer extends SimpleServer
 implements Runnable, TemperatureHumidityObserver, BarometerObserver,
 CalculatedObserver{
    private final int PORT = 19000; //The port for the server
-   private WeatherData _temperature;
-   private WeatherData _humidity;
-   private WeatherData _pressure;
-   private WeatherData _dewpoint;
-   private WeatherData _heatIndex;
+   private WeatherData    _temperature;
+   private WeatherData    _humidity;
+   private WeatherData    _pressure;
+   private WeatherData    _dewpoint;
+   private WeatherData    _heatIndex;
+   private DatagramSocket _socket;
 
    {
       address      = null;
@@ -42,11 +43,13 @@ CalculatedObserver{
       _pressure    = null;
       _dewpoint    = null;
       _heatIndex   = null;
+      _socket      = null;      
    }
 
    ////////////////////////Constructor////////////////////////////////
    public CurrentWeatherDataServer(){
       this.setUpAddress(this.PORT);
+      this.setUpTheServer();
    }
    
    /////////////////Interface Implementations/////////////////////////
@@ -152,6 +155,44 @@ CalculatedObserver{
    /////////////////////Private Methods///////////////////////////////
    /*
    */
-   private void waitForRequests(){}
+   private void setUpTheServer(){
+      try{
+         this._socket = new DatagramSocket(this.PORT);
+      }
+      catch(Exception e){ e.printStackTrace(); }
+   }
+   /*
+   */
+   private void waitForRequests(){
+      DatagramPacket receivePacket = null;
+      List<String>   receiveData   = null;
+      while(true){
+         try{
+            byte data[]   = new byte[1024];
+            receivePacket = new DatagramPacket(data, data.length);
+            this._socket.receive(receivePacket);
+            InetAddress addr = receivePacket.getAddress();
+            int port         = receivePacket.getPort();
+            String received  = new String(receivePacket.getData(), 0,
+                                          receivePacket.getLength());
+            System.out.println("Received:  " + received);
+            String temp = this._temperature.toString();
+            temp += "\n" + this._humidity.toString();
+            temp += "\n" + this._pressure.toString();
+            temp += "\n" + this._dewpoint.toString();
+            temp += "\n" + this._heatIndex.toString();
+            data = temp.getBytes();
+            DatagramPacket sendPacket = new DatagramPacket(data,
+                                                          data.length,
+                                                          addr,
+                                                          port);
+            this._socket.send(sendPacket);
+            
+         }
+         catch(IOException ioe){
+            ioe.printStackTrace();
+         }
+      }
+   }
 }
 //////////////////////////////////////////////////////////////////////
