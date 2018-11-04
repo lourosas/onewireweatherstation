@@ -1,0 +1,5 @@
+cd /home/lou/javaclasses/
+find . -name '*.class' -delete
+cd /home/lou/bin/
+find . -name '*.class' -delete
+javac FractionCalculatorApp.java
