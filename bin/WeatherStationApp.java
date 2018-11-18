@@ -6,6 +6,9 @@ import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 import com.dalsemi.onewire.utils.Convert;
+import com.sun.net.httpserver.*;
+import java.net.*;
+import java.io.IOException;
 
 
 public class WeatherStationApp implements TemperatureHumidityObserver,
@@ -26,6 +29,20 @@ BarometerObserver, CalculatedObserver{
       station.addCalculatedObserver(cwds);
       Thread thread = new Thread(cwds);
       thread.start();
+      BaseWeatherHandler cwh = new CurrentWeatherHandler();
+      station.addTemperatureHumidityObserver(cwh);
+      station.addBarometerObserver(cwh);
+      station.addCalculatedObserver(cwh);
+      HttpServer httpserver = null;
+      try{
+         httpserver =
+                 HttpServer.create(new InetSocketAddress(8000), 100);
+         httpserver.createContext("/", cwh);
+         httpserver.setExecutor(null);
+         httpserver.start();
+      }
+      catch(BindException be){ be.printStackTrace(); }
+      catch(IOException ioe){ ioe.printStackTrace(); }
       int i = 0;
       boolean run = true;
       //while(i < 10000){
@@ -108,4 +125,3 @@ BarometerObserver, CalculatedObserver{
    public void updateTemperatureAbsolute(double data){
    }
 }
-
