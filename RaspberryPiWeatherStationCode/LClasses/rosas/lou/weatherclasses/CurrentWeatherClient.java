@@ -34,7 +34,7 @@ public class CurrentWeatherClient implements Runnable{
 
    {
       _socket = null;
-      _addr = new byte[]{(byte)192, (byte)168. (byte)1, (byte)145};
+      _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
    }
 
    ///////////////////////Constructors///////////////////////////////
@@ -60,17 +60,17 @@ public class CurrentWeatherClient implements Runnable{
    private void requestWeatherDataFromServer(){
       DatagramPacket sendPacket    = null;
       DatagramPacket receivePacket = null;
-      List<String> data            = new LinkedList():
+      List<String> data            = new LinkedList();
       try{
          this._socket = new DatagramSocket();
          //Set a receive timeout for a given time, if a packet is
          //NOT received within a given amount of time, Throw a
          //SocketTimeoutException and GET OUT!!!  Don't "sit there
          //and spin" waiting for packets that are never comming!!
-         this.socket.setSoTimeout(TIMEOUT);
+         this._socket.setSoTimeout(TIMEOUT);
          String testData = new String("poop");
          byte test[] = testData.getBytes();
-         InetAddress iNetAddr = InetAddress.getByAddress(this.addr);
+         InetAddress iNetAddr = InetAddress.getByAddress(this._addr);
          byte[] receiveData = new byte[1024];
          sendPacket = new DatagramPacket(test,
                                          test.length,
@@ -79,8 +79,11 @@ public class CurrentWeatherClient implements Runnable{
          this._socket.send(sendPacket);
          receivePacket =
                  new DatagramPacket(receiveData, receiveData.length);
-         this.socket.receive(receivePacket);
+         this._socket.receive(receivePacket);
          String output = new String(receivePacket.getData());
+         System.out.println(receivePacket.getAddress());
+         System.out.println(receivePacket.getPort());
+         System.out.println(receivePacket.getLength());
          System.out.println(output);
       }
       catch(SocketTimeoutException ste){

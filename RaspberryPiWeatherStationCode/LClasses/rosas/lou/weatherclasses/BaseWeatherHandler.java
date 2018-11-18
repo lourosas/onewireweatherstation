@@ -1,6 +1,16 @@
 /////////////////////////////////////////////////////////////////////
 /*
-<GNU Stuff to go here>
+Copyright 2018 Lou Rosas
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /////////////////////////////////////////////////////////////////////
 package rosas.lou.weatherclasses;
@@ -12,189 +22,256 @@ import java.net.*;
 import com.sun.net.httpserver.*;
 import rosas.lou.weatherclasses.*;
 
-public class BaseWeatherHandler implements HttpHandler{
-   private WeatherDataSubscriber wds;
-   
+public abstract class BaseWeatherHandler implements HttpHandler,
+TemperatureHumidityObserver, BarometerObserver, CalculatedObserver{
+
+   protected WeatherData _temperature;
+   protected WeatherData _humidity;
+   protected WeatherData _pressure;
+   protected WeatherData _heatIndex;
+   protected WeatherData _dewPoint;
+
    {
-      wds = null;
+      _temperature = null;
+      _humidity    = null;
+      _pressure    = null;
+      _heatIndex   = null;
+      _dewPoint    = null;
    }
-   
-   //
-   //
-   //
-   public BaseWeatherHandler(){
-      this.wds = new WeatherDataSubscriber();
-   }
-   
-   //
-   //
-   //
+
+   /////////Implementation of the HttpHandler Interface//////////////
+   /**/
    public void handle(HttpExchange exchange){
       StringBuffer response = new StringBuffer();
+      final int OK          = 200;
+      OutputStream os       = null;
+      InputStream  is       = null;
       try{
+         System.out.println(exchange.getRequestMethod());
+         //System.out.println(exchange.getRequestHeaders());
+         /*
+         Headers headers = exchange.getRequestHeaders();
+         System.out.println(headers.isEmpty());
+         Set<String> keys = headers.keySet();
+         Iterator<String> it = keys.iterator();
+         while(it.hasNext()){
+            String key = it.next();
+            System.out.println(key);
+            System.out.println(headers.get(key));
+         }
+         InputStream is = exchange.getRequestBody();
+         System.out.println(is.available());
+         */
+         /*
+         BufferedReader br =
+                        new BufferedReader(new InputStreamReader(is));
+         String whatIsRead = null;
+         while((whatIsRead = br.readLine()) != null){
+            System.out.println(whatIsRead);
+         }
+         */
          response.append(this.setUpHeader());
          response.append(this.setUpBody());
          response.append(this.setUpFooter());
          String send = response.toString();
-         exchange.sendResponseHeaders(200, send.length());
-         OutputStream os = exchange.getResponseBody();
+         exchange.sendResponseHeaders(OK, send.length());
+         System.out.println(send.length());
+         System.out.println(send);
+         os = exchange.getResponseBody();
          os.write(send.getBytes());
-         os.close();
       }
       catch(IOException ioe){ ioe.printStackTrace(); }
-   }
-   
-   //
-   //
-   //
-   public WeatherDataSubscriber weatherDataSubscriber(){
-      return this.wds;
-   }
-   
-   //**************Protected Methods*********************************
-   //
-   //
-   //
-   protected double dewpoint(String type){
-      double temp        = Thermometer.DEFAULTTEMP;
-      WeatherEvent event = null;
-      try{
-         event = this.wds.getDewpoint(type);
-         temp  = event.getValue();
-      }
-      catch(NullPointerException npe){}
       finally{
-         return temp;
+         try{
+            os.close();
+         }
+         catch(IOException e){}
       }
    }
-   
-   //
-   //
-   //
-   protected String getDate(){
-      String currentDate = new String();
-      WeatherEvent event = null;
-      try{
-         event       = this.wds.getTemperature("metric");
-         currentDate = new String(event.toStringDate());
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return currentDate;
-      }
+
+   ///Implementation of the TemperatureHumidityObserver Interface////
+   /*
+   */
+   public void updateTemperature(WeatherData data){
+      this._temperature = data;
    }
-   
-   //
-   //
-   //
-   protected double heatindex(String type){
-      double hi          = Thermometer.DEFAULTTEMP;
-      WeatherEvent event = null;
-      try{
-         event = this.wds.getHeatIndex(type);
-         hi    = event.getValue();
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return hi;
-      }
+
+   /*
+   */
+   public void updateTemperatureMetric(double temp){}
+
+   /*
+   */
+   public void updateTemperatureEnglish(double temp){}
+
+   /*
+   */
+   public void updateTemperatureAbsolute(double temp){}
+
+   /*
+   */
+   public void updateHumidity(WeatherData data){
+      this._humidity = data;
    }
-   
-   //
-   //
-   //
-   protected double humidity(){
-      double humid       = Hygrometer.DEFAULTHUMIDITY;
-      WeatherEvent event = null;
-      try{
-         event = this.wds.getHumidity();
-         humid = event.getValue();
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return humid;
-      }
+
+   /*
+   */
+   public void updateHumidity(double humidity){}
+
+   ///////Implementation of the BarometerObserver Interface//////////
+   /*
+   */
+   public void updatePressure(WeatherEvent event){}
+
+   /*
+   */
+   public void updatePressure(WeatherStorage store){}
+
+   /*
+   */
+   public void updatePressure(WeatherData data){
+      this._pressure = data;
    }
-   
-   //
-   //
-   //
-   protected double pressure(String type){
-      double barometricPressure = Thermometer.DEFAULTTEMP;
-      WeatherEvent event = null;
-      try{
-         event = this.wds.getPressure(type);
-         barometricPressure = event.getValue();
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return barometricPressure;
-      }
+
+   /*
+   */
+   public void updatePressureAbsolute(double data){}
+
+   /*
+   */
+   public void updatePressureEnglish(double data){}
+
+   /*
+   */
+   public void updatePressureMetric(double data){}
+
+   ///////Implementation of the CalculatedObserver Interface/////////
+   /*
+   */
+   public void updateDewpoint(WeatherEvent event){}
+
+   /*
+   */
+   public void updateDewpoint(WeatherStorage storage){}
+
+   /*
+   */
+   public void updateDewpoint(WeatherData data){
+      this._dewPoint = data;
    }
-   
-   //
-   //
-   //
-   protected double temperature(String type){
-      double temp = Thermometer.DEFAULTTEMP;
-      WeatherEvent event = null;
-      try{
-         event = this.wds.getTemperature(type);
-         temp = event.getValue();
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return temp;
-      }
+
+   /*
+   */
+   public void updateDewpointAbsolute(double data){}
+
+   /*
+   */
+   public void updateDewpointEnglish(double data){}
+
+   /*
+   */
+   public void updateDewpointMetric(double data){}
+
+   /*
+   */
+   public void updateHeatIndex(WeatherEvent event){}
+
+   /*
+   */
+   public void updateHeatIndex(WeatherStorage store){}
+
+   /*
+   */
+   public void updateHeatIndex(WeatherData data){
+      this._heatIndex = data;
    }
-   
-   //*****************Private Methods********************************
-   //
-   //
-   //
-   private String setUpBody(){
-      String value      = new String();
+
+   /*
+   */
+   public void updateHeatIndexAbsolute(double hi){}
+
+   /*
+   */
+   public void updateHeatIndexEnglish(double hi){}
+
+   /*
+   */
+   public void updateHeatIndexMetric(double hi){}
+
+   /*
+   */
+   public void updateWindChill(WeatherEvent event){}
+
+
+   ///////////////////Protected Methods//////////////////////////////
+   /*
+   */
+   protected String setUpBody(){
       StringBuffer body = new StringBuffer();
-      body.append("<body>");
+      StringBuffer data = new StringBuffer();
+      String value      = new String();
+      body.append("\n<body>");
       try{
-         value = String.format("%.2f", this.temperature("english"));
-         body.append("<p>" + value + " &#176F");
-         value = String.format("%.2f", this.humidity());
-         body.append("<p>" + value + "%");
-         value = String.format("%.2f", this.pressure("english"));
-         body.append("<p>" + value + " in");
-         value = String.format("%.2f", this.heatindex("english"));
-         body.append("<p>" + value + " &#176F");
-         value = String.format("%.2f", this.dewpoint("english"));
-         body.append("<p>" + value + " &#176F");
-         body.append("<p>" + this.getDate());
+         value=String.format("%tc",this._temperature.calendar());
+         body.append("\n<h2>" + value + "</h2>");
+         value=String.format("Temperature:  %.2f",
+                              this._temperature.englishData());
+         body.append("\n<p>" + value + " &#176F");
       }
       catch(NullPointerException npe){
-         body.append("<p>N/A");
+         body.append("\n<p>N/A");
       }
+      try{
+         value=String.format("Humidity:  %.2f",
+                              this._humidity.percentageData());
+         body.append("\n<p>" + value + "%");
+      }
+      catch(NullPointerException npe){
+         body.append("\n<p>N/A");
+      }
+      try{
+         value = String.format("Pressure:  %.2f",
+                                this._pressure.englishData());
+         body.append("\n<p>" + value + " in Hg");
+      }
+      catch(NullPointerException npe){
+         body.append("\n<p>N/A");
+      }
+      try{
+         value = String.format("Dewpoint:  %.2f",
+                                this._dewPoint.englishData());
+         body.append("\n<p>" + value + " &#176F");
+      }
+      catch(NullPointerException npe){
+         body.append("\n<p>N/A");
+      }
+      try{
+         value = String.format("Heat Index:  %.2f",
+                                this._heatIndex.englishData());
+         body.append("\n<p>" + value + " &#176F");
+      }
+      catch(NullPointerException npe){
+         body.append("\n<p>N/A");
+      }
+      body.append("\n</body>");
       return body.toString();
    }
-   
-   //
-   //
-   //
-   private String setUpFooter(){
-      StringBuffer end = new StringBuffer();
-      end.append("<p><p><center>&#169 2017 Lou Rosas");
-      end.append("<br>Do not use for personal safety</p>");
-      end.append("</center></body></html>");
-      return end.toString();
+
+   /*
+   */
+   protected String setUpFooter(){
+      StringBuffer footer = new StringBuffer();
+      footer.append("\n</html>");
+      return footer.toString();
    }
-   
-   //
-   //
-   //
-   private String setUpHeader(){
-      StringBuffer header  = new StringBuffer();
-      header.append("<html><head>");
-      header.append("<title>Lou Rosas' ");
-      header.append("Basic Weather Data Empty Web Page</title>");
-      header.append("</head>");    
+
+   /*
+   */
+   protected String setUpHeader(){
+      StringBuffer header = new StringBuffer();
+      header.append("<html>");
+      header.append("\n<head>\n<title>Base Weather Handler</title>");
+      header.append("\n</head>");
       return header.toString();
    }
 }
