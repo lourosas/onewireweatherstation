@@ -40,7 +40,8 @@ TemperatureHumidityObserver, BarometerObserver, CalculatedObserver{
    }
 
    /////////Implementation of the HttpHandler Interface//////////////
-   /**/
+   /*
+   */
    public void handle(HttpExchange exchange){
       StringBuffer response = new StringBuffer();
       final int OK          = 200;
