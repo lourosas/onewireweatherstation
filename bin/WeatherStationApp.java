@@ -29,6 +29,12 @@ BarometerObserver, CalculatedObserver{
       station.addCalculatedObserver(cwds);
       Thread thread = new Thread(cwds);
       thread.start();
+      Wunderground wg = new Wunderground();
+      station.addTemperatureHumidityObserver(wg);
+      station.addBarometerObserver(wg);
+      station.addCalculatedObserver(wg);
+      Thread wgThread = new Thread(wg);
+      wgThread.start();
       BaseWeatherHandler cwh = new CurrentWeatherHandler();
       station.addTemperatureHumidityObserver(cwh);
       station.addBarometerObserver(cwh);
