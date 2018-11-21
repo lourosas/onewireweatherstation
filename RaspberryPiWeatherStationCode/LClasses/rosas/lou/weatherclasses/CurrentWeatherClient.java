@@ -47,8 +47,8 @@ public class CurrentWeatherClient implements Runnable{
    public void run(){
       while(true){
          try{
-            Thread.sleep(60000);
             this.requestWeatherDataFromServer();
+            Thread.sleep(60000);
          }
          catch(InterruptedException ie){}
       }
@@ -72,6 +72,8 @@ public class CurrentWeatherClient implements Runnable{
          byte test[] = testData.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this._addr);
          byte[] receiveData = new byte[1024];
+         System.out.println(iNetAddr.getHostName());
+         System.out.println(iNetAddr.getHostAddress());
          sendPacket = new DatagramPacket(test,
                                          test.length,
                                          iNetAddr,
