@@ -23,7 +23,8 @@ import java.io.*;
 import java.net.*;
 import rosas.lou.weatherclasses.*;
 
-public class CurrentWeatherClient implements Runnable{
+public class CurrentWeatherClient extends WeatherClientDataPublisher
+implements Runnable{
    /*TODO--make a static method in CurrentWeatherServer to get
      this value*/
    private static final int PORT    = 19000;
@@ -31,10 +32,11 @@ public class CurrentWeatherClient implements Runnable{
    
    private DatagramSocket _socket;
    private byte[] _addr;
-
+   private String _rawData;
    {
       _socket = null;
       _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
+      _rawData = null;
    }
 
    ///////////////////////Constructors///////////////////////////////
@@ -48,6 +50,7 @@ public class CurrentWeatherClient implements Runnable{
       while(true){
          try{
             this.requestWeatherDataFromServer();
+            this.publishData(this._rawData);
             Thread.sleep(60000);
          }
          catch(InterruptedException ie){}
@@ -82,11 +85,11 @@ public class CurrentWeatherClient implements Runnable{
          receivePacket =
                  new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
-         String output = new String(receivePacket.getData());
+         this._rawData = new String(receivePacket.getData());
          System.out.println(receivePacket.getAddress());
          System.out.println(receivePacket.getPort());
          System.out.println(receivePacket.getLength());
-         System.out.println(output);
+         System.out.println(this._rawData);
       }
       catch(SocketTimeoutException ste){
          ste.printStackTrace();
