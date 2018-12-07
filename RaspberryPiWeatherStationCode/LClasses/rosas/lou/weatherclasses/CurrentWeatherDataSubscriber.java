@@ -43,6 +43,24 @@ implements WeatherClientDataSubscriber{
       //Test Print
       System.out.println("WeatherClientSubscriber");
       this._wdp = new WeatherDataParser();
-      System.out.println(this._wdp.parseRawTemperature(this._data));
+      System.out.println(this._wdp.parseCalendar(this._data));
+      System.out.println(this._wdp.parseTemperatureAbsolute(this._data));
+      System.out.println(this._wdp.parseTemperatureEnglish(this._data));
+      System.out.println(this._wdp.parseTemperatureMetric(this._data));
+      System.out.println(this._wdp.parseHumidity(this._data));
+      System.out.println(this._wdp.parsePressureAbsolute(this._data));
+      System.out.println(this._wdp.parsePressureEnglish(this._data));
+      System.out.println(this._wdp.parsePressureMetric(this._data));
+      System.out.println(this._wdp.parseDewpointAbsolute(this._data));
+      System.out.println(this._wdp.parseDewpointEnglish(this._data));
+      System.out.println(this._wdp.parseDewpointMetric(this._data));
+      System.out.println(this._wdp.parseHeatIndexAbsolute(this._data));
+      System.out.println(this._wdp.parseHeatIndexEnglish(this._data));
+      System.out.println(this._wdp.parseHeatIndexMetric(this._data));
+      //System.out.println(this._wdp.parseRawTemperature(data));
+      //System.out.println(this._wdp.parseRawHumidity(data));
+      //System.out.println(this._wdp.parseRawDewpoint(data));
+      //System.out.println(this._wdp.parseRawPressure(data));
+      //System.out.println(this._wdp.parseRawHeatIndex(data));
    }
 }
