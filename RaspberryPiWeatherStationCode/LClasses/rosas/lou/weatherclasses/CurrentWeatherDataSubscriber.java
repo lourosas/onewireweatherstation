@@ -23,17 +23,19 @@ import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherDataSubscriber
 implements WeatherClientDataSubscriber{
-   private String            _data;
-   private WeatherDataParser _wdp;
+   protected String            _data;
+   protected WeatherDataParser _wdp;
 
    {
       _data = null;
-      _wdp = null;
+      _wdp  = null;
    };
    ///////////////////////Constructors////////////////////////////////
    /*
    */
-   public CurrentWeatherDataSubscriber(){}
+   public CurrentWeatherDataSubscriber(){
+      this._wdp = new WeatherDataParser();
+   }
 
    ///////////////////Interface Implementations///////////////////////
    /*
@@ -42,7 +44,6 @@ implements WeatherClientDataSubscriber{
       this._data = new String(data);
       //Test Print
       System.out.println("WeatherClientSubscriber");
-      this._wdp = new WeatherDataParser();
       System.out.println(this._wdp.parseCalendar(this._data));
       System.out.println(this._wdp.parseTemperatureAbsolute(this._data));
       System.out.println(this._wdp.parseTemperatureEnglish(this._data));
