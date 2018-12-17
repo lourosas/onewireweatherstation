@@ -75,7 +75,10 @@ public class Hygrometer extends WeatherSensor{
       String bad = new String("No Humidity Data Available:  ");
       bad = bad.concat("default value returned");
       WeatherData data = null;
-      double rh = this.measureCalculatedHumidity();
+      //double rh = this.measureCalculatedHumidity();
+      double rh = this.measureHumidity();
+      //Make a test print--TODO--DELETE
+      System.out.println("Hygrometer.measure():  "+rh);
       if(rh > WeatherData.DEFAULTHUMIDITY){ //Relative Humidity Good
          data = new HumidityData(Units.PERCENTAGE,
                                 rh,
@@ -259,6 +262,10 @@ public class Hygrometer extends WeatherSensor{
          vdd = this.hygrometerSensor.getADVoltage(
                                      OneWireContainer26.CHANNEL_VDD,
                                      state);
+         //TODO--Delete after investigation!!!
+         System.out.println("measureCalculatedHumidity():  "+vad);
+         System.out.println("measureCalculatedHumidity():  "+vdd);
+         System.out.println("measureCalculatedHumidity():  "+temp);
          calcHum=this.convertVoltageToRelativeHumidity(vad,vdd,temp);
       }
       catch(OneWireIOException owe){
