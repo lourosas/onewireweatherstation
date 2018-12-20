@@ -58,10 +58,5 @@ implements WeatherClientDataSubscriber{
       System.out.println(this._wdp.parseHeatIndexAbsolute(this._data));
       System.out.println(this._wdp.parseHeatIndexEnglish(this._data));
       System.out.println(this._wdp.parseHeatIndexMetric(this._data));
-      //System.out.println(this._wdp.parseRawTemperature(data));
-      //System.out.println(this._wdp.parseRawHumidity(data));
-      //System.out.println(this._wdp.parseRawDewpoint(data));
-      //System.out.println(this._wdp.parseRawPressure(data));
-      //System.out.println(this._wdp.parseRawHeatIndex(data));
    }
 }

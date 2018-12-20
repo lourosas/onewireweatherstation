@@ -61,7 +61,7 @@ public class WeatherDataParser{
    ///////////////////////Public Methods//////////////////////////////
    /*
    Here is how the current Raw Data is entered:
-   <Absolute>,<English>,<Metric>,<Type>,<Comment>:<Date (Calendar)>"\n"
+   <Absolute>,<English>,<Metric>,<Type>,<Comment>:<Date(Calendar)>"\n"
 
    Where:
    <Absolute> is the Absolute type measurement (Kelvin for thermal
@@ -93,6 +93,38 @@ public class WeatherDataParser{
          calendar = null;
       }
       return calendar;
+   }
+
+   /*
+   */
+   public String parseDewpointMessage(String data){
+      String rawDewpoint = this.parseRawDewpoint(data);
+      return this.parseForTheMessage(rawDewpoint);
+   }
+
+   /*
+   */
+   public String parseHeatIndexMessage(String data){
+      String rawHeatIndex = this.parseRawHeatIndex(data);
+      return this.parseForTheMessage(rawHeatIndex);
+   }
+
+   /*
+   */
+   public String parseHumidityMessage(String data){
+      return this.parseForTheMessage(this.parseRawHumidity(data));
+   }
+
+   /*
+   */
+   public String parsePressureMessage(String data){
+      return this.parseForTheMessage(this.parseRawPressure(data));
+   }
+
+   /*
+   */
+   public String parseTemperatureMessage(String data){
+      return this.parseForTheMessage(this.parseRawTemperature(data));
    }
 
    /*
@@ -267,6 +299,26 @@ public class WeatherDataParser{
          returnString = null;
       }
       return returnString;
+   }
+
+   /*
+   The format for the raw data goes like the following (as from the
+   Header notes)-<Message>: <Full Date>.  This means I can parse the
+   data based on the month (it will be one of them), just like
+   parsing for the Calendar, except get the first part of the string
+   that was split up! Not the Second
+   */
+   private String parseForTheMessage(String rawData){
+      String message = null;
+      try{
+         String ref = this.parseData(rawData, ",", MONTHS);
+         String [] parts = ref.split(": ");
+         message = parts[0].trim();
+      }
+      catch(NullPointerException npe){
+         message = null;
+      }
+      return message;
    }
 
    /*
