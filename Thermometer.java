@@ -27,7 +27,8 @@ import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 import com.dalsemi.onewire.utils.Convert;
 
-public class Thermometer extends Sensor{
+public class Thermometer extends WeatherSensor{
+   public static final int DEFAULTTEMP = -999;
    private TemperatureContainer thermalSensor;
    private static Thermometer instance;
    private static final String MAIN_NAME      = "DS1920";
@@ -71,7 +72,7 @@ public class Thermometer extends Sensor{
       WeatherData currentData;
       //Default the data in case something bad happens, have
       //Something to return
-      double currentTemp = WeatherData.DEFAULTMEASURE;
+      double currentTemp = WeatherData.DEFAULTVALUE;
       try{
          byte [] state = this.thermalSensor.readDevice();
          //perform the temperature conversion
@@ -81,32 +82,38 @@ public class Thermometer extends Sensor{
          //set the current temp (which is returned by default in
          //Celsius)
          currentTemp = this.thermalSensor.getTemperature(state);
-         currentData = new WeatherData();
-         currentData.data(WeatherDataType.TEMPERATURE,
-                          Units.METRIC,
+         currentData = new TemperatureData();
+         currentData.data(Units.METRIC,
                           currentTemp,
-                          "Good Temperature Data");
+                          "Good Temperature Data",
+                          Calendar.getInstance());
       }
       catch(OneWireIOException ioe){
-         currentTemp = WeatherData.DEFAULTMEASURE;
-         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
-                                       Units.METRIC,
-                                       currentTemp,
-                                       bad);
+         currentTemp = WeatherData.DEFAULTVALUE;
+         System.out.println(ioe.getStackTrace()[0].getFileName());
+         System.out.println(""+ioe.getStackTrace()[0].getLineNumber());
+         currentData = new TemperatureData(Units.METRIC,
+                                           currentTemp,
+                                           bad,
+                                           Calendar.getInstance());
       }
       catch(OneWireException   owe){
-         currentTemp = WeatherData.DEFAULTMEASURE;
-         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
-                                       Units.METRIC,
-                                       currentTemp,
-                                       bad);
+         currentTemp = WeatherData.DEFAULTVALUE;
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
+         currentData = new TemperatureData(Units.METRIC,
+                                           currentTemp,
+                                           bad,
+                                           Calendar.getInstance());
       }
       catch(NullPointerException npe){
-         currentTemp = WeatherData.DEFAULTMEASURE;
-         currentData = new WeatherData(WeatherDataType.TEMPERATURE,
-                                       Units.METRIC,
-                                       currentTemp,
-                                       bad);
+         currentTemp = WeatherData.DEFAULTVALUE;
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
+         currentData = new TemperatureData(Units.METRIC,
+                                           currentTemp,
+                                           bad,
+                                           Calendar.getInstance());
       }
       return currentData;
    }
@@ -159,10 +166,12 @@ public class Thermometer extends Sensor{
       }
       catch(OneWireIOException ioe){
          this.thermalSensor = null;
+         ioe.printStackTrace();
          System.out.println("Error Setting Temperature Resolution");
       }
       catch(OneWireException owe){
          this.thermalSensor = null;
+         owe.printStackTrace();
          System.out.println("Error Setting Temperature Resolution");
       }
       catch(NullPointerException npe){

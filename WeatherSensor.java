@@ -27,19 +27,18 @@ import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 
 public abstract class WeatherSensor{
-   private String _address;
-   private String _name;
-   private String _type;
-   private Units  _units;
+   protected String _address;
+   protected String _name;
+   protected String _type;
+   protected Units  _units;
 
-   protected DSPortAdaptor _dspa;
+   static protected DSPortAdapter _dspa = null;
 
    {
       _address     = null;
       _name        = null;
       _type        = null;
       _units       = Units.METRIC; //Initialize to Metric
-      _dspa        = null;
    };
 
    //*************************Public Methods*************************
@@ -49,14 +48,14 @@ public abstract class WeatherSensor{
    public String address(){
       return this._address;
    }
-   
+
    /*
    Return the Name:  DS1920, DS18S10, DS2438, ...
    */
    public String name(){
       return this._name;
    }
-   
+
    /*
    Return the Verbal Type of Sensor:  Thermometer, Hygrometer,
    Barometer...
@@ -64,12 +63,12 @@ public abstract class WeatherSensor{
    public String type(){
       return this._type;
    }
-   
+
    /**/
    public Units units(){
       return this._units;
    }
-   
+
    /*
    Override the toString() method (for polymorphic purposes only)
    */
@@ -100,16 +99,18 @@ public abstract class WeatherSensor{
    */
    protected void usbAdapter(){
       try{
-         PortSniffer ps = new PortSniffer(PortSniffer.PORT_USB);
-         Hashtable<Stack<String>,Stack<String>> hash = ps.findPorts();
-         Enumeration<Stack<String>> e = hash.keys();
-         while(e.hasMoreElements()){
-            Stack<String> key = (Stack)e.nextElement();
-            if(key.size() == 2){//Name, Port
-                String name = key.pop();
-                String port = key.pop();
-                this._dspa = 
+        if(_dspa == null){
+            PortSniffer ps = new PortSniffer(PortSniffer.PORT_USB);
+            Hashtable<Stack<String>,Stack<String>> hash = ps.findPorts();
+            Enumeration<Stack<String>> e = hash.keys();
+            while(e.hasMoreElements()){
+               Stack<String> key = (Stack)e.nextElement();
+               if(key.size() == 2){//Name, Port
+                   String name = key.pop();
+                   String port = key.pop();
+                   this._dspa =
                          OneWireAccessProvider.getAdapter(name,port);
+               }
             }
          }
       }
