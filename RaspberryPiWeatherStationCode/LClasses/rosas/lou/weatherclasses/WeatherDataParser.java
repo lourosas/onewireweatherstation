@@ -228,6 +228,41 @@ public class WeatherDataParser{
    }
 
    /*
+   The weatherdata database sends back the data in the following form:
+   <Month>, <Day>, <Year>, <Hour>:<Min>:<Sec> <Time Zone>
+   as a String.
+   This method will parse that string into siz separate integer values
+   to set a Calendar instance for the purpose of storage.
+   */
+   public Calendar parseStringIntoCalendar(String data){
+      Calendar cal = null;
+      //String dateTime = this.parseData(data, ", ", MONTHS);
+      String month=this.parseData(data,", ",MONTHS);
+      String dS=this.parseStringForStringNumericalValue(data,1,", ");
+      String yS=this.parseStringForStringNumericalValue(data,2,", ");
+      String tS=this.parseStringForStringNumericalValue(data,3,", ");
+      String hS=this.parseStringForStringNumericalValue(tS,0,":");
+      String mS=this.parseStringForStringNumericalValue(tS,1,":");
+      String sS=this.parseStringForStringNumericalValue(tS,2,":");
+      sS=this.parseStringForStringNumericalValue(sS.trim(),0," ");
+      try{
+         int mon  =this.parseStringMonthForNumerical(month.trim());
+         int date = Integer.parseInt(dS);
+         int year = Integer.parseInt(yS);
+         int hour = Integer.parseInt(hS);
+         int min  = Integer.parseInt(mS);
+         int sec  = Integer.parseInt(sS);
+         cal = Calendar.getInstance();
+         cal.set(year,mon,date,hour,min,sec);
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         cal = null;
+      }
+      return cal;
+   }
+
+   /*
    */
    public String parseTemperatureAbsolute(String data){
       String rawTemperature = this.parseRawTemperature(data);
@@ -319,6 +354,25 @@ public class WeatherDataParser{
          message = null;
       }
       return message;
+   }
+
+   /*
+   */
+   private int parseStringMonthForNumerical(String monthString){
+      int month     = -1;
+      boolean found = false;
+      int i         = 0;
+
+      String compare = monthString.toUpperCase();
+
+      do{
+         if(compare.contains(MONTHS[i])){
+            found = true;
+            month = i;
+         }
+      }while((++i < MONTHS.length) && !found);
+
+      return month;
    }
 
    /*

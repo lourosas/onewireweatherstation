@@ -506,6 +506,139 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public List<WeatherData> barometricPressure
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double pressure = Barometer.DEFAULTPRESSURE;
+      String message  = new String();
+
+      String command  = new String("SELECT * FROM pressuredata");
+      command = command.concat(" WHERE month = \'" + month + "\'");
+      command = command.concat(" AND day = \'" + day + "\'");
+      command = command.concat(" AND year = \'" + year + "\'");
+
+      List<WeatherData> pressureList = null;
+
+      try{
+         WeatherDataParser wdp = new WeatherDataParser();
+         List<String> stringList = this.barometricPressure(command);
+         pressureList = new LinkedList<WeatherData>();
+         Iterator<String> it = stringList.iterator();
+         while(it.hasNext()){
+            String entry = it.next();
+            Calendar cal = wdp.parseStringIntoCalendar(entry);
+            WeatherData bd = new PressureData();
+            try{
+               String pressureString = entry.split(", ")[4].trim();
+               pressure=Double.parseDouble(pressureString.trim());
+               message = "good";
+            }
+            catch(NumberFormatException nfe){
+               nfe.printStackTrace();
+               pressure = Barometer.DEFAULTPRESSURE;
+               message  = "bad";
+            }
+            bd.data(Units.METRIC,pressure,message,cal);
+            pressureList.add(bd);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         pressureList = new LinkedList<WeatherData>();
+      }
+      return pressureList;
+   }
+
+   /*
+   */
+   public List<String> barometricPressure(String command){
+      Connection conn           = null;
+      Statement  stmt           = null;
+      ResultSet  resultSet      = null;
+      List<String> pressureList = null;
+
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet    = stmt.executeQuery(command);
+         pressureList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") || command.contains("mmHg")){
+               double metric = resultSet.getDouble("mmHg");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") || command.contains("inHg")){
+               double english = resultSet.getDouble("inHg");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") || command.contains("mB")){
+               double absolute = resultSet.getDouble("mB");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            } 
+            pressureList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sql){}
+         return pressureList;
+      }
+   }
+
+   /*
+   */
    public void dewpoint(WeatherData dpData_){
       Connection conn = null;
       Statement  stmt = null;
@@ -548,6 +681,136 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sqle){}
          System.out.println("\n" + dpData_ + "\n");
+      }
+   }
+
+   /*
+   */
+   public List<WeatherData> dewpoint
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double dewpoint = Thermometer.DEFAULTTEMP;
+      String message  = new String();
+
+      String command = new String("SELECT * FROM dewpointdata");
+      command = command.concat(" WHERE month = \'" + month + "\'");
+      command = command.concat(" AND day = \'" + day + "\'");
+      command = command.concat(" AND year = \'" + year + "\'");
+      List<WeatherData> dpList = null;
+      try{
+         WeatherDataParser wdp = new WeatherDataParser();
+         List<String> stringList = this.dewpoint(command);
+         dpList = new LinkedList<WeatherData>();
+         Iterator<String> it = stringList.iterator();
+         while(it.hasNext()){
+            String entry = it.next();
+            Calendar cal = wdp.parseStringIntoCalendar(entry);
+            WeatherData dd = new DewpointData();
+            try{
+               String metricDPString = entry.split(", ")[4].trim();
+               dewpoint = Double.parseDouble(metricDPString.trim());
+               message = "good";
+            }
+            catch(NumberFormatException nfe){
+               nfe.printStackTrace();
+               dewpoint = Thermometer.DEFAULTTEMP;
+               message = "bad";
+            }
+            dd.data(Units.METRIC,dewpoint,message,cal);
+            dpList.add(dd);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         dpList = new LinkedList<WeatherData>();
+      }
+      return dpList;
+   }
+
+   /*
+   */
+   public List<String> dewpoint(String command){
+      Connection conn      = null;
+      Statement  stmt      = null;
+      ResultSet  resultSet = null;
+      List<String> dpList  = null;
+      try{
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(command);
+         dpList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") || command.contains("dewptc")){
+               double metric = resultSet.getDouble("dewptc");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") || command.contains("dewptf")){
+               double english = resultSet.getDouble("dewptf");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") || command.contains("dewptk")){
+               double absolute = resultSet.getDouble("dewptk");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            }
+            dpList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sql){}
+         return dpList;
       }
    }
 
@@ -600,6 +863,141 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public List<WeatherData> heatIndex
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double heatIndex = Thermometer.DEFAULTTEMP;
+      String message   = new String();
+
+      String command  = new String("SELECT * FROM heatindexdata");
+      command = command.concat(" WHERE month = \'" + month + "\'");
+      command = command.concat(" AND day = \'" + day + "\'");
+      command = command.concat(" AND year = \'" + year + "\'");
+
+      List<WeatherData> hiList = null;
+      try{
+         WeatherDataParser wdp = new WeatherDataParser();
+         List<String> stringList = this.heatIndex(command);
+         hiList = new LinkedList<WeatherData>();
+         Iterator<String> it = stringList.iterator();
+         while(it.hasNext()){
+            String entry = it.next();
+            Calendar cal = wdp.parseStringIntoCalendar(entry);
+            WeatherData hId = new HeatIndexData();
+            try{
+               String metricHIString = entry.split(", ")[4].trim();
+               heatIndex = Double.parseDouble(metricHIString.trim());
+               message = "good";
+            }
+            catch(NumberFormatException nfe){
+               nfe.printStackTrace();
+               heatIndex = Thermometer.DEFAULTTEMP;
+               message = "bad";
+            }
+            hId.data(Units.METRIC,heatIndex,message,cal);
+            hiList.add(hId);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         hiList = new LinkedList<WeatherData>();
+      }
+      return hiList;
+   }
+
+   /*
+   */
+   public List<String> heatIndex(String command){
+      Connection conn      = null;
+      Statement  stmt      = null;
+      ResultSet  resultSet = null;
+      List<String> hiList  = null;
+
+      try{
+         conn = DriverManager.getConnection(DB_URL, USER, PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet  = stmt.executeQuery(command);
+         hiList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }            
+            if(command.contains("*") ||
+                                      command.contains("heatindexc")){
+               double metric = resultSet.getDouble("heatindexc");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + metric;
+            }
+            if(command.contains("*") ||
+                                      command.contains("heatindexf")){
+               double english = resultSet.getDouble("heatindexf");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + english;
+            }
+            if(command.contains("*") ||
+                                      command.contains("heatindexk")){
+               double absolute = resultSet.getDouble("heatindexk");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + absolute;
+            }
+            hiList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sql){}
+         return hiList;
+      }
+   }
+
+   /*
+   */
    public void humidity(WeatherData humidity_){
       Connection conn = null;
       Statement  stmt = null;
@@ -640,6 +1038,125 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sqe){}
          System.out.println("\n" + humidity_ + "\n");
+      }
+   }
+
+   /*
+   */
+   public List<WeatherData> humidity
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double humidity = Hygrometer.DEFAULTHUMIDITY;
+      String message  = new String();
+
+      String command  = new String("SELECT * FROM humiditydata");
+      command = command.concat(" WHERE month = \'" + month + "\'");
+      command = command.concat(" AND day = \'" + day + "\'");
+      command = command.concat(" AND year = \'" + year + "\'");
+
+      List<WeatherData> humiList = null;
+      try{
+         WeatherDataParser wdp = new WeatherDataParser();
+         List<String> stringList = this.humidity(command);
+         humiList = new LinkedList<WeatherData>();
+         Iterator<String> it = stringList.iterator();
+         while(it.hasNext()){
+            String entry = it.next();
+            Calendar cal = wdp.parseStringIntoCalendar(entry);
+            WeatherData hd = new HumidityData();
+            try{
+               String humidityString = entry.split(", ")[4].trim();
+               humidity = Double.parseDouble(humidityString.trim());
+               message = "good";
+            }
+            catch(NumberFormatException nfe){
+               nfe.printStackTrace();
+               humidity = Hygrometer.DEFAULTHUMIDITY;
+               message  = "bad";
+            }
+            hd.data(Units.PERCENTAGE,humidity,message,cal);
+            humiList.add(hd);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         humiList = new LinkedList<WeatherData>();
+      }
+      return humiList;
+   }
+
+   /*
+   */
+   public List<String> humidity(String command){
+      Connection conn           = null;
+      Statement  stmt           = null;
+      ResultSet  resultSet      = null;
+      List<String> humidityList = null;
+
+      try{
+         Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                    ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         humidityList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }
+            if(command.contains("*") || command.contains("humidity")){
+               double humidity = resultSet.getDouble("humidity");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + humidity;
+            }
+            humidityList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sql){}
+         return humidityList;
       }
    }
 
@@ -687,6 +1204,140 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sqe){}
          System.out.println("\n" + temperature_ + "\n");
+      }
+   }
+
+   /*
+   */
+   public List<WeatherData> temperature
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double temp    = Thermometer.DEFAULTTEMP;
+      String message = new String();
+
+      String command = new String("SELECT * FROM temperaturedata");
+      command = command.concat(" WHERE month = \'" + month + "\'");
+      command = command.concat(" AND day = \'" + day + "\'");
+      command = command.concat(" AND year = \'" + year + "\'");
+      List<WeatherData> tempList = null;
+      try{
+         WeatherDataParser wdp = new WeatherDataParser();
+         List<String> stringList = this.temperature(command);
+         tempList = new LinkedList<WeatherData>();
+         Iterator<String> it = stringList.iterator();
+         while(it.hasNext()){
+            String entry = it.next();
+            Calendar cal = wdp.parseStringIntoCalendar(entry);
+            WeatherData td = new TemperatureData();
+            try{
+               String metricTempString = entry.split(", ")[4].trim();
+               temp = Double.parseDouble(metricTempString.trim());
+               message = "good";
+            }
+            catch(NumberFormatException nfe){
+               nfe.printStackTrace();
+               temp = Thermometer.DEFAULTTEMP;
+               message = "bad";
+            }
+            td.data(Units.METRIC,temp,message,cal);
+            tempList.add(td);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         //Just Return An Empty Set
+         tempList = new LinkedList<WeatherData>();
+      }
+      return tempList;
+   }
+
+   /*
+   */
+   public List<String> temperature(String command){
+      List<String> tempList  = null;
+      Connection   conn      = null;
+      ResultSet    resultSet = null;
+      Statement    stmt      = null;
+
+      try{
+         //System.out.prinltln("Database:  " + command);
+         //Class.forName(JDBC_DRIVER);
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                  ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                  ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         tempList = new LinkedList<String>();
+         while(resultSet.next()){
+            String indexdata = new String();
+            if(command.contains("*") || command.contains("month")){
+               String month = resultSet.getString("month");
+               indexdata += month;
+            }
+            if(command.contains("*") || command.contains("day")){
+               String day   = resultSet.getString("day");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += day;
+            }
+            if(command.contains("*") || command.contains("year")){
+               String year  = resultSet.getString("year");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += year;
+            }
+            if(command.contains("*") || command.contains("time")){
+               String time  = resultSet.getString("time");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += time;
+            }
+            if(command.contains("*") || command.contains("tempc")){
+               double tempc = resultSet.getDouble("tempc");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + tempc;
+            }
+            if(command.contains("*") || command.contains("tempf")){
+               double tempf = resultSet.getDouble("tempf");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + tempf;
+            }
+            if(command.contains("*") || command.contains("tempk")){
+               double tempk = resultSet.getDouble("tempk");
+               if(indexdata.length() > 0){
+                  indexdata += ", ";
+               }
+               indexdata += "" + tempk;
+            }
+            tempList.add(indexdata);
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+         return tempList;
       }
    }
 }

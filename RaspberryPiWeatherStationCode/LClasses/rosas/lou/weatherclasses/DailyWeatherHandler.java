@@ -1,6 +1,16 @@
 /////////////////////////////////////////////////////////////////////
 /*
-<GNU Stuff to go here>
+Copyright 2018 Lou Rosas
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 /////////////////////////////////////////////////////////////////////
 package rosas.lou.weatherclasses;
@@ -12,54 +22,20 @@ import java.net.*;
 import com.sun.net.httpserver.*;
 import rosas.lou.weatherclasses.*;
 
-public class DailyWeatherHandler extends BaseWeatherHandler
-implements HttpHandler{
+public class DailyWeatherHandler
+extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String[] months = {"January", "February", "March", 
                               "April", "May", "June", "July",
                               "August", "September", "October",
                               "November", "December" };
-   private List<Double> dewPointData;
-   private List<String> dewPointTimes;
-   private List<Double> heatIndexData;
-   private List<String> heatIndexTimes;
-   private List<Double> humidityData;
-   private List<String> humidityTimes;
-   private List<Double> pressureData;
-   private List<String> pressureTimes;
-   private List<Double> temperatureData;
-   private List<String> temperatureTimes;
-   private String []    dates;
-   
-   {
-      dewPointData     = null;
-      dewPointTimes    = null;
-      humidityData     = null;
-      heatIndexData    = null;
-      heatIndexTimes   = null;
-      humidityTimes    = null;
-      pressureData     = null;
-      pressureTimes    = null;
-      temperatureData  = null;
-      temperatureTimes = null;
-      dates            = null;
-   }
-
    //
    //Implementation of the HttpHandler interface
    //
    public void handle(HttpExchange exchange){
       StringBuffer response = new StringBuffer();
+      final int OK          = 200;
+      OutputStream os       = null;
       try{
-         /*
-         //response.append(this.setUpData());
-         response.append(this.setUpTemperature());
-         response.append(this.setUpHumidity());
-         response.append(this.setUpPressure());
-         response.append(this.setUpDewpoint());
-         response.append(this.setUpHeatIndex());
-         response.append("\n</script></head>\n");
-         */
-         this.setDates();
          response.append(this.setUpHeader());
          response.append(this.setUpTemperature());
          response.append(this.setUpHumidity());
@@ -69,12 +45,19 @@ implements HttpHandler{
          response.append("\n</script>\n</head>\n");
          response.append(this.setUpBody());
          String send = response.toString();
-         exchange.sendResponseHeaders(200, send.length());
-         OutputStream os = exchange.getResponseBody();
+         exchange.sendResponseHeaders(OK, send.length());
+         os = exchange.getResponseBody();
          os.write(send.getBytes());
          os.close();
       }
       catch(IOException ioe){ ioe.printStackTrace(); }
+      catch(Exception e){ e.printStackTrace(); }
+      finally{
+         try{
+            os.close();
+         }
+         catch(IOException io){}
+      }
    }
 
    //
@@ -124,106 +107,16 @@ implements HttpHandler{
    //
    //
    //
-   private Double getValue(String data, Units type){
-      Double value = Double.NEGATIVE_INFINITY;
-      String current = null;
-      try{
-         if(type == Units.METRIC || type == Units.NULL){
-            current = data.split(",")[4].trim();
-         }
-         else if(type == Units.ENGLISH){
-            current = data.split(",")[5].trim();
-         }
-         else{
-            current = data.split(",")[6].trim();
-         }
-         value   = Double.parseDouble(current);
-      }
-      catch(NumberFormatException nfe){}
-      finally{
-         return value;
-      }
-   }
-   
-   //
-   //
-   //
-   private void setDates(){
-      try{
-         this.dates = this.getDate().split(" ");
-      }
-      catch(NullPointerException npe){
-         this.dates = null;
-      }
-   }
-
-   //
-   //
-   //
-   private Integer[] separateOutTime(String data){
-      String [] line = data.split(",");
-      String completeTime = line[3].trim();
-      String time = completeTime.split(" ")[0].trim();
-      String [] hms = time.split(":");
-      Integer[] theHms = new Integer[3];
-      try{
-         theHms[0] = new Integer(Integer.parseInt(hms[0].trim()));
-         theHms[1] = new Integer(Integer.parseInt(hms[1].trim()));
-         theHms[2] = new Integer(Integer.parseInt(hms[2].trim()));
-      }
-      catch(NumberFormatException nfe){}
-      finally{
-         return theHms;
-      }
-   }
-   
-   //
-   //
-   //
    private String setUpBody(){
       String [] dates   = null;
       String [] time    = null;
       StringBuffer body = new StringBuffer();
       StringBuffer date = new StringBuffer();
       Calendar cal      = Calendar.getInstance();
-      /*
-      try{
-         date.append(this.getDate());
-         dates = this.getDate().split(" ");
-         time = dates[3].split(":");
-         
-         int month = cal.get(Calendar.MONTH);
-         date.append(months[month] + ", ");
-         int day = cal.get(Calendar.DAY_OF_MONTH);
-         date.append(Integer.toString(day) + ", ");
-         int year = cal.get(Calendar.YEAR);
-         date.append(Integer.toString(year));
-         
-         String month = this.discernMonth(dates[1]);
-         this.setTemperatureData(month, dates[2], dates[5]);
-         body.append("\n<body>");
-         body.append("<h2>" + date + "</h2>");
-         body.append("\n<h2>Date:  " + month + "</h2>");
-         body.append("<h2> "+dates[2]+"  "+dates[3]+" </h2>");
-         body.append("<h2> "+time[0]+","+time[1]+","+time[2]);
-         body.append("\n</body>\n</html>");
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-         date = new StringBuffer("No Date!!!");
-         body.append("\n<body>");
-         body.append("<h2>" + date + "</h2>");
-         body.append("\n</body>\n</html>");
-      }
-      finally{
-         return body.toString();
-      }
-      */
-      body.append("\n<body>\n");
-      body.append("<div id = \"humidity_div\" style = ");
+      body.append("<div id = \"temp_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
-      body.append("<div id = \"temp_div\" style = ");
+      body.append("<div id = \"humidity_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
       body.append("<div id = \"pressure_div\" style = ");
@@ -243,15 +136,27 @@ implements HttpHandler{
    //
    //
    private String setUpDewpoint(){
-      StringBuffer buffer = new StringBuffer();
-      String month        = this.discernMonth(this.dates[1]);
-      String display      = new String();
-      this.setDewpointData(month, dates[2], dates[5]);
-      Iterator<String> times    = this.dewPointTimes.iterator();
-      Iterator<Double> dewpoint = this.dewPointData.iterator();
-      while(dewpoint.hasNext()){
-         display = display.concat("[" + times.next() + ",");
-         display = display.concat(dewpoint.next() +"], "); 
+      StringBuffer buffer     = new StringBuffer();
+      String display          = new String();
+      Calendar calendar       = Calendar.getInstance();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      String calendarString   = calendar.getTime().toString();
+      String [] dates         = calendarString.split(" ");
+      String month            = this.discernMonth(dates[1]);
+      String day              = dates[2];
+      String year             = dates[5];
+      List<WeatherData> dps   = mysqldb.dewpoint(month,day,year);
+      Iterator<WeatherData> it = dps.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         double dp = wd.englishData();
+         if(dp > Thermometer.DEFAULTTEMP){
+            display = display.concat("["+time+","+dp+"], ");
+         }
       }
       buffer.append("\nfunction drawDewpoint() {\n");
       buffer.append("var dpdata = new google.visualization.DataTable();");
@@ -264,26 +169,34 @@ implements HttpHandler{
       buffer.append("\n\ndpchart.draw(dpdata, dpoptions);\n}");
       return buffer.toString();
    }
-   
+  
    //
    //
    //
    private String setUpHeatIndex(){
-      StringBuffer buffer = new StringBuffer();
-      String month        = this.discernMonth(this.dates[1]);
-      String display      = new String();
-      this.setHeatIndexData(month, dates[2], dates[5]);
-      Iterator<String> times     = this.heatIndexTimes.iterator();
-      Iterator<Double> heatIndex = this.heatIndexData.iterator(); 
-      if(!(this.heatIndexData.isEmpty())){
-         while(heatIndex.hasNext()){
-            Double hi   = heatIndex.next();
-            String time = times.next();
-            if(hi > Thermometer.DEFAULTTEMP){
-               display = display.concat("[" + time + ",");
-               display = display.concat(hi +"], ");
-            }
+      StringBuffer buffer     = new StringBuffer();
+      String display          = new String();
+      Calendar calendar       = Calendar.getInstance();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      String calendarString   = calendar.getTime().toString();
+      String [] dates         = calendarString.split(" ");
+      String month            = this.discernMonth(dates[1]);
+      String day              = dates[2];
+      String year             = dates[5];
+      List<WeatherData> his = mysqldb.heatIndex(month,day,year);
+      Iterator<WeatherData> it = his.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         double hi = wd.englishData();
+         if(hi > Thermometer.DEFAULTTEMP){
+            display = display.concat("["+time+","+hi+"], ");
          }
+      }
+      if(!display.isEmpty()){
          buffer.append("\nfunction drawHeatIndex() {\n");
          buffer.append("var hidata = new google.visualization.DataTable();");
          buffer.append("\nhidata.addColumn('timeofday', 'X');");
@@ -296,20 +209,33 @@ implements HttpHandler{
       }
       return buffer.toString();
    }
-   
+
    //
    //
    //
    private String setUpHumidity(){
-      StringBuffer buffer = new StringBuffer();
-      String month        = this.discernMonth(this.dates[1]);
-      String display      = new String();
-      this.setHumidityData(month, dates[2], dates[5]);
-      Iterator<String> times    = this.humidityTimes.iterator();
-      Iterator<Double> humidity = this.humidityData.iterator();
-      while(humidity.hasNext()){
-         display = display.concat("[" + times.next() + ",");
-         display = display.concat(humidity.next() +"], ");         
+      StringBuffer buffer     = new StringBuffer();
+      String display          = new String();
+      Calendar calendar       = Calendar.getInstance();
+      WeatherDatabase msqldb  = MySQLWeatherDatabase.getInstance();
+      String calendarString   = calendar.getTime().toString();
+      String [] dates         = calendarString.split(" ");
+      String month            = this.discernMonth(dates[1]);
+      String day              = dates[2];
+      String year             = dates[5];
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      List<WeatherData> hums  = mysqldb.humidity(month,day,year);
+      Iterator<WeatherData> it= hums.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         double hum = wd.percentageData();
+         if(hum > Hygrometer.DEFAULTHUMIDITY){
+            display = display.concat("["+time+","+hum+"], ");
+         }
       }
       buffer.append("\n\nfunction drawHumidity() {\n");
       buffer.append("var humdata = new google.visualization.DataTable();");
@@ -322,20 +248,33 @@ implements HttpHandler{
       buffer.append("\n\nhumchart.draw(humdata, humidoptions);\n}");
       return buffer.toString();
    }
-   
+
    //
    //
    //
    private String setUpPressure(){
-      StringBuffer buffer = new StringBuffer();
-      String month        = this.discernMonth(this.dates[1]);
-      String display      = new String();
-      this.setPressureData(month, dates[2], dates[5]);
-      Iterator<String> times    = this.pressureTimes.iterator();
-      Iterator<Double> pressure = this.pressureData.iterator();
-      while(pressure.hasNext()){
-         display = display.concat("[" + times.next() + ",");
-         display = display.concat(pressure.next() +"], ");
+      StringBuffer buffer     = new StringBuffer();
+      String display          = new String();
+      Calendar calendar       = Calendar.getInstance();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      String calendarString   = calendar.getTime().toString();
+      String [] dates         = calendarString.split(" ");
+      String month            = this.discernMonth(dates[1]);
+      String day              = dates[2];
+      String year             = dates[5];
+      List<WeatherData> press =
+                           mysqldb.barometricPressure(month,day,year);
+      Iterator<WeatherData> it = press.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         double pres = wd.englishData();
+         if(pres > Barometer.DEFAULTPRESSURE){
+            display = display.concat("["+time+","+pres+"], ");
+         }
       }
       buffer.append("\n\nfunction drawPressure() {\n");
       buffer.append("var presdata = new google.visualization.DataTable();");
@@ -353,15 +292,27 @@ implements HttpHandler{
    //
    //
    private String setUpTemperature(){
-      StringBuffer buffer = new StringBuffer();
-      String month        = this.discernMonth(this.dates[1]);
-      String display      = new String();
-      this.setTemperatureData(month, dates[2], dates[5]);
-      Iterator<String> times = this.temperatureTimes.iterator();
-      Iterator<Double> temps = this.temperatureData.iterator();
-      while(temps.hasNext()){
-         display = display.concat("[" + times.next() + ",");
-         display = display.concat(temps.next() +"], ");
+      StringBuffer buffer     = new StringBuffer();
+      String display          = new String();
+      Calendar calendar       = Calendar.getInstance();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      String calendarString   = calendar.getTime().toString();
+      String [] dates         = calendarString.split(" ");
+      String month            = this.discernMonth(dates[1]);
+      String day              = dates[2];
+      String year             = dates[5];
+      List<WeatherData> temps = mysqldb.temperature(month,day,year);
+      Iterator<WeatherData> it = temps.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         double temp = wd.englishData();
+         if(temp > Thermometer.DEFAULTTEMP){
+            display = display.concat("["+time+","+temp+"], ");
+         }
       }
       buffer.append("\nfunction drawTemperature() {\n");
       buffer.append("var tempdata = new google.visualization.DataTable();");
@@ -374,180 +325,7 @@ implements HttpHandler{
       buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");
       return buffer.toString();
    }
-   
-   //
-   //
-   //
-   private void setDewpointData
-   (
-      String month,
-      String day,
-      String year
-   ){
-      Double dewpoint     = Double.NEGATIVE_INFINITY;
-      Integer[] hms       = null;
-      List<String> dpData = null;
-      
-      WeatherStorage ws = WeatherStorage.getInstance();
-      try{
-         this.dewPointData  = new LinkedList<Double>();
-         this.dewPointTimes = new LinkedList<String>();
-         dpData = ws.dewpointFromDatabase(month,day,year);
-         Iterator<String> it = dpData.iterator();
-         while(it.hasNext()){
-            String values = it.next();
-            hms = this.separateOutTime(values);
-            //The Dewpoint is stored in the METRIC location
-            dewpoint = this.getValue(values, Units.ENGLISH);
-            this.dewPointData.add(dewpoint);
-            String time = new String("["+hms[0]+","+hms[1]+",");
-            time = time.concat(hms[2]+"]");
-            this.dewPointTimes.add(time);
-         }
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }      
-   }
-   
-   //
-   //
-   //
-   private void setHeatIndexData
-   (
-      String month,
-      String day,
-      String year
-   ){
-      Double heatIndex      = Double.NEGATIVE_INFINITY;
-      Integer[] hms         = null;
-      List<String> hiData   = null;
-      
-      WeatherStorage ws = WeatherStorage.getInstance();
-      try{
-         this.heatIndexData  = new LinkedList<Double>();
-         this.heatIndexTimes = new LinkedList<String>();
-         hiData = ws.heatIndexFromDatabase(month,day,year);
-         Iterator<String> it = hiData.iterator();
-         while(it.hasNext()){
-            String values = it.next();
-            hms = this.separateOutTime(values);
-            heatIndex = this.getValue(values, Units.ENGLISH);
-            this.heatIndexData.add(heatIndex);
-            String time = new String("["+hms[0]+","+hms[1]+",");
-            time = time.concat(hms[2]+"]");
-            this.heatIndexTimes.add(time);
-         }
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }      
-   }
-   
-   //
-   //
-   //
-   private void setHumidityData
-   (
-      String month,
-      String day,
-      String year
-   ){
-      Double humidity           = Double.NEGATIVE_INFINITY;
-      Integer[] hms             = null;
-      List<String> humidData    = null;
-      
-      WeatherStorage ws = WeatherStorage.getInstance();
-      try{
-         this.humidityData  = new LinkedList<Double>();
-         this.humidityTimes = new LinkedList<String>();
-         humidData = ws.humidityFromDatabase(month,day,year);
-         Iterator<String> it = humidData.iterator();
-         while(it.hasNext()){
-            String values = it.next();
-            hms = this.separateOutTime(values);
-            //The Relative Humidity is stored in the METRIC location
-            humidity = this.getValue(values, Units.METRIC);
-            this.humidityData.add(humidity);
-            String time = new String("["+hms[0]+","+hms[1]+",");
-            time = time.concat(hms[2]+"]");
-            this.humidityTimes.add(time);
-         }
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }
-   }
-   
-   //
-   //
-   //
-   private void setPressureData
-   (
-      String month,
-      String day,
-      String year
-   ){
-      Double pressure           = Double.NEGATIVE_INFINITY;
-      Integer[] hms             = null;
-      List<String> pressureData = null;
-      
-      WeatherStorage ws = WeatherStorage.getInstance();
-      try{
-         this.pressureData  = new LinkedList<Double>();
-         this.pressureTimes = new LinkedList<String>();
-         //pressureData        = ws.requestData(command);
-         pressureData = ws.pressureFromDatabase(month,day,year);
-         Iterator<String> it = pressureData.iterator();
-         while(it.hasNext()){
-            String values = it.next();
-            hms = this.separateOutTime(values);
-            pressure = this.getValue(values, Units.ENGLISH);
-            this.pressureData.add(pressure);
-            String time = new String("["+hms[0]+","+hms[1]+",");
-            time = time.concat(hms[2]+"]");
-            this.pressureTimes.add(time);
-         }
-      }
-      catch(NullPointerException npe){
-         npe.printStackTrace();
-      }
-   }
-   
-   //
-   //
-   //
-   private void setTemperatureData
-   (
-      String month,
-      String day,
-      String year
-   ){
-      Double  temp          = Double.NEGATIVE_INFINITY;
-      Integer[] hms         = null;
-      List<String> tempData = null;
 
-      WeatherStorage ws = WeatherStorage.getInstance();
-      try{
-         this.temperatureData  = new LinkedList<Double>();
-         this.temperatureTimes = new LinkedList<String>();
-         //tempData              = ws.requestData(command);
-         tempData = ws.temperatureFromDatabase(month,day,year);
-         Iterator<String> it   = tempData.iterator();
-         while(it.hasNext()){
-            String values = it.next();
-            hms  = this.separateOutTime(values);
-            temp = this.getValue(values, Units.ENGLISH);
-            this.temperatureData.add(temp);
-            String time = new String("["+hms[0]+","+hms[1]+",");
-            time = time.concat(hms[2]+"]");
-            this.temperatureTimes.add(time);
-            
-         }
-      }
-      catch(NullPointerException npe){ npe.printStackTrace(); }
-   }
-   
    //
    //
    //

@@ -31,4 +31,14 @@ public interface WeatherDatabase{
    public void barometricPressure(WeatherData data);
    public void dewpoint(WeatherData data);
    public void heatIndex(WeatherData data);
+   public List<WeatherData> temperature(String month,String day,String year);
+   public List<WeatherData> humidity(String month,String day,String year);
+   public List<WeatherData> barometricPressure(String month,String day, String year);
+   public List<WeatherData> dewpoint(String month,String day,String year);
+   public List<WeatherData> heatIndex(String month,String day,String year);
+   public List<String> temperature(String request);
+   public List<String> humidity(String request);
+   public List<String> barometricPressure(String request);
+   public List<String> dewpoint(String request);
+   public List<String> heatIndex(String request);
 }
