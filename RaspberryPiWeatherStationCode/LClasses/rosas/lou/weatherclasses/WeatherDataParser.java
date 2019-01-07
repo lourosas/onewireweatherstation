@@ -81,6 +81,8 @@ public class WeatherDataParser{
    For Humidity measurements, there is NO different units (just
    percentage, so the data is measured in percentage ONLY).
    */
+   /*
+   */
    public String parseCalendar(String data){
       String calendar = null;
       try{
@@ -88,6 +90,37 @@ public class WeatherDataParser{
          ref = this.parseData(ref, ",", MONTHS);
          String [] parts = ref.split(": ");
          calendar = parts[1].trim();
+      }
+      catch(NullPointerException npe){
+         calendar = null;
+      }
+      return calendar;
+   }
+
+   public String parseCalendar(String data, String type){
+      String calendar = null;
+      try{
+         String ref = null;
+         if(type.toUpperCase().contains("TEMPERATURE")){
+            ref = this.parseRawTemperature(data);
+         }
+         else if(type.toUpperCase().contains("HUMIDITY")){
+            ref = this.parseRawHumidity(data);
+         }
+         else if(type.toUpperCase().contains("PRESSURE")){
+            ref = this.parseRawPressure(data);
+         }
+         else if(type.toUpperCase().contains("DEWPOINT")){
+            ref = this.parseRawDewpoint(data);
+         }
+         else if(type.toUpperCase().contains("HEATINDEX")){
+            ref = this.parseRawHeatIndex(data);
+         }
+         else{
+            ref = this.parseRawTemperature(data);
+         }
+         String [] parts = ref.split(": ");
+         calendar        = parts[1].trim();
       }
       catch(NullPointerException npe){
          calendar = null;
@@ -180,6 +213,16 @@ public class WeatherDataParser{
 
    /*
    */
+   public String parseDewpointCalendar(String data){
+      String calendar = null;
+      String ref = this.parseRawDewpoint(data);
+      String [] parts = ref.split(": ");
+      calendar = parts[1].trim();
+      return calendar;
+   }
+
+   /*
+   */
    public String parseHeatIndexAbsolute(String data){
       String rawHI = this.parseRawHeatIndex(data);
       return this.parseStringForStringNumericalValue(rawHI,0,", ");
@@ -201,9 +244,29 @@ public class WeatherDataParser{
 
    /*
    */
+   public String parseHeatIndexCalendar(String data){
+      String calendar = null;
+      String ref = this.parseRawHeatIndex(data);
+      String [] parts = ref.split(": ");
+      calendar = parts[1].trim();
+      return calendar;
+   }
+
+   /*
+   */
    public String parseHumidity(String data){
       String rawH = this.parseRawHumidity(data);
       return this.parseStringForStringNumericalValue(rawH,0,", ");
+   }
+
+   /*
+   */
+   public String parseHumidityCalendar(String data){
+      String calendar = null;
+      String ref = this.parseRawHumidity(data);
+      String [] parts = ref.split(": ");
+      calendar = parts[1].trim();
+      return calendar;
    }
 
    /*
@@ -228,10 +291,18 @@ public class WeatherDataParser{
    }
 
    /*
-   The weatherdata database sends back the data in the following form:
+   */
+   public String parsePressureCalendar(String data){
+      String ref = this.parseRawPressure(data);
+      String [] parts = ref.split(": ");
+      return parts[1].trim();
+   }
+
+   /*
+   The weatherdata database sends back the date in the following form:
    <Month>, <Day>, <Year>, <Hour>:<Min>:<Sec> <Time Zone>
    as a String.
-   This method will parse that string into siz separate integer values
+   This method will parse that string into separate integer values
    to set a Calendar instance for the purpose of storage.
    */
    public Calendar parseStringIntoCalendar(String data){
@@ -254,6 +325,35 @@ public class WeatherDataParser{
          int sec  = Integer.parseInt(sS);
          cal = Calendar.getInstance();
          cal.set(year,mon,date,hour,min,sec);
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         cal = null;
+      }
+      return cal;
+   }
+
+   /*
+   <Day> <Month> <Date> <hr:min:sec> <Zone> <year>
+   */
+   public Calendar parseRawDataCalStringIntoCalendar(String date){
+      Calendar cal = null;
+      String month = this.parseData(date," ",MONTHS);
+      String dS=this.parseStringForStringNumericalValue(date,2," ");
+      String yS=this.parseStringForStringNumericalValue(date,5," ");
+      String tS=this.parseStringForStringNumericalValue(date,3," ");
+      String hS=this.parseStringForStringNumericalValue(tS,0,":");
+      String mS=this.parseStringForStringNumericalValue(tS,1,":");
+      String sS=this.parseStringForStringNumericalValue(tS,2,":");
+      try{
+         int mon  = this.parseStringMonthForNumerical(month.trim());
+         int date_ = Integer.parseInt(dS);
+         int year = Integer.parseInt(yS);
+         int hour = Integer.parseInt(hS);
+         int min  = Integer.parseInt(mS);
+         int sec  = Integer.parseInt(sS);
+         cal = Calendar.getInstance();
+         cal.set(year,mon,date_,hour,min,sec);
       }
       catch(NumberFormatException nfe){
          nfe.printStackTrace();
@@ -290,6 +390,17 @@ public class WeatherDataParser{
    public String parseTemperatureMetric(String data){
       String rawTemp = this.parseRawTemperature(data);
       return this.parseStringForStringNumericalValue(rawTemp,2,", ");
+   }
+
+   /*
+   */
+   public String parseTemperatureCalendar(String data){
+      String calendar = null;
+      String rawTemp = this.parseRawTemperature(data);
+      String [] parts = rawTemp.split(": ");
+      calendar = parts[1].trim();
+      return calendar;
+      
    }
 
    ///////////////////////Private Methods/////////////////////////////

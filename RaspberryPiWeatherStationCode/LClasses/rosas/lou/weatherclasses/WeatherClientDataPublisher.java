@@ -54,4 +54,14 @@ public abstract class WeatherClientDataPublisher{
          it.next().updateData(data);
       }
    }
+
+   /*
+   */
+   protected void publishData(List<WeatherData> data){
+      Iterator<WeatherClientDataSubscriber> it =
+                                         this._subscribers.iterator();
+      while(it.hasNext()){
+         it.next().updateData(data);
+      }
+   }
 }

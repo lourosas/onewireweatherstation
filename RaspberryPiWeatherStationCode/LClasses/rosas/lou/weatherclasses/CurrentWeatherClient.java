@@ -21,6 +21,8 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.text.DateFormat;
+import java.text.ParseException;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherClient extends WeatherClientDataPublisher
@@ -33,10 +35,12 @@ implements Runnable{
    private DatagramSocket _socket;
    private byte[] _addr;
    private String _rawData;
+   private List<WeatherData> _weatherData;
    {
-      _socket = null;
       _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
-      _rawData = null;
+      _socket      = null;
+      _rawData     = null;
+      _weatherData = null;
    }
 
    ///////////////////////Constructors///////////////////////////////
@@ -50,7 +54,9 @@ implements Runnable{
       while(true){
          try{
             this.requestWeatherDataFromServer();
+            this.convertToWeatherData();
             this.publishData(this._rawData);
+            this.publishData(this._weatherData);
             Thread.sleep(60000);
          }
          catch(InterruptedException ie){}
@@ -58,6 +64,108 @@ implements Runnable{
    }
 
    //////////////////Private Methods/////////////////////////////////
+   /*
+   */
+   private void convertToWeatherData(){
+      try{
+         try{
+            this._weatherData.clear();
+         }
+         catch(NullPointerException e){
+            this._weatherData = new LinkedList<WeatherData>();
+         }
+         WeatherDataParser wdp = new WeatherDataParser();
+         String cal = wdp.parseTemperatureCalendar(this._rawData);
+         Calendar calendar =
+                           wdp.parseRawDataCalStringIntoCalendar(cal);
+         String message = wdp.parseTemperatureMessage(this._rawData);
+         String dataS = wdp.parseTemperatureMetric(this._rawData);
+         double temp = (double)Thermometer.DEFAULTTEMP;
+         try{
+            temp = Double.parseDouble(dataS);
+         }
+         catch(NumberFormatException npe){
+            npe.printStackTrace();
+            temp = (double)Thermometer.DEFAULTTEMP;
+         }
+         WeatherData tempData = new TemperatureData(Units.METRIC,
+                                                    temp, message,
+                                                    calendar);
+         this._weatherData.add(tempData);
+
+         cal         = wdp.parseHumidityCalendar(this._rawData);
+         calendar    = wdp.parseRawDataCalStringIntoCalendar(cal);
+         message     = wdp.parseHumidityMessage(this._rawData);
+         dataS       = wdp.parseHumidity(this._rawData);
+         double humi = Hygrometer.DEFAULTHUMIDITY;
+         try{
+             humi = Double.parseDouble(dataS);
+         }
+         catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+            humi = Hygrometer.DEFAULTHUMIDITY;
+         }
+         WeatherData humiData = new HumidityData(Units.PERCENTAGE,
+                                                 humi, message,
+                                                 calendar);
+         this._weatherData.add(humiData);
+
+         cal        = wdp.parsePressureCalendar(this._rawData);
+         calendar   = wdp.parseRawDataCalStringIntoCalendar(cal);
+         message    = wdp.parsePressureMessage(this._rawData);
+         dataS      = wdp.parsePressureMetric(this._rawData);
+         double pres = Barometer.DEFAULTPRESSURE;
+         try{
+            pres = Double.parseDouble(dataS);
+         }
+         catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+            pres = Barometer.DEFAULTPRESSURE;
+         }
+         WeatherData presData = new PressureData(Units.METRIC,
+                                                 pres,
+                                                 message,
+                                                 calendar);
+         this._weatherData.add(presData);
+
+         cal       = wdp.parseDewpointCalendar(this._rawData);
+         calendar  = wdp.parseRawDataCalStringIntoCalendar(cal);
+         message   = wdp.parseDewpointMessage(this._rawData);
+         dataS     = wdp.parseDewpointMetric(this._rawData);
+         double dp = (double)Thermometer.DEFAULTTEMP;
+         try{
+            dp = Double.parseDouble(dataS);
+         }
+         catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+            dp = (double)Thermometer.DEFAULTTEMP;
+         }
+         WeatherData dpData = new DewpointData(Units.METRIC, dp,
+                                               message, calendar);
+         this._weatherData.add(dpData);
+
+         cal       = wdp.parseHeatIndexCalendar(this._rawData);
+         calendar  = wdp.parseRawDataCalStringIntoCalendar(cal);
+         message   = wdp.parseHeatIndexMessage(this._rawData);
+         dataS     = wdp.parseHeatIndexMetric(this._rawData);
+         double hi = (double)Thermometer.DEFAULTTEMP;
+         try{
+            hi = Double.parseDouble(dataS);
+         }
+         catch(NumberFormatException nfe){
+            nfe.printStackTrace();
+            hi = (double)Thermometer.DEFAULTTEMP;
+         }
+         WeatherData hiData = new HeatIndexData(Units.METRIC, hi,
+                                                message, calendar);
+         this._weatherData.add(hiData);
+         
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
    /*
    */
    private void requestWeatherDataFromServer(){

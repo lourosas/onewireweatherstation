@@ -25,6 +25,11 @@ public class CurrentWeatherDataSubscriber
 implements WeatherClientDataSubscriber{
    protected String            _data;
    protected WeatherDataParser _wdp;
+   protected WeatherData       temperatureData;
+   protected WeatherData       humidityData;
+   protected WeatherData       pressureData;
+   protected WeatherData       dewpointData;
+   protected WeatherData       heatIndexData;
 
    {
       _data = null;
@@ -58,5 +63,41 @@ implements WeatherClientDataSubscriber{
       System.out.println(this._wdp.parseHeatIndexAbsolute(this._data));
       System.out.println(this._wdp.parseHeatIndexEnglish(this._data));
       System.out.println(this._wdp.parseHeatIndexMetric(this._data));
+   }
+
+   /*
+   Making an attempt NOT to use Type Checking for the assignment!
+   This way is ONE possibility!
+   */
+   public void updateData(List<WeatherData> data){
+      Iterator<WeatherData> it = data.iterator();
+      while(it.hasNext()){
+         WeatherData currentData = it.next();
+         try{
+            TemperatureData td = (TemperatureData)currentData;
+            this.temperatureData = td;
+         }
+         catch(ClassCastException cce){}
+         try{
+            HumidityData hd = (HumidityData)currentData;
+            this.humidityData = hd;
+         }
+         catch(ClassCastException cce){}
+         try{
+            PressureData pd = (PressureData)currentData;
+            this.pressureData = pd;
+         }
+         catch(ClassCastException cce){}
+         try{
+            DewpointData dd = (DewpointData)currentData;
+            this.dewpointData = dd;
+         }
+         catch(ClassCastException cce){}
+         try{
+            HeatIndexData hid = (HeatIndexData)currentData;
+            this.heatIndexData = hid;
+         }
+         catch(ClassCastException cce){}
+      }
    }
 }
