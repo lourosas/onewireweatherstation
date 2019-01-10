@@ -24,10 +24,25 @@ import rosas.lou.weatherclasses.*;
 
 public class DailyWeatherHandler
 extends CurrentWeatherDataSubscriber implements HttpHandler{
+   private String _month;
+   private String _date;
+   private String _year;
    private String[] months = {"January", "February", "March", 
                               "April", "May", "June", "July",
                               "August", "September", "October",
                               "November", "December" };
+   private String [] dates = {"01","02","03","04","05","06","07","08",
+                              "09","10","11","12","13","14","15","16",
+                              "17","18","19","20","21","22","23","24",
+                              "25","26","27","28","29","30","31"};
+   private String [] years = {"2019", "2018", "2017"};
+
+   {
+      _month = null;
+      _date  = null;
+      _year  = null;
+   };
+
    //
    //Implementation of the HttpHandler interface
    //
@@ -36,6 +51,34 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       final int OK          = 200;
       OutputStream os       = null;
       try{
+         String parts[] = null;
+         String query = exchange.getRequestURI().getQuery();
+         try{
+            parts = query.split("&");
+            this._month = parts[0].split("=")[1].trim();
+            this._date  = parts[1].split("=")[1].trim();
+            this._year  = parts[2].split("=")[1].trim();
+         }
+         catch(NullPointerException npe){
+            Calendar calendar     = Calendar.getInstance();
+            String calendarString = calendar.getTime().toString();
+            String [] dates       = calendarString.split(" ");
+            this._month           = this.discernMonth(dates[1]);
+            this._date            = dates[2];
+            this._year            = dates[5];
+         }
+         //There may be so many more exception that need to be
+         //handled...just give them the latest data and be done
+         //with it!!!
+         catch(Exception e){
+            Calendar calendar     = Calendar.getInstance();
+            String calendarString = calendar.getTime().toString();
+            String [] dates       = calendarString.split(" ");
+            this._month           = this.discernMonth(dates[1]);
+            this._date            = dates[2];
+            this._year            = dates[5];
+         }
+
          response.append(this.setUpHeader());
          response.append(this.setUpTemperature());
          response.append(this.setUpHumidity());
@@ -108,11 +151,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    private String setUpBody(){
-      String [] dates   = null;
-      String [] time    = null;
       StringBuffer body = new StringBuffer();
-      StringBuffer date = new StringBuffer();
-      Calendar cal      = Calendar.getInstance();
+      body.append("\n<body>");
+      body.append(this.setUpTheForm());
       body.append("<div id = \"temp_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
@@ -138,14 +179,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpDewpoint(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      Calendar calendar       = Calendar.getInstance();
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      String calendarString   = calendar.getTime().toString();
-      String [] dates         = calendarString.split(" ");
-      String month            = this.discernMonth(dates[1]);
-      String day              = dates[2];
-      String year             = dates[5];
-      List<WeatherData> dps   = mysqldb.dewpoint(month,day,year);
+      List<WeatherData> dps =
+                 mysqldb.dewpoint(this._month,this._date,this._year);
       Iterator<WeatherData> it = dps.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
@@ -176,14 +212,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHeatIndex(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      Calendar calendar       = Calendar.getInstance();
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      String calendarString   = calendar.getTime().toString();
-      String [] dates         = calendarString.split(" ");
-      String month            = this.discernMonth(dates[1]);
-      String day              = dates[2];
-      String year             = dates[5];
-      List<WeatherData> his = mysqldb.heatIndex(month,day,year);
+      List<WeatherData> his =
+                mysqldb.heatIndex(this._month,this._date,this._year);
       Iterator<WeatherData> it = his.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
@@ -216,15 +247,10 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHumidity(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      Calendar calendar       = Calendar.getInstance();
       WeatherDatabase msqldb  = MySQLWeatherDatabase.getInstance();
-      String calendarString   = calendar.getTime().toString();
-      String [] dates         = calendarString.split(" ");
-      String month            = this.discernMonth(dates[1]);
-      String day              = dates[2];
-      String year             = dates[5];
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> hums  = mysqldb.humidity(month,day,year);
+      List<WeatherData> hums  =
+                  mysqldb.humidity(this._month,this._date,this._year);
       Iterator<WeatherData> it= hums.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
@@ -255,15 +281,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpPressure(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      Calendar calendar       = Calendar.getInstance();
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      String calendarString   = calendar.getTime().toString();
-      String [] dates         = calendarString.split(" ");
-      String month            = this.discernMonth(dates[1]);
-      String day              = dates[2];
-      String year             = dates[5];
       List<WeatherData> press =
-                           mysqldb.barometricPressure(month,day,year);
+        mysqldb.barometricPressure(this._month,this._date,this._year);
       Iterator<WeatherData> it = press.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
@@ -294,14 +314,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpTemperature(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      Calendar calendar       = Calendar.getInstance();
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      String calendarString   = calendar.getTime().toString();
-      String [] dates         = calendarString.split(" ");
-      String month            = this.discernMonth(dates[1]);
-      String day              = dates[2];
-      String year             = dates[5];
-      List<WeatherData> temps = mysqldb.temperature(month,day,year);
+      List<WeatherData> temps =
+               mysqldb.temperature(this._month,this._date,this._year);
       Iterator<WeatherData> it = temps.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
@@ -334,7 +349,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       header.append("<html><head>\n");
       header.append("<title> Lou Rosas:  One Wire Weather Station");
       header.append(" Daily Data</title>\n");
-      header.append("<meta http-equiv=\"refresh\" content=\"600\">\n");
+      //header.append("<meta http-equiv=\"refresh\" content=\"600\">\n");
       header.append("<script type=\"text/javascript\" src=\"https://www.gstatic.com/charts/loader.js\"></script>\n");
       header.append("<script type=\"text/javascript\">\n");
       header.append("google.charts.load('current',{packages:['corechart','line']});");
@@ -345,5 +360,45 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       header.append("\ngoogle.charts.setOnLoadCallback(drawDewpoint);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawHeatIndex);");
       return header.toString();
+   }
+
+   //
+   //
+   //
+   private String setUpTheForm(){
+      StringBuffer form = new StringBuffer();
+      form.append("\n");
+      form.append("<form action=\"http://68.98.39.39:8000/daily\"");
+      form.append(" method=\"GET\">\n");
+      form.append("<select name=\"month\">\n");
+      for(int i = 0; i < months.length; i++){
+         form.append("<option value=\"" + months[i] + "\"");
+         if(months[i].equals(this._month)){
+            form.append(" selected");
+         }
+         form.append(">" + months[i] + "</option>\n");
+      }
+      form.append("</select>\n");
+      form.append("<select name=\"date\">\n");
+      for(int i = 0; i < dates.length; i++){
+         form.append("<option value=\"" + dates[i] + "\"");
+         if(dates[i].equals(this._date)){
+            form.append(" selected");
+         }
+         form.append(">" + (i+1) + "</option>\n");
+      }
+      form.append("</select>\n");
+      form.append("<select name=\"year\">\n");
+      for(int i = 0; i < years.length; i++){
+         form.append("<option value=\"" + years[i] + "\"");
+         if(years[i].equals(this._year)){
+            form.append(" selected");
+         }
+         form.append(">" + years[i] + "</option>\n");
+      }
+      form.append("</select>\n");
+      form.append("<button type=\"submit\">View</button><br>\n");
+      form.append("</form>\n\n");
+      return form.toString();
    }
 }
