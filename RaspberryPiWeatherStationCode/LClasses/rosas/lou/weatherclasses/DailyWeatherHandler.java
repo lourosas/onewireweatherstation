@@ -369,6 +369,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       StringBuffer form = new StringBuffer();
       form.append("\n");
       form.append("<form action=\"http://68.98.39.39:8000/daily\"");
+      //form.append("<form action=\"http://www.onewireweather.us/daily\"");
       form.append(" method=\"GET\">\n");
       form.append("<select name=\"month\">\n");
       for(int i = 0; i < months.length; i++){

@@ -19,16 +19,27 @@ import java.lang.*;
 import java.util.*;
 import java.io.*;
 import java.net.*;
+import java.text.*;
 import com.sun.net.httpserver.*;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentHttpHandler 
 extends CurrentWeatherDataSubscriber implements HttpHandler{
+   private Calendar start;
+   private long     startMillis;
+
+   {
+      start       = null;
+      startMillis = -1;
+   };
+
    ////////////////////////Constructors///////////////////////////////
    /*
    */
    public CurrentHttpHandler(){
       super();
+      this.start        = Calendar.getInstance();
+      this.startMillis  = this.start.getTimeInMillis();
    }
 
    ///////////////////Interface Implementations///////////////////////
@@ -103,7 +114,10 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       body.append("</tr>");
       body.append("\n<tr><td><div id=\"press_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
-      body.append("\n</tr>\n</table>");
+      body.append("\n</tr>\n</table>\n");
+      body.append("<h3 style=\"color:blue;text-align:center;\">");
+      body.append("This website has been up for:  ");
+      body.append(this.calculateUpTime() + "</h3>\n");
       body.append("</body>\n");
       return body.toString();
    }
@@ -164,6 +178,33 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    }
 
    ///////////////////////Private Methods/////////////////////////////
+   /*
+   */
+   private String calculateUpTime(){
+      StringBuffer upTime = null;
+      int DAY_DIFF        = 1;
+      int EPOCH           = 1970;
+      Calendar current    = Calendar.getInstance();
+
+      current.setTimeZone(TimeZone.getTimeZone("UTC"));
+      long currentMillis = current.getTimeInMillis();
+      current.setTimeInMillis(currentMillis - this.startMillis);
+
+      int secs = current.get(Calendar.SECOND);
+      int mins = current.get(Calendar.MINUTE);
+      int hrs  = current.get(Calendar.HOUR_OF_DAY);
+      int days = current.get(Calendar.DAY_OF_YEAR) - DAY_DIFF;
+      int yrs  = current.get(Calendar.YEAR) - EPOCH;
+
+      upTime = new StringBuffer(yrs + " Years ");
+      upTime.append(days + " days ");
+      upTime.append(String.format("%02d", hrs ) + " Hours ");
+      upTime.append(String.format("%02d", mins) +  " Mins ");
+      upTime.append(String.format("%02d", secs) +  " Secs ");
+
+      return upTime.toString();
+   }
+
    /*
    */
    private String setUpDewpoint(){
