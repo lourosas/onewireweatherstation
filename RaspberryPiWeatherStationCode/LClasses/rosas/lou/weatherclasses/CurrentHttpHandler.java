@@ -27,10 +27,16 @@ public class CurrentHttpHandler
 extends CurrentWeatherDataSubscriber implements HttpHandler{
    private Calendar start;
    private long     startMillis;
+   private int      currentDate;
+   private String   sunrise;
+   private String   sunset;
 
    {
       start       = null;
       startMillis = -1;
+      currentDate = -1;
+      sunrise     = "";
+      sunset      = "";
    };
 
    ////////////////////////Constructors///////////////////////////////
@@ -40,6 +46,8 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       super();
       this.start        = Calendar.getInstance();
       this.startMillis  = this.start.getTimeInMillis();
+      this.currentDate  = start.get(Calendar.DATE);
+      this.setSunriseSunset();
    }
 
    ///////////////////Interface Implementations///////////////////////
@@ -94,6 +102,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    protected String setUpBody(){
       StringBuffer body = new StringBuffer();
       String date = this._wdp.parseCalendar(this._data);
+      if(!this.checkDate()){
+         this.setSunriseSunset();
+      }
       body.append("\n<body>\n");
       body.append("<table width = \"740\">");
       body.append("<tr align = \"center\"><td><h2>Tucson, AZ<br>");
@@ -101,6 +112,12 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       body.append("</h2></td>");
       body.append("<td><h2>As Of: "+ date + "</h2></td>");
       body.append("</tr></table>");
+      body.append("<table width = \"740\">");
+      body.append("<tr align = \"center\">");
+      body.append("<td><h3>Sunrise:  "+this.sunrise+"</h3></td>");
+      body.append("<td><h3>Sunset:   "+this.sunset+"</h3></td>");
+      body.append("</tr>");
+      body.append("</table>");
       body.append("\n<table class=\"rows\">\n<tr>");
       body.append("\n<td><div id=\"temp_div\", ");
       body.append("style=\"width: 300px;height: 240px;\"</div></td>");
@@ -128,6 +145,62 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       StringBuffer footer = new StringBuffer();
       footer.append("\n</html>");
       return footer.toString();
+   }
+
+   /*
+   */
+   private boolean checkDate(){
+      boolean isTheSame = true;
+      Calendar cal = Calendar.getInstance();
+      if(this.currentDate != cal.get(Calendar.DATE)){
+         isTheSame = false;
+         this.currentDate = cal.get(Calendar.DATE);
+      }
+      return isTheSame;
+   }
+
+   /*
+   */
+   private void setSunriseSunset(){
+      Calendar cal = Calendar.getInstance();
+      int month    = cal.get(Calendar.MONTH) + 1;
+      int day      = cal.get(Calendar.DATE);
+      int year     = cal.get(Calendar.YEAR);
+
+      StringBuffer date = new StringBuffer(); 
+      date.append(String.format("%02d", month)+"/");
+      date.append(String.format("%02d", day) + "/");
+      date.append(year);
+      StringBuffer send = new StringBuffer("https://");
+      send.append("api.usno.navy.mil/rstt/oneday?");
+      send.append("date="+date.toString().trim());
+      send.append("&coords=32.10N,110.78W&tz=-7");
+      try{
+         URL url = new URL(send.toString().trim());
+         URLConnection conn = url.openConnection();
+         BufferedReader in = new BufferedReader(
+                       new InputStreamReader(conn.getInputStream()));
+         String line;
+         while((line = in.readLine()) != null){
+            if(line.contains("sundata")){
+               while(!line.contains("moondata")){
+                  if(line.contains("R")){
+                     this.sunrise = line.split("\"")[7];
+                  }
+                  else if(line.contains("S")){
+                     this.sunset = line.split("\"")[7];
+                  }
+                  line = in.readLine();
+               }
+            }
+         }
+      }
+      catch(MalformedURLException me){
+         System.out.println("URL Exception " + me);
+      }
+      catch(IOException ioe){
+         System.out.println("IO Exception " + ioe);
+      }
    }
 
    /*
