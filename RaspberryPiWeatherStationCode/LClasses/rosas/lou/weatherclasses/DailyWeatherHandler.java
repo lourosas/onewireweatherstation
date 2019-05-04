@@ -80,6 +80,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          }
 
          response.append(this.setUpHeader());
+         response.append(this.setUpHighLowTable());
          response.append(this.setUpTemperature());
          response.append(this.setUpHumidity());
          response.append(this.setUpPressure());
@@ -154,6 +155,8 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       StringBuffer body = new StringBuffer();
       body.append("\n<body>");
       body.append(this.setUpTheForm());
+      body.append("<div id = \"lowhigh_div\"></div>\n");
+      body.append("<br /><br />\n\n");
       body.append("<div id = \"temp_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
@@ -238,6 +241,79 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
          buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");
       }
+      return buffer.toString();
+   }
+
+   //
+   //
+   //
+   private String setUpHighLowTable(){
+      StringBuffer buffer     = new StringBuffer();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      WeatherData data = 
+           mysqldb.temperatureMax(this._month,this._date,this._year);
+      double max = data.englishData();
+      data=mysqldb.temperatureMin(this._month,this._date,this._year);
+      double min = data.englishData();
+      buffer.append("\n\nfunction drawHighLowTable() {\n");
+      buffer.append("var hldata = new google.visualization.DataTable();");
+      buffer.append("hldata.addColumn('string', 'Measurement');\n");
+      buffer.append("hldata.addColumn('string', 'Low');\n");
+      buffer.append("hldata.addColumn('string', 'High');\n");
+      buffer.append("hldata.addRows([\n");
+      buffer.append("['Temperature', ");
+      if(min > WeatherData.DEFAULTVALUE){
+         String temp = String.format("%.2f",min);
+         buffer.append("'"+temp+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+      buffer.append("['Humidity', ");
+      data = mysqldb.humidityMin(this._month,this._date,this._year);
+      min  = data.percentageData();
+      data = mysqldb.humidityMax(this._month,this._date,this._year);
+      max  = data.percentageData();
+      if(min > WeatherData.DEFAULTHUMIDITY){
+         buffer.append("'" + String.format("%.2f",min) + "', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTHUMIDITY){
+         buffer.append("'"+String.format("%.2f",max)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+      buffer.append("['Dew Point', ");
+      data = mysqldb.dewPointMin(this._month,this._date,this._year);
+      min  = data.englishData();
+      data = mysqldb.dewPointMax(this._month,this._date,this._year);
+      max  = data.englishData();
+      if(min > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",min)+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+      buffer.append("]);\n");
+      buffer.append("var hltable = new google.visualization.Table(document.getElementById('lowhigh_div'));");
+      buffer.append("\n\n");
+      buffer.append("hltable.draw(hldata,{showRowNumber:false,width:'20%',height:'20%'});");
+      buffer.append("\n}\n");
       return buffer.toString();
    }
 
@@ -337,7 +413,8 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       buffer.append("var tempoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
       buffer.append("vAxis:{\ntitle: 'Temperature'\n},\ncolors:['red']\n};\n\n");
       buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('temp_div'));");
-      buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n}");
+      buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n");
+      buffer.append("}");
       return buffer.toString();
    }
 
@@ -354,7 +431,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       header.append("<script type=\"text/javascript\">\n");
       header.append("google.charts.load('current',{packages:['corechart','line']});");
       header.append("\n");
-      header.append("google.charts.setOnLoadCallback(drawTemperature);");
+      header.append("google.charts.load('current',{packages:['table']});");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawHighLowTable);");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawTemperature);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawHumidity);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawPressure);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawDewpoint);");

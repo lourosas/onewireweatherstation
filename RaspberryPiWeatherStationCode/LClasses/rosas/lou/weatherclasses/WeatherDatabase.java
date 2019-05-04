@@ -41,4 +41,10 @@ public interface WeatherDatabase{
    public List<String> barometricPressure(String request);
    public List<String> dewpoint(String request);
    public List<String> heatIndex(String request);
+   public WeatherData dewPointMax(String month,String day, String year);
+   public WeatherData dewPointMin(String month,String day, String year);
+   public WeatherData humidityMax(String month,String day, String year);
+   public WeatherData humidityMin(String month,String day, String year);
+   public WeatherData temperatureMax(String month,String day,String year);
+   public WeatherData temperatureMin(String month,String day,String year);
 }

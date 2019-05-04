@@ -816,6 +816,140 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public WeatherData dewPointMax
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double max           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String maxString     = new String();
+      WeatherData maxData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT MAX(dewptc) FROM ");
+      command = command.concat("dewpointdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            maxString = resultSet.getString("MAX(dewptc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         max     = Double.parseDouble(maxString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         max     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         max     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      finally{
+         maxData = new DewpointData();
+         maxData.data(Units.METRIC, max, message);
+         return maxData;
+      }
+   }
+
+   /*
+   */
+   public WeatherData dewPointMin
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double min           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String minString     = new String();
+      WeatherData minData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT MIN(dewptc) FROM ");
+      command = command.concat("dewpointdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            minString = resultSet.getString("MIN(dewptc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         min     = Double.parseDouble(minString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         min     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         min     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      finally{
+         minData = new DewpointData();
+         minData.data(Units.METRIC, min, message);
+         return minData;
+      }
+   }
+
+   /*
+   */
    public void heatIndex(WeatherData hiData_){
       Connection conn = null;
       Statement  stmt = null;
@@ -1162,6 +1296,139 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public WeatherData humidityMax
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double max          = WeatherData.DEFAULTHUMIDITY;
+      String message      = new String();
+      String maxString    = null;
+      WeatherData maxData = null;
+      Connection conn     = null;
+      ResultSet resultSet = null;
+      Statement stmt      = null;
+
+      String command = new String("SELECT MAX(humidity) FROM ");
+      command = command.concat("humiditydata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            maxString = resultSet.getString("MAX(humidity)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         max     = Double.parseDouble(maxString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         max     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         max     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      finally{
+         maxData = new HumidityData();
+         maxData.data(Units.PERCENTAGE, max, message);
+         return maxData;
+      }
+   }
+
+   /*
+   */
+   public WeatherData humidityMin
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double min          = WeatherData.DEFAULTHUMIDITY;
+      String message      = new String();
+      String minString    = new String();
+      WeatherData minData = null;
+      Connection conn     = null;
+      ResultSet resultSet = null;
+      Statement stmt      = null; 
+
+      String command = new String("SELECT MIN(humidity) FROM ");
+      command = command.concat("humiditydata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            minString = resultSet.getString("MIN(humidity)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         min     = Double.parseDouble(minString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         min     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         min     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      finally{
+         minData = new HumidityData(Units.PERCENTAGE,min,message);
+         return minData;
+      }
+   }
+
+   /*
+   */
    public void temperature(WeatherData temperature_){
       Connection conn = null;
       Statement  stmt = null;
@@ -1338,6 +1605,140 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sqle){}
          return tempList;
+      }
+   }
+
+   /*
+   */
+   public WeatherData temperatureMax
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double max           = Thermometer.DEFAULTTEMP;
+      String message       = new String();
+      String maxString     = null;
+      WeatherData maxData  = null;
+      Connection conn      = null;
+      ResultSet  resultSet = null;
+      Statement  stmt      = null;
+
+      String command = new String("SELECT max(tempc) FROM ");
+      command = command.concat("temperaturedata WHERE month = ");
+      command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            maxString = resultSet.getString("max(tempc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         max     = Double.parseDouble(maxString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         max     = Thermometer.DEFAULTTEMP;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         max     = Thermometer.DEFAULTTEMP;
+         message = "bad";
+      }
+      finally{
+         maxData = new TemperatureData();
+         maxData.data(Units.METRIC, max, message);
+         return maxData;
+      }
+   }
+
+   /*
+   */
+   public WeatherData temperatureMin
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double min              = Thermometer.DEFAULTTEMP;
+      String message          = new String();
+      String minString        = null;
+      WeatherData minData     = null;
+      Connection conn         = null;
+      ResultSet  resultSet    = null;
+      Statement  stmt         = null;
+
+      String command = new String("SELECT min(tempc) FROM ");
+      command = command.concat("temperaturedata WHERE month = ");
+      command = command.concat("'"+month+"' AND day = '"+day+"'");
+      command = command.concat(" AND year = '"+year+"'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            minString = resultSet.getString("min(tempc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         min     = Double.parseDouble(minString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         min     = Thermometer.DEFAULTTEMP;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         min     = Thermometer.DEFAULTTEMP;
+         message = "bad";
+      }
+      finally{
+         minData = new TemperatureData();
+         minData.data(Units.METRIC,min,message,Calendar.getInstance());
+         return minData;
       }
    }
 }
