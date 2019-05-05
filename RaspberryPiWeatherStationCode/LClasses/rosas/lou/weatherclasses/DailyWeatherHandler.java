@@ -309,6 +309,23 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       else{
          buffer.append("'N/A'],\n");
       }
+      buffer.append("['Heat Index', ");
+      data = mysqldb.heatIndexMin(this._month,this._date,this._year);
+      min  = data.englishData();
+      data = mysqldb.heatIndexMax(this._month,this._date,this._year); 
+      max  = data.englishData();
+      if(min > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",min)+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
       buffer.append("]);\n");
       buffer.append("var hltable = new google.visualization.Table(document.getElementById('lowhigh_div'));");
       buffer.append("\n\n");

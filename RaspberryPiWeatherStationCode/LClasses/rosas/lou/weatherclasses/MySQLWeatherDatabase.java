@@ -866,12 +866,12 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
       catch(NumberFormatException nfe){
          nfe.printStackTrace();
-         max     = WeatherData.DEFAULTHUMIDITY;
+         max     = WeatherData.DEFAULTVALUE;
          message = "bad";
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
-         max     = WeatherData.DEFAULTHUMIDITY;
+         max     = WeatherData.DEFAULTVALUE;
          message = "bad";
       }
       finally{
@@ -933,12 +933,12 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
       catch(NumberFormatException nfe){
          nfe.printStackTrace();
-         min     = WeatherData.DEFAULTHUMIDITY;
+         min     = WeatherData.DEFAULTVALUE;
          message = "bad";
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
-         min     = WeatherData.DEFAULTHUMIDITY;
+         min     = WeatherData.DEFAULTVALUE;
          message = "bad";
       }
       finally{
@@ -1127,6 +1127,152 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sql){}
          return hiList;
+      }
+   }
+
+   /*
+   */
+   public WeatherData heatIndexMax
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double max           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String maxString     = new String();
+      WeatherData maxData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT MAX(heatindexf) FROM ");
+      command = command.concat("heatindexdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("heatindexf >= 0");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            maxString = resultSet.getString("MAX(heatindexf)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      //Heat Index is odd--the formula is measured in English Units
+      //And if the temperature is NOT > 70, the heat index is not
+      //measured.  As a result, a NULL value will be returned and
+      //could result in a default value with no error--so check for
+      //the exception, but do not report it.
+      try{
+         max     = Double.parseDouble(maxString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         //nfe.printStackTrace();
+         max     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         //npe.printStackTrace();
+         max     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      finally{
+         maxData = new HeatIndexData();
+         maxData.data(Units.ENGLISH, max, message);
+         return maxData;
+      }
+   }
+
+   /*
+   */
+   public WeatherData heatIndexMin
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double min           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String minString     = new String();
+      WeatherData minData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT MIN(heatindexf) FROM ");
+      command = command.concat("heatindexdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("heatindexf >= 0");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            minString = resultSet.getString("MIN(heatindexf)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      //Heat Index is odd--the formula is measured in English Units
+      //And if the temperature is NOT > 70, the heat index is not
+      //measured.  As a result, a NULL value will be returned and
+      //could result in a default value with no error--so check for
+      //the exception, but do not report it.
+      try{
+         min     = Double.parseDouble(minString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         //nfe.printStackTrace();
+         min     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         //npe.printStackTrace();
+         min     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      finally{
+         minData = new HeatIndexData();
+         minData.data(Units.ENGLISH, min, message);
+         return minData;
       }
    }
 
