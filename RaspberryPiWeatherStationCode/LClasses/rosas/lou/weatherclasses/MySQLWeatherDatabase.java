@@ -816,6 +816,74 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public WeatherData dewPointAvg
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double avg           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String avgString     = new String();
+      WeatherData avgData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT AVG(dewptc) FROM ");
+      command = command.concat("dewpointdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            avgString = resultSet.getString("AVG(dewptc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         avg     = Double.parseDouble(avgString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      finally{
+         avgData = new DewpointData();
+         avgData.data(Units.METRIC, avg, message);
+         return avgData;
+      }
+
+   }
+
+   /*
+   */
    public WeatherData dewPointMax
    (
       String month,
@@ -1132,6 +1200,79 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
 
    /*
    */
+   public WeatherData heatIndexAvg
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double avg           = WeatherData.DEFAULTVALUE;
+      String message       = new String();
+      String avgString     = new String();
+      WeatherData avgData  = null;
+      Connection conn      = null;
+      ResultSet resultSet  = null;
+      Statement stmt       = null;
+
+      String command = new String("SELECT AVG(heatindexf) FROM ");
+      command = command.concat("heatindexdata WHERE month = ");
+      command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("heatindexf >= 0");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            avgString = resultSet.getString("AVG(heatindexf)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      //Heat Index is odd--the formula is measured in English Units
+      //And if the temperature is NOT > 70, the heat index is not
+      //measured.  As a result, a NULL value will be returned and
+      //could result in a default value with no error--so check for
+      //the exception, but do not report it.
+      try{
+         avg     = Double.parseDouble(avgString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         //nfe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         //npe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      finally{
+         avgData = new HeatIndexData();
+         avgData.data(Units.ENGLISH, avg, message);
+         return avgData;
+      }
+   }
+
+   /*
+   */
    public WeatherData heatIndexMax
    (
       String month,
@@ -1437,6 +1578,74 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sql){}
          return humidityList;
+      }
+   }
+
+   /*
+   */
+   public WeatherData humidityAvg
+   (
+      String month,
+      String day,
+      String year
+   ){
+
+      double avg           = WeatherData.DEFAULTHUMIDITY;
+      String message       = new String();
+      String avgString     = null;
+      WeatherData avgData  = null;
+      Connection conn      = null;
+      ResultSet  resultSet = null;
+      Statement  stmt      = null;
+
+      String command = new String("SELECT avg(humidity) FROM ");
+      command = command.concat("humiditydata WHERE month = ");
+      command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
+      command = command.concat("AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            avgString = resultSet.getString("avg(humidity)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         avg     = Double.parseDouble(avgString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         avg     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         avg     = WeatherData.DEFAULTHUMIDITY;
+         message = "bad";
+      }
+      finally{
+         avgData = new HumidityData();
+         avgData.data(Units.PERCENTAGE, avg, message);
+         return avgData;
       }
    }
 
@@ -1751,6 +1960,73 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          }
          catch(SQLException sqle){}
          return tempList;
+      }
+   }
+
+   /*
+   */
+   public WeatherData temperatureAvg
+   (
+      String month,
+      String day,
+      String year
+   ){
+      double avg           = Thermometer.DEFAULTTEMP;
+      String message       = new String();
+      String avgString     = null;
+      WeatherData avgData  = null;
+      Connection conn      = null;
+      ResultSet  resultSet = null;
+      Statement  stmt      = null;
+
+      String command = new String("SELECT avg(tempc) FROM ");
+      command = command.concat("temperaturedata WHERE month = ");
+      command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
+      command = command.concat("AND year = \'"+year+"\'");
+      try{
+         conn = DriverManager.getConnection(DB_URL,USER,PASS);
+         stmt = conn.createStatement();
+         stmt = conn.createStatement(
+                                   ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                   ResultSet.CONCUR_UPDATABLE);
+         resultSet = stmt.executeQuery(command);
+         while(resultSet.next()){
+            avgString = resultSet.getString("avg(tempc)");
+         }
+      }
+      catch(SQLException sqe){
+         sqe.printStackTrace();
+         resultSet = null;
+      }
+      catch(Exception e){
+         e.printStackTrace();
+         resultSet = null;
+      }
+      finally{
+         try{
+            stmt.close();
+            conn.close();
+         }
+         catch(SQLException sqle){}
+      }
+      try{
+         avg     = Double.parseDouble(avgString.trim());
+         message = "good";
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+         avg     = WeatherData.DEFAULTVALUE;
+         message = "bad";
+      }
+      finally{
+         avgData = new TemperatureData();
+         avgData.data(Units.METRIC, avg, message);
+         return avgData;
       }
    }
 

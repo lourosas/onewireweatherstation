@@ -208,6 +208,42 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       buffer.append("\n\ndpchart.draw(dpdata, dpoptions);\n}");
       return buffer.toString();
    }
+
+   //
+   //
+   //
+   private String setUpDewPointRow(){
+      WeatherData     data    = null;
+      StringBuffer    buffer  = new StringBuffer();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+
+      data = mysqldb.dewPointMin(this._month,this._date,this._year);
+      double min = data.englishData();
+      data = mysqldb.dewPointMax(this._month,this._date,this._year);
+      double max = data.englishData();
+      data = mysqldb.dewPointAvg(this._month,this._date,this._year);
+      double avg = data.englishData();
+      buffer.append("['Dew Point', ");
+      if(min > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",min)+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(avg > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",avg)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+      return buffer.toString();
+   }
   
    //
    //
@@ -247,85 +283,63 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    //
+   private String setUpHeatIndexRow(){
+      WeatherData     data    = null;
+      StringBuffer    buffer  = new StringBuffer();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+
+      data = mysqldb.heatIndexMin(this._month,this._date,this._year);
+      double min = data.englishData();
+      data = mysqldb.heatIndexMax(this._month,this._date,this._year);
+      double max = data.englishData();
+      data = mysqldb.heatIndexAvg(this._month,this._date,this._year);
+      double avg = data.englishData();
+      buffer.append("['Heat Index', ");
+      if(min > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",min)+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"', ");
+      }
+      else{
+         buffer.append("'N/A',");
+      }
+      if(avg > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",avg)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+      return buffer.toString();
+   }
+
+   //
+   //
+   //
    private String setUpHighLowTable(){
       StringBuffer buffer     = new StringBuffer();
+      /*
       WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
       WeatherData data = 
            mysqldb.temperatureMax(this._month,this._date,this._year);
       double max = data.englishData();
       data=mysqldb.temperatureMin(this._month,this._date,this._year);
       double min = data.englishData();
+      */
       buffer.append("\n\nfunction drawHighLowTable() {\n");
       buffer.append("var hldata = new google.visualization.DataTable();");
       buffer.append("hldata.addColumn('string', 'Measurement');\n");
       buffer.append("hldata.addColumn('string', 'Low');\n");
       buffer.append("hldata.addColumn('string', 'High');\n");
+      buffer.append("hldata.addColumn('string', 'Average');\n");
       buffer.append("hldata.addRows([\n");
-      buffer.append("['Temperature', ");
-      if(min > WeatherData.DEFAULTVALUE){
-         String temp = String.format("%.2f",min);
-         buffer.append("'"+temp+"', ");
-      }
-      else{
-         buffer.append("'N/A', ");
-      }
-      if(max > WeatherData.DEFAULTVALUE){
-         buffer.append("'"+String.format("%.2f",max)+"'],\n");
-      }
-      else{
-         buffer.append("'N/A'],\n");
-      }
-      buffer.append("['Humidity', ");
-      data = mysqldb.humidityMin(this._month,this._date,this._year);
-      min  = data.percentageData();
-      data = mysqldb.humidityMax(this._month,this._date,this._year);
-      max  = data.percentageData();
-      if(min > WeatherData.DEFAULTHUMIDITY){
-         buffer.append("'" + String.format("%.2f",min) + "', ");
-      }
-      else{
-         buffer.append("'N/A', ");
-      }
-      if(max > WeatherData.DEFAULTHUMIDITY){
-         buffer.append("'"+String.format("%.2f",max)+"'],\n");
-      }
-      else{
-         buffer.append("'N/A'],\n");
-      }
-      buffer.append("['Dew Point', ");
-      data = mysqldb.dewPointMin(this._month,this._date,this._year);
-      min  = data.englishData();
-      data = mysqldb.dewPointMax(this._month,this._date,this._year);
-      max  = data.englishData();
-      if(min > WeatherData.DEFAULTVALUE){
-         buffer.append("'"+String.format("%.2f",min)+"', ");
-      }
-      else{
-         buffer.append("'N/A', ");
-      }
-      if(max > WeatherData.DEFAULTVALUE){
-         buffer.append("'"+String.format("%.2f",max)+"'],\n");
-      }
-      else{
-         buffer.append("'N/A'],\n");
-      }
-      buffer.append("['Heat Index', ");
-      data = mysqldb.heatIndexMin(this._month,this._date,this._year);
-      min  = data.englishData();
-      data = mysqldb.heatIndexMax(this._month,this._date,this._year); 
-      max  = data.englishData();
-      if(min > WeatherData.DEFAULTVALUE){
-         buffer.append("'"+String.format("%.2f",min)+"', ");
-      }
-      else{
-         buffer.append("'N/A', ");
-      }
-      if(max > WeatherData.DEFAULTVALUE){
-         buffer.append("'"+String.format("%.2f",max)+"'],\n");
-      }
-      else{
-         buffer.append("'N/A'],\n");
-      }
+      buffer.append(this.setUpTemperatureRow());
+      buffer.append(this.setUpHumidityRow());
+      buffer.append(this.setUpDewPointRow());
+      buffer.append(this.setUpHeatIndexRow());
       buffer.append("]);\n");
       buffer.append("var hltable = new google.visualization.Table(document.getElementById('lowhigh_div'));");
       buffer.append("\n\n");
@@ -365,6 +379,43 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       buffer.append("vAxis:{\ntitle: 'Humidity'\n},\ncolors:['blue']\n};\n\n");
       buffer.append("var humchart = new google.visualization.LineChart(document.getElementById('humidity_div'));");
       buffer.append("\n\nhumchart.draw(humdata, humidoptions);\n}");
+      return buffer.toString();
+   }
+
+   //
+   //
+   //
+   private String setUpHumidityRow(){
+      WeatherData     data    = null;
+      StringBuffer    buffer  = new StringBuffer();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+
+      data = mysqldb.humidityMin(this._month,this._date,this._year);
+      double min = data.percentageData();
+      data = mysqldb.humidityMax(this._month,this._date,this._year);
+      double max = data.percentageData();
+      data = mysqldb.humidityAvg(this._month,this._date,this._year);
+      double avg = data.percentageData();
+      buffer.append("['Humidity', "); 
+      if(min > WeatherData.DEFAULTHUMIDITY){
+         buffer.append("'" + String.format("%.2f",min) + "', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTHUMIDITY){
+         buffer.append("'"+String.format("%.2f",max)+"',");
+      }
+      else{
+         buffer.append("'N/A',");
+      }
+      if(avg > WeatherData.DEFAULTHUMIDITY){
+         buffer.append("'"+String.format("%.2f",avg)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
+
       return buffer.toString();
    }
 
@@ -432,6 +483,43 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       buffer.append("var tempchart = new google.visualization.LineChart(document.getElementById('temp_div'));");
       buffer.append("\n\ntempchart.draw(tempdata, tempoptions);\n");
       buffer.append("}");
+      return buffer.toString();
+   }
+
+   //
+   //
+   //
+   private String setUpTemperatureRow(){
+      WeatherData     data    = null;
+      StringBuffer    buffer  = new StringBuffer();
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+
+      data=mysqldb.temperatureMax(this._month,this._date,this._year);
+      double max = data.englishData();
+      data=mysqldb.temperatureMin(this._month,this._date,this._year);
+      double min = data.englishData();
+      data=mysqldb.temperatureAvg(this._month,this._date,this._year);
+      double avg = data.englishData();
+      buffer.append("['Temperature', ");
+      if(min > WeatherData.DEFAULTVALUE){
+         String temp = String.format("%.2f",min);
+         buffer.append("'"+temp+"', ");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(max > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",max)+"',");
+      }
+      else{
+         buffer.append("'N/A', ");
+      }
+      if(avg > WeatherData.DEFAULTVALUE){
+         buffer.append("'"+String.format("%.2f",avg)+"'],\n");
+      }
+      else{
+         buffer.append("'N/A'],\n");
+      }
       return buffer.toString();
    }
 
