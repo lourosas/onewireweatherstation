@@ -24,7 +24,7 @@ import rosas.lou.clock.ClockState;
 
 public class StopWatch implements Runnable{
    private long  lapTime;
-   private short querryTime;
+   private int   querryTime;
    private long  startTime;
    private long  stopTime;
    private long  elapsedTime;
@@ -69,7 +69,7 @@ public class StopWatch implements Runnable{
    /**
    Constructor setting the Querry Time in Milliseconds
    */
-   public StopWatch(short time){
+   public StopWatch(int time){
       this.watchMechanism = WatchMechanism.getInstance();
       this.setQuerryTime(time);
       //Start the Watch Mechanism
@@ -157,7 +157,7 @@ public class StopWatch implements Runnable{
                this.getState() == State.LAP){
                this.running();
             }
-            Thread.sleep(querryTime);
+            Thread.sleep(this.querryTime);
          }
          catch(InterruptedException ie){}
       }
@@ -165,7 +165,7 @@ public class StopWatch implements Runnable{
 
    /**
    */
-   public void setQuerryTime(short time){
+   public void setQuerryTime(int time){
       this.querryTime = time;
    }
 

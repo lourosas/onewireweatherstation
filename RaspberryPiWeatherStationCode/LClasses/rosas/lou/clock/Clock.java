@@ -1,5 +1,17 @@
-/*
-*/
+/*********************************************************************
+* Copyright (C) 2015 Lou Rosas
+* This file is part of many applications registered with
+* the GNU General Public License as published
+* by the Free Software Foundation; either version 3 of the License,
+* or (at your option) any later version.
+* PaceCalculator is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied
+* warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+* You should have received a copy of the GNU General Public License
+* along with this program.
+* If not, see <http://www.gnu.org/licenses/>.
+*********************************************************************/
 
 package rosas.lou.clock;
 
@@ -8,10 +20,14 @@ import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.clock.*;
 
-public class Clock implements Runnable{
-   private List<ClockObserver> c_o_List = null;
-   private long millis;
+public class Clock{
+   private long time;
    private Date date;
+
+   {
+      time = 0;
+      date = null;
+   }
 
    //*********************Constructor********************************
    /*
@@ -22,73 +38,16 @@ public class Clock implements Runnable{
    //*********************Public Methods*****************************
    /*
    */
-   public void addClockObserver(ClockObserver co){
-      try{
-         this.c_o_List.add(co);
-      }
-      catch(NullPointerException npe){
-         this.c_o_List = new Vector<ClockObserver>();
-         this.c_o_List.add(co);
-      }
-   }
-   /*
-   */
-   public long getMilliSeconds(){
-      return this.millis;
+   public long getTime(){
+      this.time = Calendar.getInstance().getTimeInMillis();
+      this.date = Calendar.getInstance().getTime();
+      return this.time;
    }
 
    /*
    */
-   public void initialize(){}
-
-   /*
-   */
-   public void reset(){}
-
-   /*
-   Implementing the run method as part of implementing the Runnable
-   interface
-   */
-   public void run(){
-      final int SLEEPTIME = 1000;
-      long millis         = 0;
-      Date date;
-      while(true){
-         try{
-            Thread.sleep(SLEEPTIME);
-            millis = Calendar.getInstance().getTimeInMillis();
-            date =   Calendar.getInstance().getTime();
-            this.millis = millis;
-            this.publishTimeEvents();
-         }
-         catch(InterruptedException ie){}
-      }
-   }
-
-   /*
-   Simply, just set the clock
-   */
-   public void set(){}
-
-   /*
-   Set to a specific time
-   */
-   public void set(int hr, int min, int sec){}
-
-   //**********************Private Methods*************************
-   /*
-   */
-   private void publishTimeEvents(){
-      Iterator<ClockObserver> i = this.c_o_List.iterator();
-      while(i.hasNext()){
-         ClockObserver co = i.next();
-         co.updateTime(this.getMilliSeconds());
-      }
-   }
-   
-   /*
-   */
-   private void setMilliSeconds(long millis){
-      this.millis = millis;
+   public Date getDate(){
+      this.date = Calendar.getInstance().getTime();
+      return this.date;
    }
 }
