@@ -27,7 +27,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String _month;
    private String _date;
    private String _year;
-   private String[] months = {"January", "February", "March", 
+   private String[] months = {"January", "February", "March",
                               "April", "May", "June", "July",
                               "August", "September", "October",
                               "November", "December" };
@@ -36,11 +36,45 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
                               "17","18","19","20","21","22","23","24",
                               "25","26","27","28","29","30","31"};
    private String [] years = {"2019", "2018", "2017"};
+   List<WeatherData> _temperature;
+   List<WeatherData> _humidity;
+   List<WeatherData> _barometricPressure;
+   List<WeatherData> _dewPoint;
+   List<WeatherData> _heatIndex;
+   WeatherData       _tempMax;
+   WeatherData       _tempMin;
+   WeatherData       _tempAvg;
+   WeatherData       _humidityMax;
+   WeatherData       _humidityMin;
+   WeatherData       _humidityAvg;
+   WeatherData       _dewPointMax;
+   WeatherData       _dewPointMin;
+   WeatherData       _dewPointAvg;
+   WeatherData       _heatIndexMax;
+   WeatherData       _heatIndexMin;
+   WeatherData       _heatIndexAvg;
 
    {
-      _month = null;
-      _date  = null;
-      _year  = null;
+      _month              = null;
+      _date               = null;
+      _year               = null;
+      _temperature        = null;
+      _humidity           = null;
+      _barometricPressure = null;
+      _dewPoint           = null;
+      _heatIndex          = null;
+      _tempMax            = null;
+      _tempMin            = null;
+      _tempAvg            = null;
+      _humidityMax        = null;
+      _humidityMin        = null;
+      _humidityAvg        = null;
+      _dewPointMax        = null;
+      _dewPointMin        = null;
+      _dewPointAvg        = null;
+      _heatIndexMax       = null;
+      _heatIndexMin       = null;
+      _heatIndexAvg       = null;
    };
 
    //
@@ -77,6 +111,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             this._month           = this.discernMonth(dates[1]);
             this._date            = dates[2];
             this._year            = dates[5];
+         }
+         finally{
+            this.setUpMeasurementLists();
          }
 
          response.append(this.setUpHeader());
@@ -175,17 +212,14 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       body.append("\n</body>\n</html>\n");
       return body.toString();
    }
-   
+
    //
    //
    //
    private String setUpDewpoint(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> dps =
-                 mysqldb.dewpoint(this._month,this._date,this._year);
-      Iterator<WeatherData> it = dps.iterator();
+      Iterator<WeatherData> it = this._dewPoint.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
@@ -215,14 +249,10 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpDewPointRow(){
       WeatherData     data    = null;
       StringBuffer    buffer  = new StringBuffer();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      double min = this._dewPointMin.englishData();
+      double max = this._dewPointMax.englishData();
+      double avg = this._dewPointAvg.englishData();
 
-      data = mysqldb.dewPointMin(this._month,this._date,this._year);
-      double min = data.englishData();
-      data = mysqldb.dewPointMax(this._month,this._date,this._year);
-      double max = data.englishData();
-      data = mysqldb.dewPointAvg(this._month,this._date,this._year);
-      double avg = data.englishData();
       buffer.append("['Dew Point', ");
       if(min > WeatherData.DEFAULTVALUE){
          buffer.append("'"+String.format("%.2f",min)+"', ");
@@ -244,17 +274,14 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       }
       return buffer.toString();
    }
-  
+
    //
    //
    //
    private String setUpHeatIndex(){
-      StringBuffer buffer     = new StringBuffer();
-      String display          = new String();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> his =
-                mysqldb.heatIndex(this._month,this._date,this._year);
-      Iterator<WeatherData> it = his.iterator();
+      StringBuffer buffer      = new StringBuffer();
+      String display           = new String();
+      Iterator<WeatherData> it = this._heatIndex.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
@@ -286,14 +313,9 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHeatIndexRow(){
       WeatherData     data    = null;
       StringBuffer    buffer  = new StringBuffer();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-
-      data = mysqldb.heatIndexMin(this._month,this._date,this._year);
-      double min = data.englishData();
-      data = mysqldb.heatIndexMax(this._month,this._date,this._year);
-      double max = data.englishData();
-      data = mysqldb.heatIndexAvg(this._month,this._date,this._year);
-      double avg = data.englishData();
+      double min = this._heatIndexMin.englishData();
+      double max = this._heatIndexMax.englishData();
+      double avg = this._heatIndexAvg.englishData();
       buffer.append("['Heat Index', ");
       if(min > WeatherData.DEFAULTVALUE){
          buffer.append("'"+String.format("%.2f",min)+"', ");
@@ -321,14 +343,6 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    private String setUpHighLowTable(){
       StringBuffer buffer     = new StringBuffer();
-      /*
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      WeatherData data = 
-           mysqldb.temperatureMax(this._month,this._date,this._year);
-      double max = data.englishData();
-      data=mysqldb.temperatureMin(this._month,this._date,this._year);
-      double min = data.englishData();
-      */
       buffer.append("\n\nfunction drawHighLowTable() {\n");
       buffer.append("var hldata = new google.visualization.DataTable();");
       buffer.append("hldata.addColumn('string', 'Measurement');\n");
@@ -354,11 +368,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHumidity(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      WeatherDatabase msqldb  = MySQLWeatherDatabase.getInstance();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> hums  =
-                  mysqldb.humidity(this._month,this._date,this._year);
-      Iterator<WeatherData> it= hums.iterator();
+      Iterator<WeatherData> it = this._humidity.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
@@ -388,15 +398,11 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHumidityRow(){
       WeatherData     data    = null;
       StringBuffer    buffer  = new StringBuffer();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      double min = this._humidityMin.percentageData();
+      double max = this._humidityMax.percentageData();
+      double avg = this._humidityAvg.percentageData();
 
-      data = mysqldb.humidityMin(this._month,this._date,this._year);
-      double min = data.percentageData();
-      data = mysqldb.humidityMax(this._month,this._date,this._year);
-      double max = data.percentageData();
-      data = mysqldb.humidityAvg(this._month,this._date,this._year);
-      double avg = data.percentageData();
-      buffer.append("['Humidity', "); 
+      buffer.append("['Humidity', ");
       if(min > WeatherData.DEFAULTHUMIDITY){
          buffer.append("'" + String.format("%.2f",min) + "', ");
       }
@@ -419,16 +425,46 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       return buffer.toString();
    }
 
+   //Might as well put all (or most) of the database "hits" in one
+   //method
+   //
+   private void setUpMeasurementLists(){
+      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      this._temperature =
+               mysqldb.temperature(this._month,this._date,this._year);
+      this._humidity =
+                  mysqldb.humidity(this._month,this._date,this._year);
+      this._barometricPressure =
+        mysqldb.barometricPressure(this._month,this._date,this._year);
+      this._dewPoint =
+                  mysqldb.dewpoint(this._month,this._date,this._year);
+      this._heatIndex =
+                 mysqldb.heatIndex(this._month,this._date,this._year);
+      //Put together the Max,Min,Ave stuff, as well...
+      this._tempMax =
+            mysqldb.temperatureMax(this._month,this._date,this._year);
+      this._tempMin =
+            mysqldb.temperatureMin(this._month,this._date,this._year);
+      this._tempAvg =
+            mysqldb.temperatureAvg(this._month,this._date,this._year);
+      _humidityMax  = mysqldb.humidityMax(_month, _date, _year);
+      _humidityMin  = mysqldb.humidityMin(_month, _date, _year);
+      _humidityAvg  = mysqldb.humidityAvg(_month, _date, _year);
+      _dewPointMax  = mysqldb.dewPointMin(_month, _date, _year);
+      _dewPointMin  = mysqldb.dewPointMax(_month, _date, _year);
+      _dewPointAvg  = mysqldb.dewPointAvg(_month, _date, _year);
+      _heatIndexMax = mysqldb.heatIndexMax(_month, _date, _year);
+      _heatIndexMin = mysqldb.heatIndexMin(_month, _date, _year);
+      _heatIndexAvg = mysqldb.heatIndexAvg(_month, _date, _year);
+   }
+
    //
    //
    //
    private String setUpPressure(){
-      StringBuffer buffer     = new StringBuffer();
-      String display          = new String();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> press =
-        mysqldb.barometricPressure(this._month,this._date,this._year);
-      Iterator<WeatherData> it = press.iterator();
+      StringBuffer buffer      = new StringBuffer();
+      String display           = new String();
+      Iterator<WeatherData> it = this._barometricPressure.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
@@ -448,7 +484,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       buffer.append("var presoptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
       buffer.append("vAxis:{\ntitle: 'Pressure'\n}\n};\n\n");
       buffer.append("var preschart = new google.visualization.LineChart(document.getElementById('pressure_div'));");
-      buffer.append("\n\npreschart.draw(presdata, presoptions);\n}");  
+      buffer.append("\n\npreschart.draw(presdata, presoptions);\n}");
       return buffer.toString();
    }
 
@@ -458,10 +494,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpTemperature(){
       StringBuffer buffer     = new StringBuffer();
       String display          = new String();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
-      List<WeatherData> temps =
-               mysqldb.temperature(this._month,this._date,this._year);
-      Iterator<WeatherData> it = temps.iterator();
+      Iterator<WeatherData> it = this._temperature.iterator();
       while(it.hasNext()){
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
@@ -490,16 +523,12 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    private String setUpTemperatureRow(){
-      WeatherData     data    = null;
-      StringBuffer    buffer  = new StringBuffer();
-      WeatherDatabase mysqldb = MySQLWeatherDatabase.getInstance();
+      WeatherData  data    = null;
+      StringBuffer buffer  = new StringBuffer();
+      double min = this._tempMin.englishData();
+      double max = this._tempMax.englishData();
+      double avg = this._tempAvg.englishData();
 
-      data=mysqldb.temperatureMax(this._month,this._date,this._year);
-      double max = data.englishData();
-      data=mysqldb.temperatureMin(this._month,this._date,this._year);
-      double min = data.englishData();
-      data=mysqldb.temperatureAvg(this._month,this._date,this._year);
-      double avg = data.englishData();
       buffer.append("['Temperature', ");
       if(min > WeatherData.DEFAULTVALUE){
          String temp = String.format("%.2f",min);
