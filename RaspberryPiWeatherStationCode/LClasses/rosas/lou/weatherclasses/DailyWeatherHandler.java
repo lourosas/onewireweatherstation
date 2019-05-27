@@ -123,6 +123,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          response.append(this.setUpPressure());
          response.append(this.setUpDewpoint());
          response.append(this.setUpHeatIndex());
+         response.append(this.setUpDataTable());
          response.append("\n</script>\n</head>\n");
          response.append(this.setUpBody());
          String send = response.toString();
@@ -188,12 +189,140 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    //
+   private List<String> getDewpointStringList(){
+      List<String> dewpoints   = new LinkedList<String>();
+      Iterator<WeatherData> it = this._dewPoint.iterator();
+      while(it.hasNext()){
+         WeatherData wd  = it.next();
+         double dewpt    = wd.englishData();
+         String dewpoint = new String();
+         if(dewpt > WeatherData.DEFAULTVALUE){
+            dewpoint = "'" + String.format("%.2f", dewpt) + "'";
+         }
+         else{
+            dewpoint = new String("'N/A'");
+         }
+         dewpoints.add(dewpoint);
+      }
+      return dewpoints;
+   }
+
+   //
+   //
+   //
+   private List<String> getHeatIndexStringList(){
+      List<String> indices     = new LinkedList<String>();
+      Iterator<WeatherData> it = this._heatIndex.iterator();
+      while(it.hasNext()){
+         WeatherData wd   = it.next();
+         double heatIdx   = wd.englishData();
+         String heatIndex = new String();
+         if(heatIdx > WeatherData.DEFAULTVALUE){
+            heatIndex = "'" + String.format("%.2f", heatIdx) + "'";
+         }
+         else{
+            heatIndex = new String("'N/A'");
+         }
+         indices.add(heatIndex);
+      }
+      return indices;
+   }
+
+   //
+   //
+   //
+   private List<String> getHumidityStringList(){
+      List<String> humis       = new LinkedList<String>();
+      Iterator<WeatherData> it = this._humidity.iterator();
+      while(it.hasNext()){
+         WeatherData wd  = it.next();
+         double humi     = wd.percentageData();
+         String humidity = new String();
+         if(humi > WeatherData.DEFAULTHUMIDITY){
+            humidity = "'" + String.format("%.2f", humi) + "'";
+         }
+         else{
+            humidity = new String("'N/A'");
+         }
+         humis.add(humidity);
+      }
+      return humis;
+   }
+
+   //
+   //
+   //
+   private List<String> getPressureStringList(){
+      List<String> press       = new LinkedList<String>();
+      Iterator<WeatherData> it = this._barometricPressure.iterator();
+      while(it.hasNext()){
+         WeatherData wd  = it.next();
+         double pres     = wd.englishData();
+         String pressure = new String();
+         if(pres > WeatherData.DEFAULTVALUE){
+            pressure = "'" + String.format("%.2f", pres) + "'";
+         }
+         else{
+            pressure = new String("'N/A'");
+         }
+         press.add(pressure);
+      }
+      return press;
+   }
+
+   //
+   //
+   //
+   private List<String> getTemperatureStringList(){
+      List<String> temps       = new LinkedList<String>();
+      Iterator<WeatherData> it = this._temperature.iterator();
+      while(it.hasNext()){
+         WeatherData wd    = it.next();
+         double temp       = wd.englishData();
+         String stringtemp = new String();
+         if(temp > WeatherData.DEFAULTVALUE){
+            stringtemp = "'" + String.format("%.2f", temp) + "'";
+         }
+         else{
+            stringtemp = new String("'N/A'");
+         }
+         temps.add(stringtemp);
+      }
+      return temps;
+   }
+
+   //
+   //
+   //
+   private List<String> getTimeStringList(){
+      List<String> times = new LinkedList<String>();
+      Iterator<WeatherData> it = this._temperature.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         String calString = wd.calendar().getTime().toString();
+         String time = calString.split(" ")[3].trim();
+         time = time.replace(":",",");
+         time = "["+time+"]";
+         times.add(time);
+      }
+      return times;
+   }
+
+   //
+   //
+   //
    private String setUpBody(){
       StringBuffer body = new StringBuffer();
       body.append("\n<body>");
       body.append(this.setUpTheForm());
       body.append("<div id = \"lowhigh_div\"></div>\n");
       body.append("<br /><br />\n\n");
+      body.append("<div class = \"tab\">\n");
+      body.append("<button class=\"tablinks\" onclick=\"openData(event,'Graph')\">Graph</button>");
+      body.append("\n");
+      body.append("<button class=\"tablinks\" onclick=\"openData(event,'Tabular')\">Table</button>");
+      body.append("\n</div>\n\n");
+      body.append("<div id=\"Graph\" class=\"tabcontent\">\n");
       body.append("<div id = \"temp_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
       body.append("<br /><br />\n\n");
@@ -208,9 +337,71 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       body.append("<br /><br />\n\n");
       body.append("<div id = \"hi_div\" style = ");
       body.append("\"width: 80%; height: 220px;\"></div>\n");
-      body.append("<br /><br />\n\n");
+      body.append("<br /><br /></div>\n\n");
+      body.append("<div id=\"Tabular\" class=\"tabcontent\">\n");
+      body.append("<div id = \"table_div\"></div>\n");
+      body.append("</div>\n\n");
       body.append("\n</body>\n</html>\n");
       return body.toString();
+   }
+
+   //Unlike the graph, everything needs to go into this table.
+   //I will put everthing in this table, regardless of a good
+   //measurement.
+   private String setUpDataTable(){
+      StringBuffer buffer = new StringBuffer();
+      String display      = new String();
+      //Somehow, get the measurement data in String form
+      List<String> times = this.getTimeStringList();
+      List<String> temps = this.getTemperatureStringList();
+      List<String> humis = this.getHumidityStringList();
+      List<String> press = this.getPressureStringList();
+      List<String> dewps = this.getDewpointStringList();
+      List<String> heats = this.getHeatIndexStringList();
+
+      buffer.append("\nfunction drawAsTable() {");
+      buffer.append("\nvar i;");
+      buffer.append("\nvar theData = new google.visualization.DataTable();");
+      buffer.append("\ntheData.addColumn('timeofday','Time');");
+      buffer.append("\ntheData.addColumn('string','Temperature');");
+      buffer.append("\ntheData.addColumn('string','Humidity');");
+      buffer.append("\ntheData.addColumn('string','Pressure');");
+      buffer.append("\ntheData.addColumn('string','Dewpoint');");
+      buffer.append("\ntheData.addColumn('string','Heat Index');");
+      buffer.append("\n\ntheData.addRows([\n");
+
+      Iterator<String> ittimes = times.iterator();
+      Iterator<String> ittemps = temps.iterator();
+      Iterator<String> ithumis = humis.iterator();
+      Iterator<String> itpress = press.iterator();
+      Iterator<String> itdewps = dewps.iterator();
+      Iterator<String> itheats = heats.iterator();
+      while(ittemps.hasNext()){
+         buffer.append("[");
+         buffer.append(ittimes.next() + "," + ittemps.next() + ",");
+         buffer.append(ithumis.next() + "," + itpress.next() + ",");
+         buffer.append(itdewps.next() + "," + itheats.next());
+         buffer.append("],");
+      }
+      buffer.append("\n]);\n");
+      buffer.append("\nvar theTable = new google.visualization.Table(document.getElementById('table_div'));");
+      buffer.append("\n\n");
+      buffer.append("theTable.draw(theData,{showRowNumber:false,width:'80%',height:'85%'});");
+      buffer.append("\n}\n\n");
+      buffer.append("function openData(evt,dataType){\n");
+      buffer.append("var i, tabcontent, tablinks;\n");
+      buffer.append("tabcontent=document.getElementsByClassName(\"tabcontent\");");
+      buffer.append("\nfor(i=0;i<tabcontent.length;i++){");
+      buffer.append("\ntabcontent[i].style.display = \"none\";");
+      buffer.append("\n}\n");
+      buffer.append("tablinks = document.getElementsByClassName(\"tablinks\");");
+      buffer.append("\nfor(i=0;i<tablinks.length;i++){\n");
+      buffer.append("tablinks[i].className=tablinks[i].className.replace(\" active\",\"\");");
+      buffer.append("\n}\n");
+      buffer.append("document.getElementById(dataType).style.display = \"block\";");
+      buffer.append("\nevt.currentTarget.className += \" active\";");
+      buffer.append("\n}\n");
+      return buffer.toString();
    }
 
    //
@@ -293,17 +484,15 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             display = display.concat("["+time+","+hi+"], ");
          }
       }
-      if(!display.isEmpty()){
-         buffer.append("\nfunction drawHeatIndex() {\n");
-         buffer.append("var hidata = new google.visualization.DataTable();");
-         buffer.append("\nhidata.addColumn('timeofday', 'X');");
-         buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
-         buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
-         buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
-         buffer.append("vAxis:{\ntitle: 'Heat Index'\n},\ncolors:['black']\n};\n\n");
-         buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
-         buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");
-      }
+      buffer.append("\nfunction drawHeatIndex() {\n");
+      buffer.append("var hidata = new google.visualization.DataTable();");
+      buffer.append("\nhidata.addColumn('timeofday', 'X');");
+      buffer.append("\nhidata.addColumn('number','Heat Index');\n\n");
+      buffer.append("hidata.addRows([\n"+display+"\n]);\n\n");
+      buffer.append("var hioptions = {\nhAxis:{\ntitle: 'Time'\n},\n");
+      buffer.append("vAxis:{\ntitle: 'Heat Index'\n},\ncolors:['black']\n};\n\n");
+      buffer.append("var hichart = new google.visualization.LineChart(document.getElementById('hi_div'));");
+      buffer.append("\n\nhichart.draw(hidata, hioptions);\n}");
       return buffer.toString();
    }
 
@@ -572,6 +761,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       header.append("\ngoogle.charts.setOnLoadCallback(drawPressure);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawDewpoint);");
       header.append("\ngoogle.charts.setOnLoadCallback(drawHeatIndex);");
+      header.append("\ngoogle.charts.setOnLoadCallback(drawAsTable);");
       return header.toString();
    }
 
