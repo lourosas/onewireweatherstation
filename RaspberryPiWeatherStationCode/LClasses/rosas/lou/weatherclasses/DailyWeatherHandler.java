@@ -27,6 +27,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String _month;
    private String _date;
    private String _year;
+   private String _unit;
    private String[] months = {"January", "February", "March",
                               "April", "May", "June", "July",
                               "August", "September", "October",
@@ -36,6 +37,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
                               "17","18","19","20","21","22","23","24",
                               "25","26","27","28","29","30","31"};
    private String [] years = {"2019", "2018", "2017"};
+   private String [] units = {"English", "metric", "absolute"};
    List<WeatherData> _temperature;
    List<WeatherData> _humidity;
    List<WeatherData> _barometricPressure;
@@ -58,6 +60,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       _month              = null;
       _date               = null;
       _year               = null;
+      _unit               = null;
       _temperature        = null;
       _humidity           = null;
       _barometricPressure = null;
@@ -92,6 +95,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             this._month = parts[0].split("=")[1].trim();
             this._date  = parts[1].split("=")[1].trim();
             this._year  = parts[2].split("=")[1].trim();
+            this._unit  = parts[3].split("=")[1].trim();
          }
          catch(NullPointerException npe){
             Calendar calendar     = Calendar.getInstance();
@@ -100,6 +104,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             this._month           = this.discernMonth(dates[1]);
             this._date            = dates[2];
             this._year            = dates[5];
+            this._unit            = this.units[0];
          }
          //There may be so many more exception that need to be
          //handled...just give them the latest data and be done
@@ -111,6 +116,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             this._month           = this.discernMonth(dates[1]);
             this._date            = dates[2];
             this._year            = dates[5];
+            this._unit            = this.units[0];
          }
          finally{
             this.setUpMeasurementLists();
@@ -192,9 +198,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private List<String> getDewpointStringList(){
       List<String> dewpoints   = new LinkedList<String>();
       Iterator<WeatherData> it = this._dewPoint.iterator();
+      double dewpt             = WeatherData.DEFAULTVALUE;
       while(it.hasNext()){
          WeatherData wd  = it.next();
-         double dewpt    = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            dewpt = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            dewpt = wd.metricData();
+         }
+         else{
+            dewpt = wd.absoluteData();
+         }
          String dewpoint = new String();
          if(dewpt > WeatherData.DEFAULTVALUE){
             dewpoint = "'" + String.format("%.2f", dewpt) + "'";
@@ -213,9 +228,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private List<String> getHeatIndexStringList(){
       List<String> indices     = new LinkedList<String>();
       Iterator<WeatherData> it = this._heatIndex.iterator();
+      double heatIdx           = WeatherData.DEFAULTVALUE;
       while(it.hasNext()){
          WeatherData wd   = it.next();
-         double heatIdx   = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            heatIdx = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            heatIdx = wd.metricData();
+         }
+         else{
+            heatIdx = wd.absoluteData();
+         }
          String heatIndex = new String();
          if(heatIdx > WeatherData.DEFAULTVALUE){
             heatIndex = "'" + String.format("%.2f", heatIdx) + "'";
@@ -255,9 +279,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private List<String> getPressureStringList(){
       List<String> press       = new LinkedList<String>();
       Iterator<WeatherData> it = this._barometricPressure.iterator();
+      double pres              = WeatherData.DEFAULTVALUE;
       while(it.hasNext()){
          WeatherData wd  = it.next();
-         double pres     = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            pres = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            pres = wd.metricData();
+         }
+         else{
+            pres = wd.absoluteData();
+         }
          String pressure = new String();
          if(pres > WeatherData.DEFAULTVALUE){
             pressure = "'" + String.format("%.2f", pres) + "'";
@@ -276,9 +309,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private List<String> getTemperatureStringList(){
       List<String> temps       = new LinkedList<String>();
       Iterator<WeatherData> it = this._temperature.iterator();
+      double temp              = WeatherData.DEFAULTVALUE;
       while(it.hasNext()){
          WeatherData wd    = it.next();
-         double temp       = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            temp = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            temp = wd.metricData();
+         }
+         else{
+            temp = wd.absoluteData();
+         }
          String stringtemp = new String();
          if(temp > WeatherData.DEFAULTVALUE){
             stringtemp = "'" + String.format("%.2f", temp) + "'";
@@ -415,9 +457,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
          String time = calString.split(" ")[3].trim();
+         double dp = WeatherData.DEFAULTVALUE;
          time = time.replace(":",",");
          time = "["+time+"]";
-         double dp = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            dp = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            dp = wd.metricData();
+         }
+         else{
+            dp = wd.absoluteData();
+         }
          if(dp > Thermometer.DEFAULTTEMP){
             display = display.concat("["+time+","+dp+"], ");
          }
@@ -440,9 +491,24 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpDewPointRow(){
       WeatherData     data    = null;
       StringBuffer    buffer  = new StringBuffer();
-      double min = this._dewPointMin.englishData();
-      double max = this._dewPointMax.englishData();
-      double avg = this._dewPointAvg.englishData();
+      double min = WeatherData.DEFAULTVALUE;
+      double max = WeatherData.DEFAULTVALUE;
+      double avg = WeatherData.DEFAULTVALUE;
+      if(this._unit.equals(this.units[0])){
+         min = this._dewPointMin.englishData();
+         max = this._dewPointMax.englishData();
+         avg = this._dewPointAvg.englishData();
+      }
+      else if(this._unit.equals(this.units[1])){
+         min = this._dewPointMin.metricData();
+         max = this._dewPointMax.metricData();
+         avg = this._dewPointAvg.metricData();
+      }
+      else{
+         min = this._dewPointMin.absoluteData();
+         max = this._dewPointMax.absoluteData();
+         avg = this._dewPointAvg.absoluteData();
+      }
 
       buffer.append("['Dew Point', ");
       if(min > WeatherData.DEFAULTVALUE){
@@ -477,9 +543,18 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
          String time = calString.split(" ")[3].trim();
+         double hi = WeatherData.DEFAULTVALUE;
          time = time.replace(":",",");
          time = "["+time+"]";
-         double hi = wd.englishData();
+         if(this._unit.equals(this.units[0])){
+            hi = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            hi = wd.metricData();
+         }
+         else{
+            hi = wd.absoluteData();
+         }
          if(hi > Thermometer.DEFAULTTEMP){
             display = display.concat("["+time+","+hi+"], ");
          }
@@ -502,9 +577,24 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpHeatIndexRow(){
       WeatherData     data    = null;
       StringBuffer    buffer  = new StringBuffer();
-      double min = this._heatIndexMin.englishData();
-      double max = this._heatIndexMax.englishData();
-      double avg = this._heatIndexAvg.englishData();
+      double min = WeatherData.DEFAULTVALUE;
+      double max = WeatherData.DEFAULTVALUE;
+      double avg = WeatherData.DEFAULTVALUE;
+      if(this._unit.equals(this.units[0])){
+         min = this._heatIndexMin.englishData();
+         max = this._heatIndexMax.englishData();
+         avg = this._heatIndexAvg.englishData();
+      }
+      else if(this._unit.equals(this.units[1])){
+         min = this._heatIndexMin.metricData();
+         max = this._heatIndexMax.metricData();
+         avg = this._heatIndexAvg.metricData();
+      }
+      else{
+         min = this._heatIndexMin.absoluteData();
+         max = this._heatIndexMax.absoluteData();
+         avg = this._heatIndexAvg.absoluteData();
+      }
       buffer.append("['Heat Index', ");
       if(min > WeatherData.DEFAULTVALUE){
          buffer.append("'"+String.format("%.2f",min)+"', ");
@@ -639,8 +729,8 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       _humidityMax  = mysqldb.humidityMax(_month, _date, _year);
       _humidityMin  = mysqldb.humidityMin(_month, _date, _year);
       _humidityAvg  = mysqldb.humidityAvg(_month, _date, _year);
-      _dewPointMax  = mysqldb.dewPointMin(_month, _date, _year);
-      _dewPointMin  = mysqldb.dewPointMax(_month, _date, _year);
+      _dewPointMax  = mysqldb.dewPointMax(_month, _date, _year);
+      _dewPointMin  = mysqldb.dewPointMin(_month, _date, _year);
       _dewPointAvg  = mysqldb.dewPointAvg(_month, _date, _year);
       _heatIndexMax = mysqldb.heatIndexMax(_month, _date, _year);
       _heatIndexMin = mysqldb.heatIndexMin(_month, _date, _year);
@@ -658,10 +748,19 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
          String time = calString.split(" ")[3].trim();
+         double pres = WeatherData.DEFAULTVALUE;
          time = time.replace(":",",");
          time = "["+time+"]";
-         double pres = wd.englishData();
-         if(pres > Barometer.DEFAULTPRESSURE){
+         if(this._unit.equals(this.units[0])){
+            pres = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            pres = wd.metricData();
+         }
+         else{
+            pres = wd.absoluteData();
+         }
+         if(pres > WeatherData.DEFAULTVALUE){
             display = display.concat("["+time+","+pres+"], ");
          }
       }
@@ -688,10 +787,19 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          WeatherData wd = it.next();
          String calString = wd.calendar().getTime().toString();
          String time = calString.split(" ")[3].trim();
+         double temp = WeatherData.DEFAULTVALUE;
          time = time.replace(":",",");
          time = "["+time+"]";
-         double temp = wd.englishData();
-         if(temp > Thermometer.DEFAULTTEMP){
+         if(this._unit.equals(this.units[0])){
+            temp = wd.englishData();
+         }
+         else if(this._unit.equals(this.units[1])){
+            temp = wd.metricData();
+         }
+         else{
+            temp = wd.absoluteData();
+         }
+         if(temp > WeatherData.DEFAULTVALUE){
             display = display.concat("["+time+","+temp+"], ");
          }
       }
@@ -714,10 +822,24 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    private String setUpTemperatureRow(){
       WeatherData  data    = null;
       StringBuffer buffer  = new StringBuffer();
-      double min = this._tempMin.englishData();
-      double max = this._tempMax.englishData();
-      double avg = this._tempAvg.englishData();
-
+      double min = WeatherData.DEFAULTVALUE;
+      double max = WeatherData.DEFAULTVALUE;
+      double avg = WeatherData.DEFAULTVALUE;
+      if(this._unit.equals(this.units[0])){
+         min = this._tempMin.englishData();
+         max = this._tempMax.englishData();
+         avg = this._tempAvg.englishData();
+      }
+      else if(this._unit.equals(this.units[1])){
+         min = this._tempMin.metricData();
+         max = this._tempMax.metricData();
+         avg = this._tempAvg.metricData();
+      }
+      else{
+         min = this._tempMin.absoluteData();
+         max = this._tempMax.absoluteData();
+         avg = this._tempAvg.absoluteData();
+      }
       buffer.append("['Temperature', ");
       if(min > WeatherData.DEFAULTVALUE){
          String temp = String.format("%.2f",min);
@@ -799,6 +921,15 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
             form.append(" selected");
          }
          form.append(">" + years[i] + "</option>\n");
+      }
+      form.append("</select>\n");
+      form.append("<select name=\"units\">\n");
+      for(int i = 0; i < units.length; i++){
+         form.append("<option value=\"" + units[i]+ "\"");
+         if(units[i].equals(this._unit)){
+            form.append(" selected");
+         }
+         form.append(">" + units[i] + "</option>\n");
       }
       form.append("</select>\n");
       form.append("<button type=\"submit\">View</button><br>\n");

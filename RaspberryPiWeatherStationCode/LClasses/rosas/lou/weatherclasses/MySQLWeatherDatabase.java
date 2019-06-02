@@ -55,9 +55,9 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
    protected MySQLWeatherDatabase(){
       //Connect to the Database (MySQL)
       this.attemptToConnect();
-   }   
+   }
 
-   
+
    ///////////////////////Private Methods////////////////////////////
    /*
    */
@@ -204,13 +204,13 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
       catch(Exception e){}
       finally{
-         try{ 
+         try{
             stmt.close();
             conn.close();
          }
          catch(SQLException sqe2){}
       }
-   } 
+   }
 
    /*
    */
@@ -259,7 +259,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
       catch(Exception e){}
       finally{
-         try{ 
+         try{
             stmt.close();
             conn.close();
          }
@@ -315,7 +315,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       }
       catch(Exception e){}
       finally{
-         try{ 
+         try{
             stmt.close();
             conn.close();
          }
@@ -443,7 +443,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "(month, day, year) ";
          insert += "VALUES( '" + month_ +"'";
          insert += ", '" + day_ + "','" + year_ + "')";
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sqe){ sqe.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -490,7 +490,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
          insert += time+"')";
          System.out.println(insert);
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sql){ sql.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -594,7 +594,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
                   indexdata += ", ";
                }
                indexdata += time;
-            }            
+            }
             if(command.contains("*") || command.contains("mmHg")){
                double metric = resultSet.getDouble("mmHg");
                if(indexdata.length() > 0){
@@ -615,7 +615,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
                   indexdata += ", ";
                }
                indexdata += "" + absolute;
-            } 
+            }
             pressureList.add(indexdata);
          }
       }
@@ -654,7 +654,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          this.store(month, day, year);
          time  = String.format("%tT",  cal.getTime());
          time += String.format(" %tZ", cal.getTime());
-      }      
+      }
       try{
          double dewpk = dpData_.absoluteData();
          double dewpc = dpData_.metricData();
@@ -670,7 +670,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
          insert += time+"')";
          System.out.println(insert);
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sqe){ sqe.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -771,7 +771,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
                   indexdata += ", ";
                }
                indexdata += time;
-            }            
+            }
             if(command.contains("*") || command.contains("dewptc")){
                double metric = resultSet.getDouble("dewptc");
                if(indexdata.length() > 0){
@@ -833,7 +833,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT AVG(dewptc) FROM ");
       command = command.concat("dewpointdata WHERE month = ");
       command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("dewptc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -901,7 +902,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT MAX(dewptc) FROM ");
       command = command.concat("dewpointdata WHERE month = ");
       command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("dewptc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -968,7 +970,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT MIN(dewptc) FROM ");
       command = command.concat("dewpointdata WHERE month = ");
       command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat(" AND year = \'"+year+"\' AND ");
+      command = command.concat("dewptc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -1049,7 +1052,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
          insert += time+"')";
          System.out.println(insert);
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sqe){ sqe.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -1152,7 +1155,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
                   indexdata += ", ";
                }
                indexdata += time;
-            }            
+            }
             if(command.contains("*") ||
                                       command.contains("heatindexc")){
                double metric = resultSet.getDouble("heatindexc");
@@ -1448,7 +1451,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
          insert += time+"')";
          System.out.println(insert);
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sql){ sql.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -1601,7 +1604,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT avg(humidity) FROM ");
       command = command.concat("humiditydata WHERE month = ");
       command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
-      command = command.concat("AND year = \'"+year+"\'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("humidity >= 0");//that is obvious
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -1668,7 +1672,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT MAX(humidity) FROM ");
       command = command.concat("humiditydata WHERE month = ");
       command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("humidity >= 0");//that is obvious
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -1730,12 +1735,13 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       WeatherData minData = null;
       Connection conn     = null;
       ResultSet resultSet = null;
-      Statement stmt      = null; 
+      Statement stmt      = null;
 
       String command = new String("SELECT MIN(humidity) FROM ");
       command = command.concat("humiditydata WHERE month = ");
       command = command.concat("\'"+month+"\'AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("humidity >= 0");//that is obvious
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -1815,7 +1821,7 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
          insert += "VALUES( '"+month+"', '"+day+"', '"+year+"', '";
          insert += time+"')";
          System.out.println(insert);
-         stmt.executeUpdate(insert); 
+         stmt.executeUpdate(insert);
       }
       catch(SQLException sql){ sql.printStackTrace(); }
       catch(Exception e){ e.printStackTrace(); }
@@ -1982,7 +1988,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT avg(tempc) FROM ");
       command = command.concat("temperaturedata WHERE month = ");
       command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
-      command = command.concat("AND year = \'"+year+"\'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("tempc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -2049,7 +2056,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT max(tempc) FROM ");
       command = command.concat("temperaturedata WHERE month = ");
       command = command.concat("\'"+month+"\' AND day = \'"+day+"\'");
-      command = command.concat(" AND year = \'"+year+"\'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("tempc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
@@ -2116,7 +2124,8 @@ public class MySQLWeatherDatabase implements WeatherDatabase{
       String command = new String("SELECT min(tempc) FROM ");
       command = command.concat("temperaturedata WHERE month = ");
       command = command.concat("'"+month+"' AND day = '"+day+"'");
-      command = command.concat(" AND year = '"+year+"'");
+      command = command.concat("AND year = \'"+year+"\' AND ");
+      command = command.concat("tempc > "+WeatherData.DEFAULTVALUE);
       try{
          conn = DriverManager.getConnection(DB_URL,USER,PASS);
          stmt = conn.createStatement();
