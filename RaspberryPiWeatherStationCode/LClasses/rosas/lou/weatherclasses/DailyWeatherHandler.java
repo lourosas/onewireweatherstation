@@ -197,27 +197,48 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    private List<String> getDewpointStringList(){
       List<String> dewpoints   = new LinkedList<String>();
-      Iterator<WeatherData> it = this._dewPoint.iterator();
+      List<Calendar> cals      = this.getMainCalendarList();
+      //Iterator<WeatherData> it = this._dewPoint.iterator();
       double dewpt             = WeatherData.DEFAULTVALUE;
-      while(it.hasNext()){
-         WeatherData wd  = it.next();
-         if(this._unit.equals(this.units[0])){
-            dewpt = wd.englishData();
-         }
-         else if(this._unit.equals(this.units[1])){
-            dewpt = wd.metricData();
-         }
-         else{
-            dewpt = wd.absoluteData();
-         }
+      //Should just SORT the Collection, and go through it once!!
+      Iterator<Calendar> calIt = cals.iterator();
+      while(calIt.hasNext()){
+         Calendar cal = calIt.next();
          String dewpoint = new String();
-         if(dewpt > WeatherData.DEFAULTVALUE){
-            dewpoint = "'" + String.format("%.2f", dewpt) + "'";
+         try{
+            int hr  = cal.get(Calendar.HOUR_OF_DAY);
+            int min = cal.get(Calendar.MINUTE);
+            Iterator<WeatherData> it = this._dewPoint.iterator();
+            boolean found = false;
+            while(it.hasNext() && !found){
+               WeatherData wd = it.next();
+               int hour   = wd.calendar().get(Calendar.HOUR_OF_DAY);
+               int minute = wd.calendar().get(Calendar.MINUTE);
+               if((hr == hour)&&(min == minute)){
+                  if(this._unit.equals(this.units[0])){
+                     dewpt = wd.englishData();
+                  }
+                  else if(this._unit.equals(this.units[1])){
+                     dewpt = wd.metricData();
+                  }
+                  else{
+                     dewpt = wd.absoluteData();
+                  }
+                  if(dewpt > WeatherData.DEFAULTVALUE){
+                     dewpoint = "'"+String.format("%.2f", dewpt)+"'";
+                  }
+                  else{
+                     dewpoint = new String("'N/A'");
+                  }
+                  found = true;
+               }
+            }
+            if(!found){
+               dewpoint = new String("'N/A'");
+            }
+            dewpoints.add(dewpoint);
          }
-         else{
-            dewpoint = new String("'N/A'");
-         }
-         dewpoints.add(dewpoint);
+         catch(NullPointerException npe){}
       }
       return dewpoints;
    }
@@ -226,28 +247,51 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    private List<String> getHeatIndexStringList(){
-      List<String> indices     = new LinkedList<String>();
-      Iterator<WeatherData> it = this._heatIndex.iterator();
-      double heatIdx           = WeatherData.DEFAULTVALUE;
-      while(it.hasNext()){
-         WeatherData wd   = it.next();
-         if(this._unit.equals(this.units[0])){
-            heatIdx = wd.englishData();
-         }
-         else if(this._unit.equals(this.units[1])){
-            heatIdx = wd.metricData();
-         }
-         else{
-            heatIdx = wd.absoluteData();
-         }
+      List<String> indices          = new LinkedList<String>();
+      List<Calendar> cals           = this.getMainCalendarList();
+      //Iterator<WeatherData> it = this._heatIndex.iterator();
+      ListIterator<WeatherData> lit = null;
+      Iterator<Calendar> calIt      = cals.iterator();
+      int index                     = 0;
+      double heatIdx                = WeatherData.DEFAULTVALUE;
+      while(calIt.hasNext()){
+         Calendar cal     = calIt.next();
          String heatIndex = new String();
-         if(heatIdx > WeatherData.DEFAULTVALUE){
-            heatIndex = "'" + String.format("%.2f", heatIdx) + "'";
+         try{
+            int hr  = cal.get(Calendar.HOUR_OF_DAY);
+            int min = cal.get(Calendar.MINUTE);
+            lit     = this._heatIndex.listIterator(index);
+            boolean found = false;
+            while(lit.hasNext() && !found){
+               WeatherData wd = lit.next();
+               int hour   = wd.calendar().get(Calendar.HOUR_OF_DAY);
+               int minute = wd.calendar().get(Calendar.MINUTE);
+               if((hr == hour) && (min == minute)){
+                  if(this._unit.equals(this.units[0])){
+                     heatIdx = wd.englishData();
+                  }
+                  else if(this._unit.equals(this.units[1])){
+                     heatIdx = wd.metricData();
+                  }
+                  else{
+                     heatIdx = wd.absoluteData();
+                  }
+                  if(heatIdx > WeatherData.DEFAULTVALUE){
+                     heatIndex="'"+String.format("%.2f", heatIdx)+"'";
+                  }
+                  else{
+                     heatIndex = new String("'N/A'");
+                  }
+                  found = true;
+                  ++index;
+               }
+            }
+            if(!found){
+               heatIndex = new String("'N/A'");
+            }
+            indices.add(heatIndex);
          }
-         else{
-            heatIndex = new String("'N/A'");
-         }
-         indices.add(heatIndex);
+         catch(NullPointerException npe){}
       }
       return indices;
    }
@@ -256,19 +300,42 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    private List<String> getHumidityStringList(){
-      List<String> humis       = new LinkedList<String>();
-      Iterator<WeatherData> it = this._humidity.iterator();
-      while(it.hasNext()){
-         WeatherData wd  = it.next();
-         double humi     = wd.percentageData();
+      List<String> humis            = new LinkedList<String>();
+      List<Calendar> cals           = this.getMainCalendarList();
+      ListIterator<WeatherData> lit = null;
+      Iterator<Calendar> calIt      = cals.iterator();
+      int index                     = 0;
+      double humi                   = WeatherData.DEFAULTHUMIDITY;
+      while(calIt.hasNext()){
+         Calendar cal    = calIt.next();
          String humidity = new String();
-         if(humi > WeatherData.DEFAULTHUMIDITY){
-            humidity = "'" + String.format("%.2f", humi) + "'";
+         try{
+            int hr  = cal.get(Calendar.HOUR_OF_DAY);
+            int min = cal.get(Calendar.MINUTE);
+            lit = this._humidity.listIterator(index);
+            boolean found = false;
+            while(lit.hasNext() && !found){
+               WeatherData wd = lit.next();
+               int hour   = wd.calendar().get(Calendar.HOUR_OF_DAY);
+               int minute = wd.calendar().get(Calendar.MINUTE);
+               if((hr == hour) && (min == minute)){
+                  humi = wd.percentageData();
+                  if(humi > WeatherData.DEFAULTHUMIDITY){
+                     humidity = "'"+String.format("%.2f",humi)+"'";
+                  }
+                  else{
+                     humidity = new String("'N/A'");
+                  }
+                  found = true;
+                  ++index;
+               }
+            }
+            if(!found){
+               humidity = new String("'N/A'");
+            }
+            humis.add(humidity);
          }
-         else{
-            humidity = new String("'N/A'");
-         }
-         humis.add(humidity);
+         catch(NullPointerException npe){}
       }
       return humis;
    }
@@ -276,10 +343,27 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    //
    //
+   private List<Calendar> getMainCalendarList(){
+      List<Calendar> cals      = new LinkedList<Calendar>();
+      Iterator<WeatherData> it = this._temperature.iterator();
+      while(it.hasNext()){
+         cals.add(it.next().calendar());
+      }
+      return cals;
+   }
+
+   //
+   //
+   //
    private List<String> getPressureStringList(){
-      List<String> press       = new LinkedList<String>();
-      Iterator<WeatherData> it = this._barometricPressure.iterator();
-      double pres              = WeatherData.DEFAULTVALUE;
+      List<String> press            = new LinkedList<String>();
+      List<Calendar> cals           = this.getMainCalendarList();
+      //Iterator<WeatherData> it = this._barometricPressure.iterator();
+      ListIterator<WeatherData> lit = null;
+      Iterator<Calendar> calIt   = cals.iterator();
+      int index                     = 0;
+      double pres                   = WeatherData.DEFAULTVALUE;
+      /*
       while(it.hasNext()){
          WeatherData wd  = it.next();
          if(this._unit.equals(this.units[0])){
@@ -300,6 +384,46 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
          }
          press.add(pressure);
       }
+      */
+      while(calIt.hasNext()){
+         Calendar cal    = calIt.next();
+         String pressure = new String();
+         try{
+            int hr   = cal.get(Calendar.HOUR_OF_DAY);
+            int min  = cal.get(Calendar.MINUTE);
+            lit      = this._barometricPressure.listIterator(index);
+            boolean found = false;
+            while(lit.hasNext() && !found){
+               WeatherData wd = lit.next();
+               int hour   = wd.calendar().get(Calendar.HOUR_OF_DAY);
+               int minute = wd.calendar().get(Calendar.MINUTE);
+               if((hr == hour) && (min == minute)){
+                  if(this._unit.equals(this.units[0])){
+                     pres = wd.englishData();
+                  }
+                  else if(this._unit.equals(this.units[1])){
+                     pres = wd.metricData();
+                  }
+                  else{
+                     pres = wd.absoluteData();
+                  }
+                  if(pres > WeatherData.DEFAULTVALUE){
+                     pressure = "'"+String.format("%.2f",pres)+"'";
+                  }
+                  else{
+                     pressure = new String("'N/A'");
+                  }
+                  found = true;
+                  ++index;
+               }
+            }
+            if(!found){
+               pressure = new String("'N/A'");
+            }
+            press.add(pressure);
+         }
+         catch(NumberFormatException npe){}
+      }
       return press;
    }
 
@@ -308,6 +432,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
    //
    private List<String> getTemperatureStringList(){
       List<String> temps       = new LinkedList<String>();
+      List<Calendar> cals      = this.getMainCalendarList();
       Iterator<WeatherData> it = this._temperature.iterator();
       double temp              = WeatherData.DEFAULTVALUE;
       while(it.hasNext()){
