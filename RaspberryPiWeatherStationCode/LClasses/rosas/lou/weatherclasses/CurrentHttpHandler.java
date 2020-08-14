@@ -167,31 +167,32 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       int day      = cal.get(Calendar.DATE);
       int year     = cal.get(Calendar.YEAR);
 
-      StringBuffer date = new StringBuffer(); 
-      date.append(String.format("%02d", month)+"/");
-      date.append(String.format("%02d", day) + "/");
-      date.append(year);
+      StringBuffer date = new StringBuffer();
+      date.append(year + "-");
+      date.append(String.format("%02d", month) + "-");
+      date.append(String.format("%02d", day));
       StringBuffer send = new StringBuffer("https://");
-      send.append("api.usno.navy.mil/rstt/oneday?");
-      send.append("date="+date.toString().trim());
-      send.append("&coords=32.10N,110.78W&tz=-7");
+      send.append("api.met.no/weatherapi/sunrise/2.0/?");
+      send.append("lat=32.1017&lon=-110.7895&");
+      send.append("date=" + date.toString().trim());
+      send.append("&offset=-07:00");
       try{
+         System.out.println(send);
          URL url = new URL(send.toString().trim());
          URLConnection conn = url.openConnection();
          BufferedReader in = new BufferedReader(
                        new InputStreamReader(conn.getInputStream()));
          String line;
          while((line = in.readLine()) != null){
-            if(line.contains("sundata")){
-               while(!line.contains("moondata")){
-                  if(line.contains("R")){
-                     this.sunrise = line.split("\"")[7];
-                  }
-                  else if(line.contains("S")){
-                     this.sunset = line.split("\"")[7];
-                  }
-                  line = in.readLine();
-               }
+            if(line.contains("sunrise time")){
+               String currentTime = line.split("T")[1];
+               this.sunrise = currentTime.split("-")[0];
+               System.out.println(this.sunrise);
+            }
+            else if(line.contains("sunset time")){
+               String currentTime = line.split("T")[1];
+               this.sunset = currentTime.split("-")[0];
+               System.out.println(this.sunset);
             }
          }
       }
