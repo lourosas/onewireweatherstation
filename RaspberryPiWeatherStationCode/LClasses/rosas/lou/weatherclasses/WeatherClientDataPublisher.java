@@ -46,28 +46,22 @@ public abstract class WeatherClientDataPublisher{
    /*
    */
    protected void publishData(String data){
-      try{
-         Iterator<WeatherClientDataSubscriber> it =
+      Iterator<WeatherClientDataSubscriber> it =
                                          this._subscribers.iterator();
-         while(it.hasNext()){
-            //WeatherClientDataSubscriber sub = it.next();
-            //sub.updateData(data);
-            it.next().updateData(data);
-         }
+      while(it.hasNext()){
+         //WeatherClientDataSubscriber sub = it.next();
+         //sub.updateData(data);
+         it.next().updateData(data);
       }
-      catch(NullPointerException npe){}
    }
 
    /*
    */
    protected void publishData(List<WeatherData> data){
-      try{
-         Iterator<WeatherClientDataSubscriber> it =
+      Iterator<WeatherClientDataSubscriber> it =
                                          this._subscribers.iterator();
-         while(it.hasNext()){
-            it.next().updateData(data);
-         }
+      while(it.hasNext()){
+         it.next().updateData(data);
       }
-      catch(NullPointerException npe){}
    }
 }

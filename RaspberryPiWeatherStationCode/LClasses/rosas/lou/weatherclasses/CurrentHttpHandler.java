@@ -167,8 +167,8 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
       int day      = cal.get(Calendar.DATE);
       int year     = cal.get(Calendar.YEAR);
 
-      StringBuffer date = new StringBuffer();
-      date.append(year + "-");
+      StringBuffer date = new StringBuffer(); 
+      date.append(year+"-");
       date.append(String.format("%02d", month) + "-");
       date.append(String.format("%02d", day));
       StringBuffer send = new StringBuffer("https://");

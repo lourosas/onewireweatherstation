@@ -338,11 +338,23 @@ public class WeatherStationReader extends WeatherDataPublisher{
          final double b =  17.62; //beta constant
          double temp     = Double.parseDouble(data.split(" ")[2]);
          double humidity = Double.parseDouble(data.split(" ")[3]);
+         if(humidity <= 0.){
+            throw new ArithmeticException(" Humidity Too Low ");
+         }
          double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
          double dp    = (l * alpha)/(b - alpha);
          weatherData = new DewpointData(Units.METRIC,
                                      dp,
                                      "good",
+                                     this._cal);
+      }
+      //If this happens, something usaully goes wrong in the dewpoint
+      //calculation.
+      catch(ArithmeticException ae){
+         dewpoint = WeatherData.DEFAULTVALUE;
+         weatherData = new DewpointData(Units.METRIC,
+                                     dewpoint,
+                                     ae.getMessage(),
                                      this._cal);
       }
       catch(NumberFormatException nfe){

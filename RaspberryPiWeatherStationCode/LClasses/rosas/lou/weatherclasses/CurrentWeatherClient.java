@@ -37,7 +37,8 @@ implements Runnable{
    private String _rawData;
    private List<WeatherData> _weatherData;
    {
-      _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
+      //_addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
+      _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)114};
       _socket      = null;
       _rawData     = null;
       _weatherData = null;
@@ -164,6 +165,11 @@ implements Runnable{
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
+      System.out.println(this._weatherData.get(0));
+      System.out.println(this._weatherData.get(1));
+      System.out.println(this._weatherData.get(2));
+      System.out.println(this._weatherData.get(3));
+      System.out.println(this._weatherData.get(4));
    }
 
    /*

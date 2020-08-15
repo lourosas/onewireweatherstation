@@ -66,10 +66,10 @@ implements WeatherClientDataSubscriber{
    }
 
    /*
-   Making an attempt NOT to use Type Checking for the assignment!
-   This way is ONE possibility!
+   I am sure there is a better way to do this than to check the type!
    */
    public void updateData(List<WeatherData> data){
+      System.out.println("More WeatherClientSubscriber");
       Iterator<WeatherData> it = data.iterator();
       while(it.hasNext()){
          WeatherData currentData = it.next();
