@@ -15,6 +15,11 @@ public class URLWeatherParser{
    static String [] months = {"January", "February", "March", "April",
    "May", "June", "July", "August", "September", "October",
    "November", "December"};
+
+   private String minMaxAvgFile = new String("MinMaxAvg.txt");
+   private String dailyFile     = new String("Daily.txt");
+   private String globalDate    = null;
+
    /**/
    public static void main(String [] args){
       new URLWeatherParser();
@@ -25,6 +30,35 @@ public class URLWeatherParser{
       System.out.println("Hello World");
       this.setUpDates();
       this.parseTheData();
+   }
+
+   /**/
+   private void parseDailyData(URLConnection conn){
+      try{
+         conn.connect();
+         BufferedReader in = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream()));
+         String line = null;
+         while((line = in.readLine()) != null){
+            if(line.contains("theData.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  if(line.length() > 0){
+                     FileWriter fw=new FileWriter(this.dailyFile,true);
+                     PrintWriter pw=new PrintWriter(fw, true);
+                     pw.println(this.globalDate);
+                     pw.println(line);
+                     pw.close();
+                  }
+               }
+            }
+         }
+      }
+      catch(MalformedURLException mle){
+         System.out.println("URL Exception " + mle);
+      }
+      catch(IOException ioe){
+         System.out.println("IOException " + ioe);
+      }
    }
 
    /**/
@@ -39,6 +73,16 @@ public class URLWeatherParser{
                while(!(line = in.readLine()).contains("]);")){
                   if(line.contains("Temperature")){
                      if(!line.contains("N/A")){
+                        try{
+                           FileWriter fw =
+                              new FileWriter(this.minMaxAvgFile,true);
+                           PrintWriter pw  = new PrintWriter(fw,true);
+                           pw.println(this.globalDate);
+                           pw.close();
+                        }
+                        catch(IOException ioe){
+                           ioe.printStackTrace();
+                        }
                         this.splitHighLowValues(line);
                      }
                   }
@@ -82,14 +126,17 @@ public class URLWeatherParser{
             for(int k = 0; k < dates.length; k++){
                date = dates[k];
                StringBuffer send = new StringBuffer("http://");
-               send.append("68.98.39.39:8500/daily");
+               send.append("68.98.39.39:8000/daily");
                send.append("?month="+month+"&date="+date);
                send.append("&year="+year+"&units=English");
                try{
-                  System.out.println(send.toString());
+                  this.globalDate=new String(year+"-"+month+"-"+date);
                   URL url = new URL(send.toString().trim());
                   URLConnection conn = url.openConnection();
+                  this.parseDailyData(conn);
+                  conn = url.openConnection();
                   this.parseHighLowAverage(conn);
+                  //this.parseDailyData(conn);
                }
                catch(MalformedURLException mle){
                   System.out.println("URL Exception " + mle);
@@ -115,18 +162,23 @@ public class URLWeatherParser{
       String [] tString = line.split(",");
       String tempString = tString[0].substring(2,
                                                tString[0].length()-1);
-      System.out.println(tempString);
       String minString = tString[1].trim();
       minString = minString.substring(1, minString.length()-1);
       double min = Double.parseDouble(minString);
-      System.out.println(min);
       String maxString = tString[2].trim();
       maxString = maxString.substring(1, maxString.length()-1);
       double max = Double.parseDouble(maxString);
-      System.out.println(max);
       String avgString = tString[3].trim();
       avgString = avgString.substring(1, avgString.length()-2);
       double avg = Double.parseDouble(avgString);
-      System.out.println(avg);
+      try{
+         FileWriter  fw = new FileWriter(this.minMaxAvgFile, true);
+         PrintWriter pw = new PrintWriter(fw, true);
+         pw.println(tempString + ": " + min + " " + max + " " + avg);
+         pw.close();
+      }
+      catch(IOException ioe){
+         ioe.printStackTrace();
+      }
    }
 }
