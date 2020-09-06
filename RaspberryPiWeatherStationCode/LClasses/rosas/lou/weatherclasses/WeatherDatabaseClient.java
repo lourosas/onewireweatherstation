@@ -29,7 +29,7 @@ public class WeatherDatabaseClient{
    private static final int PORT     = 20001;
    private static final int TIMEOUT  = 20000;
 
-   private DatagramSockect   _socket;
+   private DatagramSocket    _socket;
    private byte[]            _addr;
    private String            _rawData;
    private List<WeatherData> _temperatureData;
@@ -71,7 +71,7 @@ public class WeatherDatabaseClient{
    //////////////////////Private Methods//////////////////////////////
    /*
    */
-   public void requestTemepratureData(){
+   public void requestTemperatureData(){
       DatagramPacket  sendPacket    = null;
       DatagramPacket  receivePacket = null;
       List<String>    data          = new LinkedList();
@@ -92,7 +92,7 @@ public class WeatherDatabaseClient{
                                          iNetAddr,
                                          PORT);
           
-         this._socket.send(sentPacket);
+         this._socket.send(sendPacket);
          receivePacket =
                   new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
