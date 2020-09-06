@@ -33,7 +33,7 @@ implements Runnable{
    private List<WeatherData> _pressure;
    private List<WeatherData> _dewpoint;
    private List<WeatherData> _heatIndex;
-   private DatagramSockect   _socket;
+   private DatagramSocket    _socket;
 
    {
       address       = null;
@@ -66,6 +66,37 @@ implements Runnable{
       }
    }
 
+   ////TemperatureHumidityObserver Interface Implementation///////////
+   public void updateTemperature(WeatherData data){}
+   public void updateTemperatureMetric(double metric){}
+   public void updateTemperatureEnglish(double english){}
+   public void updateTemperatureAbsolute(double absolute){}
+   public void updateHumidity(WeatherData data){}
+   public void updateHumidity(double percentage){}
+
+   //////////BarometerObserver Interface Implementation///////////////
+   public void updatePressure(WeatherEvent event){}
+   public void updatePressure(WeatherStorage store){}
+   public void updatePressure(WeatherData data){}
+   public void updatePressureAbsolute(double absolute){}
+   public void updatePressureEnglish(double english){}
+   public void updatePressureMetric(double metric){}
+
+   /////////CalculatorObserver Interface Implementation///////////////
+   public void updateDewpoint(WeatherEvent event){}
+   public void updateDewpoint(WeatherStorage store){}
+   public void updateDewpoint(WeatherData data){}
+   public void updateDewpointAbsolute(double absolute){}
+   public void updateDewpointEnglish(double english){}
+   public void updateDewpointMetric(double metric){}
+   public void updateHeatIndex(WeatherEvent event){}
+   public void updateHeatIndex(WeatherStorage store){}
+   public void updateHeatIndex(WeatherData data){}
+   public void updateHeatIndexAbsolute(double absolute){}
+   public void updateHeatIndexEnglish(double english){}
+   public void updateHeatIndexMetric(double metric){}
+   public void updateWindChill(WeatherEvent event){}
+
    ////////////////////////Private Methods////////////////////////////
    /*
    */
@@ -88,9 +119,9 @@ implements Runnable{
             byte data[]    = new byte[8192];
             receivePacket  = new DatagramPacket(data, data.length);
             this._socket.receive(receivePacket);
-            InetAddres addr = receivePacket.getAddress();
-            int port        = receivePacket.getPort();
-            String received = new String(receivePacket.getData(), 0,
+            InetAddress addr = receivePacket.getAddress();
+            int port         = receivePacket.getPort();
+            String received  = new String(receivePacket.getData(), 0,
                                          receivePacket.getLength());
             System.out.println(addr);
             System.out.println(port);
