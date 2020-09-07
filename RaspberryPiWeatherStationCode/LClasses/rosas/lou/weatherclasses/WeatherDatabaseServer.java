@@ -125,7 +125,40 @@ implements Runnable{
                                          receivePacket.getLength());
             System.out.println(addr);
             System.out.println(port);
-            System.out.println(received);
+            String [] values = received.split(" ");
+            System.out.println(values[0]);
+            System.out.println(values[1]);
+            System.out.println(values[2]);
+            System.out.println(values[3]);
+            WeatherDatabase wdb = MySQLWeatherDatabase.getInstance();
+            List<WeatherData> wdl = null;
+            if(values[0].equals("TEMPERATURE")){
+               wdl = wdb.temperature(values[1],values[2],values[3]);
+            }
+            else if(values[0].equals("HUMIDITY")){
+               wdl = wdb.humidity(values[1],values[2],values[3]);
+            }
+            else if(values[0].equals("PRESSURE")){
+               wdl = wdb.barometricPressure(values[1],values[2],
+                                                           values[3]);
+            }
+            else if(values[0].equals("DEWPOINT")){
+               wdl = wdb.dewpoint(values[1], values[2], values[3]);
+            }
+            else if(values[0].equals("HEATINDEX")){
+               wdl = wdb.heatIndex(values[1], values[2], values[3]);
+            }
+            Iterator<WeatherData> it = wdl.iterator();
+            while(it.hasNext()){
+               WeatherData currentData = it.next();
+               ByteArrayOutputStream bos=new ByteArrayOutputStream();
+               ObjectOutputStream oos=new ObjectOutputStream(bos);
+               oos.writeObject(it.next());
+               oos.flush();
+               data = bos.toByteArray();
+               System.out.println(data.length);
+               //System.out.println(it.next());
+            }
             String temp = "Send back something";
             data = temp.getBytes();
             DatagramPacket sendPacket = new DatagramPacket(data,
