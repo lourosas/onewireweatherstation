@@ -36,6 +36,8 @@ public class TestCurrentWeatherClient{
 
       HttpServer httpserver = null;
       try{
+         //httpserver =
+         //         HttpServer.create(new InetSocketAddress(8000),100);
          httpserver =
                   HttpServer.create(new InetSocketAddress(8000),100);
          httpserver.createContext("/", (HttpHandler)chttph);

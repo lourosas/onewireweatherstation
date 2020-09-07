@@ -1,0 +1,10 @@
+/////////////////////////////////////////////////////////////////////
+import java.lang.*;
+import java.util.*;
+
+public class TestUnicode{
+   public static void main(String [] args){
+      System.out.println("Temp:  " + 100 + "\u00B0F");
+   }
+}
+/////////////////////////////////////////////////////////////////////

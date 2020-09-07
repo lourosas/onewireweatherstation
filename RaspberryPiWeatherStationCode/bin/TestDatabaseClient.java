@@ -9,14 +9,6 @@ public class TestDatabaseClient{
 
    public TestDatabaseClient(){
       WeatherDatabaseClient client = new WeatherDatabaseClient();
-      String [] dates = new String[3];
-      dates[0] = "September";
-      dates[1] = "07";
-      dates[2] = "2020";
-      client.requestData("temperature", dates);
-      client.requestData("humidity", dates);
-      client.requestData("pressure", dates);
-      /*
       int count = 0;
       do{
          try{
@@ -25,6 +17,5 @@ public class TestDatabaseClient{
          }
          catch(InterruptedException ie){}
       }while(++count < 5);
-      */
    }
 }
