@@ -71,37 +71,38 @@ public class WeatherDatabaseClient{
    //////////////////////Private Methods//////////////////////////////
    /*
    */
-   public void requestTemperatureData(){
+   private void request(String command){
       DatagramPacket  sendPacket    = null;
       DatagramPacket  receivePacket = null;
       List<String>    data          = new LinkedList();
       try{
          this._socket = new DatagramSocket();
          this._socket.setSoTimeout(TIMEOUT);
-         String tempData = new String("Request Temperature Data");
+         String sendData = new String(command);
 
-         byte temp[]          = tempData.getBytes();
+         byte temp[]          = sendData.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this._addr);
          byte [] receiveData  = new byte[8192];
 
-         System.out.println(iNetAddr.getHostName());
-         System.out.println(iNetAddr.getHostAddress());
+         System.out.println("HostName:  " + iNetAddr.getHostName());
+         System.out.println("HostAddr:  "+iNetAddr.getHostAddress());
 
          sendPacket = new DatagramPacket(temp,
                                          temp.length,
                                          iNetAddr,
                                          PORT);
-          
+
          this._socket.send(sendPacket);
          receivePacket =
                   new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
          this._rawData = new String(receivePacket.getData());
 
-         System.out.println(this._rawData);
-         System.out.println(receivePacket.getAddress());
-         System.out.println(receivePacket.getPort());
-         System.out.println(receivePacket.getLength());
+         System.out.println("Return Data:  " + this._rawData);
+         System.out.println("addr: " + receivePacket.getAddress());
+         System.out.println("port:  " + receivePacket.getPort());
+         System.out.println("length:  " + receivePacket.getLength());
+         System.out.println();
       }
       catch(SocketTimeoutException ste){
          ste.printStackTrace();
@@ -110,20 +111,40 @@ public class WeatherDatabaseClient{
          e.printStackTrace();
       }
    }
+   /*
+   */
+   private void requestTemperatureData(){
+      this.request("Request Temperature Data");
+
+   }
 
    /*
    */
-   public void requestHumidityData(){}
+   private void requestHumidityData(){
+      this.request("Request Humidity Data on any date");
+   }
 
    /*
    */
-   public void requestPressureData(){}
+   private void requestPressureData(){
+      String theRequest = new String("Request Pressure data");
+      theRequest += " on a given date";
+      this.request(theRequest);
+   }
 
    /*
    */
-   public void requestDewpointData(){}
+   private void requestDewpointData(){
+      String theRequest = new String("Request Dewpoint data");
+      theRequest += " on a given date; entering in the date";
+      this.request(theRequest);
+   }
 
    /*
    */
-   public void requestHeatIndexData(){}
+   private void requestHeatIndexData(){
+      String theRequest = new String("Request Heatindex data");
+      theRequest += " on a given date; entering in the date; ";
+      theRequest += " and the Units.";
+      this.request(theRequest);   }
 }
