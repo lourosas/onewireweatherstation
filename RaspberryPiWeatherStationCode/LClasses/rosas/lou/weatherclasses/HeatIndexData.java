@@ -24,7 +24,8 @@ import rosas.lou.weatherclasses.*;
 import gnu.io.*;
 import com.dalsemi.onewire.utils.Convert;
 
-public class HeatIndexData extends ThermalData implements WeatherData{
+public class HeatIndexData extends ThermalData implements WeatherData,
+java.io.Serializable{
    {
       _type = WeatherDataType.HEATINDEX;
    };

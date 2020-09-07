@@ -24,7 +24,8 @@ import rosas.lou.weatherclasses.*;
 import gnu.io.*;
 import com.dalsemi.onewire.utils.Convert;
 
-public class DewpointData extends ThermalData implements WeatherData{
+public class DewpointData extends ThermalData implements WeatherData,
+java.io.Serializable{
    {
       _type = WeatherDataType.DEWPOINT;
    };

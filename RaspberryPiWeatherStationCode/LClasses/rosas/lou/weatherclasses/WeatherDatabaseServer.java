@@ -153,11 +153,13 @@ implements Runnable{
                WeatherData currentData = it.next();
                ByteArrayOutputStream bos=new ByteArrayOutputStream();
                ObjectOutputStream oos=new ObjectOutputStream(bos);
-               oos.writeObject(it.next());
+               oos.writeObject(currentData);
                oos.flush();
                data = bos.toByteArray();
                System.out.println(data.length);
-               //System.out.println(it.next());
+               DatagramPacket sendPacket = 
+                       new DatagramPacket(data,data.length,addr,port);
+               this._socket.send(sendPacket);
             }
             String temp = "Send back something";
             data = temp.getBytes();

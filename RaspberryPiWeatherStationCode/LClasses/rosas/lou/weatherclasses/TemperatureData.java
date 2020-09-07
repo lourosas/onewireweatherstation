@@ -25,7 +25,7 @@ import gnu.io.*;
 import com.dalsemi.onewire.utils.Convert;
 
 public class TemperatureData extends ThermalData
-implements WeatherData{
+implements WeatherData, java.io.Serializable{
    {
       _type = WeatherDataType.TEMPERATURE;
    };

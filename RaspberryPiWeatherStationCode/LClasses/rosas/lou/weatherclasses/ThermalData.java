@@ -21,10 +21,10 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
-public class ThermalData implements WeatherData{
+public class ThermalData implements WeatherData, java.io.Serializable{
    protected double          _absolute;
    protected double          _english;
    protected double          _metric;

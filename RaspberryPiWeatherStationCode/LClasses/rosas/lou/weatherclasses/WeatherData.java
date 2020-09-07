@@ -17,12 +17,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package rosas.lou.weatherclasses;
 
+import java.io.*;
 import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
 
 public interface WeatherData{

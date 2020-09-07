@@ -21,10 +21,10 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
-public class PressureData implements WeatherData{
+public class PressureData implements WeatherData, java.io.Serializable{
    private double _absolutePressure;
    private double _englishPressure;
    private double _metricPressure;
