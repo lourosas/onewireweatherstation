@@ -54,18 +54,27 @@ public class WeatherDatabaseClient{
    /////////////////////////Constructors//////////////////////////////
    /*
    */
-   public WeatherDatabaseClient(){
-      this.requestData();
-   }
+   public WeatherDatabaseClient(){}
 
-   /**/
-   public void requestData(){
-      //request the data
-      this.requestTemperatureData();
-      this.requestHumidityData();
-      this.requestPressureData();
-      this.requestDewpointData();
-      this.requestHeatIndexData();
+
+   /*
+   */
+   public void requestData(String measurement, String [] values){
+      if((measurement.toUpperCase()).contains("TEMP")){
+         this.requestTemperatureData(values);
+      }
+      else if((measurement.toUpperCase()).contains("HUMI")){
+         this.requestHumidityData(values);
+      }
+      else if((measurement.toUpperCase()).contains("PRES")){
+         this.requestPressureData(values);
+      }
+      else if((measurement.toUpperCase()).contains("DEWP")){
+         this.requestDewpointData(values);
+      }
+      else if((measurement.toUpperCase()).contains("HEAT")){
+         this.requestHeatIndexData(values);
+      }
    }
 
    //////////////////////Private Methods//////////////////////////////
@@ -113,38 +122,41 @@ public class WeatherDatabaseClient{
    }
    /*
    */
-   private void requestTemperatureData(){
-      this.request("Request Temperature Data");
-
+   private void requestTemperatureData(String [] values){
+      String requestString = new String("TEMPERATURE " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
    }
 
    /*
    */
-   private void requestHumidityData(){
-      this.request("Request Humidity Data on any date");
+   private void requestHumidityData(String [] values){
+      String requestString = new String("HUMIDITY " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
    }
 
    /*
    */
-   private void requestPressureData(){
-      String theRequest = new String("Request Pressure data");
-      theRequest += " on a given date";
-      this.request(theRequest);
+   private void requestPressureData(String [] values){
+      String requestString = new String("PRESSURE " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
    }
 
    /*
    */
-   private void requestDewpointData(){
-      String theRequest = new String("Request Dewpoint data");
-      theRequest += " on a given date; entering in the date";
-      this.request(theRequest);
+   private void requestDewpointData(String [] values){
+      String requestString = new String("DEWPOINT " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
    }
 
    /*
    */
-   private void requestHeatIndexData(){
-      String theRequest = new String("Request Heatindex data");
-      theRequest += " on a given date; entering in the date; ";
-      theRequest += " and the Units.";
-      this.request(theRequest);   }
+   private void requestHeatIndexData(String [] values){
+      String requestString = new String("HEATINDEX " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 }
