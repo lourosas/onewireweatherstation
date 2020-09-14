@@ -54,54 +54,64 @@ public class WeatherDatabaseClient{
    /////////////////////////Constructors//////////////////////////////
    /*
    */
-   public WeatherDatabaseClient(){
-      this.requestData();
-   }
+   public WeatherDatabaseClient(){}
 
-   /**/
-   public void requestData(){
-      //request the data
-      this.requestTemperatureData();
-      this.requestHumidityData();
-      this.requestPressureData();
-      this.requestDewpointData();
-      this.requestHeatIndexData();
+
+   /*
+   */
+   public void requestData(String measurement, String [] values){
+      if((measurement.toUpperCase()).contains("TEMP")){
+         this.requestTemperatureData(values);
+      }
+      else if((measurement.toUpperCase()).contains("HUMI")){
+         this.requestHumidityData(values);
+      }
+      else if((measurement.toUpperCase()).contains("PRES")){
+         this.requestPressureData(values);
+      }
+      else if((measurement.toUpperCase()).contains("DEWP")){
+         this.requestDewpointData(values);
+      }
+      else if((measurement.toUpperCase()).contains("HEAT")){
+         this.requestHeatIndexData(values);
+      }
    }
 
    //////////////////////Private Methods//////////////////////////////
    /*
    */
-   public void requestTemperatureData(){
+   private void request(String command){
       DatagramPacket  sendPacket    = null;
       DatagramPacket  receivePacket = null;
       List<String>    data          = new LinkedList();
       try{
          this._socket = new DatagramSocket();
          this._socket.setSoTimeout(TIMEOUT);
-         String tempData = new String("Request Temperature Data");
+         String sendData = new String(command);
 
-         byte temp[]          = tempData.getBytes();
+         byte temp[]          = sendData.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this._addr);
-         byte [] receiveData  = new byte[8192];
+         byte [] receiveData  = new byte[16384];
 
-         System.out.println(iNetAddr.getHostName());
-         System.out.println(iNetAddr.getHostAddress());
+         System.out.println("HostName:  " + iNetAddr.getHostName());
+         System.out.println("HostAddr:  "+iNetAddr.getHostAddress());
 
          sendPacket = new DatagramPacket(temp,
                                          temp.length,
                                          iNetAddr,
                                          PORT);
-          
+
          this._socket.send(sendPacket);
          receivePacket =
                   new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
          this._rawData = new String(receivePacket.getData());
 
-         System.out.println(this._rawData);
-         System.out.println(receivePacket.getAddress());
-         System.out.println(receivePacket.getPort());
-         System.out.println(receivePacket.getLength());
+         System.out.println("Return Data:\n" + this._rawData);
+         System.out.println("addr: " + receivePacket.getAddress());
+         System.out.println("port:  " + receivePacket.getPort());
+         System.out.println("length:  " + receivePacket.getLength());
+         System.out.println();
       }
       catch(SocketTimeoutException ste){
          ste.printStackTrace();
@@ -110,20 +120,43 @@ public class WeatherDatabaseClient{
          e.printStackTrace();
       }
    }
+   /*
+   */
+   private void requestTemperatureData(String [] values){
+      String requestString = new String("TEMPERATURE " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 
    /*
    */
-   public void requestHumidityData(){}
+   private void requestHumidityData(String [] values){
+      String requestString = new String("HUMIDITY " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 
    /*
    */
-   public void requestPressureData(){}
+   private void requestPressureData(String [] values){
+      String requestString = new String("PRESSURE " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 
    /*
    */
-   public void requestDewpointData(){}
+   private void requestDewpointData(String [] values){
+      String requestString = new String("DEWPOINT " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 
    /*
    */
-   public void requestHeatIndexData(){}
+   private void requestHeatIndexData(String [] values){
+      String requestString = new String("HEATINDEX " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
+      this.request(requestString);
+   }
 }
