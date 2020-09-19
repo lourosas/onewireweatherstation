@@ -38,8 +38,12 @@ import rosas.lou.lgraphics.TestPanel2;
 //////////////////////////////////////////////////////////////////////
 public class WeatherDatabaseClientView extends GenericJFrame{
    private static final short WIDTH        = 750;
-   private static final short HEIGHT       = 500;
+   private static final short HEIGHT       = 600;
    private static final short TOTAL_PANELS = 5;
+
+   private WeatherDatabaseClientController _controller = null;
+   private JTextField _address = null;
+   private JTextField _port    = null;
 
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
@@ -53,7 +57,19 @@ public class WeatherDatabaseClientView extends GenericJFrame{
       super(title);
       //Add Model
       //Add Controllers
+      this._controller = new WeatherDatabaseClientController(this);
       this.setUpGUI();
+   }
+
+   //////////////////////////Public Methods///////////////////////////
+   /**/
+   public String address(){
+      return this._address.getText();
+   }
+
+   /**/
+   public String port(){
+      return this._port.getText();
    }
 
    //////////////////////////Private Methods//////////////////////////
@@ -82,14 +98,13 @@ public class WeatherDatabaseClientView extends GenericJFrame{
       JLabel humiLabel = new JLabel("Humidity");
       humidityPanel.add(humiLabel, BorderLayout.CENTER);
       return humidityPanel;
-      
+
    }
+
    /**/
-   private void setUpGUI(){
-      this.setLayout(new BorderLayout());
-      this.setSize(WIDTH,HEIGHT);
-      this.setResizable(false);
+   private JTabbedPane setTabbedPane(){
       JTabbedPane jtp = new JTabbedPane();
+
       jtp.addTab("Temperature",
                  null,
                  this.setUpTemperaturePanel(),
@@ -116,8 +131,42 @@ public class WeatherDatabaseClientView extends GenericJFrame{
                  "Viewing Heat Index Data");
       jtp.setMnemonicAt(4, KeyEvent.VK_I);
 
+      return jtp;
+   }
+
+   /**/
+   private void setUpGUI(){
+      this.setLayout(new BorderLayout());
+      this.setSize(WIDTH,HEIGHT);
+      this.setResizable(false);
+      JPanel northPanel = this.setUpNorthPanel();
+      JTabbedPane jtp = this.setTabbedPane();
+      this.getContentPane().add(northPanel, BorderLayout.NORTH);
       this.getContentPane().add(jtp, BorderLayout.CENTER);
       this.setVisible(true);
+   }
+
+   /**/
+   private JPanel setUpNorthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEmptyBorder(15,15,15,15));
+
+      JLabel addLabel=new JLabel("Address:  ",SwingConstants.RIGHT);
+      this._address = new JTextField("Enter Address", 16);
+      JLabel gap = new JLabel("                  ");
+      JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
+      this._port    = new JTextField(5);
+      this._port.addActionListener(this._controller);
+      this._address.requestFocus();
+      this._address.selectAll();
+
+      panel.add(addLabel);
+      panel.add(this._address);
+      panel.add(gap);
+      panel.add(portLabel);
+      panel.add(this._port);
+
+      return panel;
    }
 
    /**/

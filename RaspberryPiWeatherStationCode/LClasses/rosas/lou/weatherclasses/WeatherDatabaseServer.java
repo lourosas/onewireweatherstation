@@ -116,7 +116,7 @@ implements Runnable{
       List<String>   receiveData    = null;
       while(true){
          try{
-            byte data[]    = new byte[16384];
+            byte data[]    = new byte[8192];
             receivePacket  = new DatagramPacket(data, data.length);
             this._socket.receive(receivePacket);
             InetAddress addr = receivePacket.getAddress();
@@ -125,66 +125,10 @@ implements Runnable{
                                          receivePacket.getLength());
             System.out.println(addr);
             System.out.println(port);
-            String [] values = received.split(" ");
-            System.out.println(values[0]);
-            System.out.println(values[1]);
-            System.out.println(values[2]);
-            System.out.println(values[3]);
-            WeatherDatabase wdb = MySQLWeatherDatabase.getInstance();
-            List<String> wdl = null;
-            String command = new String("SELECT * FROM ");
-            String monthString=new  String("month = \'"+values[1]+"\'");
-            String dayString=new String(" AND day = \'"+values[2]+"\'");
-            String yearString=new String(" AND year = \'"+values[3]+"\'");
-            if(values[0].equals("TEMPERATURE")){
-               command = command.concat("temperaturedata WHERE ");
-               command = command.concat(monthString);
-               command = command.concat(dayString);
-               command = command.concat(yearString);
-               wdl     = wdb.temperature(command);
-            }
-            else if(values[0].equals("HUMIDITY")){
-               command = command.concat("humiditydata WHERE ");
-               command = command.concat(monthString);
-               command = command.concat(dayString);
-               command = command.concat(yearString);
-               wdl     = wdb.humidity(command);
-            }
-            else if(values[0].equals("PRESSURE")){
-               command = command.concat("pressuredata WHERE ");
-               command = command.concat(monthString);
-               command = command.concat(dayString);
-               command = command.concat(yearString);
-               wdl     = wdb.barometricPressure(command);
-            }
-            else if(values[0].equals("DEWPOINT")){
-               command = command.concat("dewpointdata WHERE ");
-               command = command.concat(monthString);
-               command = command.concat(dayString);
-               command = command.concat(yearString);
-               wdl     = wdb.dewpoint(command);
-            }
-            else if(values[0].equals("HEATINDEX")){
-               command = command.concat("heatindexdata WHERE ");
-               command = command.concat(monthString);
-               command = command.concat(dayString);
-               command = command.concat(yearString);
-               wdl     = wdb.heatIndex(command);
-            }
-            Iterator<String> it = wdl.iterator();
-            String currentData = new String();
-            while(it.hasNext()){
-               currentData = currentData.concat(it.next() + "\n");
-            }
-            data = currentData.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(data,
-                                                           data.length,
-                                                           addr,
-                                                           port);
-            this._socket.send(sendPacket);
+            System.out.println(received);
             String temp = "Send back something";
             data = temp.getBytes();
-            /*DatagramPacket*/ sendPacket = new DatagramPacket(data,
+            DatagramPacket sendPacket = new DatagramPacket(data,
                                                            data.length,
                                                            addr,
                                                            port);
