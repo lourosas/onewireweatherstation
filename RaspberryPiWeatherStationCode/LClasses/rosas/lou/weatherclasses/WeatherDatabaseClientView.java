@@ -40,11 +40,16 @@ public class WeatherDatabaseClientView extends GenericJFrame{
    private static final short WIDTH        = 750;
    private static final short HEIGHT       = 600;
    private static final short TOTAL_PANELS = 5;
+   private static String [] MONTHS = {"January", "February",
+   "March", "April", "May", "June", "July", "August", "September",
+   "October", "November", "December"};
 
    private WeatherDatabaseClientController _controller = null;
-   private JTextField _address = null;
-   private JTextField _port    = null;
-
+   private JTextField _address                         = null;
+   private JTextField _port                            = null;
+   private JComboBox<String> _MonthCB                  = null;
+   private JComboBox<String> _dayCB                    = null;
+   private JComboBox<String> _yearCB                   = null;
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
    /**/
