@@ -31,6 +31,8 @@ public class WeatherDatabaseClient{
 
    private DatagramSocket    _socket;
    private byte[]            _addr;
+   private int               _port;
+   private String[]           _dates;
    private String            _rawData;
    private List<WeatherData> _temperatureData;
    private List<WeatherData> _humidityData;
@@ -40,7 +42,10 @@ public class WeatherDatabaseClient{
 
    {
       //Open it "up" later when running...
-      _addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)114};
+      //_addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)114};
+      _addr = new byte[]{(byte)68, (byte)98, (byte)39, (byte)39};
+      _port            = PORT;
+      _dates           = new String[]{"January", "01", "2017"};
       _socket          = null;
       _rawData         = null;
       _temperatureData = null;
@@ -77,6 +82,46 @@ public class WeatherDatabaseClient{
       }
    }
 
+   /**/
+   public void setDay(String day){
+      this._dates[1] = day;
+   }
+
+   /**/
+   public void setMonth(String month){
+      this._dates[0] = month;
+   }
+
+   public void setYear(String year){
+      this._dates[2] = year;
+   }
+
+   /**/
+   public void setServerAddress(String address){
+      int [] addr = new int[4];
+      String [] values = address.split("\\.");
+      try{
+         for(int i = 0; i < values.length; i++){
+            addr[i] = Integer.parseInt(values[i]);
+         }
+         this._addr = new byte[]{(byte)addr[0],
+                                 (byte)addr[1],
+                                 (byte)addr[2],
+                                 (byte)addr[3]};
+      }
+      //Elevate this at some point
+      catch(NumberFormatException nfe){}
+   }
+
+   /**/
+   public void setServerPort(String port){
+      try{
+         this._port = Integer.parseInt(port.trim());
+      }
+      //Elevate this at some point
+      catch(NumberFormatException nfe){}
+   }
+
    //////////////////////Private Methods//////////////////////////////
    /*
    */
@@ -99,7 +144,7 @@ public class WeatherDatabaseClient{
          sendPacket = new DatagramPacket(temp,
                                          temp.length,
                                          iNetAddr,
-                                         PORT);
+                                         this._port);
 
          this._socket.send(sendPacket);
          receivePacket =

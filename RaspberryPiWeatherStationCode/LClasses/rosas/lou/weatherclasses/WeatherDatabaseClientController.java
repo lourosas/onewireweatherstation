@@ -72,11 +72,48 @@ ActionListener, KeyListener, ItemListener{
 
    /**/
    public void keyPressed(KeyEvent ke){
-      //System.out.println(ke);
+      try{
+         JTextField jt = ((JTextField)ke.getSource());
+         if(jt.getName().toUpperCase().equals("PORT")){
+            char k = ke.getKeyChar();
+            int  c = ke.getKeyCode();
+            if((k >= '0' && k <= '9') || c == KeyEvent.VK_BACK_SPACE){
+               jt.setEditable(true);
+            }
+            else{
+               jt.setEditable(false);
+            }
+         }
+         else if(jt.getName().toUpperCase().equals("ADDRESS")){
+            char k = ke.getKeyChar();
+            int  c = ke.getKeyCode();
+            if((k >= '0' && k <= '9') || k == '.' ||
+                c == KeyEvent.VK_BACK_SPACE){
+               jt.setEditable(true);
+            }
+            else{
+               jt.setEditable(false);
+            }
+         }
+      }
+      catch(ClassCastException cce){}
    }
 
    /**/
-   public void keyReleased(KeyEvent ke){}
+   public void keyReleased(KeyEvent ke){
+      try{
+         JTextField jt = ((JTextField)ke.getSource());
+         if(jt.getName().toUpperCase().equals("ADDRESS")){
+            //System.out.println(jt.getText());
+            this._model.setServerAddress(jt.getText());
+         }
+         else if(jt.getName().toUpperCase().equals("PORT")){
+            //System.out.println(jt.getText());
+            this._model.setServerPort(jt.getText());
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /**/
    public void keyTyped(KeyEvent ke){}
@@ -92,7 +129,13 @@ ActionListener, KeyListener, ItemListener{
       try{
          JComboBox jcb = ((JComboBox)ae.getSource());
          if(jcb.getName().toUpperCase().equals("MONTH")){
-            System.out.println((String)jcb.getSelectedItem());
+            this._model.setMonth((String)jcb.getSelectedItem());
+         }
+         else if(jcb.getName().toUpperCase().equals("DAY")){
+            this._model.setDay((String)jcb.getSelectedItem());
+         }
+         else if(jcb.getName().toUpperCase().equals("YEAR")){
+            this._model.setYear((String)jcb.getSelectedItem());
          }
       }
       catch(ClassCastException cce){}
@@ -105,8 +148,12 @@ ActionListener, KeyListener, ItemListener{
    private void handleJTextField(ActionEvent ae){
       try{
          JTextField jt = ((JTextField)ae.getSource());
-         String address = this._view.address().trim();
-         String port    = this._view.port().trim();
+         if(jt.getName().toUpperCase().equals("ADDRESS")){
+            this._model.setServerAddress(jt.getText());
+         }
+         else if(jt.getName().toUpperCase().equals("PORT")){
+            this._model.setServerPort(jt.getText());
+         }
       }
       catch(ClassCastException cce){}
    }
