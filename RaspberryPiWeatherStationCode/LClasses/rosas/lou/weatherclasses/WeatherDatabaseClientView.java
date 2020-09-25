@@ -43,11 +43,15 @@ public class WeatherDatabaseClientView extends GenericJFrame{
    private static String [] MONTHS = {"January", "February",
    "March", "April", "May", "June", "July", "August", "September",
    "October", "November", "December"};
+   private static String [] DAYS = {"01","02","03","04","05","06",
+   "07","08","09","10","11","12","13","14","15","16","17","18","19",
+   "20","21","22","23","24","25","26","27","28","29","30","31"};
+   private static String [] YEARS = {"2017", "2018", "2019", "2020"};
 
    private WeatherDatabaseClientController _controller = null;
    private JTextField _address                         = null;
    private JTextField _port                            = null;
-   private JComboBox<String> _MonthCB                  = null;
+   private JComboBox<String> _monthCB                  = null;
    private JComboBox<String> _dayCB                    = null;
    private JComboBox<String> _yearCB                   = null;
    ///////////////////////////Public Methods//////////////////////////
@@ -78,6 +82,17 @@ public class WeatherDatabaseClientView extends GenericJFrame{
    }
 
    //////////////////////////Private Methods//////////////////////////
+   /**/
+   private void setUpCurrentDate(){
+      Calendar now = Calendar.getInstance();
+      int month    = now.get(Calendar.MONTH);
+      int day      = now.get(Calendar.DAY_OF_MONTH) - 1;
+      int year     = now.get(Calendar.YEAR) - 2017;
+      this._monthCB.setSelectedIndex(month);
+      this._dayCB.setSelectedIndex(day);
+      this._yearCB.setSelectedIndex(year);
+   }
+
    /**/
    private JPanel setUpDewPointPanel(){
       JPanel dewPointPanel = new JPanel();
@@ -164,13 +179,42 @@ public class WeatherDatabaseClientView extends GenericJFrame{
       this._port.addActionListener(this._controller);
       this._address.requestFocus();
       this._address.selectAll();
-
+      this._monthCB = new JComboBox();
+      this._monthCB.setActionCommand("Month Combo Box");
+      this._monthCB.setName("Month");
+      this._monthCB.addActionListener(this._controller);
+      this._monthCB.addItemListener(this._controller);
+      this._monthCB.addKeyListener(this._controller);
+      for(int i = 0; i < this.MONTHS.length; i++){
+         this._monthCB.addItem(this.MONTHS[i].trim());
+      }
+      this._dayCB = new JComboBox();
+      this._dayCB.setActionCommand("Day Combo Box");
+      this._dayCB.setName("Day");
+      this._dayCB.addActionListener(this._controller);
+      this._dayCB.addItemListener(this._controller);
+      this._dayCB.addKeyListener(this._controller);
+      for(int i = 0; i < this.DAYS.length; i++){
+         this._dayCB.addItem(this.DAYS[i].trim());
+      }
+      this._yearCB = new JComboBox();
+      this._yearCB.setActionCommand("Year Combo Box");
+      this._yearCB.setName("Year");
+      this._yearCB.addActionListener(this._controller);
+      this._yearCB.addItemListener(this._controller);
+      this._yearCB.addKeyListener(this._controller);
+      for(int i = 0; i < this.YEARS.length; i++){
+         this._yearCB.addItem(this.YEARS[i].trim());
+      }
+      this.setUpCurrentDate();
       panel.add(addLabel);
       panel.add(this._address);
-      panel.add(gap);
       panel.add(portLabel);
       panel.add(this._port);
-
+      panel.add(gap);
+      panel.add(this._monthCB);
+      panel.add(this._dayCB);
+      panel.add(this._yearCB);
       return panel;
    }
 

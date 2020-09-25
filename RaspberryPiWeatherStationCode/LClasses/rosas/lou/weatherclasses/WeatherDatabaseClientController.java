@@ -21,7 +21,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import rosas.lou.calculator.*;
+import rosas.lou.weatherclasses.*;
 
 //////////////////////////////////////////////////////////////////////
 /*
@@ -65,13 +65,14 @@ ActionListener, KeyListener, ItemListener{
    public void actionPerformed(ActionEvent ae){
       //System.out.println(ae);
       this.handleJButton(ae);
+      this.handleJComboBox(ae);
       this.handleJMenuItem(ae);
       this.handleJTextField(ae);
    }
 
    /**/
    public void keyPressed(KeyEvent ke){
-      System.out.println(ke);
+      //System.out.println(ke);
    }
 
    /**/
@@ -85,6 +86,17 @@ ActionListener, KeyListener, ItemListener{
    ////////////////////////Private Methods////////////////////////////
    /**/
    private void handleJButton(ActionEvent ae){}
+
+   /**/
+   private void handleJComboBox(ActionEvent ae){
+      try{
+         JComboBox jcb = ((JComboBox)ae.getSource());
+         if(jcb.getName().toUpperCase().equals("MONTH")){
+            System.out.println((String)jcb.getSelectedItem());
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /**/
    private void handleJMenuItem(ActionEvent ae){}
