@@ -97,6 +97,11 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       catch(ClassCastException cce){}
+      try{
+         JButton button = ((JButton)ke.getSource());
+         button.doClick();
+      }
+      catch(ClassCastException cce){}
    }
 
    /**/
@@ -122,7 +127,15 @@ ActionListener, KeyListener, ItemListener{
    public void itemStateChanged(ItemEvent ie){}
    ////////////////////////Private Methods////////////////////////////
    /**/
-   private void handleJButton(ActionEvent ae){}
+   private void handleJButton(ActionEvent ae){
+      try{
+         JButton button = ((JButton)ae.getSource());
+         if(button.getActionCommand().equals("TemperatureRefresh")){
+            this._model.requestData("TEMPERATURE");
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /**/
    private void handleJComboBox(ActionEvent ae){

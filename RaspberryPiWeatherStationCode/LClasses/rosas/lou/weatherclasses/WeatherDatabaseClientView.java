@@ -49,6 +49,8 @@ public class WeatherDatabaseClientView extends GenericJFrame{
    private static String [] YEARS = {"2017", "2018", "2019", "2020"};
 
    private WeatherDatabaseClientController _controller = null;
+   //Really do not need these to be global any longer--handled by
+   //The Controller directly, realtime...
    private JTextField _address                         = null;
    private JTextField _port                            = null;
    private JComboBox<String> _monthCB                  = null;
@@ -245,7 +247,31 @@ public class WeatherDatabaseClientView extends GenericJFrame{
       temperaturePanel.setLayout(new BorderLayout());
       JLabel tempLabel = new JLabel("Temperature");
       temperaturePanel.add(tempLabel, BorderLayout.CENTER);
+      temperaturePanel.add(this.setUpTemperatureSouthPanel(),
+                                       BorderLayout.SOUTH);
       return temperaturePanel;
+   }
+
+   /**/
+   private JPanel setUpTemperatureSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("TemperatureRefresh");
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("TemperatureSave");
+      save.addActionListener(this._controller);
+      save.addKeyListener(this._controller);
+
+      panel.add(save);
+
+      return panel;
    }
 }
 //////////////////////////////////////////////////////////////////////

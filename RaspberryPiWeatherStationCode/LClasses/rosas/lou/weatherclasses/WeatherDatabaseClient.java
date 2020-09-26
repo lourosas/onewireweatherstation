@@ -61,6 +61,10 @@ public class WeatherDatabaseClient{
    */
    public WeatherDatabaseClient(){}
 
+   /**/
+   public void requestData(String measurement){
+      this.requestData(measurement, this._dates);
+   }
 
    /*
    */
