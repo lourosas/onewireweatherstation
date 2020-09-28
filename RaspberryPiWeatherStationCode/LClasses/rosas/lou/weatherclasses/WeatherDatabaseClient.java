@@ -24,6 +24,7 @@ import java.net.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import rosas.lou.weatherclasses.*;
+import com.sun.net.httpserver.*;
 
 public class WeatherDatabaseClient{
    private static final int PORT     = 20001;
@@ -121,6 +122,7 @@ public class WeatherDatabaseClient{
    public void setServerPort(String port){
       try{
          this._port = Integer.parseInt(port.trim());
+         //System.out.println(this._port);
       }
       //Elevate this at some point
       catch(NumberFormatException nfe){}
@@ -156,7 +158,7 @@ public class WeatherDatabaseClient{
          this._socket.receive(receivePacket);
          this._rawData = new String(receivePacket.getData());
 
-         System.out.println("Return Data:\n" + this._rawData);
+         //System.out.println("Return Data:\n" + this._rawData);
          System.out.println("addr: " + receivePacket.getAddress());
          System.out.println("port:  " + receivePacket.getPort());
          System.out.println("length:  " + receivePacket.getLength());
@@ -169,12 +171,29 @@ public class WeatherDatabaseClient{
          e.printStackTrace();
       }
    }
+
    /*
    */
    private void requestTemperatureData(String [] values){
       String requestString = new String("TEMPERATURE " + values[0]);
       requestString += " " + values[1] + " " + values[2];
       this.request(requestString);
+      String [] data = this._rawData.trim().split("\\n");
+      for(int i = 0; i < data.length; i++){
+         String [] value = data[i].split(",");
+         try{
+            Double t = Double.parseDouble(value[4].trim());
+            double temp = t.doubleValue();
+            WeatherData wd = new TemperatureData(Units.METRIC,
+                                                 temp,
+                                                 null,
+                                                 value[0],
+                                                 value[1],
+                                                 value[2],
+                                                 value[3]);
+         }
+         catch(NumberFormatException nfe){}
+      }
    }
 
    /*

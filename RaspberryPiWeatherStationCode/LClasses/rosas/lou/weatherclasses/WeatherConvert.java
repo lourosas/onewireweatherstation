@@ -6,14 +6,15 @@ import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
 
-import com.dalsemi.onewire.utils.Convert;
+//import com.dalsemi.onewire.utils.Convert;
 
 public class WeatherConvert{
    /*
    Converts a temperature from Celsius to Fahrenheit
    */
    public static double celsiusToFahrenheit(double celsius){
-      return Convert.toFahrenheit(celsius);
+      //return Convert.toFahrenheit(celsius);
+      return 1.8*celsius + 32;
    }
    
    /*
@@ -44,7 +45,8 @@ public class WeatherConvert{
    Converts a temperature from Fahrenheit to Celsius
    */
    public static double fahrenheitToCelsius(double fahrenheit){
-      return Convert.toCelsius(fahrenheit);
+      //return Convert.toCelsius(fahrenheit);
+      return (5.0/9.0)*(fahrenheit - 32.0);
    }
    
    /*

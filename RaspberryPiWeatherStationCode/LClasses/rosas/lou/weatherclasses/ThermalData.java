@@ -21,8 +21,8 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
 public class ThermalData implements WeatherData{
    protected double          _absolute;
@@ -31,6 +31,10 @@ public class ThermalData implements WeatherData{
    protected Calendar        _cal;
    protected WeatherDataType _type;
    protected String          _message;
+   protected String          _month;
+   protected String          _day;
+   protected String          _year;
+   protected String          _time;
    
    {
       _absolute = WeatherData.DEFAULTVALUE;
@@ -39,6 +43,10 @@ public class ThermalData implements WeatherData{
       _type     = WeatherDataType.TEMPERATURE;
       _cal      = null;
       _message  = null;
+      _month    = null;
+      _day      = null;
+      _year     = null;
+      _time     = null;
    };
    
    //******************Interface Implementation***********************
@@ -65,6 +73,26 @@ public class ThermalData implements WeatherData{
    /**/
    public Calendar calendar(){
       return this._cal;
+   }
+
+   /**/
+   public String month(){
+      return this._month;
+   }
+
+   /**/
+   public String day(){
+      return this._day;
+   }
+
+   /**/
+   public String year(){
+      return this._year;
+   }
+
+   /**/
+   public String time(){
+      return this._time;
    }
    
    /**/
@@ -104,6 +132,24 @@ public class ThermalData implements WeatherData{
          this._message = new String(message);
       }
       this._cal = cal;
+   }
+
+   /**/
+   public void data
+   (
+      Units units,
+      double data,
+      String message,
+      String month,
+      String year,
+      String day,
+      String time
+   ){
+      this.data(units, data, message);
+      this._month = new String(month);
+      this._day   = new String(day);
+      this._year  = new String(year);
+      this._time  = new String(time);
    }
 
    /**/
