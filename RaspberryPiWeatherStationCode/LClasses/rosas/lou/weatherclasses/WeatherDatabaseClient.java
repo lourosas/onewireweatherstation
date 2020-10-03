@@ -41,6 +41,8 @@ public class WeatherDatabaseClient{
    private List<WeatherData> _dewpointData;
    private List<WeatherData> _heatIndexData;
 
+   private List<WeatherDatabaseClientObserver> _observers;
+
    {
       //Open it "up" later when running...
       //_addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)114};
@@ -54,6 +56,7 @@ public class WeatherDatabaseClient{
       _pressureData    = null;
       _dewpointData    = null;
       _heatIndexData   = null;
+      _observers       = null;
    };
 
    /////////////////////////Public Methods////////////////////////////
@@ -130,6 +133,7 @@ public class WeatherDatabaseClient{
 
    //////////////////////Private Methods//////////////////////////////
    /*
+   Obviously going to have to throw a timeout exception
    */
    private void request(String command){
       DatagramPacket  sendPacket    = null;
@@ -186,14 +190,22 @@ public class WeatherDatabaseClient{
             double temp = t.doubleValue();
             WeatherData wd = new TemperatureData(Units.METRIC,
                                                  temp,
-                                                 null,
+                                                 "Temperature",
                                                  value[0],
                                                  value[1],
                                                  value[2],
                                                  value[3]);
+            try{
+               this._temperatureData.add(wd);
+            }
+            catch(NullPointerException npe){
+               this._temperatureData = new LinkedList<WeatherData>();
+               this._temperatureData.add(wd);
+            }
          }
          catch(NumberFormatException nfe){}
       }
+      System.out.println(this._temperatureData);
    }
 
    /*

@@ -98,8 +98,11 @@ ActionListener, KeyListener, ItemListener{
       }
       catch(ClassCastException cce){}
       try{
-         JButton button = ((JButton)ke.getSource());
-         button.doClick();
+         int code = ke.getKeyCode();
+         if(code == KeyEvent.VK_ENTER){
+            JButton button = ((JButton)ke.getSource());
+            button.doClick();
+         }
       }
       catch(ClassCastException cce){}
    }

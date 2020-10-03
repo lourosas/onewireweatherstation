@@ -45,6 +45,7 @@ public interface WeatherData{
    public String month();
    public String day();
    public String year();
+   public String time();
    public WeatherDataType type();
    public String toStringAbsolute();
    public String toStringEnglish();

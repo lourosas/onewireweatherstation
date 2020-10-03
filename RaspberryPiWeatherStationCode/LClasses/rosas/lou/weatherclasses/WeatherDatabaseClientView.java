@@ -36,7 +36,8 @@ import rosas.lou.lgraphics.TestPanel2;
 /*
 */
 //////////////////////////////////////////////////////////////////////
-public class WeatherDatabaseClientView extends GenericJFrame{
+public class WeatherDatabaseClientView extends GenericJFrame
+implements WeatherDatabaseClientObserver{
    private static final short WIDTH        = 750;
    private static final short HEIGHT       = 600;
    private static final short TOTAL_PANELS = 5;
@@ -82,6 +83,27 @@ public class WeatherDatabaseClientView extends GenericJFrame{
    public String port(){
       return this._port.getText();
    }
+
+   ///////WeatherDatabaseClientObserver Interface Implementaion///////
+   public void alertDewpointTimeout(){}
+
+   public void alertHeatIndexTimeout(){}
+
+   public void alertHumidityTimeout(){}
+
+   public void alertPressureTimeout(){}
+
+   public void alertTemperatureTimeout(){}
+
+   public void updateDewpointData(java.util.List<WeatherData> data){}
+
+   public void updateHeatIndexData(java.util.List<WeatherData> data){}
+
+   public void updateHumidityData(java.util.List<WeatherData> data){}
+
+   public void updatePressureData(java.util.List<WeatherData> data){}
+
+   public void updateTemperatureData(java.util.List<WeatherData> data){}
 
    //////////////////////////Private Methods//////////////////////////
    /**/
