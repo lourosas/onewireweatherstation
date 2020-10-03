@@ -48,6 +48,7 @@ ActionListener, KeyListener, ItemListener{
    ){
       this._view = view;
       this._model = new WeatherDatabaseClient();
+      this._model.addObserver(this._view);
    }
 
    /**/
@@ -58,6 +59,7 @@ ActionListener, KeyListener, ItemListener{
    ){
       this._view  = view;
       this._model = model;
+      this._model.addObserver(this._view);
    }
 
    /////////////////////////Public Methods////////////////////////////

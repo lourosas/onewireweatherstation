@@ -141,8 +141,8 @@ public class ThermalData implements WeatherData{
       double data,
       String message,
       String month,
-      String year,
       String day,
+      String year,
       String time
    ){
       this.data(units, data, message);

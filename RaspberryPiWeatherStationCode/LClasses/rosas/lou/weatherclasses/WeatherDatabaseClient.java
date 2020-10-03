@@ -66,6 +66,18 @@ public class WeatherDatabaseClient{
    public WeatherDatabaseClient(){}
 
    /**/
+   public void addObserver(WeatherDatabaseClientObserver observer){
+      try{
+         this._observers.add(observer);
+      }
+      catch(NullPointerException npe){
+         this._observers =
+                      new LinkedList<WeatherDatabaseClientObserver>();
+         this._observers.add(observer);
+      }
+   }
+
+   /**/
    public void requestData(String measurement){
       this.requestData(measurement, this._dates);
    }
@@ -135,7 +147,7 @@ public class WeatherDatabaseClient{
    /*
    Obviously going to have to throw a timeout exception
    */
-   private void request(String command){
+   private void request(String command) throws SocketTimeoutException{
       DatagramPacket  sendPacket    = null;
       DatagramPacket  receivePacket = null;
       List<String>    data          = new LinkedList();
@@ -169,7 +181,8 @@ public class WeatherDatabaseClient{
          System.out.println();
       }
       catch(SocketTimeoutException ste){
-         ste.printStackTrace();
+         //ste.printStackTrace();
+         throw ste;
       }
       catch(Exception e){
          e.printStackTrace();
@@ -181,62 +194,96 @@ public class WeatherDatabaseClient{
    private void requestTemperatureData(String [] values){
       String requestString = new String("TEMPERATURE " + values[0]);
       requestString += " " + values[1] + " " + values[2];
-      this.request(requestString);
-      String [] data = this._rawData.trim().split("\\n");
-      for(int i = 0; i < data.length; i++){
-         String [] value = data[i].split(",");
-         try{
-            Double t = Double.parseDouble(value[4].trim());
-            double temp = t.doubleValue();
-            WeatherData wd = new TemperatureData(Units.METRIC,
+      try{
+         this.request(requestString);
+         String [] data = this._rawData.trim().split("\\n");
+         for(int i = 0; i < data.length; i++){
+            String [] value = data[i].split(",");
+            try{
+               Double t = Double.parseDouble(value[4].trim());
+               double temp = t.doubleValue();
+               WeatherData wd = new TemperatureData(Units.METRIC,
                                                  temp,
                                                  "Temperature",
                                                  value[0],
                                                  value[1],
                                                  value[2],
                                                  value[3]);
-            try{
-               this._temperatureData.add(wd);
+               try{
+                  this._temperatureData.add(wd);
+               }
+               catch(NullPointerException npe){
+                  this._temperatureData=new LinkedList<WeatherData>();
+                  this._temperatureData.add(wd);
+               }
             }
-            catch(NullPointerException npe){
-               this._temperatureData = new LinkedList<WeatherData>();
-               this._temperatureData.add(wd);
-            }
+            //Will need to address this...
+            catch(NumberFormatException nfe){}
          }
-         catch(NumberFormatException nfe){}
+         //Alert all the Observers
+         Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+         while(it.hasNext()){
+            WeatherDatabaseClientObserver ob = it.next();
+            ob.updateTemperatureData(this._temperatureData);
+         }
       }
-      System.out.println(this._temperatureData);
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(SocketTimeoutException ste){
+         //Alert all the Observers
+         Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+         while(it.hasNext()){
+            WeatherDatabaseClientObserver ob = it.next();
+            ob.alertTemperatureTimeout();
+         }
+      }
+      //System.out.println(this._temperatureData);
    }
 
    /*
    */
    private void requestHumidityData(String [] values){
-      String requestString = new String("HUMIDITY " + values[0]);
-      requestString += " " + values[1] + " " + values[2];
-      this.request(requestString);
+      try{
+         String requestString = new String("HUMIDITY " + values[0]);
+         requestString += " " + values[1] + " " + values[2];
+         this.request(requestString);
+      }
+      catch(SocketTimeoutException ste){}
    }
 
    /*
    */
    private void requestPressureData(String [] values){
-      String requestString = new String("PRESSURE " + values[0]);
-      requestString += " " + values[1] + " " + values[2];
-      this.request(requestString);
+      try{
+         String requestString = new String("PRESSURE " + values[0]);
+         requestString += " " + values[1] + " " + values[2];
+         this.request(requestString);
+      }
+      catch(SocketTimeoutException ste){}
    }
 
    /*
    */
    private void requestDewpointData(String [] values){
-      String requestString = new String("DEWPOINT " + values[0]);
-      requestString += " " + values[1] + " " + values[2];
-      this.request(requestString);
+      try{
+         String requestString = new String("DEWPOINT " + values[0]);
+         requestString += " " + values[1] + " " + values[2];
+         this.request(requestString);
+      }
+      catch(SocketTimeoutException ste){}
    }
 
    /*
    */
    private void requestHeatIndexData(String [] values){
-      String requestString = new String("HEATINDEX " + values[0]);
-      requestString += " " + values[1] + " " + values[2];
-      this.request(requestString);
+      try{
+         String requestString = new String("HEATINDEX " + values[0]);
+         requestString += " " + values[1] + " " + values[2];
+         this.request(requestString);
+      }
+      catch(SocketTimeoutException ste){}
    }
 }

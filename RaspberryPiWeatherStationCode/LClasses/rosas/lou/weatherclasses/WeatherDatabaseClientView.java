@@ -103,7 +103,15 @@ implements WeatherDatabaseClientObserver{
 
    public void updatePressureData(java.util.List<WeatherData> data){}
 
-   public void updateTemperatureData(java.util.List<WeatherData> data){}
+   public void updateTemperatureData(java.util.List<WeatherData> data){
+      Iterator<WeatherData> it = data.iterator();
+      while(it.hasNext()){
+         WeatherData wd = it.next();
+         System.out.print(wd.month()+", "+ wd.day()+", "+wd.year());
+         System.out.print(", "+wd.time()+", ");
+         System.out.println(String.format("%.2f", wd.englishData()));
+      }
+   }
 
    //////////////////////////Private Methods//////////////////////////
    /**/
