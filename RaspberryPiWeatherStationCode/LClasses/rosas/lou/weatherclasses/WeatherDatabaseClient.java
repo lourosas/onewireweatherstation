@@ -35,10 +35,10 @@ public class WeatherDatabaseClient{
    private int               _port;
    private String[]           _dates;
    private String            _rawData;
-   private List<WeatherData> _humidityData;
-   private List<WeatherData> _pressureData;
-   private List<WeatherData> _dewpointData;
-   private List<WeatherData> _heatIndexData;
+   //private List<WeatherData> _humidityData;
+   //private List<WeatherData> _pressureData;
+   //private List<WeatherData> _dewpointData;
+   //private List<WeatherData> _heatIndexData;
 
    private List<WeatherDatabaseClientObserver> _observers;
 
@@ -50,10 +50,10 @@ public class WeatherDatabaseClient{
       _dates           = new String[]{"January", "01", "2017"};
       _socket          = null;
       _rawData         = null;
-      _humidityData    = null;
-      _pressureData    = null;
-      _dewpointData    = null;
-      _heatIndexData   = null;
+      //_humidityData    = null;
+      //_pressureData    = null;
+      //_dewpointData    = null;
+      //_heatIndexData   = null;
       _observers       = null;
    };
 

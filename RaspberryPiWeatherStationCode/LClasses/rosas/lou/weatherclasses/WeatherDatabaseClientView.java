@@ -278,8 +278,56 @@ implements WeatherDatabaseClientObserver{
       JLabel tempLabel = new JLabel("Temperature");
       temperaturePanel.add(tempLabel, BorderLayout.CENTER);
       temperaturePanel.add(this.setUpTemperatureSouthPanel(),
-                                       BorderLayout.SOUTH);
+                                                  BorderLayout.SOUTH);
+      temperaturePanel.add(this.setUpTemperatureNorthPanel(),
+                                                  BorderLayout.NORTH);
       return temperaturePanel;
+   }
+
+   /**/
+   private JPanel setUpTemperatureNorthPanel(){
+      JPanel panel                 = new JPanel();
+      ButtonGroup temperatureGroup = new ButtonGroup();
+      ButtonGroup dataGroup        = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel temperaturePanel = new JPanel();
+      JRadioButton celsius    = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("TCelsius");
+      temperatureGroup.add(celsius);
+      temperaturePanel.add(celsius);
+      celsius.addItemListener(this._controller);
+      //Add another listener...
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("TFahrenheit");
+      temperatureGroup.add(fahrenheit);
+      temperaturePanel.add(fahrenheit);
+      fahrenheit.addItemListener(this._controller);
+      //Add another listener...
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("TKelvin");
+      temperatureGroup.add(kelvin);
+      temperaturePanel.add(kelvin);
+      kelvin.addItemListener(this._controller);
+      //Add another listener...
+
+      panel.add(temperaturePanel);
+
+      JPanel dataPanel = new JPanel();
+
+      JRadioButton graph = new JRadioButton("Graph", true);
+      graph.setActionCommand("TData");
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+      graph.addItemListener(this._controller);
+      //Add another Listener...
+      JRadioButton data = new JRadioButton("Data");
+      dataGroup.add(data);
+      dataPanel.add(data);
+      data.addItemListener(this._controller);
+      //Add another Listener...
+      panel.add(dataPanel);
+      return panel;
    }
 
    /**/
