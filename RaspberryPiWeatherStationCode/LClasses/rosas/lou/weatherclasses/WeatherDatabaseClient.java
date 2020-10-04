@@ -35,7 +35,6 @@ public class WeatherDatabaseClient{
    private int               _port;
    private String[]           _dates;
    private String            _rawData;
-   private List<WeatherData> _temperatureData;
    private List<WeatherData> _humidityData;
    private List<WeatherData> _pressureData;
    private List<WeatherData> _dewpointData;
@@ -51,7 +50,6 @@ public class WeatherDatabaseClient{
       _dates           = new String[]{"January", "01", "2017"};
       _socket          = null;
       _rawData         = null;
-      _temperatureData = null;
       _humidityData    = null;
       _pressureData    = null;
       _dewpointData    = null;
@@ -197,6 +195,7 @@ public class WeatherDatabaseClient{
       try{
          this.request(requestString);
          String [] data = this._rawData.trim().split("\\n");
+         List<WeatherData> td = new LinkedList<WeatherData>();
          for(int i = 0; i < data.length; i++){
             String [] value = data[i].split(",");
             try{
@@ -209,13 +208,7 @@ public class WeatherDatabaseClient{
                                                  value[1],
                                                  value[2],
                                                  value[3]);
-               try{
-                  this._temperatureData.add(wd);
-               }
-               catch(NullPointerException npe){
-                  this._temperatureData=new LinkedList<WeatherData>();
-                  this._temperatureData.add(wd);
-               }
+               td.add(wd);
             }
             //Will need to address this...
             catch(NumberFormatException nfe){}
@@ -225,9 +218,10 @@ public class WeatherDatabaseClient{
                                            this._observers.iterator();
          while(it.hasNext()){
             WeatherDatabaseClientObserver ob = it.next();
-            ob.updateTemperatureData(this._temperatureData);
+            ob.updateTemperatureData(td);
          }
       }
+      catch(ArrayIndexOutOfBoundsException aiobe){}
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
@@ -240,7 +234,6 @@ public class WeatherDatabaseClient{
             ob.alertTemperatureTimeout();
          }
       }
-      //System.out.println(this._temperatureData);
    }
 
    /*
