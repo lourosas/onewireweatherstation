@@ -30,7 +30,7 @@ import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
-import rosas.lou.lgraphics.TestPanel2;
+import rosas.lou.lgraphics.WeatherPanel;
 
 //////////////////////////////////////////////////////////////////////
 /*
@@ -54,11 +54,11 @@ implements WeatherDatabaseClientObserver{
    private WeatherDatabaseClientController _controller = null;
    //Really do not need these to be global any longer--handled by
    //The Controller directly, realtime...
-   private JTextField _address                         = null;
-   private JTextField _port                            = null;
-   private JComboBox<String> _monthCB                  = null;
-   private JComboBox<String> _dayCB                    = null;
-   private JComboBox<String> _yearCB                   = null;
+   private JTextField _address        = null;
+   private JTextField _port           = null;
+   private JComboBox<String> _monthCB = null;
+   private JComboBox<String> _dayCB   = null;
+   private JComboBox<String> _yearCB  = null;
 
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
@@ -150,8 +150,28 @@ implements WeatherDatabaseClientObserver{
                System.out.println(String.format("%.2f",wd.metricData()));
             }
          }
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("TEMPERATURE")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            //drawPanel.setBackground(Color.BLUE);
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new WeatherPanel(data, this.temperatureUnits),
+                                                 BorderLayout.CENTER);
+         jtp.setSelectedIndex(tempTab + 1);
+         jtp.setSelectedIndex(tempTab);
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){npe.printStackTrace();}
    }
 
    /**/
@@ -337,8 +357,11 @@ implements WeatherDatabaseClientObserver{
    private JPanel setUpTemperaturePanel(){
       JPanel temperaturePanel = new JPanel();
       temperaturePanel.setLayout(new BorderLayout());
+      JPanel centerPanel = new JPanel();
       JLabel tempLabel = new JLabel("Temperature");
-      temperaturePanel.add(tempLabel, BorderLayout.CENTER);
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      centerPanel.add(tempLabel);
+      temperaturePanel.add(centerPanel, BorderLayout.CENTER);
       temperaturePanel.add(this.setUpTemperatureSouthPanel(),
                                                   BorderLayout.SOUTH);
       temperaturePanel.add(this.setUpTemperatureNorthPanel(),
