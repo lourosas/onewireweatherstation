@@ -129,7 +129,18 @@ ActionListener, KeyListener, ItemListener{
    public void keyTyped(KeyEvent ke){}
 
    /**/
-   public void itemStateChanged(ItemEvent ie){}
+   public void itemStateChanged(ItemEvent ie){
+      try{
+         AbstractButton ab = (AbstractButton)ie.getSource();
+         if(ab.isSelected()){
+            String command = ab.getActionCommand();
+            if(command.contains("T")){
+               this.handleTemperatureItemSelection(command);
+            }
+         }
+      }
+      catch(ClassCastException cce){}
+   }
    ////////////////////////Private Methods////////////////////////////
    /**/
    private void handleJButton(ActionEvent ae){
@@ -174,5 +185,27 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       catch(ClassCastException cce){}
+   }
+
+   /**/
+   private void handleTemperatureItemSelection(String command){
+      if(command.toUpperCase().equals("TCELSIUS")){
+         this._view.setTemperatureUnits(Units.METRIC);
+      }
+      else if(command.toUpperCase().equals("TFAHRENHEIT")){
+         this._view.setTemperatureUnits(Units.ENGLISH);
+      }
+      else if(command.toUpperCase().equals("TKELVIN")){
+         this._view.setTemperatureUnits(Units.ABSOLUTE);
+      }
+      else if(command.toUpperCase().equals("TGRAPH")){
+         //GRAPH = 0
+         this._view.setTemperatureDisplay((short)0);
+      }
+      else if(command.toUpperCase().equals("TDATA")){
+         //DATA = 1
+         this._view.setTemperatureDisplay((short)1);
+      }
+      this._model.publishTemperatureData();
    }
 }

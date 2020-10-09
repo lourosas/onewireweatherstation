@@ -38,6 +38,8 @@ import rosas.lou.lgraphics.TestPanel2;
 //////////////////////////////////////////////////////////////////////
 public class WeatherDatabaseClientView extends GenericJFrame
 implements WeatherDatabaseClientObserver{
+   private static final short GRAPH        = 0;
+   private static final short DATA         = 1;
    private static final short WIDTH        = 750;
    private static final short HEIGHT       = 600;
    private static final short TOTAL_PANELS = 5;
@@ -57,6 +59,12 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _monthCB                  = null;
    private JComboBox<String> _dayCB                    = null;
    private JComboBox<String> _yearCB                   = null;
+
+   private Units dewpointUnits    = Units.METRIC;
+   private Units temperatureUnits = Units.METRIC;
+   private Units heatIndexUnits   = Units.METRIC;
+   private short tempDisplay      = GRAPH;
+
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
    /**/
@@ -104,16 +112,70 @@ implements WeatherDatabaseClientObserver{
    public void updatePressureData(java.util.List<WeatherData> data){}
 
    public void updateTemperatureData(java.util.List<WeatherData> data){
-      Iterator<WeatherData> it = data.iterator();
-      while(it.hasNext()){
-         WeatherData wd = it.next();
-         System.out.print(wd.month()+", "+ wd.day()+", "+wd.year());
-         System.out.print(", "+wd.time()+", ");
-         System.out.println(String.format("%.2f", wd.englishData()));
+      if(this.tempDisplay == GRAPH){
+         this.graphTemperature(data);
       }
+      else{
+         this.printTemperature(data);
+      }
+
+   }
+
+   /**/
+   public void setTemperatureDisplay(short display){
+      this.tempDisplay = display;
+   }
+
+   /**/
+   public void setTemperatureUnits(Units units){
+      this.temperatureUnits = units;
    }
 
    //////////////////////////Private Methods//////////////////////////
+   /**/
+   private void graphTemperature(java.util.List<WeatherData> data){
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
+            System.out.print(" "+wd.time()+", ");
+            if(this.temperatureUnits == Units.ABSOLUTE){
+               System.out.println(String.format("%.2f",wd.absoluteData()));
+            }
+            else if(this.temperatureUnits == Units.ENGLISH){
+               System.out.println(String.format("%.2f",wd.englishData()));
+            }
+            else if(this.temperatureUnits == Units.METRIC){
+               System.out.println(String.format("%.2f",wd.metricData()));
+            }
+         }
+      }
+      catch(NullPointerException npe){}
+   }
+
+   /**/
+   private void printTemperature(java.util.List<WeatherData> data){
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
+            System.out.print(" "+wd.time()+", ");
+            if(this.temperatureUnits == Units.ABSOLUTE){
+               System.out.println(String.format("%.2f",wd.absoluteData()));
+            }
+            else if(this.temperatureUnits == Units.ENGLISH){
+               System.out.println(String.format("%.2f",wd.englishData()));
+            }
+            else if(this.temperatureUnits == Units.METRIC){
+               System.out.println(String.format("%.2f",wd.metricData()));
+            }
+         }
+      }
+      catch(NullPointerException npe){}
+   }
+
    /**/
    private void setUpCurrentDate(){
       Calendar now = Calendar.getInstance();
@@ -316,12 +378,13 @@ implements WeatherDatabaseClientObserver{
       JPanel dataPanel = new JPanel();
 
       JRadioButton graph = new JRadioButton("Graph", true);
-      graph.setActionCommand("TData");
+      graph.setActionCommand("TGraph");
       dataGroup.add(graph);
       dataPanel.add(graph);
       graph.addItemListener(this._controller);
       //Add another Listener...
       JRadioButton data = new JRadioButton("Data");
+      data.setActionCommand("TData");
       dataGroup.add(data);
       dataPanel.add(data);
       data.addItemListener(this._controller);

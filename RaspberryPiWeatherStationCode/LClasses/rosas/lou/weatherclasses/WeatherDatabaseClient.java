@@ -35,10 +35,11 @@ public class WeatherDatabaseClient{
    private int               _port;
    private String[]           _dates;
    private String            _rawData;
-   //private List<WeatherData> _humidityData;
-   //private List<WeatherData> _pressureData;
-   //private List<WeatherData> _dewpointData;
-   //private List<WeatherData> _heatIndexData;
+   private List<WeatherData> _temperatureData;
+   private List<WeatherData> _humidityData;
+   private List<WeatherData> _pressureData;
+   private List<WeatherData> _dewpointData;
+   private List<WeatherData> _heatIndexData;
 
    private List<WeatherDatabaseClientObserver> _observers;
 
@@ -50,10 +51,11 @@ public class WeatherDatabaseClient{
       _dates           = new String[]{"January", "01", "2017"};
       _socket          = null;
       _rawData         = null;
-      //_humidityData    = null;
-      //_pressureData    = null;
-      //_dewpointData    = null;
-      //_heatIndexData   = null;
+      _temperatureData = null;
+      _humidityData    = null;
+      _pressureData    = null;
+      _dewpointData    = null;
+      _heatIndexData   = null;
       _observers       = null;
    };
 
@@ -72,6 +74,17 @@ public class WeatherDatabaseClient{
          this._observers =
                       new LinkedList<WeatherDatabaseClientObserver>();
          this._observers.add(observer);
+      }
+   }
+
+   /**/
+   public void publishTemperatureData(){
+      //Alert all the Observers
+      Iterator<WeatherDatabaseClientObserver> it =
+                                        this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver ob = it.next();
+         ob.updateTemperatureData(this._temperatureData);
       }
    }
 
@@ -213,13 +226,10 @@ public class WeatherDatabaseClient{
             //Will need to address this...
             catch(NumberFormatException nfe){}
          }
-         //Alert all the Observers
-         Iterator<WeatherDatabaseClientObserver> it =
-                                           this._observers.iterator();
-         while(it.hasNext()){
-            WeatherDatabaseClientObserver ob = it.next();
-            ob.updateTemperatureData(td);
-         }
+         //Save it globally
+         this._temperatureData = td;
+         this.publishTemperatureData();
+
       }
       catch(ArrayIndexOutOfBoundsException aiobe){}
       catch(NullPointerException npe){
