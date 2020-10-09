@@ -1,6 +1,7 @@
-cd /home/pi/javaclasses/rosas/lou
+clear
+cd /home/lou/javaclasses/rosas/lou
 find . -name '*.class' -delete
-cd /home/pi/javaclasses/myclasses
+cd /home/lou/javaclasses/myclasses
 find . -name '*.class' -delete
-cd /home/pi/bin
+cd /home/lou/bin/
 find . -name '*.class' -delete
