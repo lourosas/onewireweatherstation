@@ -162,7 +162,6 @@ implements WeatherDatabaseClientObserver{
          JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
          JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
          if(drawPanel.getComponentCount() > 0){
-            //drawPanel.setBackground(Color.BLUE);
             drawPanel.removeAll();
          }
          drawPanel.setLayout(new BorderLayout());
