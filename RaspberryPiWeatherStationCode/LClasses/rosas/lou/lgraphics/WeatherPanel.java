@@ -135,7 +135,40 @@ public class WeatherPanel extends JPanel{
    }
 
    /**/
-   private void setXAxis(Graphics2D g2){}
+   private void setXAxis(Graphics2D g2){
+      Iterator<WeatherData> it = this._data.iterator();
+      int h                    = this.getHeight();
+      int w                    = this.getWidth();
+      int value                = 0;
+
+      Font font             = g2.getFont();
+      FontRenderContext frc = g2.getFontRenderContext();
+      LineMetrics lm        = font.getLineMetrics("0", frc);
+
+      float sh   = lm.getAscent() - lm.getDescent();
+      float sy   = h - sh;
+      String s   = "x-axis";
+      float sw   = (float)font.getStringBounds(s, frc).getWidth();
+      float sx   = (w - sw);
+      float xinc = (w - PAD)/(float)this._data.size();
+
+      String currentHour = "-"; //put something in for comparison
+      while(it.hasNext()){
+         String time = it.next().time();
+         String hour = time.split(":")[0];
+         if(!currentHour.equals(hour)){
+            currentHour = hour;
+            s = hour + ":" + time.split(":")[1];
+            sy = h;
+            sw = (float)font.getStringBounds(s,frc).getWidth();
+            sx = PAD + value*xinc - sw/2;
+            System.out.println(s);
+            System.out.println(sx);
+            g2.drawString(s, sx, sy);
+         }
+         ++value;
+      }
+   }
 
    /**/
    private void setYAxis(Graphics2D g2){}
