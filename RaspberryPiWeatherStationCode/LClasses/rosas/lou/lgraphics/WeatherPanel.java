@@ -36,10 +36,14 @@ public class WeatherPanel extends JPanel{
 
    /**/
    public void paintComponent(Graphics g){
+      int TINCREMENT = 1440;
+
       super.paintComponent(g);
       this.setBackground(Color.WHITE);
       Graphics2D g2    = (Graphics2D)g;
       double increment = this._data.size();
+
+      //double increment = 1440.0;
       int h            = this.getHeight();
       int w            = this.getWidth();
 
@@ -79,8 +83,21 @@ public class WeatherPanel extends JPanel{
             data2 = this._data.get(i+1).percentageData();
          }
          double dy1, dy2;
-         double dx1 = PAD + i * ((w - PAD)/increment);
-         double dx2 = PAD + (i + 1) * ((w - PAD)/increment);
+         String time1 = this._data.get(i).time();
+         String time2 = this._data.get(i+1).time();
+         int hour1 = 0; int hour2 = 0; int min1 = 0; int min2 = 0;
+         int value1 = 0; int value2 = 0;
+         try{
+            hour1 = Integer.parseInt(time1.split(":")[0].trim());
+            hour2 = Integer.parseInt(time2.split(":")[0].trim());
+            min1  = Integer.parseInt(time1.split(":")[1].trim());
+            min2  = Integer.parseInt(time2.split(":")[1].trim());
+            value1 = hour1*60+min1;
+            value2 = hour2*60+min2;
+         }
+         catch(NumberFormatException nfe){ nfe.printStackTrace();}
+         double dx1 = (PAD + value1 * (w-PAD)/TINCREMENT);
+         double dx2 = (PAD + value2 * (w-PAD)/TINCREMENT);
          dy1 = h-PAD-(data1 - min)*yinc;
          dy2 = h-PAD-(data2 - min)*yinc;
          //g2.fill(new Ellipse2D.Double(dx1-2, dy1-2, 4, 4));
@@ -136,40 +153,36 @@ public class WeatherPanel extends JPanel{
 
    /**/
    private void setXAxis(Graphics2D g2){
+      int HOURS                = 24;
       Iterator<WeatherData> it = this._data.iterator();
       int h                    = this.getHeight();
       int w                    = this.getWidth();
       int value                = 0;
 
-      Font font             = g2.getFont();
-      FontRenderContext frc = g2.getFontRenderContext();
-      LineMetrics lm        = font.getLineMetrics("0", frc);
+      Font font                = g2.getFont();
+      FontRenderContext frc    = g2.getFontRenderContext();
+      LineMetrics lm           = font.getLineMetrics("0", frc);
 
       float sh   = lm.getAscent() - lm.getDescent();
       float sy   = h - sh;
       String s   = "x-axis";
       float sw   = (float)font.getStringBounds(s, frc).getWidth();
       float sx   = (w - sw);
-      float xinc = (w - PAD)/(float)this._data.size();
-
-      String currentHour = "-"; //put something in for comparison
-      while(it.hasNext()){
-         String time = it.next().time();
-         String hour = time.split(":")[0];
-         if(!currentHour.equals(hour)){
-            currentHour = hour;
-            s = hour + ":" + time.split(":")[1];
-            sy = h;
-            sw = (float)font.getStringBounds(s,frc).getWidth();
-            sx = PAD + value*xinc - sw/2;
-            System.out.println(s);
-            System.out.println(sx);
+      //float xinc = (w - PAD)/(float)this._data.size();
+      float xinc = (w - PAD)/(float)HOURS;
+      for(int i = 0; i < HOURS; i++){
+         s  = i + ":00";
+         sy = h;
+         sw = (float)font.getStringBounds(s,frc).getWidth();
+         sx = PAD + i*xinc - sw/2;
+         if(i%6 == 0 || i == 23){
             g2.drawString(s, sx, sy);
          }
-         ++value;
       }
    }
 
    /**/
-   private void setYAxis(Graphics2D g2){}
+   private void setYAxis(Graphics2D g2){
+      
+   }
 }
