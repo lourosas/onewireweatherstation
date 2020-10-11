@@ -183,6 +183,60 @@ public class WeatherPanel extends JPanel{
 
    /**/
    private void setYAxis(Graphics2D g2){
-      
+      final double MID = 2.5;
+      double increment = this._data.size();
+      int h = this.getHeight();
+      int w = this.getWidth();
+
+      Font font             = g2.getFont();
+      FontRenderContext frc = g2.getFontRenderContext();
+      LineMetrics lm        = font.getLineMetrics("0", frc);
+      float sh = lm.getAscent() + lm.getDescent();
+
+      g2.setPaint(Color.BLACK);
+      g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
+      g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+      //Now, try to start drawing the y-axis text
+      float yinc = (h - PAD)/(float)(this.max() - this.min());
+      for(int i = (int)this.min() - 1; i < (int)this.max() + 1; i++){
+         if((i % 5) == 0 || i == ((int)this.min() - 1)){
+            String s = new String("" + i);
+            float sw = (float)font.getStringBounds(s,frc).getWidth();
+            float sx = (PAD - sw)/2;
+            float sy = h - PAD - (i-((int)this.min()-1))*yinc+sh/4;
+            g2.drawString(s, sx, sy);
+            if(i!=((int)this.min()-1) || i!=((int)this.max()+1)){
+               sy -= sh/4;
+               g2.draw(new Line2D.Double(PAD,sy,w,sy));
+            }
+            if((i!=(int)this.min()-1) && (i-(this.min()-1)>=2*MID)){
+               float f = (float)i - (float)MID;
+               s  = new String("" + f);
+               sw = (float)font.getStringBounds(s,frc).getWidth();
+               sx = (PAD - sw)/2;
+               sy = h - PAD -(f -((int)this.min() - 1))*yinc + sh/4;
+               g2.drawString(s, sx, sy);
+            }
+         }
+         else if(i==((int)this.max()-2)&&
+                 (((int)this.max()-1)%5>MID)||
+                 (((int)this.max()-1)%5==0)){
+            String s = "";
+            float sx, sy, sw;
+            sx = sy = sw = (float)0;
+            if((int)(this.max() - 1) % 5 > MID){
+               s = new String("" + i);
+               sy = h - PAD -(i -((int)this.min()-1)*yinc+sh/4);
+            }
+            else{
+               float f = ((int)this.max() + 1) - (float)MID;
+               s = new String("" + f);
+               sy=h-PAD - (f - ((int)this.min() - 1)) * yinc + sh/4;
+            }
+            sw = (float)font.getStringBounds(s,frc).getWidth();
+            sx = (PAD - sw)/2;
+            g2.drawString(s,sx,sy);
+         }
+      }
    }
 }
