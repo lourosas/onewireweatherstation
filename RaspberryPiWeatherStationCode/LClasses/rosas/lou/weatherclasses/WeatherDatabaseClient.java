@@ -214,6 +214,7 @@ public class WeatherDatabaseClient{
             try{
                Double t = Double.parseDouble(value[4].trim());
                double temp = t.doubleValue();
+               /*units,data,message,month,day,year,time*/
                WeatherData wd = new TemperatureData(Units.METRIC,
                                                  temp,
                                                  "Temperature",
