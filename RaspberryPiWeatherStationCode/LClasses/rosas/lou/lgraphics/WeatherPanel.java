@@ -46,9 +46,11 @@ public class WeatherPanel extends JPanel{
       //double increment = 1440.0;
       int h            = this.getHeight();
       int w            = this.getWidth();
-
       this.setXAxis(g2);
-      this.setYAxis(g2);
+      if(this._data.get(0).type() != WeatherDataType.PRESSURE){
+         this.setTypicalYAxis(g2);
+      }
+      else{}
       g2.setPaint(Color.BLUE);
       double max = this.max();
       double min = this.min();
@@ -182,21 +184,15 @@ public class WeatherPanel extends JPanel{
    }
 
    /**/
-   private void setYAxis(Graphics2D g2){
+   private void setTypicalYAxis(Graphics2D g2){
       final double MID = 2.5;
       int increment    = this._data.size();
       int h            = this.getHeight();
       int w            = this.getWidth();
       double min       = this.min();
       double max       = this.max();
-      if(this._data.get(0).type() != WeatherDataType.PRESSURE){
-         max += 1.0;
-         min -= 1.0;
-      }
-      else{
-         max += 0.30;
-         min -= 0.30;
-      }
+      max += 1.0;
+      min -= 1.0;
 
       Font font             = g2.getFont();
       FontRenderContext frc = g2.getFontRenderContext();
