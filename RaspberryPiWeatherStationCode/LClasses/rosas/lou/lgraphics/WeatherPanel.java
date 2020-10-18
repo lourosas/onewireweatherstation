@@ -57,8 +57,8 @@ public class WeatherPanel extends JPanel{
          min -= 1.0;
       }
       else{
-         max += 0.10;
-         min -= 0.10;
+         max += 0.30;
+         min -= 0.30;
       }
       double yinc = (h - PAD)/(double)(max - min);
       for(int i = 0; i < increment - 1; i++){
@@ -184,59 +184,90 @@ public class WeatherPanel extends JPanel{
    /**/
    private void setYAxis(Graphics2D g2){
       final double MID = 2.5;
-      double increment = this._data.size();
-      int h = this.getHeight();
-      int w = this.getWidth();
+      int increment    = this._data.size();
+      int h            = this.getHeight();
+      int w            = this.getWidth();
+      double min       = this.min();
+      double max       = this.max();
+      if(this._data.get(0).type() != WeatherDataType.PRESSURE){
+         max += 1.0;
+         min -= 1.0;
+      }
+      else{
+         max += 0.30;
+         min -= 0.30;
+      }
 
       Font font             = g2.getFont();
       FontRenderContext frc = g2.getFontRenderContext();
       LineMetrics lm        = font.getLineMetrics("0", frc);
-      float sh = lm.getAscent() + lm.getDescent();
+      float sh              = lm.getAscent() + lm.getDescent();
 
       g2.setPaint(Color.BLACK);
       g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
       g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
       //Now, try to start drawing the y-axis text
-      float yinc = (h - PAD)/(float)(this.max() - this.min());
-      for(int i = (int)this.min() - 1; i < (int)this.max() + 1; i++){
-         if((i % 5) == 0 || i == ((int)this.min() - 1)){
-            String s = new String("" + i);
-            float sw = (float)font.getStringBounds(s,frc).getWidth();
-            float sx = (PAD - sw)/2;
-            float sy = h - PAD - (i-((int)this.min()-1))*yinc+sh/4;
-            g2.drawString(s, sx, sy);
-            if(i!=((int)this.min()-1) || i!=((int)this.max()+1)){
-               sy -= sh/4;
+      double yinc = (h - PAD)/(double)(max - min);
+      double value = min;
+      while(value < max){
+         int temp = (int)value;
+         if((temp % 5) == 0 || value == min){
+            String s = new String("" + temp);
+            double sw=(double)font.getStringBounds(s,frc).getWidth();
+            double sx = (PAD - sw)/2.0;
+            double sy = h - PAD -(temp - min)*yinc +sh/4;
+            if(temp % 5 != 4){
+               g2.drawString(s, (float)sx, (float)sy);
+            }
+            if(value != min){
+               sy = h - PAD -(temp - min)*yinc;
                g2.draw(new Line2D.Double(PAD,sy,w,sy));
             }
-            if((i!=(int)this.min()-1) && (i-(this.min()-1)>=2*MID)){
+         }
+         value += 1.0;
+      }
+      /*
+      for(int i = (int)min; i < (int)max; i++){
+         if((i % 5) == 0 || i == (int)min){
+            String s = new String("" + i);
+            float sw=(float)font.getStringBounds(s,frc).getWidth();
+            float sx = (PAD - sw)/2;
+            float sy = h - PAD - ((double)i - min)*yinc + sh/4;
+            g2.drawString(s, sx, sy);
+            if(i != min || i != max){
+               //Draw the line
+               //sy -= sh/4;
+               sy = h - PAD - ((double)i - min)*yinc;
+               g2.draw(new Line2D.Double(PAD,sy,w,sy));
+            }
+            if(i != min && ((i - min) >- 2*MID)){
                float f = (float)i - (float)MID;
-               s  = new String("" + f);
-               sw = (float)font.getStringBounds(s,frc).getWidth();
+               s = new String("" + f);
+               sw = (float)font.getStringBounds(s, frc).getWidth();
                sx = (PAD - sw)/2;
-               sy = h - PAD -(f -((int)this.min() - 1))*yinc + sh/4;
+               sy = h - PAD - (f - min)*yinc + sh/4;
                g2.drawString(s, sx, sy);
             }
          }
-         else if(i==((int)this.max()-2)&&
-                 (((int)this.max()-1)%5>MID)||
-                 (((int)this.max()-1)%5==0)){
+         else if(i == max -1 && (max % 5 > MID || max % 5 == 0)){
             String s = "";
             float sx, sy, sw;
             sx = sy = sw = (float)0;
-            if((int)(this.max() - 1) % 5 > MID){
+            if(max % 5 > MID){
                s = new String("" + i);
-               sy = h - PAD -(i -((int)this.min()-1)*yinc+sh/4);
+               sy = h - PAD - (i - min)*yinc + sh/4;
             }
             else{
-               float f = ((int)this.max() + 1) - (float)MID;
+               float f = (float)max - (float)MID;
                s = new String("" + f);
-               sy=h-PAD - (f - ((int)this.min() - 1)) * yinc + sh/4;
+               sy = h - PAD - (f - min)*yinc + sh/4;
             }
             sw = (float)font.getStringBounds(s,frc).getWidth();
             sx = (PAD - sw)/2;
-            g2.drawString(s,sx,sy);
+            g2.drawString(s, sx, sy);
          }
       }
+      */
    }
+
 }
