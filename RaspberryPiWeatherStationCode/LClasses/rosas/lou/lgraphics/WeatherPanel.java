@@ -108,7 +108,7 @@ public class WeatherPanel extends JPanel{
    }
 
    /**/
-   private double max(){
+   private double max() throws NumberFormatException{
       double max = Double.NEGATIVE_INFINITY;
       Iterator<WeatherData> it = this._data.iterator();
       while(it.hasNext()){
@@ -123,6 +123,12 @@ public class WeatherPanel extends JPanel{
          else if(this._units == Units.ABSOLUTE){
             value = it.next().absoluteData();
          }
+         else if(this._units == Units.PERCENTAGE){
+            value = it.next().percentageData();
+         }
+         else{
+            throw new NumberFormatException();
+         }
          if(value > max){
             max = value;
          }
@@ -131,7 +137,7 @@ public class WeatherPanel extends JPanel{
    }
 
    /**/
-   private double min(){
+   private double min() throws NumberFormatException{
       double min = Double.POSITIVE_INFINITY;
       Iterator<WeatherData> it = this._data.iterator();
       while(it.hasNext()){
@@ -145,6 +151,12 @@ public class WeatherPanel extends JPanel{
          }
          else if(this._units == Units.ABSOLUTE){
             value = it.next().absoluteData();
+         }
+         else if(this._units == Units.PERCENTAGE){
+            value = it.next().percentageData();
+         }
+         else{
+            throw new NumberFormatException();
          }
          if(value < min){
             min = value;
@@ -189,44 +201,46 @@ public class WeatherPanel extends JPanel{
       int increment    = this._data.size();
       int h            = this.getHeight();
       int w            = this.getWidth();
-      double min       = this.min();
-      double max       = this.max();
-      max += 1.0;
-      min -= 1.0;
+      try{
+         double min = this.min() - 1.0;
+         double max = this.max() + 1.0;
+         Font font             = g2.getFont();
+         FontRenderContext frc = g2.getFontRenderContext();
+         LineMetrics lm        = font.getLineMetrics("0", frc);
+         float sh              = lm.getAscent() + lm.getDescent();
 
-      Font font             = g2.getFont();
-      FontRenderContext frc = g2.getFontRenderContext();
-      LineMetrics lm        = font.getLineMetrics("0", frc);
-      float sh              = lm.getAscent() + lm.getDescent();
-
-      g2.setPaint(Color.BLACK);
-      g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
-      g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
-      //Now, try to start drawing the y-axis text
-      double yinc = (h - PAD)/(double)(max - min);
-      double value = min;
-      while(value < max){
-         int temp = (int)value;
-         if((temp % 5) == 0 || value == min){
-            String s = new String("" + temp);
-            if(value == min){
-               s = new String("" + String.format("%.2f",value));
+         g2.setPaint(Color.BLACK);
+         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
+         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         //Now, try to start drawing the y-axis text
+         double yinc = (h - PAD)/(double)(max - min);
+         double value = min;
+         while(value < max){
+            int temp = (int)value;
+            if((temp % 5) == 0 || value == min){
+               String s = new String("" + temp);
+               if(value == min){
+                  s = new String("" + String.format("%.2f",value));
+               }
+               double sw=(double)font.getStringBounds(s,frc).getWidth();
+               double sx = (PAD - sw)/2.0;
+               double sy = h - PAD -(temp - min)*yinc +sh/4;
+               if(value == min){
+                  sy = h - PAD -(value-min) + sh/4;
+               }
+               if(temp % 5 != 4){
+                  g2.drawString(s, (float)sx, (float)sy);
+               }
+               if(value != min){
+                  sy = h - PAD -(temp - min)*yinc;
+                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+               }
             }
-            double sw=(double)font.getStringBounds(s,frc).getWidth();
-            double sx = (PAD - sw)/2.0;
-            double sy = h - PAD -(temp - min)*yinc +sh/4;
-            if(value == min){
-               sy = h - PAD -(value-min) + sh/4;
-            }
-            if(temp % 5 != 4){
-               g2.drawString(s, (float)sx, (float)sy);
-            }
-            if(value != min){
-               sy = h - PAD -(temp - min)*yinc;
-               g2.draw(new Line2D.Double(PAD,sy,w,sy));
-            }
+            value += 1.0;
          }
-         value += 1.0;
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
       }
    }
 
