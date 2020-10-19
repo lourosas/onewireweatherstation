@@ -78,10 +78,21 @@ public class WeatherDatabaseClient{
    }
 
    /**/
+   public void publishHumdityData(){
+      //Alert all The Observers
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver ob = it.next();
+         ob.updateHumidityData(this._humidityData);
+      }
+   }
+
+   /**/
    public void publishTemperatureData(){
       //Alert all the Observers
       Iterator<WeatherDatabaseClientObserver> it =
-                                        this._observers.iterator();
+                                           this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver ob = it.next();
          ob.updateTemperatureData(this._temperatureData);
@@ -230,7 +241,6 @@ public class WeatherDatabaseClient{
          //Save it globally
          this._temperatureData = td;
          this.publishTemperatureData();
-
       }
       catch(ArrayIndexOutOfBoundsException aiobe){}
       catch(NullPointerException npe){
@@ -254,8 +264,42 @@ public class WeatherDatabaseClient{
          String requestString = new String("HUMIDITY " + values[0]);
          requestString += " " + values[1] + " " + values[2];
          this.request(requestString);
+         String [] data = this._rawData.trim().split("\\n");
+         List<WeatherData> hd = new LinkedList<WeatherData>();
+         for(int i = 0; i < data.length; i++){
+            String [] value = data[i].split(",");
+            try{
+               Double h = Double.parseDouble(value[4].trim());
+               double humidity = h.doubleValue();
+               /*units,data,message,month,day,year,time*/
+               WeatherData wd = new HumidityData(Units.PERCENTAGE,
+                                                 humidity,
+                                                 "Humidity",
+                                                 value[0],
+                                                 value[1],
+                                                 value[2],
+                                                 value[3]);
+               hd.add(wd);
+            }
+            catch(NumberFormatException nfe){}
+         }
+         //Save it globally
+         this._humidityData = hd;
+         this.publishHumdityData();
       }
-      catch(SocketTimeoutException ste){}
+      catch(ArrayIndexOutOfBoundsException aiobe){}
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(SocketTimeoutException ste){
+         //Alert all the _observers
+         Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+         while(it.hasNext()){
+            WeatherDatabaseClientObserver ob = it.next();
+            ob.alertHumidityTimeout();
+         }
+      }
    }
 
    /*

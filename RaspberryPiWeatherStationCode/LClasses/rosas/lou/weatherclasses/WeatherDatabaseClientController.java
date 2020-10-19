@@ -137,6 +137,9 @@ ActionListener, KeyListener, ItemListener{
             if(command.contains("T")){
                this.handleTemperatureItemSelection(command);
             }
+            else if(command.contains("H")){
+               this.handleHumidityItemSelection(command);
+            }
          }
       }
       catch(ClassCastException cce){}
@@ -148,6 +151,9 @@ ActionListener, KeyListener, ItemListener{
          JButton button = ((JButton)ae.getSource());
          if(button.getActionCommand().equals("TemperatureRefresh")){
             this._model.requestData("TEMPERATURE");
+         }
+         else if(button.getActionCommand().equals("HumidityRefresh")){
+            this._model.requestData("HUMIDITY");
          }
       }
       catch(ClassCastException cce){}
@@ -185,6 +191,17 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       catch(ClassCastException cce){}
+   }
+
+   /**/
+   private void handleHumidityItemSelection(String command){
+      if(command.toUpperCase().equals("HGRAPH")){
+         this._view.setHumidityDisplay((short)0);
+      }
+      else if(command.toUpperCase().equals("HDATA")){
+         this._view.setHumidityDisplay((short)1);
+      }
+      this._model.publishHumdityData();
    }
 
    /**/

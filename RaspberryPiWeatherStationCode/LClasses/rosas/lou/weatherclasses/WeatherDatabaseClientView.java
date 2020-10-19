@@ -64,6 +64,7 @@ implements WeatherDatabaseClientObserver{
    private Units temperatureUnits = Units.METRIC;
    private Units heatIndexUnits   = Units.METRIC;
    private short tempDisplay      = GRAPH;
+   private short humidityDisplay  = GRAPH;
 
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
@@ -107,7 +108,14 @@ implements WeatherDatabaseClientObserver{
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){}
 
-   public void updateHumidityData(java.util.List<WeatherData> data){}
+   public void updateHumidityData(java.util.List<WeatherData> data){
+      if(this.humidityDisplay == GRAPH){
+         this.graphHumidity(data);
+      }
+      else{
+         this.printHumidity(data);
+      }
+   }
 
    public void updatePressureData(java.util.List<WeatherData> data){}
 
@@ -122,6 +130,11 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
+   public void setHumidityDisplay(short display){
+      this.humidityDisplay = display;
+   }
+
+   /**/
    public void setTemperatureDisplay(short display){
       this.tempDisplay = display;
    }
@@ -133,23 +146,51 @@ implements WeatherDatabaseClientObserver{
 
    //////////////////////////Private Methods//////////////////////////
    /**/
-   private void graphTemperature(java.util.List<WeatherData> data){
+   private void graphHumidity(java.util.List<WeatherData> data){
+      try{
+         int humidityTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HUMIDITY")){
+               humidityTab = i;
+            }
+         }
+         jtp.setSelectedIndex(humidityTab);
+         JPanel humidityPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel     = (JPanel)humidityPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+
+         drawPanel.add(new WeatherPanel(data, Units.PERCENTAGE),
+                                                 BorderLayout.CENTER);
+
+         jtp.setSelectedIndex(humidityTab + 1);
+         jtp.setSelectedIndex(humidityTab);
+      }
+      catch(NullPointerException npe){npe.printStackTrace();}
+   }
+
+   /**/
+   private void printHumidity(java.util.List<WeatherData> data){
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
             System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
             System.out.print(" "+wd.time()+", ");
-            if(this.temperatureUnits == Units.ABSOLUTE){
-               System.out.println(String.format("%.2f",wd.absoluteData()));
-            }
-            else if(this.temperatureUnits == Units.ENGLISH){
-               System.out.println(String.format("%.2f",wd.englishData()));
-            }
-            else if(this.temperatureUnits == Units.METRIC){
-               System.out.println(String.format("%.2f",wd.metricData()));
-            }
+            System.out.println(
+                           String.format("%.2f",wd.percentageData()));
          }
+      }
+      catch(NullPointerException npe){npe.printStackTrace();}
+   }
+
+   /**/
+   private void graphTemperature(java.util.List<WeatherData> data){
+      try{
          int tempTab = -1;
          JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(1);
@@ -261,11 +302,58 @@ implements WeatherDatabaseClientObserver{
    private JPanel setUpHumidityPanel(){
       JPanel humidityPanel = new JPanel();
       humidityPanel.setLayout(new BorderLayout());
+      JPanel centerPanel = new JPanel();
       JLabel humiLabel = new JLabel("Humidity");
-      humidityPanel.add(humiLabel, BorderLayout.CENTER);
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      centerPanel.add(humiLabel);
+      humidityPanel.add(centerPanel, BorderLayout.CENTER);
+      humidityPanel.add(this.setUpHumiditySouthPanel(), BorderLayout.SOUTH);
+      humidityPanel.add(this.setUpHumidityNorthPanel(), BorderLayout.NORTH);
       return humidityPanel;
-
    }
+
+   /**/
+   private JPanel setUpHumidityNorthPanel(){
+      JPanel panel               = new JPanel();
+      ButtonGroup dataGroup      = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel dataPanel = new JPanel();
+      JRadioButton graph = new JRadioButton("Graph", true);
+      graph.setActionCommand("HGraph");
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+      graph.addItemListener(this._controller);
+      JRadioButton data = new JRadioButton("Data");
+      data.setActionCommand("HData");
+      dataGroup.add(data);
+      dataPanel.add(data);
+      data.addItemListener(this._controller);
+
+      panel.add(dataPanel);
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpHumiditySouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("HumidityRefresh");
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("HumiditySave");
+      save.addActionListener(this._controller);
+      save.addKeyListener(this._controller);
+      panel.add(save);
+
+      return panel;
+   }
+
 
    /**/
    private JTabbedPane setTabbedPane(){
