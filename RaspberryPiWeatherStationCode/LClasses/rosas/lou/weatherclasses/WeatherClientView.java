@@ -31,8 +31,8 @@ import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
-import rosas.lou.weatherclasses.*;
 import rosas.lou.IOObserver;
+import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
 
