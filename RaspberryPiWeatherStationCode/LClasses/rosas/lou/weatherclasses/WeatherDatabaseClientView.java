@@ -176,12 +176,40 @@ implements WeatherDatabaseClientObserver{
          jtp.setSelectedIndex(dpTab);
          JPanel dpPanel   = (JPanel)jtp.getSelectedComponent();
          JPanel drawPanel = (JPanel)dpPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new WeatherPanel(data, this.dewpointUnits),
+                                                 BorderLayout.CENTER);
+         jtp.setSelectedIndex(dpTab + 1);
+         jtp.setSelectedIndex(dpTab);
+
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    /**/
-   private void printDewpoint(java.util.List<WeatherData> data){}
+   private void printDewpoint(java.util.List<WeatherData> data){
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
+            System.out.print(" "+wd.time()+", ");
+            if(this.dewpointUnits == Units.ABSOLUTE){
+               System.out.println(String.format("%.2f",wd.absoluteData()));
+            }
+            else if(this.dewpointUnits == Units.ENGLISH){
+               System.out.println(String.format("%.2f",wd.englishData()));
+            }
+            else if(this.dewpointUnits == Units.METRIC){
+               System.out.println(String.format("%.2f",wd.metricData()));
+            }
+         }
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
    /**/
    private void graphHumidity(java.util.List<WeatherData> data){
