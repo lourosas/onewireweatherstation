@@ -137,8 +137,11 @@ ActionListener, KeyListener, ItemListener{
             if(command.contains("T")){
                this.handleTemperatureItemSelection(command);
             }
-            else if(command.contains("H")){
+            else if(command.contains("HG") || command.contains("HD")){
                this.handleHumidityItemSelection(command);
+            }
+            else if(command.contains("DP")){
+               this.handleDewpointItemSelection(command);
             }
          }
       }
@@ -154,6 +157,9 @@ ActionListener, KeyListener, ItemListener{
          }
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.requestData("HUMIDITY");
+         }
+         else if(button.getActionCommand().equals("DewpointRefresh")){
+            this._model.requestData("DEWPOINT");
          }
       }
       catch(ClassCastException cce){}
@@ -202,6 +208,28 @@ ActionListener, KeyListener, ItemListener{
          this._view.setHumidityDisplay((short)1);
       }
       this._model.publishHumdityData();
+   }
+
+   /**/
+   private void handleDewpointItemSelection(String command){
+      if(command.toUpperCase().equals("DPCELSIUS")){
+         this._view.setDewpointUnits(Units.METRIC);
+      }
+      else if(command.toUpperCase().equals("DPFAHRENHEIT")){
+         this._view.setDewpointUnits(Units.ENGLISH);
+      }
+      else if(command.toUpperCase().equals("DPKELVIN")){
+         this._view.setDewpointUnits(Units.ABSOLUTE);
+      }
+      else if(command.toUpperCase().equals("DPGRAPH")){
+         //GRAPH = 0
+         this._view.setDewpointDisplay((short)0);
+      }
+      else if(command.toUpperCase().equals("DPDATA")){
+         //DATA = 1
+         this._view.setDewpointDisplay((short)1);
+      }
+      this._model.publishDewpointData();
    }
 
    /**/

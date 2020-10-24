@@ -27,7 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
+//import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.WeatherPanel;
@@ -65,6 +65,7 @@ implements WeatherDatabaseClientObserver{
    private Units heatIndexUnits   = Units.METRIC;
    private short tempDisplay      = GRAPH;
    private short humidityDisplay  = GRAPH;
+   private short dewpointDisplay  = GRAPH;
 
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
@@ -104,7 +105,14 @@ implements WeatherDatabaseClientObserver{
 
    public void alertTemperatureTimeout(){}
 
-   public void updateDewpointData(java.util.List<WeatherData> data){}
+   public void updateDewpointData(java.util.List<WeatherData> data){
+      if(this.dewpointDisplay == GRAPH){
+         this.graphDewpoint(data);
+      }
+      else{
+         this.printDewpoint(data);
+      }
+   }
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){}
 
@@ -130,6 +138,10 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
+   public void setDewpointDisplay(short display){
+      this.dewpointDisplay = display;
+   }
+   /**/
    public void setHumidityDisplay(short display){
       this.humidityDisplay = display;
    }
@@ -140,11 +152,37 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
+   public void setDewpointUnits(Units units){
+      this.dewpointUnits = units;
+   }
+
+   /**/
    public void setTemperatureUnits(Units units){
       this.temperatureUnits = units;
    }
 
    //////////////////////////Private Methods//////////////////////////
+   /**/
+   private void graphDewpoint(java.util.List<WeatherData> data){
+      try{
+         int dpTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
+               dpTab = i;
+            }
+         }
+         jtp.setSelectedIndex(dpTab);
+         JPanel dpPanel   = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)dpPanel.getComponent(0);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void printDewpoint(java.util.List<WeatherData> data){}
+
    /**/
    private void graphHumidity(java.util.List<WeatherData> data){
       try{
@@ -284,9 +322,77 @@ implements WeatherDatabaseClientObserver{
    private JPanel setUpDewPointPanel(){
       JPanel dewPointPanel = new JPanel();
       dewPointPanel.setLayout(new BorderLayout());
+      JPanel centerPanel = new JPanel();
       JLabel dpLabel = new JLabel("Dew Point");
-      dewPointPanel.add(dpLabel, BorderLayout.CENTER);
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+      centerPanel.add(dpLabel);
+      dewPointPanel.add(centerPanel, BorderLayout.CENTER);
+      dewPointPanel.add(this.setUpDewpointSouthPanel(),
+                                                  BorderLayout.SOUTH);
+      dewPointPanel.add(this.setUpDewpointNorthPanel(),
+                                                  BorderLayout.NORTH);
       return dewPointPanel;
+   }
+
+   /**/
+   private JPanel setUpDewpointNorthPanel(){
+      JPanel panel                = new JPanel();
+      ButtonGroup dewpointGroup   = new ButtonGroup();
+      ButtonGroup dataGroup       = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel dewpointPanel = new JPanel();
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("DPCelsius");
+      dewpointGroup.add(celsius);
+      dewpointPanel.add(celsius);
+      celsius.addItemListener(this._controller);
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("DPFahrenheit");
+      dewpointGroup.add(fahrenheit);
+      dewpointPanel.add(fahrenheit);
+      fahrenheit.addItemListener(this._controller);
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("DPKelvin");
+      dewpointGroup.add(kelvin);
+      dewpointPanel.add(kelvin);
+      kelvin.addItemListener(this._controller);
+      panel.add(dewpointPanel);
+
+      JPanel dataPanel = new JPanel();
+      JRadioButton graph = new JRadioButton("Graph", true);
+      graph.setActionCommand("DPGraph");
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+      graph.addItemListener(this._controller);
+      JRadioButton data = new JRadioButton("Data");
+      data.setActionCommand("DPData");
+      dataGroup.add(data);
+      dataPanel.add(data);
+      data.addItemListener(this._controller);
+      panel.add(dataPanel);
+
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpDewpointSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("DewpointRefresh");
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("DewpointSave");
+      save.addActionListener(this._controller);
+      save.addKeyListener(this._controller);
+      panel.add(save);
+
+      return panel;
    }
 
    /**/

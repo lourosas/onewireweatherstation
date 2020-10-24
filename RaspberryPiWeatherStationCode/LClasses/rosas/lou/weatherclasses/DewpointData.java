@@ -21,8 +21,8 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
 public class DewpointData extends ThermalData implements WeatherData{
    {
@@ -56,6 +56,21 @@ public class DewpointData extends ThermalData implements WeatherData{
       Calendar cal
    ){
       this.data(units, data, message, cal);
+   }
+
+   /*
+   */
+   public DewpointData
+   (
+      Units   units,
+      double  data,
+      String  message,
+      String  month,
+      String  day,
+      String  year,
+      String  time
+   ){
+      this.data(units,data,message,month,day,year,time);
    }
    
    //******************Interface Implementation***********************

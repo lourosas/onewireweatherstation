@@ -78,6 +78,17 @@ public class WeatherDatabaseClient{
    }
 
    /**/
+   public void publishDewpointData(){
+      //Alert all the Observers
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver ob = it.next();
+         ob.updateDewpointData(this._dewpointData);
+      }
+   }
+
+   /**/
    public void publishHumdityData(){
       //Alert all The Observers
       Iterator<WeatherDatabaseClientObserver> it =
@@ -316,12 +327,46 @@ public class WeatherDatabaseClient{
    /*
    */
    private void requestDewpointData(String [] values){
+      String requestString = new String("DEWPOINT " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
       try{
-         String requestString = new String("DEWPOINT " + values[0]);
-         requestString += " " + values[1] + " " + values[2];
          this.request(requestString);
+         String [] data = this._rawData.trim().split("\\n");
+         List<WeatherData> dpd = new LinkedList<WeatherData>();
+         for(int i = 0; i < data.length; i++){
+            String [] value = data[i].split(",");
+            try{
+               Double dp = Double.parseDouble(value[4].trim());
+               double dewPoint = dp.doubleValue();
+               /*units,data,message,month,day,year,time*/
+               WeatherData wd = new DewpointData(Units.METRIC,
+                                                 dewPoint,
+                                                 "Dewpoint",
+                                                 value[0],
+                                                 value[1],
+                                                 value[2],
+                                                 value[3]);
+               dpd.add(wd);
+            }
+            catch(NumberFormatException nfe){}
+         }
+         //Save it globally
+         this._dewpointData = dpd;
+         this.publishDewpointData();
       }
-      catch(SocketTimeoutException ste){}
+      catch(ArrayIndexOutOfBoundsException aiobe){}
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(SocketTimeoutException ste){
+         //Alert all the Observers
+         Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+         while(it.hasNext()){
+            WeatherDatabaseClientObserver ob = it.next();
+            ob.alertTemperatureTimeout();
+         }
+      }
    }
 
    /*
