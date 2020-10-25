@@ -21,8 +21,8 @@ import java.util.*;
 import java.lang.*;
 import java.text.DateFormat;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
-import com.dalsemi.onewire.utils.Convert;
+//import gnu.io.*;
+//import com.dalsemi.onewire.utils.Convert;
 
 public class PressureData implements WeatherData{
    private double _absolutePressure;
@@ -31,6 +31,10 @@ public class PressureData implements WeatherData{
    private Calendar _cal;
    private WeatherDataType _type;
    private String _message;
+   private String _month;
+   private String _day;
+   private String _year;
+   private String _time;
    
    {
       _absolutePressure = WeatherData.DEFAULTVALUE;
@@ -38,7 +42,11 @@ public class PressureData implements WeatherData{
       _metricPressure   = WeatherData.DEFAULTVALUE;
       _type             = WeatherDataType.PRESSURE;
       _cal              = null;
-      _message          = null; 
+      _message          = null;
+      _month            = null;
+      _day              = null;
+      _year             = null;
+      _time             = null;
    };
    
    //************************Constructors*****************************
@@ -67,6 +75,20 @@ public class PressureData implements WeatherData{
       this.data(units, value, message, cal);
    }
 
+   /**/
+   public PressureData
+   (
+      Units units,
+      double value,
+      String message,
+      String month,
+      String day,
+      String year,
+      String time
+   ){
+      this.data(units,value,message,month,day,year,time);
+   }
+
    //******************Interface Implementation***********************
    /**/
    public double absoluteData(){
@@ -91,6 +113,24 @@ public class PressureData implements WeatherData{
    /**/
    public Calendar calendar(){
       return this._cal;
+   }
+
+   /**/
+   public void data
+   (
+      Units  units,
+      double value,
+      String message,
+      String month,
+      String day,
+      String year,
+      String time
+   ){
+      this.data(units, value, message);
+      this._month = new String(month);
+      this._day   = new String(day);
+      this._year  = new String(year);
+      this._time  = new String(time);
    }
    
    /**/
@@ -120,7 +160,26 @@ public class PressureData implements WeatherData{
    public String message(){
       return this._message;
    }
+
+   /**/
+   public String month(){
+      return this._month;
+   }
+
+   /**/
+   public String day(){
+      return this._day;
+   }
+
+   /**/
+   public String year(){
+      return this._year;
+   }
    
+   /**/
+   public String time(){
+      return this._time;
+   }
    /**/
    public WeatherDataType type(){
       return this._type;

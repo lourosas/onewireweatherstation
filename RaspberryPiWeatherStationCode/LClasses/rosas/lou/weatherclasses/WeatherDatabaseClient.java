@@ -111,6 +111,17 @@ public class WeatherDatabaseClient{
    }
 
    /**/
+   public void publishPressureData(){
+      //Alert all the Observers
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver ob = it.next();
+         ob.updatePressureData(this._pressureData);
+      }
+   }
+
+   /**/
    public void publishTemperatureData(){
       //Alert all the Observers
       Iterator<WeatherDatabaseClientObserver> it =
@@ -143,6 +154,9 @@ public class WeatherDatabaseClient{
       }
       else if((measurement.toUpperCase()).contains("HEAT")){
          this.requestHeatIndexData(values);
+      }
+      else if((measurement.toUpperCase()).contains("PRES")){
+         this.requestPressureData(values);
       }
    }
 
@@ -327,10 +341,33 @@ public class WeatherDatabaseClient{
    /*
    */
    private void requestPressureData(String [] values){
+      String requestString = new String("PRESSURE " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
       try{
-         String requestString = new String("PRESSURE " + values[0]);
-         requestString += " " + values[1] + " " + values[2];
          this.request(requestString);
+         String [] data = this._rawData.trim().split("\\n");
+         List<WeatherData> pd = new LinkedList<WeatherData>();
+         for(int i = 0; i < data.length; i++){
+            String [] value = data[i].split(",");
+            try{
+               Double p = Double.parseDouble(value[4].trim());
+               double pressure = p.doubleValue();
+               /*units,data,message,month,day,year,time*/
+               WeatherData wd = new PressureData(Units.METRIC,
+                                                  pressure,
+                                                  "Pressure",
+                                                  value[0],
+                                                  value[1],
+                                                  value[2],
+                                                  value[3]);
+               pd.add(wd);
+            }
+            //Will need to address this...
+            catch(NumberFormatException nfe){}
+         }
+         //Save it globally
+         this._pressureData = pd;
+         this.publishPressureData();
       }
       catch(SocketTimeoutException ste){}
    }

@@ -146,6 +146,14 @@ ActionListener, KeyListener, ItemListener{
             else if(command.contains("DP")){
                this.handleDewpointItemSelection(command);
             }
+            else if(command.contains("PG") || command.contains("PD")){
+               this.handlePressureItemSelection(command);
+            }
+            else if(command.toUpperCase().equals("MMS") ||
+                    command.toUpperCase().equals("INCHES") ||
+                    command.toUpperCase().equals("MILLIBARS")){
+               this.handlePressureItemSelection(command);
+            }
          }
       }
       catch(ClassCastException cce){}
@@ -166,6 +174,9 @@ ActionListener, KeyListener, ItemListener{
          }
          else if(button.getActionCommand().equals("HeatIndexRefresh")){
             this._model.requestData("HEATINDEX");
+         }
+         else if(button.getActionCommand().equals("Pressure Refresh")){
+            this._model.requestData("PRESSURE");
          }
       }
       catch(ClassCastException cce){}
@@ -259,6 +270,28 @@ ActionListener, KeyListener, ItemListener{
          this._view.setDewpointDisplay((short)1);
       }
       this._model.publishDewpointData();
+   }
+
+   /**/
+   private void handlePressureItemSelection(String command){
+      if(command.toUpperCase().equals("MMS")){
+         this._view.setPressureUnits(Units.METRIC);
+      }
+      else if(command.toUpperCase().equals("INCHES")){
+         this._view.setPressureUnits(Units.ENGLISH);
+      }
+      else if(command.toUpperCase().equals("MILLIBARS")){
+         this._view.setPressureUnits(Units.ABSOLUTE);
+      }
+      else if(command.toUpperCase().equals("PGRAPH")){
+         //GRAPH = 0
+         this._view.setPressureDisplay((short)0);
+      }
+      else if(command.toUpperCase().equals("PDATA")){
+         // = DATA = 1
+         this._view.setPressureDisplay((short)1);
+      }
+      this._model.publishPressureData();
    }
 
    /**/

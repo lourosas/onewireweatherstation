@@ -63,10 +63,12 @@ implements WeatherDatabaseClientObserver{
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
    private Units heatIndexUnits   = Units.METRIC;
+   private Units pressureUnits    = Units.ABSOLUTE;
    private short heatIndexDisplay = GRAPH;
    private short tempDisplay      = GRAPH;
    private short humidityDisplay  = GRAPH;
    private short dewpointDisplay  = GRAPH;
+   private short pressureDisplay  = GRAPH;
 
    ///////////////////////////Public Methods//////////////////////////
    /////////////////////////////Constructors//////////////////////////
@@ -133,7 +135,14 @@ implements WeatherDatabaseClientObserver{
       }
    }
 
-   public void updatePressureData(java.util.List<WeatherData> data){}
+   public void updatePressureData(java.util.List<WeatherData> data){
+      if(this.pressureDisplay == GRAPH){
+         this.graphPressure(data);
+      }
+      else{
+         this.printPressure(data);
+      }
+   }
 
    public void updateTemperatureData(java.util.List<WeatherData> data){
       if(this.tempDisplay == GRAPH){
@@ -160,6 +169,11 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
+   public void setPressureDisplay(short display){
+      this.pressureDisplay = display;
+   }
+
+   /**/
    public void setTemperatureDisplay(short display){
       this.tempDisplay = display;
    }
@@ -172,6 +186,11 @@ implements WeatherDatabaseClientObserver{
    /**/
    public void setHeatIndexUnits(Units units){
       this.heatIndexUnits = units;
+   }
+
+   /**/
+   public void setPressureUnits(Units units){
+      this.pressureUnits = units;
    }
 
    /**/
@@ -256,7 +275,24 @@ implements WeatherDatabaseClientObserver{
    }
    /**/
    private void printHeatIndex(java.util.List<WeatherData> data){
-
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
+            System.out.print(" "+wd.time()+", ");
+            if(this.heatIndexUnits == Units.ABSOLUTE){
+               System.out.println(String.format("%.2f",wd.absoluteData()));
+            }
+            else if(this.heatIndexUnits == Units.ENGLISH){
+               System.out.println(String.format("%.2f",wd.englishData()));
+            }
+            else if(this.heatIndexUnits == Units.METRIC){
+               System.out.println(String.format("%.2f",wd.metricData()));
+            }
+         }
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    /**/
@@ -300,6 +336,55 @@ implements WeatherDatabaseClientObserver{
          }
       }
       catch(NullPointerException npe){npe.printStackTrace();}
+   }
+
+   /**/
+   private void graphPressure(java.util.List<WeatherData> data){
+      try{
+         int pressureTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("PRESSURE")){
+               pressureTab = i;
+            }
+         }
+         jtp.setSelectedIndex(pressureTab);
+         JPanel pressurePanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel     = (JPanel)pressurePanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new WeatherPanel(data, this.pressureUnits),
+                                                 BorderLayout.CENTER);
+         jtp.setSelectedIndex(pressureTab + 1);
+         jtp.setSelectedIndex(pressureTab);
+
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void printPressure(java.util.List<WeatherData> data){
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
+            System.out.print(" "+wd.time()+", ");
+            if(this.pressureUnits == Units.ABSOLUTE){
+               System.out.println(String.format("%.2f",wd.absoluteData()));
+            }
+            else if(this.pressureUnits == Units.ENGLISH){
+               System.out.println(String.format("%.2f",wd.englishData()));
+            }
+            else if(this.pressureUnits == Units.METRIC){
+               System.out.println(String.format("%.2f",wd.metricData()));
+            }
+         }
+      }
+      catch(NullPointerException npe){}
    }
 
    /**/
@@ -686,9 +771,74 @@ implements WeatherDatabaseClientObserver{
    private JPanel setUpPressurePanel(){
       JPanel pressurePanel = new JPanel();
       pressurePanel.setLayout(new BorderLayout());
+      JPanel centerPanel = new JPanel();
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
       JLabel presLabel = new JLabel("Pressure");
-      pressurePanel.add(presLabel, BorderLayout.CENTER);
+      centerPanel.add(presLabel);
+      pressurePanel.add(centerPanel, BorderLayout.CENTER);
+      pressurePanel.add(this.setUpPressureSouthPanel(), BorderLayout.SOUTH);
+      pressurePanel.add(this.setUpPressureNorthPanel(), BorderLayout.NORTH);
       return pressurePanel;
+   }
+
+   /**/
+   private JPanel setUpPressureNorthPanel(){
+      JPanel panel              = new JPanel();
+      ButtonGroup pressureGroup = new ButtonGroup();
+      ButtonGroup dataGroup     = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel pressurePanel = new JPanel();
+      JRadioButton mms  = new JRadioButton("millimeters Hg");
+      mms.setActionCommand("mms");
+      pressureGroup.add(mms);
+      pressurePanel.add(mms);
+      mms.addItemListener(this._controller);
+      JRadioButton inches = new JRadioButton("inches Hg");
+      inches.setActionCommand("inches") ;
+      pressureGroup.add(inches);
+      pressurePanel.add(inches);
+      inches.addItemListener(this._controller);
+      JRadioButton millibars = new JRadioButton("millibars", true);
+      millibars.setActionCommand("millibars");
+      pressureGroup.add(millibars);
+      pressurePanel.add(millibars);
+      millibars.addItemListener(this._controller);
+      panel.add(pressurePanel);
+
+      JPanel dataPanel = new JPanel();
+      JRadioButton graph = new JRadioButton("Graph", true);
+      graph.setActionCommand("PGraph");
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+      graph.addItemListener(this._controller);
+      JRadioButton data = new JRadioButton("Data");
+      data.setActionCommand("PData");
+      dataGroup.add(data);
+      dataPanel.add(data);
+      data.addItemListener(this._controller);
+      panel.add(dataPanel);
+
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpPressureSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("Pressure Refresh");
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("Pressure Save");
+      save.addActionListener(this._controller);
+      panel.add(save);
+
+      return panel;
    }
 
    /**/
