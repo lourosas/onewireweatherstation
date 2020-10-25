@@ -33,7 +33,7 @@ public class WeatherDatabaseClient{
    private DatagramSocket    _socket;
    private byte[]            _addr;
    private int               _port;
-   private String[]           _dates;
+   private String[]          _dates;
    private String            _rawData;
    private List<WeatherData> _temperatureData;
    private List<WeatherData> _humidityData;
@@ -85,6 +85,17 @@ public class WeatherDatabaseClient{
       while(it.hasNext()){
          WeatherDatabaseClientObserver ob = it.next();
          ob.updateDewpointData(this._dewpointData);
+      }
+   }
+
+   /**/
+   public void publishHeatIndexData(){
+      //Alert the Observers
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver ob = it.next();
+         ob.updateHeatIndexData(this._heatIndexData);
       }
    }
 
@@ -370,13 +381,50 @@ public class WeatherDatabaseClient{
    }
 
    /*
+   Many quesions need to be addressed here--like what if there is
+   NO Heat Index data for the day (like if the temp never gets over
+   70 deg F?)...handling NO data is the next issue to address...
    */
    private void requestHeatIndexData(String [] values){
+      String requestString = new String("HEATINDEX " + values[0]);
+      requestString += " " + values[1] + " " + values[2];
       try{
-         String requestString = new String("HEATINDEX " + values[0]);
-         requestString += " " + values[1] + " " + values[2];
          this.request(requestString);
+         String [] data = this._rawData.trim().split("\\n");
+         List<WeatherData> hid = new LinkedList<WeatherData>();
+         for(int i = 0; i < data.length; i++){
+            String [] value = data[i].split(",");
+            try{
+               Double dp = Double.parseDouble(value[4].trim());
+               double heatIndex = dp.doubleValue();
+               /*units,data,message,month,day,year,time*/
+               WeatherData wd = new HeatIndexData(Units.METRIC,
+                                                  heatIndex,
+                                                  "HeatIndex",
+                                                  value[0],
+                                                  value[1],
+                                                  value[2],
+                                                  value[3]);
+               hid.add(wd);
+            }
+            catch(NumberFormatException nfe){}
+            //Save it globally
+            this._heatIndexData = hid;
+            this.publishHeatIndexData();
+         }
       }
-      catch(SocketTimeoutException ste){}
+      catch(ArrayIndexOutOfBoundsException aiobe){}
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      catch(SocketTimeoutException ste){
+         //Alert all Observers
+         Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+         while(it.hasNext()){
+            WeatherDatabaseClientObserver ob = it.next();
+            ob.alertHeatIndexTimeout();
+         }
+      }
    }
 }

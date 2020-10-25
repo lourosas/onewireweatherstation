@@ -140,6 +140,9 @@ ActionListener, KeyListener, ItemListener{
             else if(command.contains("HG") || command.contains("HD")){
                this.handleHumidityItemSelection(command);
             }
+            else if(command.contains("HI")){
+               this.handleHeatIndexItemSelection(command);
+            }
             else if(command.contains("DP")){
                this.handleDewpointItemSelection(command);
             }
@@ -160,6 +163,9 @@ ActionListener, KeyListener, ItemListener{
          }
          else if(button.getActionCommand().equals("DewpointRefresh")){
             this._model.requestData("DEWPOINT");
+         }
+         else if(button.getActionCommand().equals("HeatIndexRefresh")){
+            this._model.requestData("HEATINDEX");
          }
       }
       catch(ClassCastException cce){}
@@ -197,6 +203,29 @@ ActionListener, KeyListener, ItemListener{
          }
       }
       catch(ClassCastException cce){}
+   }
+
+   /**/
+   private void handleHeatIndexItemSelection(String command){
+      if(command.toUpperCase().equals("HICELSIUS")){
+         this._view.setHeatIndexUnits(Units.METRIC);
+      }
+      else if(command.toUpperCase().equals("HIFAHRENHEIT")){
+         this._view.setHeatIndexUnits(Units.ENGLISH);
+
+      }
+      else if(command.toUpperCase().equals("HIKELVIN")){
+         this._view.setHeatIndexUnits(Units.ABSOLUTE);
+      }
+      else if(command.toUpperCase().equals("HIGRAPH")){
+         //GRAPH = 0
+         this._view.setHeatIndexDisplay((short)0);
+      }
+      else if(command.toUpperCase().equals("HIDATA")){
+         //DATA = 1
+         this._view.setHeatIndexDisplay((short)1);
+      }
+      this._model.publishHeatIndexData();
    }
 
    /**/

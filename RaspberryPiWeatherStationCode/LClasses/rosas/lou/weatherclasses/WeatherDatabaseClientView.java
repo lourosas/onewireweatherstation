@@ -63,6 +63,7 @@ implements WeatherDatabaseClientObserver{
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
    private Units heatIndexUnits   = Units.METRIC;
+   private short heatIndexDisplay = GRAPH;
    private short tempDisplay      = GRAPH;
    private short humidityDisplay  = GRAPH;
    private short dewpointDisplay  = GRAPH;
@@ -114,7 +115,14 @@ implements WeatherDatabaseClientObserver{
       }
    }
 
-   public void updateHeatIndexData(java.util.List<WeatherData> data){}
+   public void updateHeatIndexData(java.util.List<WeatherData> data){
+      if(this.heatIndexDisplay == GRAPH){
+         this.graphHeatIndex(data);
+      }
+      else{
+         this.printHeatIndex(data);
+      }
+   }
 
    public void updateHumidityData(java.util.List<WeatherData> data){
       if(this.humidityDisplay == GRAPH){
@@ -141,6 +149,11 @@ implements WeatherDatabaseClientObserver{
    public void setDewpointDisplay(short display){
       this.dewpointDisplay = display;
    }
+
+   /**/
+   public void setHeatIndexDisplay(short display){
+      this.heatIndexDisplay = display;
+   }
    /**/
    public void setHumidityDisplay(short display){
       this.humidityDisplay = display;
@@ -154,6 +167,11 @@ implements WeatherDatabaseClientObserver{
    /**/
    public void setDewpointUnits(Units units){
       this.dewpointUnits = units;
+   }
+
+   /**/
+   public void setHeatIndexUnits(Units units){
+      this.heatIndexUnits = units;
    }
 
    /**/
@@ -209,6 +227,36 @@ implements WeatherDatabaseClientObserver{
          }
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void graphHeatIndex(java.util.List<WeatherData> data){
+      try{
+         int hiTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HEAT INDEX")){
+               hiTab = i;
+            }
+         }
+         jtp.setSelectedIndex(hiTab);
+         JPanel hiPanel   = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)hiPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setLayout(new BorderLayout());
+         drawPanel.add(new WeatherPanel(data, this.heatIndexUnits),
+                                                 BorderLayout.CENTER);
+         jtp.setSelectedIndex(hiTab -1);
+         jtp.setSelectedIndex(hiTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+   /**/
+   private void printHeatIndex(java.util.List<WeatherData> data){
+
    }
 
    /**/
@@ -427,9 +475,76 @@ implements WeatherDatabaseClientObserver{
    private JPanel setUpHeatIndexPanel(){
       JPanel heatIndexPanel = new JPanel();
       heatIndexPanel.setLayout(new BorderLayout());
+      JPanel centerPanel = new JPanel();
       JLabel hiLabel = new JLabel("Heat Index");
-      heatIndexPanel.add(hiLabel, BorderLayout.CENTER);
+      centerPanel.add(hiLabel);
+      heatIndexPanel.add(centerPanel, BorderLayout.CENTER);
+      heatIndexPanel.add(this.setUpHeatIndexSouthPanel(),
+                                                  BorderLayout.SOUTH);
+      heatIndexPanel.add(this.setUpHeatIndexNorthPanel(),
+                                                  BorderLayout.NORTH);
       return heatIndexPanel;
+   }
+
+   /**/
+   private JPanel setUpHeatIndexNorthPanel(){
+      JPanel panel               = new JPanel();
+      ButtonGroup heatIndexGroup = new ButtonGroup();
+      ButtonGroup dataGroup      = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JPanel heatIndexPanel = new JPanel();
+      JRadioButton celsius  = new JRadioButton("Celsuis", true);
+      celsius.setActionCommand("HICelsius");
+      heatIndexGroup.add(celsius);
+      heatIndexPanel.add(celsius);
+      celsius.addItemListener(this._controller);
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("HIFahrenheit");
+      heatIndexGroup.add(fahrenheit);
+      heatIndexPanel.add(fahrenheit);
+      fahrenheit.addItemListener(this._controller);
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("HIKelvin");
+      heatIndexGroup.add(kelvin);
+      heatIndexPanel.add(kelvin);
+      kelvin.addItemListener(this._controller);
+      panel.add(heatIndexPanel);
+
+      JPanel dataPanel = new JPanel();
+      JRadioButton graph = new JRadioButton("Graph", true);
+      graph.setActionCommand("HIGraph");
+      dataGroup.add(graph);
+      dataPanel.add(graph);
+      graph.addItemListener(this._controller);
+      JRadioButton data = new JRadioButton("Data");
+      data.setActionCommand("HIData");
+      dataGroup.add(data);
+      dataPanel.add(data);
+      data.addItemListener(this._controller);
+      panel.add(dataPanel);
+
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpHeatIndexSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("HeatIndexRefresh");
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("HeatIndexSave");
+      save.addActionListener(this._controller);
+      save.addKeyListener(this._controller);
+      panel.add(save);
+
+      return panel;
    }
 
    /**/
@@ -441,8 +556,10 @@ implements WeatherDatabaseClientObserver{
       centerPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
       centerPanel.add(humiLabel);
       humidityPanel.add(centerPanel, BorderLayout.CENTER);
-      humidityPanel.add(this.setUpHumiditySouthPanel(), BorderLayout.SOUTH);
-      humidityPanel.add(this.setUpHumidityNorthPanel(), BorderLayout.NORTH);
+      humidityPanel.add(this.setUpHumiditySouthPanel(),
+                                                  BorderLayout.SOUTH);
+      humidityPanel.add(this.setUpHumidityNorthPanel(),
+                                                  BorderLayout.NORTH);
       return humidityPanel;
    }
 
