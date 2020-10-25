@@ -79,8 +79,6 @@ public class WeatherPanel extends JPanel{
                data1 = this._data.get(i).absoluteData();
                data2 = this._data.get(i+1).absoluteData();
             }
-            //data1 = data1 > (WeatherData.DEFAULTVALUE) ? data1 : min;
-            //data2 = data2 > (WeatherData.DEFAULTVALUE) ? data2 : min;
          }
          else{
             data1 = this._data.get(i).percentageData();
