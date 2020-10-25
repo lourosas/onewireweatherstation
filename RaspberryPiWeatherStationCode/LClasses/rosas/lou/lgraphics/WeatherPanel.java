@@ -79,6 +79,8 @@ public class WeatherPanel extends JPanel{
                data1 = this._data.get(i).absoluteData();
                data2 = this._data.get(i+1).absoluteData();
             }
+            //data1 = data1 > (WeatherData.DEFAULTVALUE) ? data1 : min;
+            //data2 = data2 > (WeatherData.DEFAULTVALUE) ? data2 : min;
          }
          else{
             data1 = this._data.get(i).percentageData();
@@ -100,10 +102,13 @@ public class WeatherPanel extends JPanel{
          catch(NumberFormatException nfe){ nfe.printStackTrace();}
          double dx1 = (PAD + value1 * (w-PAD)/TINCREMENT);
          double dx2 = (PAD + value2 * (w-PAD)/TINCREMENT);
-         dy1 = h-PAD-(data1 - min)*yinc;
-         dy2 = h-PAD-(data2 - min)*yinc;
-         //g2.fill(new Ellipse2D.Double(dx1-2, dy1-2, 4, 4));
-         g2.draw(new Line2D.Double(dx1, dy1, dx2, dy2));
+         if(data1 > WeatherData.DEFAULTVALUE &&
+            data2 > WeatherData.DEFAULTVALUE){
+            dy1 = h-PAD-(data1 - min)*yinc;
+            dy2 = h-PAD-(data2 - min)*yinc;
+            //g2.fill(new Ellipse2D.Double(dx1-2, dy1-2, 4, 4));
+            g2.draw(new Line2D.Double(dx1, dy1, dx2, dy2));
+          }
       }
    }
 
@@ -158,7 +163,7 @@ public class WeatherPanel extends JPanel{
          else{
             throw new NumberFormatException();
          }
-         if(value < min){
+         if(value < min && value > WeatherData.DEFAULTVALUE){
             min = value;
          }
       }
