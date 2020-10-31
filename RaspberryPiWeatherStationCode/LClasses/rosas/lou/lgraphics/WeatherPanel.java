@@ -50,7 +50,15 @@ public class WeatherPanel extends JPanel{
       if(this._data.get(0).type() != WeatherDataType.PRESSURE){
          this.setTypicalYAxis(g2);
       }
-      else{}
+      else{
+         if(this._units != Units.ENGLISH){
+            this.setPressureYAxisNonEnglish(g2);
+            //this.setTypicalYAxis(g2);
+         }
+         else{
+            this.setPressureYAxisEnglish(g2);
+         }
+      }
       g2.setPaint(Color.BLUE);
       double max = this.max();
       double min = this.min();
@@ -59,8 +67,14 @@ public class WeatherPanel extends JPanel{
          min -= 1.0;
       }
       else{
-         max += 0.30;
-         min -= 0.30;
+         if(this._units == Units.ENGLISH){
+            max += 0.05;
+            min -= 0.05;
+         }
+         else{
+            max += 0.10;
+            min -= 0.10;
+         }
       }
       double yinc = (h - PAD)/(double)(max - min);
       for(int i = 0; i < increment - 1; i++){
@@ -84,6 +98,9 @@ public class WeatherPanel extends JPanel{
             data1 = this._data.get(i).percentageData();
             data2 = this._data.get(i+1).percentageData();
          }
+         data1 = this.setTheValue(data1);
+         data2 = this.setTheValue(data2);
+
          double dy1, dy2;
          String time1 = this._data.get(i).time();
          String time2 = this._data.get(i+1).time();
@@ -169,6 +186,28 @@ public class WeatherPanel extends JPanel{
    }
 
    /**/
+   private double setTheValue(double data){
+      double returnValue = Double.NEGATIVE_INFINITY;
+      String value       = null;
+      Double d           = null;
+      try{
+         value = String.format("%.2f", data);
+         if(this._data.get(0).type() == WeatherDataType.PRESSURE){
+            if(this._units == Units.ABSOLUTE ||
+               this._units == Units.METRIC){
+               value = String.format("%.1f", data);
+            }
+         }
+         d           = Double.parseDouble(value);
+         returnValue = d.doubleValue();
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+      return returnValue;
+   }
+
+   /**/
    private void setXAxis(Graphics2D g2){
       int HOURS                = 24;
       Iterator<WeatherData> it = this._data.iterator();
@@ -195,6 +234,106 @@ public class WeatherPanel extends JPanel{
          if(i%6 == 0 || i == 23){
             g2.drawString(s, sx, sy);
          }
+      }
+   }
+
+   /**/
+   private void setPressureYAxisNonEnglish(Graphics2D g2){
+      final double MID = 2.5;
+      int increment    = this._data.size();
+      int h            = this.getHeight();
+      int w            = this.getWidth();
+      try{
+         double min = this.min() - 0.1;
+         double max = this.max() + 0.1;
+         Font font             = g2.getFont();
+         FontRenderContext frc = g2.getFontRenderContext();
+         LineMetrics lm        = font.getLineMetrics("0", frc);
+         float sh              = lm.getAscent() + lm.getDescent();
+
+         g2.setPaint(Color.BLACK);
+         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
+         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         //Now, start drawing out the y-axis text
+         double yinc  = (h - PAD)/(double)(max - min);
+         double value = min;
+         while(value < max){
+            int temp = (int)(value * 10.0);
+            if((temp % 5) == 0 || value == min){
+               String s = new String("" + (double)(temp/10.0));
+               if(value == min){
+                  s = new String(String.format("%.2f", value));
+               }
+               double sw=(double)font.getStringBounds(s,frc).getWidth();
+               double sx = (PAD - sw)/2.0;
+               double currentValue = (double)(temp/10.0);
+               double sy = h - PAD -(currentValue - min)*yinc+sh/4;
+               if(value == min){
+                  sy = h - PAD - (value - min) + sh/4;
+               }
+               if(temp % 5 != 4){
+                  g2.drawString(s, (float)sx, (float)sy);
+               }
+               if(value != min){
+                  sy = h - PAD - (currentValue - min)*yinc;
+                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+               }
+            }
+            value += 0.01;
+         }
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
+      }
+   }
+
+   /**/
+   private void setPressureYAxisEnglish(Graphics2D g2){
+      final double MID = 2.5;
+      int increment    = this._data.size();
+      int h            = this.getHeight();
+      int w            = this.getWidth();
+      try{
+         double min = this.min() - 0.05;
+         double max = this.max() + 0.05;
+         Font font             = g2.getFont();
+         FontRenderContext frc = g2.getFontRenderContext();
+         LineMetrics lm        = font.getLineMetrics("0", frc);
+         float sh              = lm.getAscent() + lm.getDescent();
+
+         g2.setPaint(Color.BLACK);
+         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
+         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         //Now, start drawing out the y-axis text
+         double yinc  = (h - PAD)/(double)(max - min);
+         double value = min;
+         while(value < max){
+            int temp = (int)(value * 100.0);
+            if((temp % 5) == 0 || value == min){
+               String s = new String("" + (double)(temp/100.0));
+               if(value == min){
+                  s = new String(String.format("%.2f", value));
+               }
+               double sw=(double)font.getStringBounds(s,frc).getWidth();
+               double sx = (PAD - sw)/2.0;
+               double currentValue = (double)(temp/100.0);
+               double sy = h - PAD -(currentValue - min)*yinc+sh/4;
+               if(value == min){
+                  sy = h - PAD - (value - min) + sh/4;
+               }
+               if(temp % 5 != 4){
+                  g2.drawString(s, (float)sx, (float)sy);
+               }
+               if(value != min){
+                  sy = h - PAD - (currentValue - min)*yinc;
+                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+               }
+            }
+            value += 0.01;
+         }
+      }
+      catch(NumberFormatException nfe){
+         nfe.printStackTrace();
       }
    }
 
@@ -246,5 +385,4 @@ public class WeatherPanel extends JPanel{
          nfe.printStackTrace();
       }
    }
-
 }
