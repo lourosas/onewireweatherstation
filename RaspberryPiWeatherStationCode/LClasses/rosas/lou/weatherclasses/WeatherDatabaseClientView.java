@@ -51,7 +51,7 @@ implements WeatherDatabaseClientObserver{
    "20","21","22","23","24","25","26","27","28","29","30","31"};
    private static String [] YEARS = {"2017", "2018", "2019", "2020"};
 
-   private WeatherDatabaseClientController _controller = null;
+   private GenericWeatherController _controller = null;
    //Really do not need these to be global any longer--handled by
    //The Controller directly, realtime...
    private JTextField _address        = null;
@@ -86,6 +86,18 @@ implements WeatherDatabaseClientObserver{
       this.setUpGUI();
    }
 
+   /**/
+   public WeatherDatabaseClientView(
+      String title,
+      boolean createController
+   ){
+      super(title);
+      if(createController){
+         this._controller = new WeatherDatabaseClientController(this);
+      }
+      this.setUpGUI();
+   }
+
    //////////////////////////Public Methods///////////////////////////
    /**/
    public String address(){
@@ -107,6 +119,10 @@ implements WeatherDatabaseClientObserver{
    public void alertPressureTimeout(){}
 
    public void alertTemperatureTimeout(){}
+
+   public void setController(GenericWeatherController controller){
+      this._controller = controller;
+   }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
       if(this.dewpointDisplay == GRAPH){

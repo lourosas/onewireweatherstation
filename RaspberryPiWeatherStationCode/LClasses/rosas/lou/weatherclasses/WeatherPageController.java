@@ -28,10 +28,11 @@ import rosas.lou.weatherclasses.*;
 The complete Controller for the WeatherPage application
 */
 //////////////////////////////////////////////////////////////////////
-public class WeatherPageController implements ActionListener,
-KeyListener, ItemListener{
-   private WeatherPageView _view;
-   private WeatherPage     _model;
+public class WeatherPageController extends
+GenericWeatherController implements ActionListener, KeyListener,
+ItemListener{
+   private WeatherDatabaseClientView _view;
+   private WeatherPage               _model;
 
    {
       _view  = null;
@@ -42,12 +43,45 @@ KeyListener, ItemListener{
    public WeatherPageController(){}
 
    /**/
-   public WeatherPageController(WeatherPageView view){}
+   public WeatherPageController(WeatherDatabaseClientView view){}
 
    /**/
-   public WeatherPageController(WeatherPageView view,WeatherPage model){
-
+   public WeatherPageController(
+      WeatherDatabaseClientView view,
+      WeatherPage model
+   ){
+      this._view  = view;
+      this._model = model;
+      this._model.addObserver(this._view);
+      this._view.setController(this);
    }
 
-   /////////////////////////Public Methods////////////////////////////
+   /**/
+   public void actionPerformed(ActionEvent ae){
+      this.handleJButton(ae);
+      this.handleJComboBox(ae);
+      //this.handleJMenuItem(ae);
+      //this.handleJTextField(ae);
+   }
+
+   /**/
+   public void keyPressed(KeyEvent ke){}
+
+   /**/
+   public void keyReleased(KeyEvent ke){}
+
+   /**/
+   public void keyTyped(KeyEvent ke){}
+
+   /**/
+   public void itemStateChanged(ItemEvent ie){}
+
+   /////////////////////////Private Methods///////////////////////////
+   /**/
+   private void handleJButton(ActionEvent ae){}
+
+   /**/
+   private void handleJComboBox(ActionEvent ae){
+      System.out.println(ae.getSource());
+   }
 }

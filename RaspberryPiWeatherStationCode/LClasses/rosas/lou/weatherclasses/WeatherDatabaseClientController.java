@@ -28,8 +28,9 @@ import rosas.lou.weatherclasses.*;
 The complete Controller for the WeatherDatabaseClient application
 */
 //////////////////////////////////////////////////////////////////////
-public class WeatherDatabaseClientController implements
-ActionListener, KeyListener, ItemListener{
+public class WeatherDatabaseClientController extends
+GenericWeatherController implements ActionListener, KeyListener,
+ItemListener{
    private WeatherDatabaseClientView _view;
    private WeatherDatabaseClient     _model;
 
