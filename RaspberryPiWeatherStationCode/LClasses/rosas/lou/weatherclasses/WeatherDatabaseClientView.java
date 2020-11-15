@@ -89,12 +89,10 @@ implements WeatherDatabaseClientObserver{
    /**/
    public WeatherDatabaseClientView(
       String title,
-      boolean createController
+      GenericWeatherController controller
    ){
       super(title);
-      if(createController){
-         this._controller = new WeatherDatabaseClientController(this);
-      }
+      this._controller = controller;
       this.setUpGUI();
    }
 
@@ -120,9 +118,6 @@ implements WeatherDatabaseClientObserver{
 
    public void alertTemperatureTimeout(){}
 
-   public void setController(GenericWeatherController controller){
-      this._controller = controller;
-   }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
       if(this.dewpointDisplay == GRAPH){
@@ -168,6 +163,22 @@ implements WeatherDatabaseClientObserver{
          this.printTemperature(data);
       }
 
+   }
+
+   ///////////////////////Public Methods//////////////////////////////
+   /**/
+   public String getDay(){
+      return (String)this._dayCB.getSelectedItem();
+   }
+
+   /**/
+   public String getMonth(){
+      return (String)this._monthCB.getSelectedItem();
+   }
+
+   /**/
+   public String getYear(){
+      return (String)this._yearCB.getSelectedItem();
    }
 
    /**/

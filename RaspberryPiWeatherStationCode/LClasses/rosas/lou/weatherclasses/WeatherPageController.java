@@ -53,7 +53,16 @@ ItemListener{
       this._view  = view;
       this._model = model;
       this._model.addObserver(this._view);
-      this._view.setController(this);
+   }
+
+   /**/
+   public void addModel(WeatherPage model){
+      this._model = model;
+   }
+
+   /**/
+   public void addView(WeatherDatabaseClientView view){
+      this._view = view;
    }
 
    /**/
@@ -61,7 +70,7 @@ ItemListener{
       this.handleJButton(ae);
       this.handleJComboBox(ae);
       //this.handleJMenuItem(ae);
-      //this.handleJTextField(ae);
+      this.handleJTextField(ae);
    }
 
    /**/
@@ -78,10 +87,42 @@ ItemListener{
 
    /////////////////////////Private Methods///////////////////////////
    /**/
-   private void handleJButton(ActionEvent ae){}
+   private void handleJButton(ActionEvent ae){
+      try{
+         String mo = this._view.getMonth();
+         String dy = this._view.getDay();
+         String yr = this._view.getYear();
+
+
+         JButton button = (JButton)ae.getSource();
+         this._model.setCalendar(mo,dy,yr);
+         if(button.getActionCommand().equals("TemperatureRefresh")){
+            this._model.grabTemperatureData(mo,dy,yr);
+         }
+      }
+      catch(NullPointerException npe){}
+      catch(ClassCastException cce){}
+   }
 
    /**/
    private void handleJComboBox(ActionEvent ae){
-      System.out.println(ae.getSource());
+      try{
+         JComboBox jcb = ((JComboBox)ae.getSource());
+         String value = (String)jcb.getSelectedItem();
+         if(jcb.getName().toUpperCase().equals("MONTH")){
+            this._model.setCalendar(value,null,null);
+         }
+         else if(jcb.getName().toUpperCase().equals("DAY")){
+            this._model.setCalendar(null,value,null);
+         }
+         else if(jcb.getName().toUpperCase().equals("YEAR")){
+            this._model.setCalendar(null,null,value);
+         }
+      }
+      catch(ClassCastException cce){}
+      catch(NullPointerException npe){}
    }
+
+   /**/
+   private void handleJTextField(ActionEvent ae){}
 }

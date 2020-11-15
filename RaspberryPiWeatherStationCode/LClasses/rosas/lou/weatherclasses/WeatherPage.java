@@ -43,7 +43,7 @@ public class WeatherPage{
    private List<WeatherDatabaseClientObserver> _observers;
 
    {
-      _addr = new byte[]{(byte)68, (byte)110, (byte)91, (byte)225};
+      _addr = new byte[]{(byte)68,(byte)110,(byte)91,(byte)225};
       _port            = PORT;
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
@@ -75,22 +75,77 @@ public class WeatherPage{
 
    /**/
    public void grabTemperatureData(String month,String day,String year){
-      String data = this.connectAndGrab(month,day,year);
+      String data = this.connectAndGrab(month,day,year,"metric");
       this.parseTemperature(data);
    }
 
+   public void setCalendar(String month, String day, String year){
+      if(month != null && month != ""){
+         this._cal[0] = month;
+      }
+      if(day != null && day != ""){
+         this._cal[1] = day;
+      }
+      if(year != null && year != ""){
+         this._cal[2] = year;
+      }
+   }
    ////////////////////////Private Methods////////////////////////////
    /**/
-   private String connectAndGrab(String month,String day,String year){
+   private String connectAndGrab
+   (
+      String month,
+      String day,
+      String year,
+      String units
+   ){
+      int first = new Byte(this._addr[0]).intValue();
+      first = first < 0 ? first + 256 : first;
+      int sec   = new Byte(this._addr[1]).intValue();
+      sec = sec < 0 ? sec + 256 : sec;
+      int third = new Byte(this._addr[2]).intValue();
+      third = third < 0 ? third + 256 : third;
+      int fourth= new Byte(this._addr[3]).intValue();
+      fourth=fourth < 0 ? fourth + 256 : fourth;
+      String returnLine = null;
       StringBuffer send = new StringBuffer("http://");
-      String addr = new String(""+this._addr[0]+"."+this._addr[1]);
-      addr = addr.concat("."+this._addr[2]+"."+this._addr[3]);
+      String addr = new String(""+first+"."+sec+"."+third+"."+fourth);
       addr = addr.concat(":"+this._port);
-      send.append(addr);
-      System.out.println(send);
-      return send.toString(); //TODO-->FIX!!!
+      send.append(addr+"/daily?month="+month+"&date="+day);
+      send.append("&year="+year+"&units="+units);
+      try{
+         URL url = new URL(send.toString().trim());
+         URLConnection conn = url.openConnection();
+         conn.connect();
+         BufferedReader in = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream()));
+         String line = null;
+         while((line = in.readLine()) != null){
+            if(line.contains("theData.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  if(line.length() > 0){
+                     if(returnLine == null){
+                        returnLine = new String();
+                     }
+                     returnLine = returnLine.concat(line);
+                  }
+               }
+            }
+         }
+      }
+      catch(MalformedURLException mle){ mle.printStackTrace();}
+      catch(IOException ioe){ioe.printStackTrace();}
+      return returnLine;
    }
 
    /**/
-   private void parseTemperature(String data){}
+   private void parseTemperature(String data){
+      //System.out.println(data);
+      String [] arrayData = data.split("],");
+      for(int i = 0; i < arrayData.length; i++){
+         if(arrayData[i].contains("[")){
+            System.out.println(arrayData[i]);
+         }
+      }
+   }
 }
