@@ -75,6 +75,7 @@ public class WeatherPage{
 
    /**/
    public void grabTemperatureData(String month,String day,String year){
+      this.setCalendar(month,day,year);
       String data = this.connectAndGrab(month,day,year,"metric");
       this.parseTemperature(data);
    }
@@ -90,6 +91,7 @@ public class WeatherPage{
          this._cal[2] = year;
       }
    }
+
    ////////////////////////Private Methods////////////////////////////
    /**/
    private String connectAndGrab
@@ -142,9 +144,33 @@ public class WeatherPage{
    private void parseTemperature(String data){
       //System.out.println(data);
       String [] arrayData = data.split("],");
+      String time = null;
+      String temp = null;
       for(int i = 0; i < arrayData.length; i++){
          if(arrayData[i].contains("[")){
-            System.out.println(arrayData[i]);
+            String [] timeArray = arrayData[i].substring(2,
+                                    arrayData[i].length()).split(",");
+            time = new String(timeArray[0].trim() + ":");
+            time = time.concat(timeArray[1].trim() + ":");
+            time = time.concat(timeArray[2].trim());
+         }
+         else{
+            temp = arrayData[i].trim().split(",")[0];
+            temp = temp.substring(1,temp.length()-1);
+         }
+         WeatherData td = new TemperatureData(Units.METRIC,
+                                              temp,
+                                              "Temperature",
+                                              this._cal[0],
+                                              this._cal[1],
+                                              this._cal[2],
+                                              time);
+         try{
+            this._temperatureData.add(td);
+         }
+         catch(NullPointerException npe){
+            this._temperatureData = new LinkedList<WeatherData>();
+            this._temperatureData.add(td);
          }
       }
    }
