@@ -74,6 +74,38 @@ public class WeatherPage{
    }
 
    /**/
+   public void grabHumidityData(String month,String day,String year){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(month,day,year);
+         String data = this.connectAndGrab(month,day,year,"metric");
+         wl          = this.parseHumidity(data);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+      }
+      finally{
+         this.publishHumidity(wl);
+      }
+   }
+
+   /**/
+   public void grabPressureData(String month,String day,String year){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(month,day,year);
+         String data = this.connectAndGrab(month,day,year,"absolute");
+         wl          = this.parsePressure(data);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+      }
+      finally{
+         this.publishPressure(wl);
+      }
+   }
+
+   /**/
    public void grabTemperatureData(String month,String day,String year){
       List<WeatherData> wl = null;
       try{
@@ -154,6 +186,93 @@ public class WeatherPage{
    }
 
    /**/
+   private List<WeatherData> parseHumidity(String data){
+      String [] arrayData      = data.split("],");
+      String time              = null;
+      String humidity          = null;
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; i += 2){
+         double hum     = WeatherData.DEFAULTVALUE;
+         WeatherData hd = null;
+         if(arrayData[i].contains("[")){
+            String [] timeArray = arrayData[i].substring(2,
+                                    arrayData[i].length()).split(",");
+            time = new String(timeArray[0].trim() + ":");
+            time = time.concat(timeArray[1].trim() + ":");
+            time = time.concat(timeArray[2].trim());
+            humidity = arrayData[i+1].trim().split(",")[1];
+            humidity = humidity.substring(1,humidity.length()-1);
+            try{
+               hum = Double.parseDouble(humidity);
+            }
+            catch(NumberFormatException nfe){
+               hum = WeatherData.DEFAULTHUMIDITY;
+            }
+            catch(NullPointerException npe){
+               hum = WeatherData.DEFAULTHUMIDITY;
+            }
+            finally{
+               hd = new HumidityData(Units.PERCENTAGE, hum,
+                                     "Humidity", this._cal[0],
+                                     this._cal[1],this._cal[2],
+                                     time);
+            }
+            try{
+               wdList.add(hd);
+            }
+            catch(NullPointerException npe){
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(hd);
+            }
+         }
+      }
+      return wdList;
+   }
+
+   private List<WeatherData> parsePressure(String data){
+      String [] arrayData      = data.split("],");
+      String time              = null;
+      String pressure          = null;
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; i += 2){
+         double press   = WeatherData.DEFAULTVALUE;
+         WeatherData pd = null;
+         if(arrayData[i].contains("[")){
+            String [] timeArray = arrayData[i].substring(2,
+                                    arrayData[i].length()).split(",");
+            time = new String(timeArray[0].trim() + ":");
+            time = time.concat(timeArray[1].trim() + ":");
+            time = time.concat(timeArray[2].trim());
+            pressure = arrayData[i+1].trim().split(",")[2];
+            pressure = pressure.substring(1,pressure.length()-1);
+            try{
+               press = Double.parseDouble(pressure);
+            }
+            catch(NumberFormatException nfe){
+               press = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){
+               press = WeatherData.DEFAULTVALUE;
+            }
+            finally{
+               pd = new PressureData(Units.ABSOLUTE, press,
+                                     "Pressure", this._cal[0],
+                                     this._cal[1],this._cal[2],
+                                     time);
+            }
+            try{
+               wdList.add(pd);
+            }
+            catch(NullPointerException npe){
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(pd);
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
    private List<WeatherData> parseTemperature(String data){
       String [] arrayData      = data.split("],");
       String time              = null;
@@ -195,6 +314,34 @@ public class WeatherPage{
          }
       }
       return wdList;
+   }
+
+   /**/
+   private void publishHumidity(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         if(list.size() > 0){
+            (it.next()).updateHumidityData(list);
+         }
+         else{
+            (it.next()).alertNoHumidityData();
+         }
+      }
+   }
+
+   /**/
+   private void publishPressure(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         if(list.size() > 0){
+            (it.next()).updatePressureData(list);
+         }
+         else{
+            (it.next()).alertNoPressureData();
+         }
+      }
    }
 
    /**/

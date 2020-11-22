@@ -61,6 +61,8 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _yearCB  = null;
 
    private java.util.List<WeatherData> temperatureData = null;
+   private java.util.List<WeatherData> humidityData    = null;
+   private java.util.List<WeatherData> pressureData    = null;
 
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
@@ -125,9 +127,61 @@ implements WeatherDatabaseClientObserver{
 
    public void alertNoHeatIndexData(){}
 
-   public void alertNoHumidityData(){}
+   public void alertNoHumidityData(){
+      try{
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HUMIDITY")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+         drawPanel.setLayout(new BorderLayout());
+         String errorString = new String("No Humidity Data ");
+         errorString = errorString.concat("Available for this Date");
+         JLabel label = new JLabel(errorString,SwingConstants.CENTER);
+         drawPanel.add(label, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
-   public void alertNoPressureData(){}
+   public void alertNoPressureData(){
+      try{
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("PRESSURE")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+         drawPanel.setLayout(new BorderLayout());
+         String errorString = new String("No Pressure Data ");
+         errorString = errorString.concat("Available for this Date");
+         JLabel label = new JLabel(errorString,SwingConstants.CENTER);
+         drawPanel.add(label, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
    public void alertNoTemperatureData(){
       try{
@@ -176,6 +230,7 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updateHumidityData(java.util.List<WeatherData> data){
+      this.humidityData = data;
       if(this.humidityDisplay == GRAPH){
          this.graphHumidity(data);
       }
@@ -185,6 +240,7 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updatePressureData(java.util.List<WeatherData> data){
+      this.pressureData = data;
       if(this.pressureDisplay == GRAPH){
          this.graphPressure(data);
       }
@@ -204,6 +260,50 @@ implements WeatherDatabaseClientObserver{
    }
 
    ///////////////////////Public Methods//////////////////////////////
+   /**/
+   public void displayHumidity(short display){
+      this.setHumidityDisplay(display);
+      if(this.humidityData.size() > 0){
+         this.updateHumidityData(this.humidityData);
+      }
+      else{
+         this.alertNoHumidityData();
+      }
+   }
+
+   /**/
+   public void displayPressure(short display){
+      this.setPressureDisplay(display);
+      this.displayPressure(this.pressureUnits);
+   }
+
+   /**/
+   public void displayPressure(Units units){
+      this.setPressureUnits(units);
+      if(this.pressureData.size() > 0){
+         this.updatePressureData(this.pressureData);
+      }
+      else{
+         this.alertNoPressureData();
+      }
+   }
+
+   /**/
+   public void displayTemperature(short display){
+      this.setTemperatureDisplay(display);
+      this.displayTemperature(this.temperatureUnits);
+   }
+   /**/
+   public void displayTemperature(Units units){
+      this.setTemperatureUnits(units);
+      if(this.temperatureData.size() > 0){
+         this.updateTemperatureData(this.temperatureData);
+      }
+      else{
+         this.alertNoTemperatureData();
+      }
+   }
+
    /**/
    public String getDay(){
       return (String)this._dayCB.getSelectedItem();

@@ -112,6 +112,12 @@ ItemListener{
          if(button.getActionCommand().equals("TemperatureRefresh")){
             this._model.grabTemperatureData(mo,dy,yr);
          }
+         else if(button.getActionCommand().equals("HumidityRefresh")){
+            this._model.grabHumidityData(mo,dy,yr);
+         }
+         else if(button.getActionCommand().equals("Pressure Refresh")){
+            this._model.grabPressureData(mo,dy,yr);
+         }
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
@@ -154,7 +160,12 @@ ItemListener{
    /**/
    private void handleHumidityItemSelection(String command){
       if(command.contains("HG") || command.contains("HD")){
-         System.out.println(command);
+         if(command.toUpperCase().equals("HGRAPH")){
+            this._view.displayHumidity((short)0);
+         }
+         else if(command.toUpperCase().equals("HDATA")){
+            this._view.displayHumidity((short)1);
+         }
       }
    }
 
@@ -164,14 +175,46 @@ ItemListener{
          command.toUpperCase().equals("MMS")              ||
          command.toUpperCase().equals("INCHES")           ||
          command.toUpperCase().equals("MILLIBARS")){
-         System.out.println(command);
+         if(command.toUpperCase().equals("MMS")){
+            this._view.displayPressure(Units.METRIC);
+         }
+         else if(command.toUpperCase().equals("INCHES")){
+            this._view.displayPressure(Units.ENGLISH);
+         }
+         else if(command.toUpperCase().equals("MILLIBARS")){
+            this._view.displayPressure(Units.ABSOLUTE);
+         }
+         else if(command.toUpperCase().equals("PGRAPH")){
+            //GRAPH = 0
+            this._view.displayPressure((short)0);
+         }
+         else if(command.toUpperCase().equals("PDATA")){
+            //DATA = 1
+            this._view.displayPressure((short)1);
+         }
       }
    }
 
    /**/
    private void handleTemperatureItemSelection(String command){
       if(command.contains("T")){
-         System.out.println(command);
+         if(command.toUpperCase().equals("TCELSIUS")){
+            this._view.displayTemperature(Units.METRIC);
+         }
+         else if(command.toUpperCase().equals("TFAHRENHEIT")){
+            this._view.displayTemperature(Units.ENGLISH);
+         }
+         else if(command.toUpperCase().equals("TKELVIN")){
+            this._view.displayTemperature(Units.ABSOLUTE);
+         }
+         else if(command.toUpperCase().equals("TGRAPH")){
+            //GRAPH = 0
+            this._view.displayTemperature((short)0);
+         }
+         else if(command.toUpperCase().equals("TDATA")){
+            //DATA = 1
+            this._view.displayTemperature((short)1);
+         }
       }
    }
 }
