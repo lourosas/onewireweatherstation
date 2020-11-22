@@ -83,7 +83,20 @@ ItemListener{
    public void keyTyped(KeyEvent ke){}
 
    /**/
-   public void itemStateChanged(ItemEvent ie){}
+   public void itemStateChanged(ItemEvent ie){
+      try{
+         AbstractButton ab = (AbstractButton)ie.getSource();
+         if(ab.isSelected()){
+            String command = ab.getActionCommand();
+            this.handleTemperatureItemSelection(command);
+            this.handleHumidityItemSelection(command);
+            this.handleHeatIndexItemSelection(command);
+            this.handleDewpointItemSelection(command);
+            this.handlePressureItemSelection(command);
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /////////////////////////Private Methods///////////////////////////
    /**/
@@ -127,4 +140,38 @@ ItemListener{
 
    /**/
    private void handleJTextField(ActionEvent ae){}
+
+   /**/
+   private void handleDewpointItemSelection(String command){
+      if(command.contains("DP")){ System.out.println(command); }
+   }
+
+   /**/
+   private void handleHeatIndexItemSelection(String command){
+      if(command.contains("HI")){ System.out.println(command);}
+   }
+
+   /**/
+   private void handleHumidityItemSelection(String command){
+      if(command.contains("HG") || command.contains("HD")){
+         System.out.println(command);
+      }
+   }
+
+   /**/
+   private void handlePressureItemSelection(String command){
+      if(command.contains("PG") || command.contains("PD") ||
+         command.toUpperCase().equals("MMS")              ||
+         command.toUpperCase().equals("INCHES")           ||
+         command.toUpperCase().equals("MILLIBARS")){
+         System.out.println(command);
+      }
+   }
+
+   /**/
+   private void handleTemperatureItemSelection(String command){
+      if(command.contains("T")){
+         System.out.println(command);
+      }
+   }
 }
