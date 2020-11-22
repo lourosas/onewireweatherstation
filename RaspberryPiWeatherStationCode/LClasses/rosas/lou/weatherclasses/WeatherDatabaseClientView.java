@@ -60,6 +60,8 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _dayCB   = null;
    private JComboBox<String> _yearCB  = null;
 
+   private java.util.List<WeatherData> temperatureData = null;
+
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
    private Units heatIndexUnits   = Units.METRIC;
@@ -93,6 +95,7 @@ implements WeatherDatabaseClientObserver{
    ){
       super(title);
       this._controller = controller;
+      this._controller.addView(this);
       this.setUpGUI();
    }
 
@@ -118,6 +121,41 @@ implements WeatherDatabaseClientObserver{
 
    public void alertTemperatureTimeout(){}
 
+   public void alertNoDewpointData(){}
+
+   public void alertNoHeatIndexData(){}
+
+   public void alertNoHumidityData(){}
+
+   public void alertNoPressureData(){}
+
+   public void alertNoTemperatureData(){
+      try{
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("TEMPERATURE")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+         drawPanel.setLayout(new BorderLayout());
+         String errorString = new String("No Temperature Data ");
+         errorString = errorString.concat("Available for this Date");
+         JLabel label = new JLabel(errorString,SwingConstants.CENTER);
+         drawPanel.add(label, BorderLayout.CENTER);
+         jtp.setSelectedIndex(tempTab + 1);
+         jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
       if(this.dewpointDisplay == GRAPH){
@@ -156,13 +194,13 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updateTemperatureData(java.util.List<WeatherData> data){
+      this.temperatureData = data;
       if(this.tempDisplay == GRAPH){
          this.graphTemperature(data);
       }
       else{
          this.printTemperature(data);
       }
-
    }
 
    ///////////////////////Public Methods//////////////////////////////
@@ -478,30 +516,30 @@ implements WeatherDatabaseClientObserver{
       this._monthCB = new JComboBox();
       this._monthCB.setActionCommand("Month Combo Box");
       this._monthCB.setName("Month");
-      this._monthCB.addActionListener(this._controller);
-      //this._monthCB.addItemListener(this._controller);
-      //this._monthCB.addKeyListener(this._controller);
       for(int i = 0; i < this.MONTHS.length; i++){
          this._monthCB.addItem(this.MONTHS[i].trim());
       }
       this._dayCB = new JComboBox();
       this._dayCB.setActionCommand("Day Combo Box");
       this._dayCB.setName("Day");
-      this._dayCB.addActionListener(this._controller);
-      //this._dayCB.addItemListener(this._controller);
-      //this._dayCB.addKeyListener(this._controller);
       for(int i = 0; i < this.DAYS.length; i++){
          this._dayCB.addItem(this.DAYS[i].trim());
       }
       this._yearCB = new JComboBox();
       this._yearCB.setActionCommand("Year Combo Box");
       this._yearCB.setName("Year");
-      this._yearCB.addActionListener(this._controller);
-      //this._yearCB.addItemListener(this._controller);
-      //this._yearCB.addKeyListener(this._controller);
       for(int i = 0; i < this.YEARS.length; i++){
          this._yearCB.addItem(this.YEARS[i].trim());
       }
+      this._monthCB.addActionListener(this._controller);
+      //this._monthCB.addItemListener(this._controller);
+      //this._monthCB.addKeyListener(this._controller);
+      this._dayCB.addActionListener(this._controller);
+      //this._dayCB.addItemListener(this._controller);
+      //this._dayCB.addKeyListener(this._controller);
+      this._yearCB.addActionListener(this._controller);
+      //this._yearCB.addItemListener(this._controller);
+      //this._yearCB.addKeyListener(this._controller);
       //Set the current date in the combo box
       this.setUpCurrentDate();
    }

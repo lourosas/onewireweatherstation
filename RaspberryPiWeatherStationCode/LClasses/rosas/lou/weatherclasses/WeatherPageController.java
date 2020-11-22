@@ -100,7 +100,9 @@ ItemListener{
             this._model.grabTemperatureData(mo,dy,yr);
          }
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
       catch(ClassCastException cce){}
    }
 

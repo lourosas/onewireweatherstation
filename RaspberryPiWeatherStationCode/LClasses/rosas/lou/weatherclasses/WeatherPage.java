@@ -75,9 +75,22 @@ public class WeatherPage{
 
    /**/
    public void grabTemperatureData(String month,String day,String year){
-      this.setCalendar(month,day,year);
-      String data = this.connectAndGrab(month,day,year,"metric");
-      this.parseTemperature(data);
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(month,day,year);
+         String data = this.connectAndGrab(month,day,year,"metric");
+         wl          = this.parseTemperature(data);
+         //this.publishTemperature(wl);
+      }
+      catch(NullPointerException npe){
+         //npe.printStackTrace();
+         //Need to figure out a better way to aleart the view!!!
+         //Let the View figure out what to do!!
+         wl = new LinkedList<WeatherData>();
+      }
+      finally{
+         this.publishTemperature(wl);
+      }
    }
 
    public void setCalendar(String month, String day, String year){
@@ -141,36 +154,59 @@ public class WeatherPage{
    }
 
    /**/
-   private void parseTemperature(String data){
-      //System.out.println(data);
-      String [] arrayData = data.split("],");
-      String time = null;
-      String temp = null;
-      for(int i = 0; i < arrayData.length; i++){
+   private List<WeatherData> parseTemperature(String data){
+      String [] arrayData      = data.split("],");
+      String time              = null;
+      String temp              = null;
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; i += 2){
+         double tempd   = WeatherData.DEFAULTVALUE;
+         WeatherData td = null;
          if(arrayData[i].contains("[")){
             String [] timeArray = arrayData[i].substring(2,
                                     arrayData[i].length()).split(",");
             time = new String(timeArray[0].trim() + ":");
             time = time.concat(timeArray[1].trim() + ":");
             time = time.concat(timeArray[2].trim());
+            temp = arrayData[i + 1].trim().split(",")[0];
+            temp = temp.substring(1,temp.length()-1);
+            try{
+               tempd = Double.parseDouble(temp);
+            }
+            catch(NumberFormatException nfe){
+               tempd = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){
+               tempd = WeatherData.DEFAULTVALUE;
+            }
+            finally{
+               td = new TemperatureData(Units.METRIC, tempd,
+                                        "Temperature", this._cal[0],
+                                        this._cal[1], this._cal[2],
+                                        time);
+            }
+            try{
+               wdList.add(td);
+            }
+            catch(NullPointerException npe){
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(td);
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
+   private void publishTemperature(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         if(list.size() > 0){
+            (it.next()).updateTemperatureData(list);
          }
          else{
-            temp = arrayData[i].trim().split(",")[0];
-            temp = temp.substring(1,temp.length()-1);
-         }
-         WeatherData td = new TemperatureData(Units.METRIC,
-                                              temp,
-                                              "Temperature",
-                                              this._cal[0],
-                                              this._cal[1],
-                                              this._cal[2],
-                                              time);
-         try{
-            this._temperatureData.add(td);
-         }
-         catch(NullPointerException npe){
-            this._temperatureData = new LinkedList<WeatherData>();
-            this._temperatureData.add(td);
+            (it.next()).alertNoTemperatureData();
          }
       }
    }
