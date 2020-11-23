@@ -120,6 +120,9 @@ ItemListener{
          else if(button.getActionCommand().equals("DewpointRefresh")){
             this._model.grabDewpointData(mo,dy,yr);
          }
+         else if(button.getActionCommand().equals("HeatIndexRefresh")){
+            this._model.grabHeatIndexData(mo,dy,yr);
+         }
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
