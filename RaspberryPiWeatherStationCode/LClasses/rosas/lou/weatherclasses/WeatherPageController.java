@@ -177,7 +177,25 @@ ItemListener{
 
    /**/
    private void handleHeatIndexItemSelection(String command){
-      if(command.contains("HI")){ System.out.println(command);}
+      if(command.contains("HI")){
+         if(command.toUpperCase().equals("HICELSIUS")){
+            this._view.displayHeatIndex(Units.METRIC);
+         }
+         else if(command.toUpperCase().equals("HIFAHRENHEIT")){
+            this._view.displayHeatIndex(Units.ENGLISH);
+         }
+         else if(command.toUpperCase().equals("HIKELVIN")){
+            this._view.displayHeatIndex(Units.ABSOLUTE);
+         }
+         else if(command.toUpperCase().equals("HIGRAPH")){
+            //GRAPH = 0
+            this._view.displayHeatIndex((short)0);
+         }
+         else if(command.toUpperCase().equals("HIDATA")){
+            //DATA  = 1
+            this._view.displayHeatIndex((short)1);
+         }
+      }
    }
 
    /**/

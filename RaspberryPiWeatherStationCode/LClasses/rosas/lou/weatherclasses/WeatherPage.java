@@ -452,7 +452,16 @@ public class WeatherPage{
 
    /**/
    private void publishHeatIndex(List<WeatherData> list){
-      
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         if(list.size() > 0){
+            (it.next()).updateHeatIndexData(list);
+         }
+         else{
+            (it.next()).alertNoHeatIndexData();
+         }
+      }
    }
 
    /**/

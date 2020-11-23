@@ -64,6 +64,7 @@ implements WeatherDatabaseClientObserver{
    private java.util.List<WeatherData> humidityData    = null;
    private java.util.List<WeatherData> pressureData    = null;
    private java.util.List<WeatherData> dewpointData    = null;
+   private java.util.List<WeatherData> heatIndexData   = null;
 
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
@@ -152,7 +153,33 @@ implements WeatherDatabaseClientObserver{
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
-   public void alertNoHeatIndexData(){}
+   public void alertNoHeatIndexData(){
+      try{
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HEAT INDEX")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+         drawPanel.setLayout(new BorderLayout());
+         String errorString = new String("No Heatindex Data ");
+         errorString = errorString.concat("Available for this Date");
+         JLabel label = new JLabel(errorString,SwingConstants.CENTER);
+         drawPanel.add(label, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
    public void alertNoHumidityData(){
       try{
@@ -249,6 +276,7 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){
+      this.heatIndexData = data;
       if(this.heatIndexDisplay == GRAPH){
          this.graphHeatIndex(data);
       }
@@ -302,6 +330,23 @@ implements WeatherDatabaseClientObserver{
       }
       else{
          this.alertNoDewpointData();
+      }
+   }
+
+   /**/
+   public void displayHeatIndex(short display){
+      this.setHeatIndexDisplay(display);
+      this.displayHeatIndex(this.heatIndexUnits);
+   }
+
+   /**/
+   public void displayHeatIndex(Units units){
+      this.setHeatIndexUnits(units);
+      if(this.heatIndexData.size() > 0){
+         this.updateHeatIndexData(this.heatIndexData);
+      }
+      else{
+         this.alertNoHeatIndexData();
       }
    }
 
