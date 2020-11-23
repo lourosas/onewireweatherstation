@@ -169,6 +169,30 @@ public class WeatherPage{
       }
    }
 
+   /**/
+   public void setServerAddress(String address){
+      int [] addr = new int[4];
+      String [] values = address.split("\\.");
+      try{
+         for(int i = 0; i < values.length; i++){
+            addr[i] = Integer.parseInt(values[i]);
+         }
+         this._addr = new byte[]{(byte)addr[0],
+                                 (byte)addr[1],
+                                 (byte)addr[2],
+                                 (byte)addr[3]};
+      }
+      catch(NumberFormatException nfe){}
+   }
+
+   /**/
+   public void setServerPort(String port){
+      try{
+         this._port = Integer.parseInt(port.trim());
+      }
+      catch(NumberFormatException nfe){}
+   }
+
    ////////////////////////Private Methods////////////////////////////
    /**/
    private String connectAndGrab

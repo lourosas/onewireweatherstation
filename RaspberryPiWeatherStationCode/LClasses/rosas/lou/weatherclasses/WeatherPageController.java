@@ -74,10 +74,57 @@ ItemListener{
    }
 
    /**/
-   public void keyPressed(KeyEvent ke){}
+   public void keyPressed(KeyEvent ke){
+      try{
+         JTextField jt = (JTextField)ke.getSource();
+         if(jt.getName().toUpperCase().equals("PORT")){
+            char k = ke.getKeyChar();
+            int  c = ke.getKeyCode();
+            if((k >= '0' && k <= '9') || c == KeyEvent.VK_BACK_SPACE){
+               jt.setEditable(true);
+            }
+            else{
+               jt.setEditable(false);
+            }
+         }
+         else if(jt.getName().toUpperCase().equals("ADDRESS")){
+            char k = ke.getKeyChar();
+            int  c = ke.getKeyCode();
+            if((k >= '0' && k <= '9') || k == '.' ||
+                c == KeyEvent.VK_BACK_SPACE){
+               jt.setEditable(true);
+            }
+            else{
+               jt.setEditable(false);
+            }
+         }
+      }
+      catch(ClassCastException cce){}
+      try{
+         int code = ke.getKeyCode();
+         if(code == KeyEvent.VK_ENTER){
+            JButton button = ((JButton)ke.getSource());
+            button.doClick();
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /**/
-   public void keyReleased(KeyEvent ke){}
+   public void keyReleased(KeyEvent ke){
+      try{
+         JTextField jt = ((JTextField)ke.getSource());
+         if(jt.getName().toUpperCase().equals("ADDRESS")){
+            //System.out.println(jt.getText());
+            this._model.setServerAddress(jt.getText());
+         }
+         else if(jt.getName().toUpperCase().equals("PORT")){
+            //System.out.println(jt.getText());
+            this._model.setServerPort(jt.getText());
+         }
+      }
+      catch(ClassCastException cce){}
+   }
 
    /**/
    public void keyTyped(KeyEvent ke){}
@@ -97,6 +144,8 @@ ItemListener{
       }
       catch(ClassCastException cce){}
    }
+
+
 
    /////////////////////////Private Methods///////////////////////////
    /**/
