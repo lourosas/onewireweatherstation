@@ -220,7 +220,6 @@ public class WeatherPage{
             dewpoint = dewpoint.substring(1,dewpoint.length()-1);
             try{
                dp = Double.parseDouble(dewpoint);
-               System.out.println(dp);
             }
             catch(NumberFormatException nfe){
                dp = WeatherData.DEFAULTVALUE;
@@ -378,7 +377,18 @@ public class WeatherPage{
    }
 
    /**/
-   private void publishDewpoint(List<WeatherData> list){}
+   private void publishDewpoint(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         if(list.size() > 0){
+            (it.next()).updateDewpointData(list);
+         }
+         else{
+            (it.next()).alertNoDewpointData();
+         }
+      }
+   }
 
    /**/
    private void publishHumidity(List<WeatherData> list){

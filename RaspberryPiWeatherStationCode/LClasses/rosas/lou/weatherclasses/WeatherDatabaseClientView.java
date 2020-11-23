@@ -63,6 +63,7 @@ implements WeatherDatabaseClientObserver{
    private java.util.List<WeatherData> temperatureData = null;
    private java.util.List<WeatherData> humidityData    = null;
    private java.util.List<WeatherData> pressureData    = null;
+   private java.util.List<WeatherData> dewpointData    = null;
 
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
@@ -123,7 +124,33 @@ implements WeatherDatabaseClientObserver{
 
    public void alertTemperatureTimeout(){}
 
-   public void alertNoDewpointData(){}
+   public void alertNoDewpointData(){
+      try{
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel drawPanel = (JPanel)tempPanel.getComponent(0);
+         if(drawPanel.getComponentCount() > 0){
+            drawPanel.removeAll();
+         }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
+         drawPanel.setLayout(new BorderLayout());
+         String errorString = new String("No Dewpoint Data ");
+         errorString = errorString.concat("Available for this Date");
+         JLabel label = new JLabel(errorString,SwingConstants.CENTER);
+         drawPanel.add(label, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(tempTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
 
    public void alertNoHeatIndexData(){}
 
@@ -212,6 +239,7 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
+      this.dewpointData = data;
       if(this.dewpointDisplay == GRAPH){
          this.graphDewpoint(data);
       }
@@ -260,6 +288,23 @@ implements WeatherDatabaseClientObserver{
    }
 
    ///////////////////////Public Methods//////////////////////////////
+   /**/
+   public void displayDewpoint(short display){
+      this.setDewpointDisplay(display);
+      this.displayDewpoint(this.dewpointUnits);
+   }
+
+   /**/
+   public void displayDewpoint(Units units){
+      this.setDewpointUnits(units);
+      if(this.dewpointData.size() > 0){
+         this.updateDewpointData(this.dewpointData);
+      }
+      else{
+         this.alertNoDewpointData();
+      }
+   }
+
    /**/
    public void displayHumidity(short display){
       this.setHumidityDisplay(display);

@@ -151,7 +151,25 @@ ItemListener{
 
    /**/
    private void handleDewpointItemSelection(String command){
-      if(command.contains("DP")){ System.out.println(command); }
+      if(command.contains("DP")){
+         if(command.toUpperCase().equals("DPCELSIUS")){
+            this._view.displayDewpoint(Units.METRIC);
+         }
+         else if(command.toUpperCase().equals("DPFAHRENHEIT")){
+            this._view.displayDewpoint(Units.ENGLISH);
+         }
+         else if(command.toUpperCase().equals("DPKELVIN")){
+            this._view.displayDewpoint(Units.ABSOLUTE);
+         }
+         else if(command.toUpperCase().equals("DPGRAPH")){
+            //GRAPH = 0
+            this._view.displayDewpoint((short)0);
+         }
+         else if(command.toUpperCase().equals("DPDATA")){
+            //DATA = 1
+            this._view.displayDewpoint((short)1);
+         }
+      }
    }
 
    /**/
