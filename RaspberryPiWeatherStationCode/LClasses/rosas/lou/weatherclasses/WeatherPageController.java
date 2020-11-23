@@ -106,7 +106,6 @@ ItemListener{
          String dy = this._view.getDay();
          String yr = this._view.getYear();
 
-
          JButton button = (JButton)ae.getSource();
          this._model.setCalendar(mo,dy,yr);
          if(button.getActionCommand().equals("TemperatureRefresh")){
@@ -117,6 +116,9 @@ ItemListener{
          }
          else if(button.getActionCommand().equals("Pressure Refresh")){
             this._model.grabPressureData(mo,dy,yr);
+         }
+         else if(button.getActionCommand().equals("DewpointRefresh")){
+            this._model.grabDewpointData(mo,dy,yr);
          }
       }
       catch(NullPointerException npe){

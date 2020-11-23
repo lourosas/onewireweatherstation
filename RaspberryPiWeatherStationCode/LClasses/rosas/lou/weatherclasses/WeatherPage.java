@@ -74,6 +74,22 @@ public class WeatherPage{
    }
 
    /**/
+   public void grabDewpointData(String month,String day,String year){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(month,day,year);
+         String data = this.connectAndGrab(month,day,year,"metric");
+         wl          = this.parseDewpoint(data);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+      }
+      finally{
+         this.publishDewpoint(wl);
+      }
+   }
+
+   /**/
    public void grabHumidityData(String month,String day,String year){
       List<WeatherData> wl = null;
       try{
@@ -183,6 +199,51 @@ public class WeatherPage{
       catch(MalformedURLException mle){ mle.printStackTrace();}
       catch(IOException ioe){ioe.printStackTrace();}
       return returnLine;
+   }
+
+   /**/
+   private List<WeatherData> parseDewpoint(String data){
+      String [] arrayData      = data.split("],");
+      String time              = null;
+      String dewpoint          = null;
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; i += 2){
+         double dp      = WeatherData.DEFAULTVALUE;
+         WeatherData dd = null;
+         if(arrayData[i].contains("[")){
+            String [] timeArray = arrayData[i].substring(2,
+                                    arrayData[i].length()).split(",");
+            time = new String(timeArray[0].trim() + ":");
+            time = time.concat(timeArray[1].trim() + ":");
+            time = time.concat(timeArray[2].trim());
+            dewpoint = arrayData[i+1].trim().split(",")[3];
+            dewpoint = dewpoint.substring(1,dewpoint.length()-1);
+            try{
+               dp = Double.parseDouble(dewpoint);
+               System.out.println(dp);
+            }
+            catch(NumberFormatException nfe){
+               dp = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){
+               dp = WeatherData.DEFAULTVALUE;
+            }
+            finally{
+               dd = new DewpointData(Units.METRIC, dp,
+                                     "Dewpoint", this._cal[0],
+                                     this._cal[1],this._cal[2],
+                                     time);
+            }
+            try{
+               wdList.add(dd);
+            }
+            catch(NullPointerException npe){
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(dd);
+            }
+         }
+      }
+      return wdList;
    }
 
    /**/
@@ -315,6 +376,9 @@ public class WeatherPage{
       }
       return wdList;
    }
+
+   /**/
+   private void publishDewpoint(List<WeatherData> list){}
 
    /**/
    private void publishHumidity(List<WeatherData> list){
