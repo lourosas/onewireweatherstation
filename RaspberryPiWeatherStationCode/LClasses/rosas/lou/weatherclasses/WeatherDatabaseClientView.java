@@ -471,6 +471,7 @@ implements WeatherDatabaseClientObserver{
          if(drawPanel.getComponentCount() > 0){
             drawPanel.removeAll();
          }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.dewpointUnits),
                                                  BorderLayout.CENTER);
@@ -483,22 +484,56 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printDewpoint(java.util.List<WeatherData> data){
+      String dewpoint = new String();
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
-            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
-            System.out.print(" "+wd.time()+", ");
+            dewpoint = dewpoint.concat(wd.month()+" "+ wd.day()+" ");
+            dewpoint = dewpoint.concat(wd.year()+" "+wd.time()+" ");
             if(this.dewpointUnits == Units.ABSOLUTE){
-               System.out.println(String.format("%.2f",wd.absoluteData()));
+               dewpoint = dewpoint.concat(
+                            String.format("%.2f",wd.absoluteData()));
+               dewpoint = dewpoint.concat(" K");
             }
             else if(this.dewpointUnits == Units.ENGLISH){
-               System.out.println(String.format("%.2f",wd.englishData()));
+               dewpoint = dewpoint.concat(
+                              String.format("%.2f",wd.englishData()));
+               dewpoint = dewpoint.concat(" \u00B0" + "F");
             }
             else if(this.dewpointUnits == Units.METRIC){
-               System.out.println(String.format("%.2f",wd.metricData()));
+               dewpoint = dewpoint.concat(
+                               String.format("%.2f",wd.metricData()));
+               dewpoint = dewpoint.concat(" \u00B0" + "C");
+            }
+            dewpoint = dewpoint.concat("\n");
+         }
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+      try{
+         JTextArea dpArea = new JTextArea(dewpoint);
+         dpArea.setEditable(false);
+         JScrollPane dpSP = new JScrollPane(dpArea);
+         int dpTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
+               dpTab = i;
             }
          }
+         jtp.setSelectedIndex(dpTab);
+         JPanel dpPanel   = (JPanel)jtp.getSelectedComponent();
+         JPanel textPanel = (JPanel)dpPanel.getComponent(0);
+         if(textPanel.getComponentCount() > 0){
+            textPanel.removeAll();
+         }
+         textPanel.setBorder(
+                        BorderFactory.createEmptyBorder(25,25,25,25));
+         textPanel.setLayout(new BorderLayout());
+         textPanel.add(dpSP, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(dpTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
@@ -520,6 +555,7 @@ implements WeatherDatabaseClientObserver{
          if(drawPanel.getComponentCount() > 0){
             drawPanel.removeAll();
          }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.heatIndexUnits),
                                                  BorderLayout.CENTER);
@@ -530,22 +566,56 @@ implements WeatherDatabaseClientObserver{
    }
    /**/
    private void printHeatIndex(java.util.List<WeatherData> data){
+      String heatIndex = new String();
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
-            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
-            System.out.print(" "+wd.time()+", ");
+            heatIndex=heatIndex.concat(wd.month()+" "+ wd.day()+" ");
+            heatIndex=heatIndex.concat(wd.year()+" "+wd.time()+" ");
             if(this.heatIndexUnits == Units.ABSOLUTE){
-               System.out.println(String.format("%.2f",wd.absoluteData()));
+               heatIndex=heatIndex.concat(
+                             String.format("%.2f",wd.absoluteData()));
+               heatIndex=heatIndex.concat(" K");
             }
             else if(this.heatIndexUnits == Units.ENGLISH){
-               System.out.println(String.format("%.2f",wd.englishData()));
+               heatIndex=heatIndex.concat(
+                              String.format("%.2f",wd.englishData()));
+               heatIndex=heatIndex.concat(" \u00B0" + "F");
             }
             else if(this.heatIndexUnits == Units.METRIC){
-               System.out.println(String.format("%.2f",wd.metricData()));
+               heatIndex=heatIndex.concat(
+                               String.format("%.2f",wd.metricData()));
+               heatIndex=heatIndex.concat(" \u00B0" + "C");
+            }
+            heatIndex = heatIndex.concat("\n");
+         }
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+      try{
+         JTextArea heatIndexArea = new JTextArea(heatIndex);
+         heatIndexArea.setEditable(false);
+         JScrollPane heatIndexSP = new JScrollPane(heatIndexArea);
+         int hiTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HEAT INDEX")){
+               hiTab = i;
             }
          }
+         jtp.setSelectedIndex(hiTab);
+         JPanel hiPanel   = (JPanel)jtp.getSelectedComponent();
+         JPanel textPanel = (JPanel)hiPanel.getComponent(0);
+         if(textPanel.getComponentCount() > 0){
+            textPanel.removeAll();
+         }
+         textPanel.setBorder(
+                        BorderFactory.createEmptyBorder(25,25,25,25));
+         textPanel.setLayout(new BorderLayout());
+         textPanel.add(heatIndexSP, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(hiTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
@@ -567,6 +637,7 @@ implements WeatherDatabaseClientObserver{
          if(drawPanel.getComponentCount() > 0){
             drawPanel.removeAll();
          }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
          drawPanel.setLayout(new BorderLayout());
 
          drawPanel.add(new WeatherPanel(data, Units.PERCENTAGE),
@@ -580,17 +651,45 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printHumidity(java.util.List<WeatherData> data){
+      String humidity = new String();
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
-            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
-            System.out.print(" "+wd.time()+", ");
-            System.out.println(
-                           String.format("%.2f",wd.percentageData()));
+            humidity = humidity.concat(wd.month()+" "+wd.day()+" ");
+            humidity = humidity.concat(wd.year()+" "+wd.time()+" ");
+            humidity = humidity.concat(String.format
+                                        ("%.2f",wd.percentageData()));
+            humidity = humidity.concat(" %\n");
          }
       }
       catch(NullPointerException npe){npe.printStackTrace();}
+      try{
+         JTextArea humidityArea = new JTextArea(humidity);
+         humidityArea.setEditable(false);
+         JScrollPane humiditySP = new JScrollPane(humidityArea);
+         int humidityTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HUMIDITY")){
+               humidityTab = i;
+            }
+         }
+         jtp.setSelectedIndex(humidityTab);
+         JPanel humidityPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel textPanel     = (JPanel)humidityPanel.getComponent(0);
+         if(textPanel.getComponentCount() > 0){
+            textPanel.removeAll();
+         }
+         textPanel.setBorder(
+                        BorderFactory.createEmptyBorder(25,25,25,25));
+         textPanel.setLayout(new BorderLayout());
+         textPanel.add(humiditySP, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(humidityTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    /**/
@@ -610,6 +709,7 @@ implements WeatherDatabaseClientObserver{
          if(drawPanel.getComponentCount() > 0){
             drawPanel.removeAll();
          }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.pressureUnits),
                                                  BorderLayout.CENTER);
@@ -622,24 +722,58 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printPressure(java.util.List<WeatherData> data){
+      String pressure = new String();
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
-            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
-            System.out.print(" "+wd.time()+", ");
+            pressure = pressure.concat(wd.month()+" "+wd.day()+" ");
+            pressure = pressure.concat(wd.year()+" "+wd.time()+" ");
             if(this.pressureUnits == Units.ABSOLUTE){
-               System.out.println(String.format("%.2f",wd.absoluteData()));
+               pressure = pressure.concat(
+                             String.format("%.2f",wd.absoluteData()));
+               pressure = pressure.concat(" mbars");
             }
             else if(this.pressureUnits == Units.ENGLISH){
-               System.out.println(String.format("%.2f",wd.englishData()));
+               pressure = pressure.concat(
+                              String.format("%.2f",wd.englishData()));
+               pressure = pressure.concat(" inHg");
             }
             else if(this.pressureUnits == Units.METRIC){
-               System.out.println(String.format("%.2f",wd.metricData()));
+               pressure = pressure.concat(
+                               String.format("%.2f",wd.metricData()));
+               pressure = pressure.concat(" mmHg");
             }
+            pressure = pressure.concat("\n");
          }
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+      try{
+         JTextArea pressureArea = new JTextArea(pressure);
+         pressureArea.setEditable(false);
+         JScrollPane pressureSP = new JScrollPane(pressureArea);
+         int pressureTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("PRESSURE")){
+               pressureTab = i;
+            }
+         }
+         jtp.setSelectedIndex(pressureTab);
+         JPanel pressurePanel = (JPanel)jtp.getSelectedComponent();
+         JPanel textPanel     = (JPanel)pressurePanel.getComponent(0);
+         if(textPanel.getComponentCount() > 0){
+            textPanel.removeAll();
+         }
+         textPanel.setBorder(
+                        BorderFactory.createEmptyBorder(25,25,25,25));
+         textPanel.setLayout(new BorderLayout());
+         textPanel.add(pressureSP, BorderLayout.CENTER);
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(pressureTab);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    /**/
@@ -659,6 +793,7 @@ implements WeatherDatabaseClientObserver{
          if(drawPanel.getComponentCount() > 0){
             drawPanel.removeAll();
          }
+         drawPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.temperatureUnits),
                                                  BorderLayout.CENTER);
@@ -691,12 +826,12 @@ implements WeatherDatabaseClientObserver{
             }
             temp = temp.concat("\n");
          }
-         System.out.println(temp);
       }
       catch(NullPointerException npe){}
       try{
          JTextArea tempArea = new JTextArea(temp);
          tempArea.setEditable(false);
+         JScrollPane tempSP = new JScrollPane(tempArea);
          int tempTab = -1;
          JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(1);
@@ -711,8 +846,10 @@ implements WeatherDatabaseClientObserver{
          if(textPanel.getComponentCount() > 0){
             textPanel.removeAll();
          }
+         textPanel.setBorder(
+                        BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
-         textPanel.add(tempArea, BorderLayout.CENTER);
+         textPanel.add(tempSP, BorderLayout.CENTER);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
       }
