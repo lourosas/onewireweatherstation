@@ -694,6 +694,24 @@ implements WeatherDatabaseClientObserver{
       try{
          JTextArea tempArea = new JTextArea(temp);
          tempArea.setEditable(false);
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("TEMPERATURE")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel textPanel = (JPanel)tempPanel.getComponent(0);
+         if(textPanel.getComponentCount() > 0){
+            textPanel.removeAll();
+         }
+         textPanel.setLayout(new BorderLayout());
+         textPanel.add(tempArea, BorderLayout.CENTER);
+         jtp.setSelectedIndex(tempTab + 1);
+         jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){npe.printStackTrace();}
    }
