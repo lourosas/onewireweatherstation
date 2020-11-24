@@ -676,15 +676,18 @@ implements WeatherDatabaseClientObserver{
          while(it.hasNext()){
             WeatherData wd = it.next();
             temp = temp.concat(wd.month()+" "+wd.day()+" "+wd.year());
-            temp = temp.concat(" "+wd.time()+", ");
+            temp = temp.concat(" "+wd.time()+" ");
             if(this.temperatureUnits == Units.ABSOLUTE){
                temp=temp.concat(String.format("%.2f",wd.absoluteData()));
+               temp=temp.concat(" K");
             }
             else if(this.temperatureUnits == Units.ENGLISH){
                temp=temp.concat(String.format("%.2f",wd.englishData()));
+               temp=temp.concat(" \u00B0" + "F");
             }
             else if(this.temperatureUnits == Units.METRIC){
                temp=temp.concat(String.format("%.2f",wd.metricData()));
+               temp=temp.concat(" \u00B0" + "C");
             }
             temp = temp.concat("\n");
          }
