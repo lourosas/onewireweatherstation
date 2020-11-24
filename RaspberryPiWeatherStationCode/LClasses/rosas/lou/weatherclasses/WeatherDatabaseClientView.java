@@ -670,24 +670,32 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printTemperature(java.util.List<WeatherData> data){
+      String temp = new String();
       try{
          Iterator<WeatherData> it = data.iterator();
          while(it.hasNext()){
             WeatherData wd = it.next();
-            System.out.print(wd.month()+" "+ wd.day()+" "+wd.year());
-            System.out.print(" "+wd.time()+", ");
+            temp = temp.concat(wd.month()+" "+wd.day()+" "+wd.year());
+            temp = temp.concat(" "+wd.time()+", ");
             if(this.temperatureUnits == Units.ABSOLUTE){
-               System.out.println(String.format("%.2f",wd.absoluteData()));
+               temp=temp.concat(String.format("%.2f",wd.absoluteData()));
             }
             else if(this.temperatureUnits == Units.ENGLISH){
-               System.out.println(String.format("%.2f",wd.englishData()));
+               temp=temp.concat(String.format("%.2f",wd.englishData()));
             }
             else if(this.temperatureUnits == Units.METRIC){
-               System.out.println(String.format("%.2f",wd.metricData()));
+               temp=temp.concat(String.format("%.2f",wd.metricData()));
             }
+            temp = temp.concat("\n");
          }
+         System.out.println(temp);
       }
       catch(NullPointerException npe){}
+      try{
+         JTextArea tempArea = new JTextArea(temp);
+         tempArea.setEditable(false);
+      }
+      catch(NullPointerException npe){npe.printStackTrace();}
    }
 
    /**/
