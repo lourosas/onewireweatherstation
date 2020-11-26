@@ -160,6 +160,9 @@ ItemListener{
          if(button.getActionCommand().equals("TemperatureRefresh")){
             this._model.grabTemperatureData(mo,dy,yr);
          }
+         else if(button.getActionCommand().equals("TemperatureSave")){
+            
+         }
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.grabHumidityData(mo,dy,yr);
          }
