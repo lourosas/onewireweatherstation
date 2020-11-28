@@ -410,6 +410,20 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
+   public void saveTemperature(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            System.out.println(saveFile.getPath());
+            //System.out.println(saveFile.getName());
+         }
+      }
+      catch(HeadlessException he){}
+   }
+
+   /**/
    public void setDewpointDisplay(short display){
       this.dewpointDisplay = display;
    }

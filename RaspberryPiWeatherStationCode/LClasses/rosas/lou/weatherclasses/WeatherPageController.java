@@ -19,8 +19,10 @@ package rosas.lou.weatherclasses;
 import java.lang.*;
 import java.util.*;
 import java.awt.*;
+import java.io.File;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.filechooser.*;
 import rosas.lou.weatherclasses.*;
 
 //////////////////////////////////////////////////////////////////////
@@ -161,7 +163,7 @@ ItemListener{
             this._model.grabTemperatureData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("TemperatureSave")){
-            
+            this._view.saveTemperature();
          }
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.grabHumidityData(mo,dy,yr);
