@@ -409,8 +409,11 @@ implements WeatherDatabaseClientObserver{
       return (String)this._yearCB.getSelectedItem();
    }
 
-   /**/
+   /*
+
+   */
    public void saveTemperature(){
+      PrintWriter outs = null;
       try{
          JFileChooser jfc = new JFileChooser();
          int fileValue = jfc.showSaveDialog(this);
@@ -418,9 +421,37 @@ implements WeatherDatabaseClientObserver{
             File saveFile = jfc.getSelectedFile();
             System.out.println(saveFile.getPath());
             //System.out.println(saveFile.getName());
+            String save = new String();
+            Iterator<WeatherData> it=this.temperatureData.iterator();
+            while(it.hasNext()){
+               WeatherData wd = it.next();
+               save = save.concat(wd.month()+" "+wd.day()+" ");
+               save = save.concat(wd.year()+" "+wd.time()+" ");
+               if(this.temperatureUnits == Units.ABSOLUTE){
+                  save = save.concat(wd.toStringAbsolute());
+               }
+               else if(this.temperatureUnits == Units.ENGLISH){
+                  save = save.concat(wd.toStringEnglish());
+               }
+               else if(this.temperatureUnits == Units.METRIC){
+                  save = save.concat(wd.toStringAbsolute());
+               }
+               save = save.concat("\n");
+            }
+            System.out.println(save);
+            outs = new PrintWriter(new FileWriter(saveFile), true);
+            outs.print(save);
+            outs.close();
          }
       }
       catch(HeadlessException he){}
+      catch(NullPointerException npe){
+         //Put something here to indecate NO DATA TO SAVE
+         //Like an error dialog box of some sort
+      }
+      catch(IOException ioe){
+         outs.close();
+      }
    }
 
    /**/

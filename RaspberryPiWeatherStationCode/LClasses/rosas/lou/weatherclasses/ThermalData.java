@@ -175,17 +175,23 @@ public class ThermalData implements WeatherData{
    
    /**/
    public String toStringAbsolute(){
-      return new String(this._absolute + "K");
+      String save = String.format("%.2f", this._absolute);
+      save = save.concat(" K");
+      return save;
    }
    
    /**/
    public String toStringEnglish(){
-      return new String(this._english + "\u00B0" + "F");
+      String save = String.format("%.2f", this._english);
+      save = save.concat(" \u00B0"+"F");
+      return save;
    }
    
    /**/
    public String toStringMetric(){
-      return new String(this._metric + "\u00B0" + "C");
+      String save = String.format("%.2f", this._metric);
+      save = save.concat(" \u00B0"+"C");
+      return save;
    }
    
    /**/
