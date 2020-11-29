@@ -547,32 +547,7 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printDewpoint(java.util.List<WeatherData> data){
-      String dewpoint = new String();
-      try{
-         Iterator<WeatherData> it = data.iterator();
-         while(it.hasNext()){
-            WeatherData wd = it.next();
-            dewpoint = dewpoint.concat(wd.month()+" "+ wd.day()+" ");
-            dewpoint = dewpoint.concat(wd.year()+" "+wd.time()+" ");
-            if(this.dewpointUnits == Units.ABSOLUTE){
-               dewpoint = dewpoint.concat(
-                            String.format("%.2f",wd.absoluteData()));
-               dewpoint = dewpoint.concat(" K");
-            }
-            else if(this.dewpointUnits == Units.ENGLISH){
-               dewpoint = dewpoint.concat(
-                              String.format("%.2f",wd.englishData()));
-               dewpoint = dewpoint.concat(" \u00B0" + "F");
-            }
-            else if(this.dewpointUnits == Units.METRIC){
-               dewpoint = dewpoint.concat(
-                               String.format("%.2f",wd.metricData()));
-               dewpoint = dewpoint.concat(" \u00B0" + "C");
-            }
-            dewpoint = dewpoint.concat("\n");
-         }
-      }
-      catch(NullPointerException npe){ npe.printStackTrace(); }
+      String dewpoint=this.grabMeasureString(data,this.dewpointUnits);
       try{
          JTextArea dpArea = new JTextArea(dewpoint);
          dpArea.setEditable(false);
@@ -629,32 +604,8 @@ implements WeatherDatabaseClientObserver{
    }
    /**/
    private void printHeatIndex(java.util.List<WeatherData> data){
-      String heatIndex = new String();
-      try{
-         Iterator<WeatherData> it = data.iterator();
-         while(it.hasNext()){
-            WeatherData wd = it.next();
-            heatIndex=heatIndex.concat(wd.month()+" "+ wd.day()+" ");
-            heatIndex=heatIndex.concat(wd.year()+" "+wd.time()+" ");
-            if(this.heatIndexUnits == Units.ABSOLUTE){
-               heatIndex=heatIndex.concat(
-                             String.format("%.2f",wd.absoluteData()));
-               heatIndex=heatIndex.concat(" K");
-            }
-            else if(this.heatIndexUnits == Units.ENGLISH){
-               heatIndex=heatIndex.concat(
-                              String.format("%.2f",wd.englishData()));
-               heatIndex=heatIndex.concat(" \u00B0" + "F");
-            }
-            else if(this.heatIndexUnits == Units.METRIC){
-               heatIndex=heatIndex.concat(
-                               String.format("%.2f",wd.metricData()));
-               heatIndex=heatIndex.concat(" \u00B0" + "C");
-            }
-            heatIndex = heatIndex.concat("\n");
-         }
-      }
-      catch(NullPointerException npe){ npe.printStackTrace(); }
+      String heatIndex = this.grabMeasureString(data,
+                                                this.heatIndexUnits);
       try{
          JTextArea heatIndexArea = new JTextArea(heatIndex);
          heatIndexArea.setEditable(false);
