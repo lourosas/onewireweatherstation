@@ -410,6 +410,86 @@ implements WeatherDatabaseClientObserver{
       return (String)this._yearCB.getSelectedItem();
    }
 
+   /**/
+   public void saveDewpoint(){
+      PrintWriter outs = null;
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            String save = this.grabMeasureString(this.dewpointData,
+                                                 this.dewpointUnits);
+            outs = new PrintWriter(new FileWriter(saveFile));
+            outs.print(save);
+            outs.close();
+         }
+      }
+      catch(HeadlessException he){}
+      catch(NullPointerException npe){}
+      catch(IOException ioe){ outs.close(); }
+   }
+
+   /**/
+   public void saveHeatIndex(){
+      PrintWriter outs = null;
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            String save = this.grabMeasureString(this.heatIndexData,
+                                                 this.heatIndexUnits);
+            outs = new PrintWriter(new FileWriter(saveFile));
+            outs.print(save);
+            outs.close();
+         }
+      }
+      catch(HeadlessException he){}
+      catch(NullPointerException npe){}
+      catch(IOException ioe){ outs.close(); }
+   }
+
+   /**/
+   public void saveHumidity(){
+      PrintWriter outs = null;
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            String save = this.grabMeasureString(this.humidityData,
+                                                    Units.PERCENTAGE);
+            outs = new PrintWriter(new FileWriter(saveFile));
+            outs.print(save);
+            outs.close();
+         }
+      }
+      catch(HeadlessException he){}
+      catch(NullPointerException npe){}
+      catch(IOException ioe){ outs.close(); }
+   }
+
+   /**/
+   public void savePressure(){
+      PrintWriter outs = null;
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            String save = this.grabMeasureString(this.pressureData,
+                                                 this.pressureUnits);
+            outs = new PrintWriter(new FileWriter(saveFile));
+            outs.print(save);
+            outs.close();
+         }
+      }
+      catch(HeadlessException he){}
+      catch(NullPointerException npe){}
+      catch(IOException ioe){ outs.close(); }
+   }
+
    /*
    The best way to do this would be to just read directly from the
    TextArea...

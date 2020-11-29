@@ -168,14 +168,26 @@ ItemListener{
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.grabHumidityData(mo,dy,yr);
          }
+         else if(button.getActionCommand().equals("HumiditySave")){
+            this._view.saveHumidity();
+         }
          else if(button.getActionCommand().equals("Pressure Refresh")){
             this._model.grabPressureData(mo,dy,yr);
+         }
+         else if(button.getActionCommand().equals("Pressure Save")){
+            this._view.savePressure();
          }
          else if(button.getActionCommand().equals("DewpointRefresh")){
             this._model.grabDewpointData(mo,dy,yr);
          }
+         else if(button.getActionCommand().equals("DewpointSave")){
+            this._view.saveDewpoint();
+         }
          else if(button.getActionCommand().equals("HeatIndexRefresh")){
             this._model.grabHeatIndexData(mo,dy,yr);
+         }
+         else if(button.getActionCommand().equals("HeatIndexSave")){
+            this._view.saveHeatIndex();
          }
       }
       catch(NullPointerException npe){
