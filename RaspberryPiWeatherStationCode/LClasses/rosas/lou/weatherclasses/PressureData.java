@@ -187,17 +187,23 @@ public class PressureData implements WeatherData{
    
    /**/
    public String toStringAbsolute(){
-      return new String(this._absolutePressure + "mb");
+      String save = String.format("%.1f", this._absolutePressure);
+      save = save.concat(" mb");
+      return save;
    }
    
    /**/
    public String toStringEnglish(){
-      return new String(this._englishPressure + "inHg");
+      String save = String.format("%.2f", this._englishPressure);
+      save = save.concat(" inHg");
+      return save;
    }
    
    /**/
    public String toStringMetric(){
-      return new String(this._metricPressure + "mm");
+      String save = String.format("%.2f", this._metricPressure);
+      save = save.concat(" mmHg");
+      return save;
    }
    
    /**/

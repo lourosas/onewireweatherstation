@@ -43,6 +43,7 @@ implements WeatherDatabaseClientObserver{
    private static final short WIDTH        = 750;
    private static final short HEIGHT       = 600;
    private static final short TOTAL_PANELS = 5;
+
    private static String [] MONTHS = {"January", "February",
    "March", "April", "May", "June", "July", "August", "September",
    "October", "November", "December"};
@@ -410,7 +411,8 @@ implements WeatherDatabaseClientObserver{
    }
 
    /*
-
+   The best way to do this would be to just read directly from the
+   TextArea...
    */
    public void saveTemperature(){
       PrintWriter outs = null;
@@ -419,34 +421,17 @@ implements WeatherDatabaseClientObserver{
          int fileValue = jfc.showSaveDialog(this);
          if(fileValue == JFileChooser.APPROVE_OPTION){
             File saveFile = jfc.getSelectedFile();
-            System.out.println(saveFile.getPath());
-            //System.out.println(saveFile.getName());
-            String save = new String();
-            Iterator<WeatherData> it=this.temperatureData.iterator();
-            while(it.hasNext()){
-               WeatherData wd = it.next();
-               save = save.concat(wd.month()+" "+wd.day()+" ");
-               save = save.concat(wd.year()+" "+wd.time()+" ");
-               if(this.temperatureUnits == Units.ABSOLUTE){
-                  save = save.concat(wd.toStringAbsolute());
-               }
-               else if(this.temperatureUnits == Units.ENGLISH){
-                  save = save.concat(wd.toStringEnglish());
-               }
-               else if(this.temperatureUnits == Units.METRIC){
-                  save = save.concat(wd.toStringAbsolute());
-               }
-               save = save.concat("\n");
-            }
-            System.out.println(save);
-            outs = new PrintWriter(new FileWriter(saveFile), true);
+            String save =
+                     this.grabMeasureString(this.temperatureData,
+                                            this.temperatureUnits);
+            outs = new PrintWriter(new FileWriter(saveFile));
             outs.print(save);
             outs.close();
          }
       }
       catch(HeadlessException he){}
       catch(NullPointerException npe){
-         //Put something here to indecate NO DATA TO SAVE
+         //Put something here to indicate NO DATA TO SAVE
          //Like an error dialog box of some sort
       }
       catch(IOException ioe){
@@ -499,6 +484,39 @@ implements WeatherDatabaseClientObserver{
    }
 
    //////////////////////////Private Methods//////////////////////////
+   /**/
+   private String grabMeasureString
+   (
+      java.util.List<WeatherData> data,
+      Units units
+   ){
+      String value = null;
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         value = new String();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            value = value.concat(wd.month() + " " + wd.day() + " ");
+            value = value.concat(wd.year() + " " +wd.time() + " ");
+            if(units == Units.ABSOLUTE){
+               value = value.concat(wd.toStringAbsolute());
+            }
+            else if(units == Units.ENGLISH){
+               value = value.concat(wd.toStringEnglish());
+            }
+            else if(units == Units.METRIC){
+               value = value.concat(wd.toStringMetric());
+            }
+            else if(units == Units.PERCENTAGE){
+               value = value.concat(wd.toStringPercentage());
+            }
+            value = value.concat("\n");
+         }
+      }
+      catch(NullPointerException npe){}
+      return value;
+   }
+
    /**/
    private void graphDewpoint(java.util.List<WeatherData> data){
       try{
@@ -696,19 +714,7 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printHumidity(java.util.List<WeatherData> data){
-      String humidity = new String();
-      try{
-         Iterator<WeatherData> it = data.iterator();
-         while(it.hasNext()){
-            WeatherData wd = it.next();
-            humidity = humidity.concat(wd.month()+" "+wd.day()+" ");
-            humidity = humidity.concat(wd.year()+" "+wd.time()+" ");
-            humidity = humidity.concat(String.format
-                                        ("%.2f",wd.percentageData()));
-            humidity = humidity.concat(" %\n");
-         }
-      }
-      catch(NullPointerException npe){npe.printStackTrace();}
+      String humidity = this.grabMeasureString(data,Units.PERCENTAGE);
       try{
          JTextArea humidityArea = new JTextArea(humidity);
          humidityArea.setEditable(false);
@@ -767,32 +773,7 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printPressure(java.util.List<WeatherData> data){
-      String pressure = new String();
-      try{
-         Iterator<WeatherData> it = data.iterator();
-         while(it.hasNext()){
-            WeatherData wd = it.next();
-            pressure = pressure.concat(wd.month()+" "+wd.day()+" ");
-            pressure = pressure.concat(wd.year()+" "+wd.time()+" ");
-            if(this.pressureUnits == Units.ABSOLUTE){
-               pressure = pressure.concat(
-                             String.format("%.2f",wd.absoluteData()));
-               pressure = pressure.concat(" mbars");
-            }
-            else if(this.pressureUnits == Units.ENGLISH){
-               pressure = pressure.concat(
-                              String.format("%.2f",wd.englishData()));
-               pressure = pressure.concat(" inHg");
-            }
-            else if(this.pressureUnits == Units.METRIC){
-               pressure = pressure.concat(
-                               String.format("%.2f",wd.metricData()));
-               pressure = pressure.concat(" mmHg");
-            }
-            pressure = pressure.concat("\n");
-         }
-      }
-      catch(NullPointerException npe){ npe.printStackTrace(); }
+      String pressure=this.grabMeasureString(data,this.pressureUnits);
       try{
          JTextArea pressureArea = new JTextArea(pressure);
          pressureArea.setEditable(false);
@@ -850,29 +831,7 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    private void printTemperature(java.util.List<WeatherData> data){
-      String temp = new String();
-      try{
-         Iterator<WeatherData> it = data.iterator();
-         while(it.hasNext()){
-            WeatherData wd = it.next();
-            temp = temp.concat(wd.month()+" "+wd.day()+" "+wd.year());
-            temp = temp.concat(" "+wd.time()+" ");
-            if(this.temperatureUnits == Units.ABSOLUTE){
-               temp=temp.concat(String.format("%.2f",wd.absoluteData()));
-               temp=temp.concat(" K");
-            }
-            else if(this.temperatureUnits == Units.ENGLISH){
-               temp=temp.concat(String.format("%.2f",wd.englishData()));
-               temp=temp.concat(" \u00B0" + "F");
-            }
-            else if(this.temperatureUnits == Units.METRIC){
-               temp=temp.concat(String.format("%.2f",wd.metricData()));
-               temp=temp.concat(" \u00B0" + "C");
-            }
-            temp = temp.concat("\n");
-         }
-      }
-      catch(NullPointerException npe){}
+      String temp=this.grabMeasureString(data,this.temperatureUnits);
       try{
          JTextArea tempArea = new JTextArea(temp);
          tempArea.setEditable(false);

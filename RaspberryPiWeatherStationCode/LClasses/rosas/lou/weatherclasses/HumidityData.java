@@ -198,7 +198,9 @@ public class HumidityData implements WeatherData{
    
    /**/
    public String toStringPercentage(){
-      return new String(this._humidity + "%");
+      String save = String.format("%.2f", this._humidity);
+      save = save.concat(" %");
+      return save;
    }
    
    //********************Pubilc Methods********************************
