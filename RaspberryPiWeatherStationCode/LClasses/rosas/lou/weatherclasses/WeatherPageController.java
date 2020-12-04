@@ -163,31 +163,32 @@ ItemListener{
             this._model.grabTemperatureData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("TemperatureSave")){
-            this._view.saveTemperature();
+            this.saveTemperature();
          }
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.grabHumidityData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("HumiditySave")){
-            this._view.saveHumidity();
+            this.saveHumidity();
          }
          else if(button.getActionCommand().equals("Pressure Refresh")){
             this._model.grabPressureData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("Pressure Save")){
-            this._view.savePressure();
+            this.savePressure();
          }
          else if(button.getActionCommand().equals("DewpointRefresh")){
             this._model.grabDewpointData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("DewpointSave")){
-            this._view.saveDewpoint();
+            this.saveDewpoint();
          }
          else if(button.getActionCommand().equals("HeatIndexRefresh")){
             this._model.grabHeatIndexData(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("HeatIndexSave")){
-            this._view.saveHeatIndex();
+            //this._view.saveHeatIndex();
+            this.saveHeatIndex();
          }
       }
       catch(NullPointerException npe){
@@ -323,5 +324,74 @@ ItemListener{
             this._view.displayTemperature((short)1);
          }
       }
+   }
+
+   /**/
+   private void saveDewpoint(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this._view);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            Units units = this._view.getDewpointUnits();
+            this._model.saveDewpoint(saveFile, units);
+         }
+      }
+      catch(HeadlessException he){}
+   }
+
+   /**/
+   private void saveHeatIndex(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this._view);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            Units units = this._view.getHeatIndexUnits();
+            this._model.saveHeatIndex(saveFile, units);
+         }
+      }
+      catch(HeadlessException he){}
+   }
+
+   /**/
+   private void saveHumidity(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this._view);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            this._model.saveHumidity(saveFile);
+         }
+      }
+      catch(HeadlessException he){}
+   }
+
+   /**/
+   private void savePressure(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this._view);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            Units units = this._view.getPressureUnits();
+            this._model.savePressure(saveFile, units);
+         }
+      }
+      catch(HeadlessException he){}
+   }
+
+   /**/
+   private void saveTemperature(){
+      try{
+         JFileChooser jfc = new JFileChooser();
+         int fileValue = jfc.showSaveDialog(this._view);
+         if(fileValue == JFileChooser.APPROVE_OPTION){
+            File saveFile = jfc.getSelectedFile();
+            Units units = this._view.getTemperatureUnits();
+            this._model.saveTemperature(saveFile, units);
+         }
+      }
+      catch(HeadlessException he){}
    }
 }

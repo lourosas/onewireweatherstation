@@ -85,6 +85,7 @@ public class WeatherPage{
          wl = new LinkedList<WeatherData>();
       }
       finally{
+         this._dewpointData = wl;
          this.publishDewpoint(wl);
       }
    }
@@ -101,6 +102,7 @@ public class WeatherPage{
          wl = new LinkedList<WeatherData>();
       }
       finally{
+         this._heatIndexData = wl;
          this.publishHeatIndex(wl);
       }
    }
@@ -117,6 +119,7 @@ public class WeatherPage{
          wl = new LinkedList<WeatherData>();
       }
       finally{
+         this._humidityData = wl;
          this.publishHumidity(wl);
       }
    }
@@ -133,6 +136,7 @@ public class WeatherPage{
          wl = new LinkedList<WeatherData>();
       }
       finally{
+         this._pressureData = wl;
          this.publishPressure(wl);
       }
    }
@@ -153,7 +157,107 @@ public class WeatherPage{
          wl = new LinkedList<WeatherData>();
       }
       finally{
+         this._temperatureData = wl;
          this.publishTemperature(wl);
+      }
+   }
+
+   /**/
+   public void saveDewpoint(File file, Units units){
+      PrintWriter outs = null;
+      try{
+         String save = this.grabMeasureString(this._dewpointData,
+                                              units);
+         if(save.length() <= 0){
+            throw new IOException();
+         }
+         outs = new PrintWriter(new FileWriter(file));
+         outs.print(save);
+         outs.close();
+      }
+      catch(NullPointerException npe){}
+      catch(IOException ioe){
+         //Will need to alert the observers or somthing like that
+         ioe.printStackTrace();
+      }
+   }
+
+   public void saveHeatIndex(File file, Units units){
+      PrintWriter outs = null;
+      try{
+         String save = this.grabMeasureString(this._heatIndexData,
+                                              units);
+         if(save.length() <= 0){
+            throw new IOException();
+         }
+         outs = new PrintWriter(new FileWriter(file));
+         outs.print(save);
+         outs.close();
+      }
+      catch(NullPointerException npe){}
+      catch(IOException ioe){
+         //Will need to alert the observers or somthing like that
+         ioe.printStackTrace();
+      }
+   }
+
+   /**/
+   public void saveHumidity(File file){
+      PrintWriter outs = null;
+      try{
+         String save = this.grabMeasureString(this._humidityData,
+                                              Units.PERCENTAGE);
+         if(save.length() <= 0){
+            throw new IOException();
+         }
+         outs = new PrintWriter(new FileWriter(file));
+         outs.print(save);
+         outs.close();
+      }
+      catch(NullPointerException npe){}
+      catch(IOException ioe){
+         //Will need to alert the observers or somthing like that
+         ioe.printStackTrace();
+      }
+   }
+
+   /**/
+   public void savePressure(File file, Units units){
+      PrintWriter outs = null;
+      try{
+         String save = this.grabMeasureString(this._pressureData,
+                                              units);
+         if(save.length() <= 0){
+            throw new IOException();
+         }
+         outs = new PrintWriter(new FileWriter(file));
+         outs.print(save);
+         outs.close();
+      }
+      catch(NullPointerException npe){}
+      catch(IOException ioe){
+         //Will need to alert the observers or somthing like that
+         ioe.printStackTrace();
+      }
+   }
+
+   /**/
+   public void saveTemperature(File file, Units units){
+      PrintWriter outs = null;
+      try{
+         String save = this.grabMeasureString(this._temperatureData,
+                                              units);
+         if(save.length() <= 0){
+            throw new IOException();
+         }
+         outs = new PrintWriter(new FileWriter(file));
+         outs.print(save);
+         outs.close();
+      }
+      catch(NullPointerException npe){}
+      catch(IOException ioe){
+         //Will need to alert the observers or somthing like that
+         ioe.printStackTrace();
       }
    }
 
@@ -239,6 +343,39 @@ public class WeatherPage{
       catch(MalformedURLException mle){ mle.printStackTrace();}
       catch(IOException ioe){ioe.printStackTrace();}
       return returnLine;
+   }
+
+   /**/
+   private String grabMeasureString
+   (
+      List<WeatherData> data,
+      Units units
+   ){
+      String value = null;
+      try{
+         Iterator<WeatherData> it = data.iterator();
+         value = new String();
+         while(it.hasNext()){
+            WeatherData wd = it.next();
+            value = value.concat(wd.month() + " " + wd.day() + " ");
+            value = value.concat(wd.year() + " " +wd.time() + " ");
+            if(units == Units.ABSOLUTE){
+               value = value.concat(wd.toStringAbsolute());
+            }
+            else if(units == Units.ENGLISH){
+               value = value.concat(wd.toStringEnglish());
+            }
+            else if(units == Units.METRIC){
+               value = value.concat(wd.toStringMetric());
+            }
+            else if(units == Units.PERCENTAGE){
+               value = value.concat(wd.toStringPercentage());
+            }
+            value = value.concat("\n");
+         }
+      }
+      catch(NullPointerException npe){}
+      return value;
    }
 
    /**/

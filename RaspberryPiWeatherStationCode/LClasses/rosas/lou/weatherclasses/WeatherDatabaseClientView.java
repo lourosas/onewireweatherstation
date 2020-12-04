@@ -411,112 +411,23 @@ implements WeatherDatabaseClientObserver{
    }
 
    /**/
-   public void saveDewpoint(){
-      PrintWriter outs = null;
-      try{
-         JFileChooser jfc = new JFileChooser();
-         int fileValue = jfc.showSaveDialog(this);
-         if(fileValue == JFileChooser.APPROVE_OPTION){
-            File saveFile = jfc.getSelectedFile();
-            String save = this.grabMeasureString(this.dewpointData,
-                                                 this.dewpointUnits);
-            outs = new PrintWriter(new FileWriter(saveFile));
-            outs.print(save);
-            outs.close();
-         }
-      }
-      catch(HeadlessException he){}
-      catch(NullPointerException npe){}
-      catch(IOException ioe){ outs.close(); }
+   public Units getDewpointUnits(){
+      return this.dewpointUnits;
    }
 
    /**/
-   public void saveHeatIndex(){
-      PrintWriter outs = null;
-      try{
-         JFileChooser jfc = new JFileChooser();
-         int fileValue = jfc.showSaveDialog(this);
-         if(fileValue == JFileChooser.APPROVE_OPTION){
-            File saveFile = jfc.getSelectedFile();
-            String save = this.grabMeasureString(this.heatIndexData,
-                                                 this.heatIndexUnits);
-            outs = new PrintWriter(new FileWriter(saveFile));
-            outs.print(save);
-            outs.close();
-         }
-      }
-      catch(HeadlessException he){}
-      catch(NullPointerException npe){}
-      catch(IOException ioe){ outs.close(); }
+   public Units getHeatIndexUnits(){
+      return this.heatIndexUnits;
    }
 
    /**/
-   public void saveHumidity(){
-      PrintWriter outs = null;
-      try{
-         JFileChooser jfc = new JFileChooser();
-         int fileValue = jfc.showSaveDialog(this);
-         if(fileValue == JFileChooser.APPROVE_OPTION){
-            File saveFile = jfc.getSelectedFile();
-            String save = this.grabMeasureString(this.humidityData,
-                                                    Units.PERCENTAGE);
-            outs = new PrintWriter(new FileWriter(saveFile));
-            outs.print(save);
-            outs.close();
-         }
-      }
-      catch(HeadlessException he){}
-      catch(NullPointerException npe){}
-      catch(IOException ioe){ outs.close(); }
+   public Units getPressureUnits(){
+      return this.pressureUnits;
    }
 
    /**/
-   public void savePressure(){
-      PrintWriter outs = null;
-      try{
-         JFileChooser jfc = new JFileChooser();
-         int fileValue = jfc.showSaveDialog(this);
-         if(fileValue == JFileChooser.APPROVE_OPTION){
-            File saveFile = jfc.getSelectedFile();
-            String save = this.grabMeasureString(this.pressureData,
-                                                 this.pressureUnits);
-            outs = new PrintWriter(new FileWriter(saveFile));
-            outs.print(save);
-            outs.close();
-         }
-      }
-      catch(HeadlessException he){}
-      catch(NullPointerException npe){}
-      catch(IOException ioe){ outs.close(); }
-   }
-
-   /*
-   The best way to do this would be to just read directly from the
-   TextArea...
-   */
-   public void saveTemperature(){
-      PrintWriter outs = null;
-      try{
-         JFileChooser jfc = new JFileChooser();
-         int fileValue = jfc.showSaveDialog(this);
-         if(fileValue == JFileChooser.APPROVE_OPTION){
-            File saveFile = jfc.getSelectedFile();
-            String save =
-                     this.grabMeasureString(this.temperatureData,
-                                            this.temperatureUnits);
-            outs = new PrintWriter(new FileWriter(saveFile));
-            outs.print(save);
-            outs.close();
-         }
-      }
-      catch(HeadlessException he){}
-      catch(NullPointerException npe){
-         //Put something here to indicate NO DATA TO SAVE
-         //Like an error dialog box of some sort
-      }
-      catch(IOException ioe){
-         outs.close();
-      }
+   public Units getTemperatureUnits(){
+      return this.temperatureUnits;
    }
 
    /**/
