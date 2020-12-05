@@ -258,7 +258,8 @@ public class WeatherPage{
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
          //ioe.printStackTrace();
-         this.publishTemperature(new LinkedList<WeatherData>());
+         //this.publishTemperature(new LinkedList<WeatherData>());
+         this.publishTemperature(null);
       }
    }
 
