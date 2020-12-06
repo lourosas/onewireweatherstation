@@ -208,16 +208,19 @@ public class WeatherPage{
          String save = this.grabMeasureString(this._humidityData,
                                               Units.PERCENTAGE);
          if(save.length() <= 0){
-            throw new IOException();
+            String error = "No Humdity data to Save";
+            throw new NullPointerException(error);
          }
          outs = new PrintWriter(new FileWriter(file));
          outs.print(save);
          outs.close();
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         this.publishHumidity(npe);
+      }
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
-         ioe.printStackTrace();
+         this.publishHumidity(ioe);
       }
    }
 
@@ -228,16 +231,19 @@ public class WeatherPage{
          String save = this.grabMeasureString(this._pressureData,
                                               units);
          if(save.length() <= 0){
-            throw new IOException();
+            String error = "No Pressure Data to Save";
+            throw new NullPointerException(error);
          }
          outs = new PrintWriter(new FileWriter(file));
          outs.print(save);
          outs.close();
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         this.publishPressure(npe);
+      }
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
-         ioe.printStackTrace();
+         this.publishPressure(ioe);
       }
    }
 
@@ -256,14 +262,9 @@ public class WeatherPage{
          outs.close();
       }
       catch(NullPointerException npe){
-         //this.publishTemperature(new LinkedList<WeatherData>());
          this.publishTemperature(npe);
       }
       catch(IOException ioe){
-         //Will need to alert the observers or somthing like that
-         //ioe.printStackTrace();
-         //this.publishTemperature(new LinkedList<WeatherData>());
-         //this.publishTemperature(null);
          this.publishTemperature(ioe);
       }
    }
@@ -637,12 +638,39 @@ public class WeatherPage{
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
       while(it.hasNext()){
-         if(list.size() > 0){
-            (it.next()).updateHumidityData(list);
+         try{
+            if(list.size() > 0){
+               (it.next()).updateHumidityData(list);
+            }
+            else{
+               (it.next()).alertNoHumidityData();
+            }
          }
-         else{
+         catch(NullPointerException npe){
             (it.next()).alertNoHumidityData();
          }
+      }
+   }
+
+   /**/
+   private void publishHumidity(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         observer.alertNoHumidityData();
+         observer.alertNoHumidityData(e);
+      }
+   }
+
+   /**/
+   private void publishPressure(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         observer.alertNoPressureData();
+         observer.alertNoPressureData(e);
       }
    }
 
@@ -651,10 +679,15 @@ public class WeatherPage{
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
       while(it.hasNext()){
-         if(list.size() > 0){
-            (it.next()).updatePressureData(list);
+         try{
+            if(list.size() > 0){
+               (it.next()).updatePressureData(list);
+            }
+            else{
+               (it.next()).alertNoPressureData();
+            }
          }
-         else{
+         catch(NullPointerException npe){
             (it.next()).alertNoPressureData();
          }
       }
@@ -662,7 +695,13 @@ public class WeatherPage{
 
    /**/
    private void publishTemperature(Exception re){
-      System.out.println(re.getMessage());
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         observer.alertNoTemperatureData();
+         observer.alertNoTemperatureData(re);
+      }
    }
 
    /**/

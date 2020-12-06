@@ -212,6 +212,12 @@ implements WeatherDatabaseClientObserver{
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
+   public void alertNoHumidityData(Exception e){
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "Humidity Data Error",
+                                    JOptionPane.ERROR_MESSAGE);
+   }
+
    public void alertNoPressureData(){
       try{
          int tempTab = -1;
@@ -240,6 +246,12 @@ implements WeatherDatabaseClientObserver{
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
+   public void alertNoPressureData(Exception e){
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "Pressure Data Error",
+                                    JOptionPane.ERROR_MESSAGE);
+   }
+
    public void alertNoTemperatureData(){
       try{
          int tempTab = -1;
@@ -266,6 +278,12 @@ implements WeatherDatabaseClientObserver{
          jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   public void alertNoTemperatureData(Exception e){
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "Temperature Data Error",
+                                    JOptionPane.ERROR_MESSAGE);
    }
 
    public void updateDewpointData(java.util.List<WeatherData> data){

@@ -32,8 +32,11 @@ public interface WeatherDatabaseClientObserver{
    public void alertNoDewpointData();
    public void alertNoHeatIndexData();
    public void alertNoHumidityData();
+   public void alertNoHumidityData(Exception e);
    public void alertNoPressureData();
+   public void alertNoPressureData(Exception e);
    public void alertNoTemperatureData();
+   public void alertNoTemperatureData(Exception e);
    public void updateDewpointData(List<WeatherData> data);
    public void updateHeatIndexData(List<WeatherData> data);
    public void updateHumidityData(List<WeatherData> data);
