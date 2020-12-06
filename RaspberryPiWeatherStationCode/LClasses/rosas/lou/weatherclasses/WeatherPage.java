@@ -169,16 +169,19 @@ public class WeatherPage{
          String save = this.grabMeasureString(this._dewpointData,
                                               units);
          if(save.length() <= 0){
-            throw new IOException();
+            String error = "No Dewpoint data to Save";
+            throw new NullPointerException(error);
          }
          outs = new PrintWriter(new FileWriter(file));
          outs.print(save);
          outs.close();
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         this.publishDewpoint(npe);
+      }
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
-         ioe.printStackTrace();
+         this.publishDewpoint(ioe);
       }
    }
 
@@ -188,16 +191,19 @@ public class WeatherPage{
          String save = this.grabMeasureString(this._heatIndexData,
                                               units);
          if(save.length() <= 0){
-            throw new IOException();
+            String error = "No Heat Index data to Save";
+            throw new NullPointerException(error);
          }
          outs = new PrintWriter(new FileWriter(file));
          outs.print(save);
          outs.close();
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         this.publishHeatIndex(npe);
+      }
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
-         ioe.printStackTrace();
+         this.publishHeatIndex(ioe);
       }
    }
 
@@ -610,12 +616,28 @@ public class WeatherPage{
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
       while(it.hasNext()){
-         if(list.size() > 0){
-            (it.next()).updateDewpointData(list);
+         try{
+            if(list.size() > 0){
+               (it.next()).updateDewpointData(list);
+            }
+            else{
+               (it.next()).alertNoDewpointData();
+            }
          }
-         else{
+         catch(NullPointerException npe){
             (it.next()).alertNoDewpointData();
          }
+      }
+   }
+
+   /**/
+   private void publishDewpoint(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         observer.alertNoDewpointData();
+         observer.alertNoDewpointData(e);
       }
    }
 
@@ -624,12 +646,28 @@ public class WeatherPage{
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
       while(it.hasNext()){
-         if(list.size() > 0){
-            (it.next()).updateHeatIndexData(list);
+         try{
+            if(list.size() > 0){
+               (it.next()).updateHeatIndexData(list);
+            }
+            else{
+               (it.next()).alertNoHeatIndexData();
+            }
          }
-         else{
+         catch(NullPointerException npe){
             (it.next()).alertNoHeatIndexData();
          }
+      }
+   }
+
+   /**/
+   private void publishHeatIndex(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         observer.alertNoHeatIndexData();
+         observer.alertNoHeatIndexData(e);
       }
    }
 

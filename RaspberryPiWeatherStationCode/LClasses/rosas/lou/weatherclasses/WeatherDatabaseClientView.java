@@ -156,6 +156,11 @@ implements WeatherDatabaseClientObserver{
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
+   public void alertNoDewpointData(Exception e){
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "Dewpoint Data Error",
+                                    JOptionPane.ERROR_MESSAGE);   }
+
    public void alertNoHeatIndexData(){
       try{
          int tempTab = -1;
@@ -182,6 +187,12 @@ implements WeatherDatabaseClientObserver{
          jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   public void alertNoHeatIndexData(Exception e){
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "Heat Index Data Error",
+                                    JOptionPane.ERROR_MESSAGE);
    }
 
    public void alertNoHumidityData(){

@@ -30,7 +30,9 @@ public interface WeatherDatabaseClientObserver{
    public void alertPressureTimeout();
    public void alertTemperatureTimeout();
    public void alertNoDewpointData();
+   public void alertNoDewpointData(Exception e);
    public void alertNoHeatIndexData();
+   public void alertNoHeatIndexData(Exception e);
    public void alertNoHumidityData();
    public void alertNoHumidityData(Exception e);
    public void alertNoPressureData();
