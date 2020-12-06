@@ -152,11 +152,13 @@ implements WeatherDatabaseClientObserver{
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
+         this.enableSaveButton("dewpoint", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    public void alertNoDewpointData(Exception e){
+      this.enableSaveButton("dewpoint", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Dewpoint Data Error",
                                     JOptionPane.ERROR_MESSAGE);   }
@@ -185,11 +187,13 @@ implements WeatherDatabaseClientObserver{
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
+         this.enableSaveButton("heatindex", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    public void alertNoHeatIndexData(Exception e){
+      this.enableSaveButton("heatindex", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Heat Index Data Error",
                                     JOptionPane.ERROR_MESSAGE);
@@ -219,11 +223,13 @@ implements WeatherDatabaseClientObserver{
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
+         this.enableSaveButton("humidity", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    public void alertNoHumidityData(Exception e){
+      this.enableSaveButton("Humidity", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Humidity Data Error",
                                     JOptionPane.ERROR_MESSAGE);
@@ -253,11 +259,13 @@ implements WeatherDatabaseClientObserver{
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
+         this.enableSaveButton("pressure", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    public void alertNoPressureData(Exception e){
+      this.enableSaveButton("pressure", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Pressure Data Error",
                                     JOptionPane.ERROR_MESSAGE);
@@ -287,23 +295,33 @@ implements WeatherDatabaseClientObserver{
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
+         //If there is NO DATA, do not want to print
+         //this.setTemperatureDisplay(GRAPH);
+         this.enableSaveButton("temperature", false);
+         this.temperatureData=new java.util.LinkedList<WeatherData>();
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    public void alertNoTemperatureData(Exception e){
+      //Do not want to PRINT the data if there is none...
+      //this.setTemperatureDisplay(GRAPH);
+      this.enableSaveButton("temperature", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Temperature Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.temperatureData = new java.util.LinkedList<WeatherData>();
    }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
       this.dewpointData = data;
       if(this.dewpointDisplay == GRAPH){
          this.graphDewpoint(data);
+         this.enableSaveButton("dewpoint", false);
       }
       else{
          this.printDewpoint(data);
+         this.enableSaveButton("dewpoint", true);
       }
    }
 
@@ -311,9 +329,11 @@ implements WeatherDatabaseClientObserver{
       this.heatIndexData = data;
       if(this.heatIndexDisplay == GRAPH){
          this.graphHeatIndex(data);
+         this.enableSaveButton("heatindex", false);
       }
       else{
          this.printHeatIndex(data);
+         this.enableSaveButton("heatindex", true);
       }
    }
 
@@ -321,9 +341,11 @@ implements WeatherDatabaseClientObserver{
       this.humidityData = data;
       if(this.humidityDisplay == GRAPH){
          this.graphHumidity(data);
+         this.enableSaveButton("humidity", false);
       }
       else{
          this.printHumidity(data);
+         this.enableSaveButton("humidity", true);
       }
    }
 
@@ -331,9 +353,11 @@ implements WeatherDatabaseClientObserver{
       this.pressureData = data;
       if(this.pressureDisplay == GRAPH){
          this.graphPressure(data);
+         this.enableSaveButton("pressure", false);
       }
       else{
          this.printPressure(data);
+         this.enableSaveButton("pressure", true);
       }
    }
 
@@ -341,9 +365,11 @@ implements WeatherDatabaseClientObserver{
       this.temperatureData = data;
       if(this.tempDisplay == GRAPH){
          this.graphTemperature(data);
+         this.enableSaveButton("temperature", false);
       }
       else{
          this.printTemperature(data);
+         this.enableSaveButton("temperature", true);
       }
    }
 
@@ -464,89 +490,54 @@ implements WeatherDatabaseClientObserver{
    /**/
    public void setDewpointDisplay(short display){
       this.dewpointDisplay = display;
-      Enumeration<AbstractButton> e =
-                                   this.saveButtonGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = e.nextElement();
-         if(ab.getActionCommand().toUpperCase().equals("DEWPOINTSAVE")){
-            if(this.dewpointDisplay == GRAPH){
-               ab.setEnabled(false);
-            }
-            else{
-               ab.setEnabled(true);
-            }
-         }
+      if(this.tempDisplay == GRAPH){
+         this.enableSaveButton("dewpoint", false);
+      }
+      else{
+         this.enableSaveButton("dewpoint", true);
       }
    }
 
    /**/
    public void setHeatIndexDisplay(short display){
       this.heatIndexDisplay = display;
-      Enumeration<AbstractButton> e =
-                                   this.saveButtonGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = e.nextElement();
-         if(ab.getActionCommand().toUpperCase().equals("HEATINDEXSAVE")){
-            if(this.heatIndexDisplay == GRAPH){
-               ab.setEnabled(false);
-            }
-            else{
-               ab.setEnabled(true);
-            }
-         }
+      if(this.tempDisplay == GRAPH){
+         this.enableSaveButton("heatindex", false);
+      }
+      else{
+         this.enableSaveButton("heatindex", true);
       }
    }
    /**/
    public void setHumidityDisplay(short display){
       this.humidityDisplay = display;
-      Enumeration<AbstractButton> e =
-                                   this.saveButtonGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = e.nextElement();
-         if(ab.getActionCommand().toUpperCase().equals("HUMIDITYSAVE")){
-            if(this.humidityDisplay == GRAPH){
-               ab.setEnabled(false);
-            }
-            else{
-               ab.setEnabled(true);
-            }
-         }
+      if(this.tempDisplay == GRAPH){
+         this.enableSaveButton("humidity", false);
+      }
+      else{
+         this.enableSaveButton("humidity", true);
       }
    }
 
    /**/
    public void setPressureDisplay(short display){
       this.pressureDisplay = display;
-      Enumeration<AbstractButton> e =
-                                   this.saveButtonGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = e.nextElement();
-         if(ab.getActionCommand().toUpperCase().equals("PRESSURE SAVE")){
-            if(this.pressureDisplay == GRAPH){
-               ab.setEnabled(false);
-            }
-            else{
-               ab.setEnabled(true);
-            }
-         }
+      if(this.tempDisplay == GRAPH){
+         this.enableSaveButton("pressure", false);
+      }
+      else{
+         this.enableSaveButton("pressure", true);
       }
    }
 
    /**/
    public void setTemperatureDisplay(short display){
       this.tempDisplay = display;
-      Enumeration<AbstractButton> e =
-                                   this.saveButtonGroup.getElements();
-      while(e.hasMoreElements()){
-         AbstractButton ab = e.nextElement();
-         if(ab.getActionCommand().toUpperCase().equals("TEMPERATURESAVE")){
-            if(this.tempDisplay == GRAPH){
-               ab.setEnabled(false);
-            }
-            else{
-               ab.setEnabled(true);
-            }
-         }
+      if(this.tempDisplay == GRAPH){
+         this.enableSaveButton("temperature", false);
+      }
+      else{
+         this.enableSaveButton("temperature", true);
       }
    }
 
@@ -571,6 +562,37 @@ implements WeatherDatabaseClientObserver{
    }
 
    //////////////////////////Private Methods//////////////////////////
+   /**/
+   private void enableSaveButton(String button, boolean enable){
+      String command = new String();
+      if(button.equals("temperature")){
+         command = "TEMPERATURESAVE";
+      }
+      else if(button.equals("humidity")){
+         command = "HUMIDITYSAVE";
+      }
+      else if(button.equals("pressure")){
+         command = "PRESSURE SAVE";
+      }
+      else if(button.equals("heatindex")){
+         command = "HEATINDEXSAVE";
+      }
+      else if(button.equals("dewpoint")){
+         command = "DEWPOINTSAVE";
+      }
+      try{
+         Enumeration<AbstractButton> e =
+                                   this.saveButtonGroup.getElements();
+         while(e.hasMoreElements()){
+            AbstractButton ab = e.nextElement();
+            if(ab.getActionCommand().toUpperCase().equals(command)){
+               ab.setEnabled(enable);
+            }
+         }
+      }
+      catch(NullPointerException npe){}
+   }
+
    /**/
    private String grabMeasureString
    (
