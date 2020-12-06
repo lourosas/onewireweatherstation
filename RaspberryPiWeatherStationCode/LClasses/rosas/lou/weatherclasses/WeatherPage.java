@@ -248,18 +248,23 @@ public class WeatherPage{
          String save = this.grabMeasureString(this._temperatureData,
                                               units);
          if(save.length() <= 0){
-            throw new IOException();
+            String error = "No Temperature Data to Save";
+            throw new NullPointerException(error);
          }
          outs = new PrintWriter(new FileWriter(file));
          outs.print(save);
          outs.close();
       }
-      catch(NullPointerException npe){}
+      catch(NullPointerException npe){
+         //this.publishTemperature(new LinkedList<WeatherData>());
+         this.publishTemperature(npe);
+      }
       catch(IOException ioe){
          //Will need to alert the observers or somthing like that
          //ioe.printStackTrace();
          //this.publishTemperature(new LinkedList<WeatherData>());
-         this.publishTemperature(null);
+         //this.publishTemperature(null);
+         this.publishTemperature(ioe);
       }
    }
 
@@ -656,14 +661,24 @@ public class WeatherPage{
    }
 
    /**/
+   private void publishTemperature(Exception re){
+      System.out.println(re.getMessage());
+   }
+
+   /**/
    private void publishTemperature(List<WeatherData> list){
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
       while(it.hasNext()){
-         if(list.size() > 0){
-            (it.next()).updateTemperatureData(list);
+         try{
+            if(list.size() > 0){
+               (it.next()).updateTemperatureData(list);
+            }
+            else{
+               (it.next()).alertNoTemperatureData();
+            }
          }
-         else{
+         catch(NullPointerException npe){
             (it.next()).alertNoTemperatureData();
          }
       }
