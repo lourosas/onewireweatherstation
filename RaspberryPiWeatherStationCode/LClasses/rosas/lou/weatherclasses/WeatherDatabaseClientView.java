@@ -314,11 +314,14 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void updateAddress(String address){
-      System.out.println(address);
+      this._address.setText(address);
+      this._address.setCaretPosition(this._address.getText().length());
+      this._address.requestFocus();
    }
 
    public void updatePort(String port){
-      System.out.println(port);
+      this._port .setText(port);
+      this._port.setCaretPosition(this._port.getText().length());
    }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
@@ -1267,6 +1270,7 @@ implements WeatherDatabaseClientObserver{
       this._port.setName("Port");
       this._port.addActionListener(this._controller);
       this._port.addKeyListener(this._controller);
+      this._port.setCaretPosition(this._port.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
       this.setUpDateComboBoxes();

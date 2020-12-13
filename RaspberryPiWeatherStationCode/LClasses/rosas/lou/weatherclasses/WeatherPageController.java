@@ -116,6 +116,12 @@ ItemListener{
    public void keyReleased(KeyEvent ke){
       try{
          JTextField jt = ((JTextField)ke.getSource());
+         int  c = ke.getKeyCode();
+         char k = ke.getKeyChar();
+         if(c == KeyEvent.VK_ENTER){
+            System.out.println(jt.getText());
+         }
+         /*
          if(jt.getName().toUpperCase().equals("ADDRESS")){
             //System.out.println(jt.getText());
             this._model.setServerAddress(jt.getText());
@@ -123,6 +129,7 @@ ItemListener{
          else if(jt.getName().toUpperCase().equals("PORT")){
             this._model.setServerPort(jt.getText());
          }
+         */
       }
       catch(ClassCastException cce){}
    }
