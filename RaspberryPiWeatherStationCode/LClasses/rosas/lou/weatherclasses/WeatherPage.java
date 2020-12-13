@@ -71,6 +71,9 @@ public class WeatherPage{
                       new LinkedList<WeatherDatabaseClientObserver>();
          this._observers.add(observer);
       }
+      String address = this.grabAddressString();
+      this.publishAddress(address);
+      this.publishPort(new String("") + this._port);
    }
 
    /**/
@@ -301,6 +304,10 @@ public class WeatherPage{
                                  (byte)addr[3]};
       }
       catch(NumberFormatException nfe){}
+      finally{
+         String addrss = this.grabAddressString();
+         this.publishAddress(addrss);
+      }
    }
 
    /**/
@@ -309,6 +316,9 @@ public class WeatherPage{
          this._port = Integer.parseInt(port.trim());
       }
       catch(NumberFormatException nfe){}
+      finally{
+         this.publishPort("" + this._port);
+      }
    }
 
    ////////////////////////Private Methods////////////////////////////
@@ -320,17 +330,9 @@ public class WeatherPage{
       String year,
       String units
    ){
-      int first = new Byte(this._addr[0]).intValue();
-      first = first < 0 ? first + 256 : first;
-      int sec   = new Byte(this._addr[1]).intValue();
-      sec = sec < 0 ? sec + 256 : sec;
-      int third = new Byte(this._addr[2]).intValue();
-      third = third < 0 ? third + 256 : third;
-      int fourth= new Byte(this._addr[3]).intValue();
-      fourth=fourth < 0 ? fourth + 256 : fourth;
       String returnLine = null;
       StringBuffer send = new StringBuffer("http://");
-      String addr = new String(""+first+"."+sec+"."+third+"."+fourth);
+      String addr = this.grabAddressString();
       addr = addr.concat(":"+this._port);
       send.append(addr+"/daily?month="+month+"&date="+day);
       send.append("&year="+year+"&units="+units);
@@ -357,6 +359,21 @@ public class WeatherPage{
       catch(MalformedURLException mle){ mle.printStackTrace();}
       catch(IOException ioe){ioe.printStackTrace();}
       return returnLine;
+   }
+
+   /**/
+   private String grabAddressString(){
+      int first = new Byte(this._addr[0]).intValue();
+      first = first < 0 ? first + 256 : first;
+      int sec   = new Byte(this._addr[1]).intValue();
+      sec = sec < 0 ? sec + 256 : sec;
+      int third = new Byte(this._addr[2]).intValue();
+      third = third < 0 ? third + 256 : third;
+      int fourth= new Byte(this._addr[3]).intValue();
+      fourth=fourth < 0 ? fourth + 256 : fourth;
+      String address = new String(""+first+"."+sec+"."+third+".");
+      address = address.concat(""+fourth);
+      return address;
    }
 
    /**/
@@ -609,6 +626,30 @@ public class WeatherPage{
          }
       }
       return wdList;
+   }
+
+   /**/
+   private void publishAddress(String address){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            (it.next()).updateAddress(address);
+         }
+         catch(NullPointerException npe){}
+      }
+   }
+
+   /**/
+   private void publishPort(String port){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            (it.next()).updatePort(port);
+         }
+         catch(NullPointerException npe){}
+      }
    }
 
    /**/

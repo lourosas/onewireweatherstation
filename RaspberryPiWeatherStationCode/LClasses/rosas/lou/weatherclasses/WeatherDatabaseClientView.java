@@ -313,6 +313,14 @@ implements WeatherDatabaseClientObserver{
       this.temperatureData = new java.util.LinkedList<WeatherData>();
    }
 
+   public void updateAddress(String address){
+      System.out.println(address);
+   }
+
+   public void updatePort(String port){
+      System.out.println(port);
+   }
+
    public void updateDewpointData(java.util.List<WeatherData> data){
       this.dewpointData = data;
       if(this.dewpointDisplay == GRAPH){
