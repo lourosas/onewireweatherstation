@@ -73,9 +73,6 @@ public class WeatherPage{
                       new LinkedList<WeatherDatabaseClientObserver>();
          this._observers.add(observer);
       }
-      //String address = this.grabAddressString();
-      //this.publishAddress(address+":"+this._port);
-      //this.publishPort(new String("") + this._port);
       this.publishAddress(this._addr);
    }
 
@@ -86,13 +83,18 @@ public class WeatherPage{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
          wl          = this.parseDewpoint(data);
+         this.publishDewpoint(wl);
       }
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
+         this.publishDewpoint(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishDewpoint(e);
       }
       finally{
          this._dewpointData = wl;
-         this.publishDewpoint(wl);
       }
    }
 
@@ -103,13 +105,18 @@ public class WeatherPage{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
          wl          = this.parseHeatIndex(data);
+         this.publishHeatIndex(wl);
       }
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
+         this.publishHeatIndex(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishHeatIndex(e);
       }
       finally{
          this._heatIndexData = wl;
-         this.publishHeatIndex(wl);
       }
    }
 
@@ -120,13 +127,18 @@ public class WeatherPage{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
          wl          = this.parseHumidity(data);
+         this.publishHumidity(wl);
       }
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
+         this.publishHumidity(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishHumidity(e);
       }
       finally{
          this._humidityData = wl;
-         this.publishHumidity(wl);
       }
    }
 
@@ -137,13 +149,18 @@ public class WeatherPage{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"absolute");
          wl          = this.parsePressure(data);
+         this.publishPressure(wl);
       }
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
+         this.publishPressure(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishPressure(e);
       }
       finally{
          this._pressureData = wl;
-         this.publishPressure(wl);
       }
    }
 
@@ -154,17 +171,21 @@ public class WeatherPage{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
          wl          = this.parseTemperature(data);
-         //this.publishTemperature(wl);
+         this.publishTemperature(wl);
       }
       catch(NullPointerException npe){
          //npe.printStackTrace();
          //Need to figure out a better way to aleart the view!!!
          //Let the View figure out what to do!!
          wl = new LinkedList<WeatherData>();
+	 this.publishTemperature(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+	 this.publishTemperature(e);
       }
       finally{
          this._temperatureData = wl;
-         this.publishTemperature(wl);
       }
    }
 
@@ -325,7 +346,7 @@ public class WeatherPage{
       String day,
       String year,
       String units
-   ){
+   ) throws Exception{
       String returnLine = null;
       StringBuffer send = new StringBuffer("http://");
       //String addr = this.grabAddressString();
@@ -352,11 +373,20 @@ public class WeatherPage{
                }
             }
          }
+	 return returnLine;
       }
-      catch(SocketTimeoutException ste){ ste.printStackTrace(); }
-      catch(MalformedURLException mle){ mle.printStackTrace();}
-      catch(IOException ioe){ioe.printStackTrace();}
-      return returnLine;
+      catch(SocketTimeoutException ste){ 
+         ste.printStackTrace();
+         throw new SocketTimeoutException(ste.getMessage());
+      }
+      catch(MalformedURLException mle){
+         mle.printStackTrace();
+         throw new MalformedURLException(mle.getMessage());
+      }
+      catch(IOException ioe){
+         ioe.printStackTrace();
+         throw new IOException(ioe.getMessage());
+      }
    }
 
    /*

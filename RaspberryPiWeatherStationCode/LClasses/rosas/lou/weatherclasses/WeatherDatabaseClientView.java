@@ -292,7 +292,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
          drawPanel.setLayout(new BorderLayout());
          String errorString = new String("No Temperature Data ");
-         errorString = errorString.concat("Available for this Date");
+         errorString = errorString.concat("Available");
+         //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(tempTab + 1);
