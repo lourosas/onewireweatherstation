@@ -50,13 +50,14 @@ implements WeatherDatabaseClientObserver{
    private static String [] DAYS = {"01","02","03","04","05","06",
    "07","08","09","10","11","12","13","14","15","16","17","18","19",
    "20","21","22","23","24","25","26","27","28","29","30","31"};
-   private static String [] YEARS = {"2017", "2018", "2019", "2020"};
+   private static String [] YEARS = {"2017", "2018", "2019", "2020",
+   "2021"};
 
    private GenericWeatherController _controller = null;
    //Really do not need these to be global any longer--handled by
    //The Controller directly, realtime...
    private JTextField _address        = null;
-   private JTextField _port           = null;
+   //private JTextField _port           = null;
    private JComboBox<String> _monthCB = null;
    private JComboBox<String> _dayCB   = null;
    private JComboBox<String> _yearCB  = null;
@@ -112,10 +113,11 @@ implements WeatherDatabaseClientObserver{
       return this._address.getText();
    }
 
-   /**/
+   /*
    public String port(){
       return this._port.getText();
    }
+   */
 
    ///////WeatherDatabaseClientObserver Interface Implementaion///////
    public void alertDewpointTimeout(){}
@@ -317,11 +319,12 @@ implements WeatherDatabaseClientObserver{
       this._address.setText(address);
       this._address.setCaretPosition(this._address.getText().length());
       this._address.requestFocus();
+      this._address.selectAll();
    }
 
    public void updatePort(String port){
-      this._port .setText(port);
-      this._port.setCaretPosition(this._port.getText().length());
+      //this._port .setText(port);
+      //this._port.setCaretPosition(this._port.getText().length());
    }
 
    public void updateDewpointData(java.util.List<WeatherData> data){
@@ -1265,20 +1268,20 @@ implements WeatherDatabaseClientObserver{
       this._address.addActionListener(this._controller);
       this._address.addKeyListener(this._controller);
       JLabel gap = new JLabel("                  ");
-      JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
-      this._port    = new JTextField(5);
-      this._port.setName("Port");
-      this._port.addActionListener(this._controller);
-      this._port.addKeyListener(this._controller);
-      this._port.setCaretPosition(this._port.getText().length());
+      //JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
+      //this._port    = new JTextField(5);
+      //this._port.setName("Port");
+      //this._port.addActionListener(this._controller);
+      //this._port.addKeyListener(this._controller);
+      //this._port.setCaretPosition(this._port.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
       this.setUpDateComboBoxes();
 
       panel.add(addLabel);
       panel.add(this._address);
-      panel.add(portLabel);
-      panel.add(this._port);
+      //panel.add(portLabel);
+      //panel.add(this._port);
       panel.add(gap);
       panel.add(this._monthCB);
       panel.add(this._dayCB);

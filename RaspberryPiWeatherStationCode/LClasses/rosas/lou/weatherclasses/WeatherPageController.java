@@ -79,20 +79,10 @@ ItemListener{
    public void keyPressed(KeyEvent ke){
       try{
          JTextField jt = (JTextField)ke.getSource();
-         if(jt.getName().toUpperCase().equals("PORT")){
+         if(jt.getName().toUpperCase().equals("ADDRESS")){
             char k = ke.getKeyChar();
             int  c = ke.getKeyCode();
-            if((k >= '0' && k <= '9') || c == KeyEvent.VK_BACK_SPACE){
-               jt.setEditable(true);
-            }
-            else{
-               jt.setEditable(false);
-            }
-         }
-         else if(jt.getName().toUpperCase().equals("ADDRESS")){
-            char k = ke.getKeyChar();
-            int  c = ke.getKeyCode();
-            if((k >= '0' && k <= '9') || k == '.' ||
+            if((k >= '0' && k <= '9') || k == '.' || k == ':' ||
                 c == KeyEvent.VK_BACK_SPACE){
                jt.setEditable(true);
             }
@@ -119,7 +109,8 @@ ItemListener{
          int  c = ke.getKeyCode();
          char k = ke.getKeyChar();
          if(c == KeyEvent.VK_ENTER){
-            System.out.println(jt.getText());
+            //System.out.println(jt.getText());
+            this._model.setServerAddress(jt.getText());
          }
          /*
          if(jt.getName().toUpperCase().equals("ADDRESS")){

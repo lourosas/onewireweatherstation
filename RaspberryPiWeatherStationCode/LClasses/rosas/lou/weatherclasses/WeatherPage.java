@@ -30,8 +30,9 @@ public class WeatherPage{
    private static final int PORT    = 8000;
    private static final int TIMEOUT = 20000;
 
-   private byte[]            _addr;
-   private int               _port;
+   //private byte[]            _addr;
+   //private int               _port;
+   private String            _addr;
    private String[]          _cal;
    private String            _rawData;
    private List<WeatherData> _temperatureData;
@@ -43,8 +44,9 @@ public class WeatherPage{
    private List<WeatherDatabaseClientObserver> _observers;
 
    {
-      _addr = new byte[]{(byte)68,(byte)230,(byte)27,(byte)225};
-      _port            = PORT;
+      //_addr = new byte[]{(byte)68,(byte)230,(byte)27,(byte)225};
+      //_port            = PORT;
+      _addr            = new String("68.230.27.225:8000");
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
       _temperatureData = null;
@@ -71,9 +73,10 @@ public class WeatherPage{
                       new LinkedList<WeatherDatabaseClientObserver>();
          this._observers.add(observer);
       }
-      String address = this.grabAddressString();
-      this.publishAddress(address);
-      this.publishPort(new String("") + this._port);
+      //String address = this.grabAddressString();
+      //this.publishAddress(address+":"+this._port);
+      //this.publishPort(new String("") + this._port);
+      this.publishAddress(this._addr);
    }
 
    /**/
@@ -292,6 +295,7 @@ public class WeatherPage{
 
    /**/
    public void setServerAddress(String address){
+      /*
       int [] addr = new int[4];
       String [] values = address.split("\\.");
       try{
@@ -308,17 +312,9 @@ public class WeatherPage{
          String addrss = this.grabAddressString();
          this.publishAddress(addrss);
       }
-   }
-
-   /**/
-   public void setServerPort(String port){
-      try{
-         this._port = Integer.parseInt(port.trim());
-      }
-      catch(NumberFormatException nfe){}
-      finally{
-         this.publishPort("" + this._port);
-      }
+      */
+      this._addr = new String(address);
+      this.publishAddress(this._addr);
    }
 
    ////////////////////////Private Methods////////////////////////////
@@ -332,13 +328,14 @@ public class WeatherPage{
    ){
       String returnLine = null;
       StringBuffer send = new StringBuffer("http://");
-      String addr = this.grabAddressString();
-      addr = addr.concat(":"+this._port);
-      send.append(addr+"/daily?month="+month+"&date="+day);
+      //String addr = this.grabAddressString();
+      //addr = addr.concat(":"+this._port);
+      send.append(this._addr+"/daily?month="+month+"&date="+day);
       send.append("&year="+year+"&units="+units);
       try{
          URL url = new URL(send.toString().trim());
          URLConnection conn = url.openConnection();
+         conn.setConnectTimeout(TIMEOUT);
          conn.connect();
          BufferedReader in = new BufferedReader(
                         new InputStreamReader(conn.getInputStream()));
@@ -356,12 +353,13 @@ public class WeatherPage{
             }
          }
       }
+      catch(SocketTimeoutException ste){ ste.printStackTrace(); }
       catch(MalformedURLException mle){ mle.printStackTrace();}
       catch(IOException ioe){ioe.printStackTrace();}
       return returnLine;
    }
 
-   /**/
+   /*
    private String grabAddressString(){
       int first = new Byte(this._addr[0]).intValue();
       first = first < 0 ? first + 256 : first;
@@ -375,6 +373,7 @@ public class WeatherPage{
       address = address.concat(""+fourth);
       return address;
    }
+   */
 
    /**/
    private String grabMeasureString
@@ -640,7 +639,7 @@ public class WeatherPage{
       }
    }
 
-   /**/
+   /*
    private void publishPort(String port){
       Iterator<WeatherDatabaseClientObserver> it =
                                            this._observers.iterator();
@@ -651,7 +650,7 @@ public class WeatherPage{
          catch(NullPointerException npe){}
       }
    }
-
+   */
    /**/
    private void publishDewpoint(List<WeatherData> list){
       Iterator<WeatherDatabaseClientObserver> it =
