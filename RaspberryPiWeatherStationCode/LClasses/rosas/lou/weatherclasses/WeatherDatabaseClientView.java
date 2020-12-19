@@ -149,7 +149,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
          drawPanel.setLayout(new BorderLayout());
          String errorString = new String("No Dewpoint Data ");
-         errorString = errorString.concat("Available for this Date");
+         errorString = errorString.concat("Available");
+         //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
@@ -184,7 +185,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
          drawPanel.setLayout(new BorderLayout());
          String errorString = new String("No Heatindex Data ");
-         errorString = errorString.concat("Available for this Date");
+         errorString = errorString.concat("Available");
+         //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
@@ -220,7 +222,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
          drawPanel.setLayout(new BorderLayout());
          String errorString = new String("No Humidity Data ");
-         errorString = errorString.concat("Available for this Date");
+         errorString = errorString.concat("Available");
+         //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
@@ -256,7 +259,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setBorder(BorderFactory.createEmptyBorder(0,5,0,5));
          drawPanel.setLayout(new BorderLayout());
          String errorString = new String("No Pressure Data ");
-         errorString = errorString.concat("Available for this Date");
+         errorString = errorString.concat("Available");
+         //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
          jtp.setSelectedIndex(0);
@@ -321,6 +325,11 @@ implements WeatherDatabaseClientObserver{
       this._address.setCaretPosition(this._address.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
+      JTabbedPane jtp = 
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+      JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+      JPanel nextPanel = (JPanel)tempPanel.getComponent(1);
+      ((JButton)nextPanel.getComponent(0)).doClick();
    }
 
    public void updatePort(String port){

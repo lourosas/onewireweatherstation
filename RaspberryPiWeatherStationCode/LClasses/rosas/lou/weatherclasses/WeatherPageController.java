@@ -112,15 +112,6 @@ ItemListener{
             //System.out.println(jt.getText());
             this._model.setServerAddress(jt.getText());
          }
-         /*
-         if(jt.getName().toUpperCase().equals("ADDRESS")){
-            //System.out.println(jt.getText());
-            this._model.setServerAddress(jt.getText());
-         }
-         else if(jt.getName().toUpperCase().equals("PORT")){
-            this._model.setServerPort(jt.getText());
-         }
-         */
       }
       catch(ClassCastException cce){}
    }
