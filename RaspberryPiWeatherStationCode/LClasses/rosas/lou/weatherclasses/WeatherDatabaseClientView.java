@@ -158,13 +158,18 @@ implements WeatherDatabaseClientObserver{
          this.enableSaveButton("dewpoint", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      finally{
+         this.dewpointData = new java.util.LinkedList<WeatherData>();
+      }
    }
 
    public void alertNoDewpointData(Exception e){
       this.enableSaveButton("dewpoint", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Dewpoint Data Error",
-                                    JOptionPane.ERROR_MESSAGE);   }
+                                    JOptionPane.ERROR_MESSAGE);
+      this.dewpointData = new java.util.LinkedList<WeatherData>();
+   }
 
    public void alertNoHeatIndexData(){
       try{
@@ -194,6 +199,9 @@ implements WeatherDatabaseClientObserver{
          this.enableSaveButton("heatindex", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      finally{
+         this.heatIndexData = new java.util.LinkedList<WeatherData>();
+      }
    }
 
    public void alertNoHeatIndexData(Exception e){
@@ -201,6 +209,8 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Heat Index Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.heatIndexData = new java.util.LinkedList<WeatherData>();
+
    }
 
    public void alertNoHumidityData(){
@@ -231,6 +241,9 @@ implements WeatherDatabaseClientObserver{
          this.enableSaveButton("humidity", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      finally{
+         this.humidityData = new java.util.LinkedList<WeatherData>();
+      }
    }
 
    public void alertNoHumidityData(Exception e){
@@ -238,6 +251,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Humidity Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.humidityData = new java.util.LinkedList<WeatherData>();
    }
 
    public void alertNoPressureData(){
@@ -268,6 +282,9 @@ implements WeatherDatabaseClientObserver{
          this.enableSaveButton("pressure", false);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      finally{
+         this.pressureData = new java.util.LinkedList<WeatherData>();
+      }
    }
 
    public void alertNoPressureData(Exception e){
@@ -275,6 +292,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Pressure Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.pressureData = new java.util.LinkedList<WeatherData>();
    }
 
    public void alertNoTemperatureData(){
@@ -305,9 +323,11 @@ implements WeatherDatabaseClientObserver{
          //If there is NO DATA, do not want to print
          //this.setTemperatureDisplay(GRAPH);
          this.enableSaveButton("temperature", false);
-         this.temperatureData=new java.util.LinkedList<WeatherData>();
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      finally{
+         this.temperatureData=new java.util.LinkedList<WeatherData>();
+      }
    }
 
    public void alertNoTemperatureData(Exception e){
@@ -325,7 +345,7 @@ implements WeatherDatabaseClientObserver{
       this._address.setCaretPosition(this._address.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
-      JTabbedPane jtp = 
+      JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(1);
       JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
       JPanel nextPanel = (JPanel)tempPanel.getComponent(1);
@@ -1277,7 +1297,7 @@ implements WeatherDatabaseClientObserver{
       this._address.setName("Address");
       this._address.addActionListener(this._controller);
       this._address.addKeyListener(this._controller);
-      JLabel gap = new JLabel("                  ");
+      //JLabel gap = new JLabel("                  ");
       //JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
       //this._port    = new JTextField(5);
       //this._port.setName("Port");
@@ -1292,7 +1312,7 @@ implements WeatherDatabaseClientObserver{
       panel.add(this._address);
       //panel.add(portLabel);
       //panel.add(this._port);
-      panel.add(gap);
+      //panel.add(gap);
       panel.add(this._monthCB);
       panel.add(this._dayCB);
       panel.add(this._yearCB);
