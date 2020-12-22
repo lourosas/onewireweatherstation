@@ -1297,7 +1297,7 @@ implements WeatherDatabaseClientObserver{
       this._address.setName("Address");
       this._address.addActionListener(this._controller);
       this._address.addKeyListener(this._controller);
-      //JLabel gap = new JLabel("                  ");
+      JLabel gap = new JLabel("                  ");
       //JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
       //this._port    = new JTextField(5);
       //this._port.setName("Port");
@@ -1312,7 +1312,7 @@ implements WeatherDatabaseClientObserver{
       panel.add(this._address);
       //panel.add(portLabel);
       //panel.add(this._port);
-      //panel.add(gap);
+      panel.add(gap);
       panel.add(this._monthCB);
       panel.add(this._dayCB);
       panel.add(this._yearCB);
