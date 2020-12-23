@@ -170,6 +170,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Dewpoint Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.alertNoDewpointData();
       this.dewpointData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -213,6 +214,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Heat Index Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.alertNoHeatIndexData();
       this.heatIndexData = new java.util.LinkedList<WeatherData>();
 
    }
@@ -257,6 +259,8 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Humidity Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      //Indicate there is no data to display
+      this.alertNoHumidityData();
       this.humidityData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -300,6 +304,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Pressure Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.alertNoPressureData();
       this.pressureData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -347,6 +352,7 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Temperature Data Error",
                                     JOptionPane.ERROR_MESSAGE);
+      this.alertNoTemperatureData();
       this.temperatureData = new java.util.LinkedList<WeatherData>();
    }
 

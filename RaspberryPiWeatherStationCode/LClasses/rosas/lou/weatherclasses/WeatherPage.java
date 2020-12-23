@@ -316,24 +316,6 @@ public class WeatherPage{
 
    /**/
    public void setServerAddress(String address){
-      /*
-      int [] addr = new int[4];
-      String [] values = address.split("\\.");
-      try{
-         for(int i = 0; i < values.length; i++){
-            addr[i] = Integer.parseInt(values[i]);
-         }
-         this._addr = new byte[]{(byte)addr[0],
-                                 (byte)addr[1],
-                                 (byte)addr[2],
-                                 (byte)addr[3]};
-      }
-      catch(NumberFormatException nfe){}
-      finally{
-         String addrss = this.grabAddressString();
-         this.publishAddress(addrss);
-      }
-      */
       this._addr = new String(address);
       this.publishAddress(this._addr);
    }
@@ -349,8 +331,6 @@ public class WeatherPage{
    ) throws Exception{
       String returnLine = null;
       StringBuffer send = new StringBuffer("http://");
-      //String addr = this.grabAddressString();
-      //addr = addr.concat(":"+this._port);
       send.append(this._addr+"/daily?month="+month+"&date="+day);
       send.append("&year="+year+"&units="+units);
       try{
