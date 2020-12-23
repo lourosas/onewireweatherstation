@@ -607,6 +607,24 @@ implements WeatherDatabaseClientObserver{
 
    //////////////////////////Private Methods//////////////////////////
    /**/
+   private void addDateToPanel(WeatherData wd,JPanel panel,int index){
+      try{
+         panel.remove(index);
+         //panel.removeAll();
+      }
+      catch(ArrayIndexOutOfBoundsException obe){}
+      finally{
+         if(wd != null){
+            String dateString = new String(wd.month()+" "+wd.day());
+            dateString = dateString.concat(", " + wd.year());
+            JLabel dateLabel = new JLabel(dateString);
+            dateLabel.setForeground(new Color(0x4961E1));//Sky Blue
+            panel.add(dateLabel);
+         }
+      }
+   }
+
+   /**/
    private void enableSaveButton(String button, boolean enable){
       String command = new String();
       if(button.equals("temperature")){
@@ -691,6 +709,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.dewpointUnits),
                                                  BorderLayout.CENTER);
+         this.addDateToPanel(data.get(0),
+                                   (JPanel)dpPanel.getComponent(2),2);
          jtp.setSelectedIndex(dpTab + 1);
          jtp.setSelectedIndex(dpTab);
 
@@ -723,6 +743,7 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(dpSP, BorderLayout.CENTER);
+         this.addDateToPanel(null,(JPanel)dpPanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(dpTab);
       }
@@ -750,6 +771,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.heatIndexUnits),
                                                  BorderLayout.CENTER);
+         this.addDateToPanel(data.get(0),
+                             (JPanel)hiPanel.getComponent(2),2);
          jtp.setSelectedIndex(hiTab -1);
          jtp.setSelectedIndex(hiTab);
       }
@@ -781,6 +804,7 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(heatIndexSP, BorderLayout.CENTER);
+         this.addDateToPanel(null,(JPanel)hiPanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(hiTab);
       }
@@ -809,7 +833,8 @@ implements WeatherDatabaseClientObserver{
 
          drawPanel.add(new WeatherPanel(data, Units.PERCENTAGE),
                                                  BorderLayout.CENTER);
-
+         this.addDateToPanel(data.get(0),
+                             (JPanel)humidityPanel.getComponent(2),1);
          jtp.setSelectedIndex(humidityTab + 1);
          jtp.setSelectedIndex(humidityTab);
       }
@@ -841,6 +866,8 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(humiditySP, BorderLayout.CENTER);
+         this.addDateToPanel(null,
+                             (JPanel)humidityPanel.getComponent(2),1);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(humidityTab);
       }
@@ -868,6 +895,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.pressureUnits),
                                                  BorderLayout.CENTER);
+         this.addDateToPanel(data.get(0),
+                             (JPanel)pressurePanel.getComponent(2),2);
          jtp.setSelectedIndex(pressureTab + 1);
          jtp.setSelectedIndex(pressureTab);
 
@@ -900,6 +929,8 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(pressureSP, BorderLayout.CENTER);
+         this.addDateToPanel(null,
+                             (JPanel)pressurePanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(pressureTab);
       }
@@ -927,6 +958,8 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.temperatureUnits),
                                                  BorderLayout.CENTER);
+         this.addDateToPanel(data.get(0),
+                             (JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
       }
@@ -958,6 +991,7 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(tempSP, BorderLayout.CENTER);
+         this.addDateToPanel(null,(JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
       }
