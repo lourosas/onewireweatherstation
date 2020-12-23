@@ -153,6 +153,8 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
+         this.addDateToPanel(new DewpointData(),
+                             (JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("dewpoint", false);
@@ -194,6 +196,8 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
+         this.addDateToPanel(new HeatIndexData(),
+                                 (JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("heatindex", false);
@@ -236,6 +240,8 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
+         this.addDateToPanel(new HumidityData(),
+                                 (JPanel)tempPanel.getComponent(2),1);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("humidity", false);
@@ -277,6 +283,8 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
+         this.addDateToPanel(new PressureData(),
+                                 (JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("pressure", false);
@@ -318,6 +326,8 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
+         this.addDateToPanel(new TemperatureData(),
+                            (JPanel)tempPanel.getComponent(2),2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
          //If there is NO DATA, do not want to print
@@ -614,12 +624,30 @@ implements WeatherDatabaseClientObserver{
       }
       catch(ArrayIndexOutOfBoundsException obe){}
       finally{
+         String dateString = null;
+         JLabel dateLabel  = null;
+         String month      = null;
+         String day        = null;
+         String year       = null;
          if(wd != null){
-            String dateString = new String(wd.month()+" "+wd.day());
-            dateString = dateString.concat(", " + wd.year());
-            JLabel dateLabel = new JLabel(dateString);
-            dateLabel.setForeground(new Color(0x4961E1));//Sky Blue
-            panel.add(dateLabel);
+            try{
+               if(wd.month()==null||wd.day()==null||wd.year()==null){
+                  throw new NullPointerException();
+               }
+               month = wd.month();day = wd.day();year = wd.year();
+            }
+            catch(NullPointerException npe){
+               month = (String)this._monthCB.getSelectedItem();
+               day   = (String)this._dayCB.getSelectedItem();
+               year  = (String)this._yearCB.getSelectedItem();
+            }
+            finally{
+               dateString = new String(month+" "+day+", "+year);
+               dateLabel  = new JLabel(dateString);
+               //Royal Blue
+               dateLabel.setForeground(new Color(0x4961E1));
+               panel.add(dateLabel);
+            }
          }
       }
    }
