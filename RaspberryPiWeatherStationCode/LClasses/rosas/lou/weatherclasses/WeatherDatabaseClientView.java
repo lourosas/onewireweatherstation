@@ -361,11 +361,7 @@ implements WeatherDatabaseClientObserver{
       this._address.setCaretPosition(this._address.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
-      JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(1);
-      JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
-      JPanel nextPanel = (JPanel)tempPanel.getComponent(1);
-      ((JButton)nextPanel.getComponent(0)).doClick();
+      this.pressCurrentRefresh();
    }
 
    public void updatePort(String port){
@@ -442,12 +438,17 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    public void displayDewpoint(Units units){
-      this.setDewpointUnits(units);
-      if(this.dewpointData.size() > 0){
-         this.updateDewpointData(this.dewpointData);
+      try{
+         this.setDewpointUnits(units);
+         if(this.dewpointData.size() > 0){
+            this.updateDewpointData(this.dewpointData);
+         }
+         else{
+            this.alertNoDewpointData();
+         }
       }
-      else{
-         this.alertNoDewpointData();
+      catch(NullPointerException npe){
+         this.pressCurrentRefresh();
       }
    }
 
@@ -459,23 +460,33 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    public void displayHeatIndex(Units units){
-      this.setHeatIndexUnits(units);
-      if(this.heatIndexData.size() > 0){
-         this.updateHeatIndexData(this.heatIndexData);
+      try{
+         this.setHeatIndexUnits(units);
+         if(this.heatIndexData.size() > 0){
+            this.updateHeatIndexData(this.heatIndexData);
+         }
+         else{
+            this.alertNoHeatIndexData();
+         }
       }
-      else{
-         this.alertNoHeatIndexData();
+      catch(NullPointerException npe){
+         this.pressCurrentRefresh();
       }
    }
 
    /**/
    public void displayHumidity(short display){
-      this.setHumidityDisplay(display);
-      if(this.humidityData.size() > 0){
-         this.updateHumidityData(this.humidityData);
+      try{
+         this.setHumidityDisplay(display);
+         if(this.humidityData.size() > 0){
+            this.updateHumidityData(this.humidityData);
+         }
+         else{
+            this.alertNoHumidityData();
+         }
       }
-      else{
-         this.alertNoHumidityData();
+      catch(NullPointerException npe){
+         this.pressCurrentRefresh();
       }
    }
 
@@ -487,12 +498,17 @@ implements WeatherDatabaseClientObserver{
 
    /**/
    public void displayPressure(Units units){
-      this.setPressureUnits(units);
-      if(this.pressureData.size() > 0){
-         this.updatePressureData(this.pressureData);
+      try{
+         this.setPressureUnits(units);
+         if(this.pressureData.size() > 0){
+            this.updatePressureData(this.pressureData);
+         }
+         else{
+            this.alertNoPressureData();
+         }
       }
-      else{
-         this.alertNoPressureData();
+      catch(NullPointerException npe){
+         this.pressCurrentRefresh();
       }
    }
 
@@ -503,12 +519,17 @@ implements WeatherDatabaseClientObserver{
    }
    /**/
    public void displayTemperature(Units units){
-      this.setTemperatureUnits(units);
-      if(this.temperatureData.size() > 0){
-         this.updateTemperatureData(this.temperatureData);
+      try{
+         this.setTemperatureUnits(units);
+         if(this.temperatureData.size() > 0){
+            this.updateTemperatureData(this.temperatureData);
+         }
+         else{
+            this.alertNoTemperatureData();
+         }
       }
-      else{
-         this.alertNoTemperatureData();
+      catch(NullPointerException npe){
+         this.pressCurrentRefresh();
       }
    }
 
@@ -1030,6 +1051,15 @@ implements WeatherDatabaseClientObserver{
          jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){npe.printStackTrace();}
+   }
+
+   /**/
+   private void pressCurrentRefresh(){
+      JTabbedPane jtp =
+                (JTabbedPane)this.getContentPane().getComponent(1);
+      JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+      JPanel nextPanel = (JPanel)tempPanel.getComponent(1);
+      ((JButton)nextPanel.getComponent(0)).doClick();
    }
 
    /**/
