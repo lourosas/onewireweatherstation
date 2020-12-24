@@ -166,11 +166,11 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoDewpointData(Exception e){
+      this.alertNoDewpointData();
       this.enableSaveButton("dewpoint", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Dewpoint Data Error",
                                     JOptionPane.ERROR_MESSAGE);
-      this.alertNoDewpointData();
       this.dewpointData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -210,11 +210,11 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoHeatIndexData(Exception e){
+      this.alertNoHeatIndexData();
       this.enableSaveButton("heatindex", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Heat Index Data Error",
                                     JOptionPane.ERROR_MESSAGE);
-      this.alertNoHeatIndexData();
       this.heatIndexData = new java.util.LinkedList<WeatherData>();
 
    }
@@ -255,12 +255,13 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoHumidityData(Exception e){
+      //Indicate there is no data to display
+      this.alertNoHumidityData();
       this.enableSaveButton("Humidity", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Humidity Data Error",
                                     JOptionPane.ERROR_MESSAGE);
-      //Indicate there is no data to display
-      this.alertNoHumidityData();
+
       this.humidityData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -300,11 +301,11 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoPressureData(Exception e){
+      this.alertNoPressureData();
       this.enableSaveButton("pressure", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Pressure Data Error",
                                     JOptionPane.ERROR_MESSAGE);
-      this.alertNoPressureData();
       this.pressureData = new java.util.LinkedList<WeatherData>();
    }
 
@@ -347,12 +348,11 @@ implements WeatherDatabaseClientObserver{
 
    public void alertNoTemperatureData(Exception e){
       //Do not want to PRINT the data if there is none...
-      //this.setTemperatureDisplay(GRAPH);
+      this.alertNoTemperatureData();
       this.enableSaveButton("temperature", false);
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                     "Temperature Data Error",
                                     JOptionPane.ERROR_MESSAGE);
-      this.alertNoTemperatureData();
       this.temperatureData = new java.util.LinkedList<WeatherData>();
    }
 

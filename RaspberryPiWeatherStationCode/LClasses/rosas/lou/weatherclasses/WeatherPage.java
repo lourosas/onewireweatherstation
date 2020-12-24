@@ -178,11 +178,11 @@ public class WeatherPage{
          //Need to figure out a better way to aleart the view!!!
          //Let the View figure out what to do!!
          wl = new LinkedList<WeatherData>();
-	 this.publishTemperature(npe);
+	      this.publishTemperature(npe);
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
-	 this.publishTemperature(e);
+	      this.publishTemperature(e);
       }
       finally{
          this._temperatureData = wl;
@@ -353,9 +353,9 @@ public class WeatherPage{
                }
             }
          }
-	 return returnLine;
+	      return returnLine;
       }
-      catch(SocketTimeoutException ste){ 
+      catch(SocketTimeoutException ste){
          ste.printStackTrace();
          throw new SocketTimeoutException(ste.getMessage());
       }
@@ -368,22 +368,6 @@ public class WeatherPage{
          throw new IOException(ioe.getMessage());
       }
    }
-
-   /*
-   private String grabAddressString(){
-      int first = new Byte(this._addr[0]).intValue();
-      first = first < 0 ? first + 256 : first;
-      int sec   = new Byte(this._addr[1]).intValue();
-      sec = sec < 0 ? sec + 256 : sec;
-      int third = new Byte(this._addr[2]).intValue();
-      third = third < 0 ? third + 256 : third;
-      int fourth= new Byte(this._addr[3]).intValue();
-      fourth=fourth < 0 ? fourth + 256 : fourth;
-      String address = new String(""+first+"."+sec+"."+third+".");
-      address = address.concat(""+fourth);
-      return address;
-   }
-   */
 
    /**/
    private String grabMeasureString
@@ -649,18 +633,6 @@ public class WeatherPage{
       }
    }
 
-   /*
-   private void publishPort(String port){
-      Iterator<WeatherDatabaseClientObserver> it =
-                                           this._observers.iterator();
-      while(it.hasNext()){
-         try{
-            (it.next()).updatePort(port);
-         }
-         catch(NullPointerException npe){}
-      }
-   }
-   */
    /**/
    private void publishDewpoint(List<WeatherData> list){
       Iterator<WeatherDatabaseClientObserver> it =
@@ -671,11 +643,18 @@ public class WeatherPage{
                (it.next()).updateDewpointData(list);
             }
             else{
-               (it.next()).alertNoDewpointData();
+               //(it.next()).alertNoDewpointData();
+               throw new Exception("No Dewpoint Data");
             }
          }
          catch(NullPointerException npe){
-            (it.next()).alertNoDewpointData();
+            //(it.next()).alertNoDewpointData();
+            (it.next()).alertNoDewpointData(npe);
+            //this.publishDewpoint(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoDewpointData(e);
+            //this.publishDewpoint(e);
          }
       }
    }
@@ -686,7 +665,7 @@ public class WeatherPage{
                                            this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver observer = it.next();
-         observer.alertNoDewpointData();
+         //observer.alertNoDewpointData();
          observer.alertNoDewpointData(e);
       }
    }
@@ -701,11 +680,16 @@ public class WeatherPage{
                (it.next()).updateHeatIndexData(list);
             }
             else{
-               (it.next()).alertNoHeatIndexData();
+               //(it.next()).alertNoHeatIndexData();
+               throw new Exception("No Heat Index Data");
             }
          }
          catch(NullPointerException npe){
-            (it.next()).alertNoHeatIndexData();
+            //(it.next()).alertNoHeatIndexData();
+            (it.next()).alertNoHeatIndexData(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoHeatIndexData(e);
          }
       }
    }
@@ -716,7 +700,7 @@ public class WeatherPage{
                                            this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver observer = it.next();
-         observer.alertNoHeatIndexData();
+         //observer.alertNoHeatIndexData();
          observer.alertNoHeatIndexData(e);
       }
    }
@@ -731,11 +715,15 @@ public class WeatherPage{
                (it.next()).updateHumidityData(list);
             }
             else{
-               (it.next()).alertNoHumidityData();
+               //(it.next()).alertNoHumidityData();
+               throw new Exception("No Humidity Data");
             }
          }
          catch(NullPointerException npe){
-            (it.next()).alertNoHumidityData();
+            (it.next()).alertNoHumidityData(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoHumidityData(e);
          }
       }
    }
@@ -746,7 +734,7 @@ public class WeatherPage{
                                            this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver observer = it.next();
-         observer.alertNoHumidityData();
+         //observer.alertNoHumidityData();
          observer.alertNoHumidityData(e);
       }
    }
@@ -757,7 +745,7 @@ public class WeatherPage{
                                            this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver observer = it.next();
-         observer.alertNoPressureData();
+         //observer.alertNoPressureData();
          observer.alertNoPressureData(e);
       }
    }
@@ -772,11 +760,15 @@ public class WeatherPage{
                (it.next()).updatePressureData(list);
             }
             else{
-               (it.next()).alertNoPressureData();
+               //(it.next()).alertNoPressureData();
+               throw new Exception("No Pressure Data");
             }
          }
          catch(NullPointerException npe){
-            (it.next()).alertNoPressureData();
+            (it.next()).alertNoPressureData(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoPressureData(e);
          }
       }
    }
@@ -787,7 +779,7 @@ public class WeatherPage{
                                            this._observers.iterator();
       while(it.hasNext()){
          WeatherDatabaseClientObserver observer = it.next();
-         observer.alertNoTemperatureData();
+         //observer.alertNoTemperatureData();
          observer.alertNoTemperatureData(re);
       }
    }
@@ -802,11 +794,15 @@ public class WeatherPage{
                (it.next()).updateTemperatureData(list);
             }
             else{
-               (it.next()).alertNoTemperatureData();
+               throw new Exception("No Temperature Data");
+               //(it.next()).alertNoTemperatureData();
             }
          }
          catch(NullPointerException npe){
-            (it.next()).alertNoTemperatureData();
+            (it.next()).alertNoTemperatureData(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoTemperatureData(e);
          }
       }
    }
