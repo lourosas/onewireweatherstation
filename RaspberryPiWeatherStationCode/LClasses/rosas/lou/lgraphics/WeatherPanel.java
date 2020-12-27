@@ -17,6 +17,7 @@ Use this class specifically for Thermal and Hygrometer data
 */
 public class WeatherPanel extends JPanel{
    private static final int PAD = 25;
+   private static final int YPAD = 50;
    private java.util.List<WeatherData> _data;
    private Units _units;
 
@@ -115,8 +116,8 @@ public class WeatherPanel extends JPanel{
             value2 = hour2*60+min2;
          }
          catch(NumberFormatException nfe){ nfe.printStackTrace();}
-         double dx1 = (PAD + value1 * (w-PAD)/TINCREMENT);
-         double dx2 = (PAD + value2 * (w-PAD)/TINCREMENT);
+         double dx1 = (YPAD + value1 * (w-YPAD)/TINCREMENT);
+         double dx2 = (YPAD + value2 * (w-YPAD)/TINCREMENT);
          if(data1 > WeatherData.DEFAULTVALUE &&
             data2 > WeatherData.DEFAULTVALUE){
             dy1 = h-PAD-(data1 - min)*yinc;
@@ -225,14 +226,18 @@ public class WeatherPanel extends JPanel{
       float sw   = (float)font.getStringBounds(s, frc).getWidth();
       float sx   = (w - sw);
       //float xinc = (w - PAD)/(float)this._data.size();
-      float xinc = (w - PAD)/(float)HOURS;
+      float xinc = (w - YPAD)/(float)HOURS;
       for(int i = 0; i < HOURS; i++){
          s  = i + ":00";
          sy = h;
          sw = (float)font.getStringBounds(s,frc).getWidth();
-         sx = PAD + i*xinc - sw/2;
-         if(i%6 == 0 || i == 23){
+         sx = YPAD + i*xinc - sw/2;
+         //if(i%6 == 0 || i == 23){
+         if(i%3 == 0 || i == 23){
+            g2.setPaint(Color.BLACK);
             g2.drawString(s, sx, sy);
+            g2.setPaint(Color.LIGHT_GRAY);
+            g2.draw(new Line2D.Double(sx+sw/2,0,sx+sw/2,h-PAD));
          }
       }
    }
@@ -252,8 +257,8 @@ public class WeatherPanel extends JPanel{
          float sh              = lm.getAscent() + lm.getDescent();
 
          g2.setPaint(Color.BLACK);
-         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
-         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, 0, YPAD, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, h - PAD, w, h - PAD));
          //Now, start drawing out the y-axis text
          double yinc  = (h - PAD)/(double)(max - min);
          double value = min;
@@ -265,7 +270,7 @@ public class WeatherPanel extends JPanel{
                   s = new String(String.format("%.2f", value));
                }
                double sw=(double)font.getStringBounds(s,frc).getWidth();
-               double sx = (PAD - sw)/2.0;
+               double sx = (YPAD - sw)/2.0;
                double currentValue = (double)(temp/10.0);
                double sy = h - PAD -(currentValue - min)*yinc+sh/4;
                if(value == min){
@@ -276,7 +281,7 @@ public class WeatherPanel extends JPanel{
                }
                if(value != min){
                   sy = h - PAD - (currentValue - min)*yinc;
-                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+                  g2.draw(new Line2D.Double(YPAD,sy,w,sy));
                }
             }
             value += 0.01;
@@ -302,8 +307,8 @@ public class WeatherPanel extends JPanel{
          float sh              = lm.getAscent() + lm.getDescent();
 
          g2.setPaint(Color.BLACK);
-         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
-         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, 0, YPAD, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, h - PAD, w, h - PAD));
          //Now, start drawing out the y-axis text
          double yinc  = (h - PAD)/(double)(max - min);
          double value = min;
@@ -315,7 +320,7 @@ public class WeatherPanel extends JPanel{
                   s = new String(String.format("%.2f", value));
                }
                double sw=(double)font.getStringBounds(s,frc).getWidth();
-               double sx = (PAD - sw)/2.0;
+               double sx = (YPAD - sw)/2.0;
                double currentValue = (double)(temp/100.0);
                double sy = h - PAD -(currentValue - min)*yinc+sh/4;
                if(value == min){
@@ -326,7 +331,7 @@ public class WeatherPanel extends JPanel{
                }
                if(value != min){
                   sy = h - PAD - (currentValue - min)*yinc;
-                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+                  g2.draw(new Line2D.Double(YPAD,sy,w,sy));
                }
             }
             value += 0.01;
@@ -352,8 +357,8 @@ public class WeatherPanel extends JPanel{
          float sh              = lm.getAscent() + lm.getDescent();
 
          g2.setPaint(Color.BLACK);
-         g2.draw(new Line2D.Double(PAD, 0, PAD, h - PAD));
-         g2.draw(new Line2D.Double(PAD, h - PAD, w, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, 0, YPAD, h - PAD));
+         g2.draw(new Line2D.Double(YPAD, h - PAD, w, h - PAD));
          //Now, try to start drawing the y-axis text
          double yinc = (h - PAD)/(double)(max - min);
          double value = min;
@@ -365,7 +370,7 @@ public class WeatherPanel extends JPanel{
                   s = new String("" + String.format("%.2f",value));
                }
                double sw=(double)font.getStringBounds(s,frc).getWidth();
-               double sx = (PAD - sw)/2.0;
+               double sx = (YPAD - sw)/2.0;
                double sy = h - PAD -(temp - min)*yinc +sh/4;
                if(value == min){
                   sy = h - PAD -(value-min) + sh/4;
@@ -375,7 +380,7 @@ public class WeatherPanel extends JPanel{
                }
                if(value != min){
                   sy = h - PAD -(temp - min)*yinc;
-                  g2.draw(new Line2D.Double(PAD,sy,w,sy));
+                  g2.draw(new Line2D.Double(YPAD,sy,w,sy));
                }
             }
             value += 1.0;
