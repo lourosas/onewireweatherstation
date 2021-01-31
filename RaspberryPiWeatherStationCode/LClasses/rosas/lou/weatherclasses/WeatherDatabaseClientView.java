@@ -63,6 +63,7 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _yearCB  = null;
 
    private java.util.List<WeatherData> temperatureData = null;
+   private java.util.List<WeatherData> temperatureMinMaxAvgData=null;
    private java.util.List<WeatherData> humidityData    = null;
    private java.util.List<WeatherData> pressureData    = null;
    private java.util.List<WeatherData> dewpointData    = null;
@@ -356,6 +357,10 @@ implements WeatherDatabaseClientObserver{
       this.temperatureData = new java.util.LinkedList<WeatherData>();
    }
 
+   public void alertNoTemperatureMinMaxAvgData(Exception e){
+      e.printStackTrace();//change later
+   }
+
    public void updateAddress(String address){
       this._address.setText(address);
       this._address.setCaretPosition(this._address.getText().length());
@@ -427,6 +432,13 @@ implements WeatherDatabaseClientObserver{
          this.printTemperature(data);
          this.enableSaveButton("temperature", true);
       }
+   }
+
+   public void updateTemperatureMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      System.out.println(data);
    }
 
    ///////////////////////Public Methods//////////////////////////////

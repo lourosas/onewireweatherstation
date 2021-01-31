@@ -149,6 +149,8 @@ ItemListener{
          this._model.setCalendar(mo,dy,yr);
          if(button.getActionCommand().equals("TemperatureRefresh")){
             this._model.grabTemperatureData(mo,dy,yr);
+            //remove this if needed...
+            this._model.grabTemperatureMinMaxAvg(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("TemperatureSave")){
             this.saveTemperature();

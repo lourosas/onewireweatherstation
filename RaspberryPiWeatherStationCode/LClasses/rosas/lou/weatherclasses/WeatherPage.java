@@ -36,6 +36,7 @@ public class WeatherPage{
    private String[]          _cal;
    private String            _rawData;
    private List<WeatherData> _temperatureData;
+   private List<WeatherData> _temperatureMinMaxAvg;
    private List<WeatherData> _humidityData;
    private List<WeatherData> _pressureData;
    private List<WeatherData> _dewpointData;
@@ -50,6 +51,7 @@ public class WeatherPage{
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
       _temperatureData = null;
+      _temperatureMinMaxAvg = null;
       _humidityData    = null;
       _pressureData    = null;
       _dewpointData    = null;
@@ -197,7 +199,24 @@ public class WeatherPage{
    /**/
    public void grabTemperatureMinMaxAvg(String mo,String dy,String yr){
       List<WeatherData> wl = null;
-
+      try{
+         this.setCalendar(mo,dy,yr);
+         String data = this.connectAndGrab(mo,dy,yr,"metric");
+         data        = this.parseTheMinMaxAvg(data);
+         wl          = this.parseTempMinMaxAvg(data);
+         this.publishMinMaxAvgTemp(wl);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgTemp(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgTemp(e);
+      }
+      finally{
+         this._temperatureMinMaxAvg = wl;
+      }
    }
 
    /**/
@@ -627,6 +646,55 @@ public class WeatherPage{
    }
 
    /**/
+   private List<WeatherData> parseTempMinMaxAvg(String data){
+      String [] arrayData     = data.split("],");
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; ++i){
+         if(arrayData[i].contains("Temperature")){
+            String [] tempArray = arrayData[i].split(",");
+            double min = WeatherData.DEFAULTVALUE;
+            double max = WeatherData.DEFAULTVALUE;
+            double avg = WeatherData.DEFAULTVALUE;
+            String sMeas = tempArray[1].trim();
+            sMeas = sMeas.substring(1,sMeas.length()-1);
+            try{
+               min = Double.parseDouble(sMeas);
+            }
+            catch(NumberFormatException nfe){
+               min = WeatherData.DEFAULTVALUE;
+            }
+            sMeas      = tempArray[2].trim();
+            sMeas      = sMeas.substring(1,sMeas.length()-1);
+            try{
+               max = Double.parseDouble(sMeas);
+            }
+            catch(NumberFormatException nfe){
+               max = WeatherData.DEFAULTVALUE;
+            }
+            sMeas      = tempArray[3].trim();
+            sMeas      = sMeas.substring(1,sMeas.length()-1);
+            try{
+               avg = Double.parseDouble(sMeas);
+            }
+            catch(NumberFormatException nfe){
+               avg = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){}
+            finally{
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(new TemperatureData(Units.METRIC, min,
+                                              "TEMPERATURE MIN"));
+               wdList.add(new TemperatureData(Units.METRIC, max,
+                                              "TEMPERATURE MAX"));
+               wdList.add(new TemperatureData(Units.METRIC, avg,
+                                              "TEMPERATURE AVG"));
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
    private String parseTheData(String data){
       String theData = null;
       if(data.contains("theData.addRows")){
@@ -644,7 +712,18 @@ public class WeatherPage{
 
    /**/
    private String parseTheMinMaxAvg(String data){
-      return null;
+      String minMaxAvg = null;
+      if(data.contains("hldata.addRows")){
+         int index    = data.indexOf("hldata.addRows");
+         String mma   = data.substring(index);
+         String begin = new String("([");
+         int beginidx = mma.indexOf(begin);
+         String end   = new String("]);");
+         int endidx   = mma.indexOf(end);
+         mma = mma.substring(beginidx+begin.length(),endidx);
+         minMaxAvg = mma;
+      }
+      return minMaxAvg;
    }
 
    /**/
@@ -829,6 +908,37 @@ public class WeatherPage{
          }
          catch(Exception e){
             (it.next()).alertNoTemperatureData(e);
+         }
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgTemp(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         (it.next()).alertNoTemperatureMinMaxAvgData(e);
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgTemp(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            if(list.size() > 0){
+               (it.next()).updateTemperatureMinMaxAvg(list);
+            }
+            else{
+               throw new Exception("No Temperature Min/Max/Avg Data");
+            }
+         }
+         catch(NullPointerException npe){
+            (it.next()).alertNoTemperatureMinMaxAvgData(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoTemperatureMinMaxAvgData(e);
          }
       }
    }
