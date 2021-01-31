@@ -46,7 +46,7 @@ public class WeatherPage{
    {
       //_addr = new byte[]{(byte)68,(byte)230,(byte)27,(byte)225};
       //_port            = PORT;
-      _addr            = new String("68.230.27.225:8000");
+      _addr            = new String("68.230.27.225:8500");
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
       _temperatureData = null;
@@ -82,6 +82,7 @@ public class WeatherPage{
       try{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
+         data        = this.parseTheData(data);
          wl          = this.parseDewpoint(data);
          this.publishDewpoint(wl);
       }
@@ -104,6 +105,7 @@ public class WeatherPage{
       try{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
+         data        = this.parseTheData(data);
          wl          = this.parseHeatIndex(data);
          this.publishHeatIndex(wl);
       }
@@ -126,6 +128,7 @@ public class WeatherPage{
       try{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
+         data        = this.parseTheData(data);
          wl          = this.parseHumidity(data);
          this.publishHumidity(wl);
       }
@@ -148,6 +151,7 @@ public class WeatherPage{
       try{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"absolute");
+         data        = this.parseTheData(data);
          wl          = this.parsePressure(data);
          this.publishPressure(wl);
       }
@@ -170,6 +174,7 @@ public class WeatherPage{
       try{
          this.setCalendar(month,day,year);
          String data = this.connectAndGrab(month,day,year,"metric");
+         data        = this.parseTheData(data);
          wl          = this.parseTemperature(data);
          this.publishTemperature(wl);
       }
@@ -187,6 +192,12 @@ public class WeatherPage{
       finally{
          this._temperatureData = wl;
       }
+   }
+
+   /**/
+   public void grabTemperatureMinMaxAvg(String mo,String dy,String yr){
+      List<WeatherData> wl = null;
+
    }
 
    /**/
@@ -342,16 +353,10 @@ public class WeatherPage{
                         new InputStreamReader(conn.getInputStream()));
          String line = null;
          while((line = in.readLine()) != null){
-            if(line.contains("theData.addRows")){
-               while(!(line = in.readLine()).contains("]);")){
-                  if(line.length() > 0){
-                     if(returnLine == null){
-                        returnLine = new String();
-                     }
-                     returnLine = returnLine.concat(line);
-                  }
-               }
+            if(returnLine == null){
+               returnLine = new String();
             }
+            returnLine = returnLine.concat(line);
          }
 	      return returnLine;
       }
@@ -619,6 +624,27 @@ public class WeatherPage{
          }
       }
       return wdList;
+   }
+
+   /**/
+   private String parseTheData(String data){
+      String theData = null;
+      if(data.contains("theData.addRows")){
+         int index = data.indexOf("theData.addRows");
+         String temp = data.substring(index);
+         String begin = new String("([");
+         int beginidx = temp.indexOf(begin);
+         String end = new String("]);");
+         int endindex = temp.indexOf(end);
+         temp = temp.substring(beginidx+begin.length(),endindex);
+         theData = temp;
+      }
+      return theData;
+   }
+
+   /**/
+   private String parseTheMinMaxAvg(String data){
+      return null;
    }
 
    /**/
