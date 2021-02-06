@@ -35,6 +35,7 @@ public interface WeatherDatabaseClientObserver{
    public void alertNoHeatIndexData(Exception e);
    public void alertNoHumidityData();
    public void alertNoHumidityData(Exception e);
+   public void alertNoHumidityMinMaxAvg(Exception e);
    public void alertNoPressureData();
    public void alertNoPressureData(Exception e);
    public void alertNoTemperatureData();
@@ -45,6 +46,7 @@ public interface WeatherDatabaseClientObserver{
    public void updateDewpointData(List<WeatherData> data);
    public void updateHeatIndexData(List<WeatherData> data);
    public void updateHumidityData(List<WeatherData> data);
+   public void updateHumidityMinMaxAvg(List<WeatherData> data);
    public void updatePressureData(List<WeatherData> data);
    public void updateTemperatureData(List<WeatherData> data);
    public void updateTemperatureMinMaxAvg(List<WeatherData> data);

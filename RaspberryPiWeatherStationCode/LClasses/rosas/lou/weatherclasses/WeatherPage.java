@@ -38,6 +38,7 @@ public class WeatherPage{
    private List<WeatherData> _temperatureData;
    private List<WeatherData> _temperatureMinMaxAvg;
    private List<WeatherData> _humidityData;
+   private List<WeatherData> _humidityMinMaxAvg;
    private List<WeatherData> _pressureData;
    private List<WeatherData> _dewpointData;
    private List<WeatherData> _heatIndexData;
@@ -53,6 +54,7 @@ public class WeatherPage{
       _temperatureData = null;
       _temperatureMinMaxAvg = null;
       _humidityData    = null;
+      _humidityMinMaxAvg = null;
       _pressureData    = null;
       _dewpointData    = null;
       _heatIndexData   = null;
@@ -144,6 +146,29 @@ public class WeatherPage{
       }
       finally{
          this._humidityData = wl;
+      }
+   }
+
+   /**/
+   public void grabHumidityMinMaxAvg(String mo,String dy,String yr){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(mo,dy,yr);
+         String data = this.connectAndGrab(mo,dy,yr,"metric");
+         data        = this.parseTheMinMaxAvg(data);
+         wl          = this.parseHumidityMinMaxAvg(data);
+         this.publishMinMaxAvgHumidity(wl);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgHumidity(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgHumidity(e);
+      }
+      finally{
+         this._humidityMinMaxAvg = wl;
       }
    }
 
@@ -558,6 +583,56 @@ public class WeatherPage{
       return wdList;
    }
 
+   /**/
+   private List<WeatherData> parseHumidityMinMaxAvg(String data){
+      String [] arrayData = data.split("],");
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; ++i){
+         if(arrayData[i].contains("Humidity")){
+            String [] humidityArray = arrayData[i].split(",");
+            double min = WeatherData.DEFAULTHUMIDITY;
+            double max = WeatherData.DEFAULTHUMIDITY;
+            double avg = WeatherData.DEFAULTHUMIDITY;
+            String hMeas = humidityArray[1].trim();
+            hMeas = hMeas.substring(1,hMeas.length()-1);
+            try{
+               min = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               min = WeatherData.DEFAULTHUMIDITY;
+            }
+            hMeas = humidityArray[2].trim();
+            hMeas = hMeas.substring(1,hMeas.length()-1);
+            try{
+               max = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               max = WeatherData.DEFAULTHUMIDITY;
+            }
+            hMeas = humidityArray[3].trim();
+            hMeas = hMeas.substring(1,hMeas.length()-1);
+            try{
+               avg = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               avg = WeatherData.DEFAULTHUMIDITY;
+            }
+            catch(NullPointerException npe){}
+            finally{
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(new HumidityData(Units.PERCENTAGE, min,
+                                           "HUMIDITY MIN"));
+               wdList.add(new HumidityData(Units.PERCENTAGE, max,
+                                           "HUMIDITY MAX"));
+               wdList.add(new HumidityData(Units.PERCENTAGE, avg,
+                                           "HUMIDITY AVG"));
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
    private List<WeatherData> parsePressure(String data){
       String [] arrayData      = data.split("],");
       String time              = null;
@@ -841,6 +916,39 @@ public class WeatherPage{
          WeatherDatabaseClientObserver observer = it.next();
          //observer.alertNoHumidityData();
          observer.alertNoHumidityData(e);
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgHumidity(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            if(list.size() > 0){
+               (it.next()).updateHumidityMinMaxAvg(list);
+            }
+            else{
+               throw new Exception("No Humidity Min/Max/Avg Data");
+            }
+         }
+         catch(NullPointerException npe){
+            (it.next()).alertNoHumidityMinMaxAvg(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoHumidityMinMaxAvg(e);
+         }
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgHumidity(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         WeatherDatabaseClientObserver observer = it.next();
+         //observer.alertNoHumidityData();
+         observer.alertNoHumidityMinMaxAvg(e);
       }
    }
 

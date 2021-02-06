@@ -266,6 +266,10 @@ implements WeatherDatabaseClientObserver{
       this.humidityData = new java.util.LinkedList<WeatherData>();
    }
 
+   public void alertNoHumidityMinMaxAvg(Exception e){
+      e.printStackTrace();
+   }
+
    public void alertNoPressureData(){
       try{
          int tempTab = -1;
@@ -408,6 +412,13 @@ implements WeatherDatabaseClientObserver{
          this.printHumidity(data);
          this.enableSaveButton("humidity", true);
       }
+   }
+
+   public void updateHumidityMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      System.out.println(data);
    }
 
    public void updatePressureData(java.util.List<WeatherData> data){

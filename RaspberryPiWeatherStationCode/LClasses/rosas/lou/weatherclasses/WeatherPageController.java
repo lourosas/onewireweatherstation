@@ -157,6 +157,8 @@ ItemListener{
          }
          else if(button.getActionCommand().equals("HumidityRefresh")){
             this._model.grabHumidityData(mo,dy,yr);
+            //Probably will want to remove
+            this._model.grabHumidityMinMaxAvg(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("HumiditySave")){
             this.saveHumidity();
