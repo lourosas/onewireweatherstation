@@ -41,6 +41,7 @@ public class WeatherPage{
    private List<WeatherData> _humidityMinMaxAvg;
    private List<WeatherData> _pressureData;
    private List<WeatherData> _dewpointData;
+   private List<WeatherData> _dewpointMinMaxAvg;
    private List<WeatherData> _heatIndexData;
 
    private List<WeatherDatabaseClientObserver> _observers;
@@ -57,6 +58,7 @@ public class WeatherPage{
       _humidityMinMaxAvg = null;
       _pressureData    = null;
       _dewpointData    = null;
+      _dewpointMinMaxAvg = null;
       _heatIndexData   = null;
       _observers       = null;
    };
@@ -100,6 +102,29 @@ public class WeatherPage{
       }
       finally{
          this._dewpointData = wl;
+      }
+   }
+
+   /**/
+   public void grabDewpointMinMaxAvg(String mo,String dy,String yr){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(mo,dy,yr);
+         String data = this.connectAndGrab(mo,dy,yr,"metric");
+         data        = this.parseTheMinMaxAvg(data);
+         wl          = this.parseDewpointMinMaxAvg(data);
+         this.publishMinMaxAvgDewpoint(wl);
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgDewpoint(npe);
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         this.publishMinMaxAvgDewpoint(e);
+      }
+      finally{
+         this._dewpointMinMaxAvg = wl;
       }
    }
 
@@ -496,6 +521,55 @@ public class WeatherPage{
    }
 
    /**/
+   private List<WeatherData> parseDewpointMinMaxAvg(String data){
+      String [] arrayData = data.split("],");
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; ++i){
+         if(arrayData[i].contains("Dew Point")){
+            String [] dpArray = arrayData[i].split(",");
+            double min = WeatherData.DEFAULTVALUE;
+            double max = WeatherData.DEFAULTVALUE;
+            double avg = WeatherData.DEFAULTVALUE;
+            String dMeas = dpArray[1].trim();
+            dMeas = dMeas.substring(1,dMeas.length()-1);
+            try{
+               min = Double.parseDouble(dMeas);
+            }
+            catch(NumberFormatException nfe){
+               min = WeatherData.DEFAULTVALUE;
+            }
+            dMeas = dpArray[2].trim();
+            dMeas = dMeas.substring(1,dMeas.length()-1);
+            try{
+               max = Double.parseDouble(dMeas);
+            }
+            catch(NumberFormatException nfe){
+               max = WeatherData.DEFAULTVALUE;
+            }
+            dMeas = dpArray[3].trim();
+            dMeas = dMeas.substring(1,dMeas.length()-1);
+            try{
+               avg = Double.parseDouble(dMeas);
+            }
+            catch(NumberFormatException nfe){
+               avg = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){}
+            finally{
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(new DewpointData(Units.METRIC, min,
+                                           "DEWPOINT MIN"));
+               wdList.add(new DewpointData(Units.METRIC, max,
+                                          "DEWPOINT MAX"));
+               wdList.add(new DewpointData(Units.METRIC, avg,
+                                           "DEWPOINT AVG"));
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
    private List<WeatherData> parseHeatIndex(String data){
       String [] arrayData      = data.split("],");
       String time              = null;
@@ -847,6 +921,37 @@ public class WeatherPage{
          WeatherDatabaseClientObserver observer = it.next();
          //observer.alertNoDewpointData();
          observer.alertNoDewpointData(e);
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgDewpoint(Exception e){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         (it.next()).alertNoDewpointMinMaxAvg(e);
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgDewpoint(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            if(list.size() > 0){
+               (it.next()).updateDewpointMinMaxAvg(list);
+            }
+            else{
+               throw new Exception("No Temperature Min/Max/Avg Data");
+            }
+         }
+         catch(NullPointerException npe){
+            (it.next()).alertNoDewpointMinMaxAvg(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoDewpointMinMaxAvg(e);
+         }
       }
    }
 

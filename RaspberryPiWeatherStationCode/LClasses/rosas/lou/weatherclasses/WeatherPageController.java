@@ -171,6 +171,8 @@ ItemListener{
          }
          else if(button.getActionCommand().equals("DewpointRefresh")){
             this._model.grabDewpointData(mo,dy,yr);
+            //Probably will want to remove
+            this._model.grabDewpointMinMaxAvg(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("DewpointSave")){
             this.saveDewpoint();

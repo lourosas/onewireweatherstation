@@ -175,6 +175,10 @@ implements WeatherDatabaseClientObserver{
       this.dewpointData = new java.util.LinkedList<WeatherData>();
    }
 
+   public void alertNoDewpointMinMaxAvg(Exception e){
+      e.printStackTrace();
+   }
+
    public void alertNoHeatIndexData(){
       try{
          int tempTab = -1;
@@ -388,6 +392,13 @@ implements WeatherDatabaseClientObserver{
          this.printDewpoint(data);
          this.enableSaveButton("dewpoint", true);
       }
+   }
+
+   public void updateDewpointMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      System.out.println(data);
    }
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){
