@@ -43,6 +43,7 @@ public class WeatherPage{
    private List<WeatherData> _dewpointData;
    private List<WeatherData> _dewpointMinMaxAvg;
    private List<WeatherData> _heatIndexData;
+   private List<WeatherData> _heatIndexMinMaxAvg;
 
    private List<WeatherDatabaseClientObserver> _observers;
 
@@ -60,6 +61,7 @@ public class WeatherPage{
       _dewpointData    = null;
       _dewpointMinMaxAvg = null;
       _heatIndexData   = null;
+      _heatIndexMinMaxAvg = null;
       _observers       = null;
    };
 
@@ -148,6 +150,29 @@ public class WeatherPage{
       }
       finally{
          this._heatIndexData = wl;
+      }
+   }
+
+   /**/
+   public void grabHeatIndexMinMaxAvg(String mo,String dy,String yr){
+      List<WeatherData> wl = null;
+      try{
+         this.setCalendar(mo,dy,yr);
+         String data = this.connectAndGrab(mo,dy,yr,"metric");
+         data        = this.parseTheMinMaxAvg(data);
+         wl          = this.parseHeatIndexMinMaxAvg(data);
+         //this.publishMinMaxAvgHeatIndex();
+      }
+      catch(NullPointerException npe){
+         wl = new LinkedList<WeatherData>();
+         //this.publishMinMaxAvgHeatIndex();
+      }
+      catch(Exception e){
+         wl = new LinkedList<WeatherData>();
+         //this.publishMinMaxAvgHeatIndex();
+      }
+      finally{
+         this._heatIndexMinMaxAvg = wl;
       }
    }
 
@@ -607,6 +632,55 @@ public class WeatherPage{
             catch(NullPointerException npe){
                wdList = new LinkedList<WeatherData>();
                wdList.add(hd);
+            }
+         }
+      }
+      return wdList;
+   }
+
+   /**/
+   private List<WeatherData> parseHeatIndexMinMaxAvg(String data){
+      String [] arrayData = data.split("],");
+      List<WeatherData> wdList = null;
+      for(int i = 0; i < arrayData.length; ++i){
+         if(arrayData[i].contains("Heat Index")){
+            String [] hiArray = arrayData[i].split(",");
+            double min = WeatherData.DEFAULTVALUE;
+            double max = WeatherData.DEFAULTVALUE;
+            double avg = WeatherData.DEFAULTVALUE;
+            String hMeas = hiArray[1].trim();
+            hMeas = hMeas.substring(1,hMeas.length()-1);
+            try{
+               min = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               min = WeatherData.DEFAULTVALUE;
+            }
+            hMeas = hiArray[2].trim();
+            hMeas = hMeas.substring(1,hMeas.length()-1);
+            try{
+               max = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               max = WeatherData.DEFAULTVALUE;
+            }
+            hMeas = hiArray[3].trim();
+            hMeas = hMeas.substring(1, hMeas.length()-1);
+            try{
+               avg = Double.parseDouble(hMeas);
+            }
+            catch(NumberFormatException nfe){
+               avg = WeatherData.DEFAULTVALUE;
+            }
+            catch(NullPointerException npe){}
+            finally{
+               wdList = new LinkedList<WeatherData>();
+               wdList.add(new HeatIndexData(Units.METRIC,min,
+                                            "HEAT INDEX MIN"));
+               wdList.add(new HeatIndexData(Units.METRIC,max,
+                                            "HEAT INDEX MAX"));
+               wdList.add(new HeatIndexData(Units.METRIC,avg,
+                                            "HEAT INDEX AVG"));
             }
          }
       }

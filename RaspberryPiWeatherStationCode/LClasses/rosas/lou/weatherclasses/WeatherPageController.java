@@ -179,6 +179,8 @@ ItemListener{
          }
          else if(button.getActionCommand().equals("HeatIndexRefresh")){
             this._model.grabHeatIndexData(mo,dy,yr);
+            //Probably will need to change
+            this._model.grabHeatIndexMinMaxAvg(mo,dy,yr);
          }
          else if(button.getActionCommand().equals("HeatIndexSave")){
             //this._view.saveHeatIndex();
