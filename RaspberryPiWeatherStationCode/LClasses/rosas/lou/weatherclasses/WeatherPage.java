@@ -161,15 +161,15 @@ public class WeatherPage{
          String data = this.connectAndGrab(mo,dy,yr,"metric");
          data        = this.parseTheMinMaxAvg(data);
          wl          = this.parseHeatIndexMinMaxAvg(data);
-         //this.publishMinMaxAvgHeatIndex();
+         this.publishMinMaxAvgHeatIndex(wl);
       }
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
-         //this.publishMinMaxAvgHeatIndex();
+         //this.publishMinMaxAvgHeatIndex(npe);
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
-         //this.publishMinMaxAvgHeatIndex();
+         //this.publishMinMaxAvgHeatIndex(e);
       }
       finally{
          this._heatIndexMinMaxAvg = wl;
@@ -1017,7 +1017,7 @@ public class WeatherPage{
                (it.next()).updateDewpointMinMaxAvg(list);
             }
             else{
-               throw new Exception("No Temperature Min/Max/Avg Data");
+               throw new Exception("No Dew Point Min/Max/Avg Data");
             }
          }
          catch(NullPointerException npe){
@@ -1061,6 +1061,28 @@ public class WeatherPage{
          WeatherDatabaseClientObserver observer = it.next();
          //observer.alertNoHeatIndexData();
          observer.alertNoHeatIndexData(e);
+      }
+   }
+
+   /**/
+   private void publishMinMaxAvgHeatIndex(List<WeatherData> list){
+      Iterator<WeatherDatabaseClientObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         try{
+            if(list.size() > 0){
+               (it.next()).updateHeatIndexMinMaxAvg(list);
+            }
+            else{
+               throw new Exception("No Heat Index Min/Max/Avg Data");
+            }
+         }
+         catch(NullPointerException npe){
+            (it.next()).alertNoHeatIndexMinMaxAvg(npe);
+         }
+         catch(Exception e){
+            (it.next()).alertNoHeatIndexMinMaxAvg(e);
+         }
       }
    }
 

@@ -65,9 +65,12 @@ implements WeatherDatabaseClientObserver{
    private java.util.List<WeatherData> temperatureData = null;
    private java.util.List<WeatherData> temperatureMinMaxAvgData=null;
    private java.util.List<WeatherData> humidityData    = null;
+   private java.util.List<WeatherData> humidityMinMaxAvgData=null;
    private java.util.List<WeatherData> pressureData    = null;
    private java.util.List<WeatherData> dewpointData    = null;
+   private java.util.List<WeatherData> dewpointMinMaxAvgData=null;
    private java.util.List<WeatherData> heatIndexData   = null;
+   private java.util.List<WeatherData> heatIndexMinMaxAvgData=null;
 
    private Units dewpointUnits    = Units.METRIC;
    private Units temperatureUnits = Units.METRIC;
@@ -222,6 +225,10 @@ implements WeatherDatabaseClientObserver{
                                     JOptionPane.ERROR_MESSAGE);
       this.heatIndexData = new java.util.LinkedList<WeatherData>();
 
+   }
+
+   public void alertNoHeatIndexMinMaxAvg(Exception e){
+      e.printStackTrace();
    }
 
    public void alertNoHumidityData(){
@@ -398,7 +405,11 @@ implements WeatherDatabaseClientObserver{
    (
       java.util.List<WeatherData> data
    ){
-      System.out.println(data);
+      this.dewpointMinMaxAvgData = data;
+      if(this.dewpointDisplay == GRAPH){
+         this.displayDewpointMinMaxAvg(data);
+      }
+      else{}
    }
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){
@@ -411,6 +422,17 @@ implements WeatherDatabaseClientObserver{
          this.printHeatIndex(data);
          this.enableSaveButton("heatindex", true);
       }
+   }
+
+   public void updateHeatIndexMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      this.heatIndexMinMaxAvgData = data;
+      if(this.heatIndexDisplay == GRAPH){
+         this.displayHeatIndexMinMaxAvg(data);
+      }
+      else{}
    }
 
    public void updateHumidityData(java.util.List<WeatherData> data){
@@ -429,7 +451,11 @@ implements WeatherDatabaseClientObserver{
    (
       java.util.List<WeatherData> data
    ){
-      System.out.println(data);
+      this.humidityMinMaxAvgData = data;
+      if(this.humidityDisplay == GRAPH){
+         this.displayHumidityMinMaxAvg(data);
+      }
+      else{}
    }
 
    public void updatePressureData(java.util.List<WeatherData> data){
@@ -460,7 +486,11 @@ implements WeatherDatabaseClientObserver{
    (
       java.util.List<WeatherData> data
    ){
-      System.out.println(data);
+      this.temperatureMinMaxAvgData = data;
+      if(this.tempDisplay == GRAPH){
+         this.displayTempMinMaxAvg(data);
+      }
+      else{}
    }
 
    ///////////////////////Public Methods//////////////////////////////
@@ -711,6 +741,50 @@ implements WeatherDatabaseClientObserver{
             }
          }
       }
+   }
+
+   /**/
+   private void displayDewpointMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      try{
+         System.out.println(data);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void displayHeatIndexMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      try{
+         System.out.println(data);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void displayHumidityMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      try{
+         System.out.println(data);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
+   }
+
+   /**/
+   private void displayTempMinMaxAvg
+   (
+      java.util.List<WeatherData> data
+   ){
+      try{
+         System.out.println(data);
+      }
+      catch(NullPointerException npe){ npe.printStackTrace(); }
    }
 
    /**/
