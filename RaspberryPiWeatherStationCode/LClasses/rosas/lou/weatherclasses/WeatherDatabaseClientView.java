@@ -749,7 +749,9 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       try{
-         System.out.println(data);
+         System.out.println(data.get(0).toStringMetric());
+         System.out.println(data.get(1).toStringMetric());
+         System.out.println(data.get(2).toStringMetric());
          int dpTab = -1;
          JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(1);
@@ -758,6 +760,15 @@ implements WeatherDatabaseClientObserver{
                dpTab = i;
             }
          }
+         //This is NOT going to work!!! I will need to do something
+         //similar to addDataToPanel()!!!
+         //Or, create a NEW Panel for something...
+         //JPanel dpPanel = (JPanel)jtp.getSelectedComponent();
+         //JPanel thePanel = (JPanel)dpPanel.getComponent(2);
+         //JLabel theLabel = new JLabel(data.get(0).toStringMetric());
+         //thePanel.add(theLabel);
+         //dpPanel.add(thePanel);
+         jtp.setSelectedIndex(dpTab + 1);
          jtp.setSelectedIndex(dpTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
