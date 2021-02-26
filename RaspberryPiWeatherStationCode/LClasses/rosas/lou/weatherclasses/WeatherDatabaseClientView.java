@@ -750,6 +750,15 @@ implements WeatherDatabaseClientObserver{
    ){
       try{
          System.out.println(data);
+         int dpTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
+               dpTab = i;
+            }
+         }
+         jtp.setSelectedIndex(dpTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
