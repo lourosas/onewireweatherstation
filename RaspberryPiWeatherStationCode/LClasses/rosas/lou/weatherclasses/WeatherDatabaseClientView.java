@@ -506,6 +506,7 @@ implements WeatherDatabaseClientObserver{
          this.setDewpointUnits(units);
          if(this.dewpointData.size() > 0){
             this.updateDewpointData(this.dewpointData);
+            this.updateDewpointMinMaxAvg(this.dewpointMinMaxAvgData);
          }
          else{
             this.alertNoDewpointData();
@@ -749,27 +750,28 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       try{
-         System.out.println(data.get(0).toStringMetric());
-         System.out.println(data.get(1).toStringMetric());
-         System.out.println(data.get(2).toStringMetric());
-         int dpTab = -1;
-         JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(1);
-         for(int i = 0; i < jtp.getTabCount(); i++){
-            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
-               dpTab = i;
-            }
+         WeatherData minData = data.get(0);
+         WeatherData maxData = data.get(1);
+         WeatherData avgData = data.get(2);
+         String min = null; String max = null; String avg = null;
+         if(this.dewpointUnits == Units.METRIC){
+            min = minData.toStringMetric();
+            max = maxData.toStringMetric();
+            avg = avgData.toStringMetric();
          }
-         //This is NOT going to work!!! I will need to do something
-         //similar to addDataToPanel()!!!
-         //Or, create a NEW Panel for something...
-         //JPanel dpPanel = (JPanel)jtp.getSelectedComponent();
-         //JPanel thePanel = (JPanel)dpPanel.getComponent(2);
-         //JLabel theLabel = new JLabel(data.get(0).toStringMetric());
-         //thePanel.add(theLabel);
-         //dpPanel.add(thePanel);
-         jtp.setSelectedIndex(dpTab + 1);
-         jtp.setSelectedIndex(dpTab);
+         else if(this.dewpointUnits == Units.ENGLISH){
+            min = minData.toStringEnglish();
+            max = maxData.toStringEnglish();
+            avg = avgData.toStringEnglish();
+         }
+         else if(this.dewpointUnits == Units.ABSOLUTE){
+            min = minData.toStringAbsolute();
+            max = maxData.toStringAbsolute();
+            avg = avgData.toStringAbsolute();
+         }
+         System.out.println(min);
+         System.out.println(max);
+         System.out.println(avg);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
    }
@@ -1524,20 +1526,12 @@ implements WeatherDatabaseClientObserver{
       this._address.addActionListener(this._controller);
       this._address.addKeyListener(this._controller);
       JLabel gap = new JLabel("                  ");
-      //JLabel portLabel=new JLabel("Port:  ",SwingConstants.RIGHT);
-      //this._port    = new JTextField(5);
-      //this._port.setName("Port");
-      //this._port.addActionListener(this._controller);
-      //this._port.addKeyListener(this._controller);
-      //this._port.setCaretPosition(this._port.getText().length());
       this._address.requestFocus();
       this._address.selectAll();
       this.setUpDateComboBoxes();
 
       panel.add(addLabel);
       panel.add(this._address);
-      //panel.add(portLabel);
-      //panel.add(this._port);
       panel.add(gap);
       panel.add(this._monthCB);
       panel.add(this._dayCB);
