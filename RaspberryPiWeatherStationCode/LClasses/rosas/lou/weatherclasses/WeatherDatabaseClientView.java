@@ -36,7 +36,7 @@ import rosas.lou.lgraphics.WeatherPanel;
 /*
 */
 //////////////////////////////////////////////////////////////////////
-public class WeatherDatabaseClientView extends GenericJFrame
+public class WeatherDatabaseClientView extends WeatherView
 implements WeatherDatabaseClientObserver{
    private static final short GRAPH        = 0;
    private static final short DATA         = 1;

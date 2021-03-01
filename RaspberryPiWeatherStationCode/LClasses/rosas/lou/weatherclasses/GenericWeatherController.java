@@ -31,7 +31,8 @@ The Generic Weather Controller Interface For all weather applications
 public abstract class GenericWeatherController implements
 ActionListener, KeyListener, ItemListener{
    public void addModel(WeatherPage wp){}
-   public void addView(WeatherDatabaseClientView view){}
+   public void addView(WeatherView view){}
+   //public void addView(WeatherDatabaseClientView view){}
    public void actionPerformed(ActionEvent ae){}
    public void keyPressed(KeyEvent ke){}
    public void keyReleased(KeyEvent ke){}

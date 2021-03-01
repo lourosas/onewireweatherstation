@@ -33,7 +33,8 @@ The complete Controller for the WeatherPage application
 public class WeatherPageController extends
 GenericWeatherController implements ActionListener, KeyListener,
 ItemListener{
-   private WeatherDatabaseClientView _view;
+   //private WeatherDatabaseClientView _view;
+   private WeatherView               _view;
    private WeatherPage               _model;
 
    {
@@ -45,9 +46,10 @@ ItemListener{
    public WeatherPageController(){}
 
    /**/
-   public WeatherPageController(WeatherDatabaseClientView view){}
+   //public WeatherPageController(WeatherDatabaseClientView view){}
 
    /**/
+   /*
    public WeatherPageController(
       WeatherDatabaseClientView view,
       WeatherPage model
@@ -56,6 +58,15 @@ ItemListener{
       this._model = model;
       this._model.addObserver(this._view);
    }
+   */
+   /**/
+   public WeatherPageController(WeatherView view){}
+
+   /**/
+   public WeatherPageController(WeatherView view, WeatherPage model){
+      this._view  = view;
+      this._model = model;
+   }
 
    /**/
    public void addModel(WeatherPage model){
@@ -63,7 +74,17 @@ ItemListener{
    }
 
    /**/
+   public void addObserverToModel(WeatherDatabaseClientObserver ob){
+      this._model.addObserver(ob);
+   }
+
+   /*
    public void addView(WeatherDatabaseClientView view){
+      this._view = view;
+   }
+   */
+
+   public void addView(WeatherView view){
       this._view = view;
    }
 
