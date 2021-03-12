@@ -42,7 +42,7 @@ implements WeatherDatabaseClientObserver{
    public Units getHeatIndexUnits(){ return Units.NULL; }
    public Units getHumidityUnits(){ return Units.NULL; }
    public Units getPressureUnits(){ return Units.NULL; }
-   public Units getTemperatureUnits(){ return Units.ABSOLUTE; }
+   public Units getTemperatureUnits(){ return Units.NULL; }
    public void alertDewpointTimeout(){}
    public void alertHeatIndexTimeout(){}
    public void alertHumidityTimeout(){}

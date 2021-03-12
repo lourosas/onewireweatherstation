@@ -36,12 +36,12 @@ import rosas.lou.lgraphics.WeatherPanel;
 /*
 */
 //////////////////////////////////////////////////////////////////////
-public class WeatherPageView extends GenericJFrame
+public class WeatherPageView extends WeatherView
 implements WeatherDatabaseClientObserver{
    private static final short GRAPH        = 0;
    private static final short DATA         = 1;
    private static final short WIDTH        = 750;
-   private static final short HEIGHT       = 600;
+   private static final short HEIGHT       = 700;
    private static final short TOTAL_PANELS = 5;
 
    private static String [] MONTHS = {"January", "February",
@@ -61,6 +61,10 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _monthCB = null;
    private JComboBox<String> _dayCB   = null;
    private JComboBox<String> _yearCB  = null;
+
+   private JLabel _dpMinLabel = null;
+   private JLabel _dpMaxLabel = null;
+   private JLabel _dpAvgLabel = null;
 
    private java.util.List<WeatherData> temperatureData = null;
    private java.util.List<WeatherData> temperatureMinMaxAvgData=null;
@@ -96,7 +100,9 @@ implements WeatherDatabaseClientObserver{
       super(title);
       //Add Model
       //Add Controllers
-      this._controller = new WeatherDatabaseClientController(this);
+      //this._controller = new WeatherDatabaseClientController(this);
+      this._controller = new WeatherPageController();
+      this._controller.addView(this);
       this.setUpGUI();
    }
 
@@ -894,8 +900,11 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.dewpointUnits),
                                                  BorderLayout.CENTER);
+         /*
          this.addDateToPanel(data.get(0),
                                    (JPanel)dpPanel.getComponent(2),2);
+         */
+         System.out.println(dpPanel.getComponent(2));
          jtp.setSelectedIndex(dpTab + 1);
          jtp.setSelectedIndex(dpTab);
 
@@ -1258,7 +1267,9 @@ implements WeatherDatabaseClientObserver{
       ButtonGroup dewpointGroup   = new ButtonGroup();
       ButtonGroup dataGroup       = new ButtonGroup();
       panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
 
+      JPanel topPanel = new JPanel();
       JPanel dewpointPanel = new JPanel();
       JRadioButton celsius = new JRadioButton("Celsius", true);
       celsius.setActionCommand("DPCelsius");
@@ -1275,7 +1286,7 @@ implements WeatherDatabaseClientObserver{
       dewpointGroup.add(kelvin);
       dewpointPanel.add(kelvin);
       kelvin.addItemListener(this._controller);
-      panel.add(dewpointPanel);
+      topPanel.add(dewpointPanel);
 
       JPanel dataPanel = new JPanel();
       JRadioButton graph = new JRadioButton("Graph", true);
@@ -1288,8 +1299,19 @@ implements WeatherDatabaseClientObserver{
       dataGroup.add(data);
       dataPanel.add(data);
       data.addItemListener(this._controller);
-      panel.add(dataPanel);
+      topPanel.add(dataPanel);
 
+      panel.add(topPanel);
+
+      JPanel bottomPanel = new JPanel();
+      this._dpMinLabel = new JLabel("Min:  ");
+      this._dpMaxLabel = new JLabel("Max:  ");
+      this._dpAvgLabel = new JLabel("Avg:  ");
+      bottomPanel.add(this._dpMinLabel);
+      bottomPanel.add(this._dpMaxLabel);
+      bottomPanel.add(this._dpAvgLabel);
+
+      panel.add(bottomPanel);
       return panel;
    }
 

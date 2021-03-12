@@ -96,7 +96,9 @@ implements WeatherDatabaseClientObserver{
       super(title);
       //Add Model
       //Add Controllers
-      this._controller = new WeatherDatabaseClientController(this);
+      //this._controller = new WeatherDatabaseClientController(this);
+      this._controller = new WeatherPageController();
+      this._controller.addView(this);
       this.setUpGUI();
    }
 
