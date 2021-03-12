@@ -776,11 +776,29 @@ implements WeatherDatabaseClientObserver{
             max = maxData.toStringAbsolute();
             avg = avgData.toStringAbsolute();
          }
-         System.out.println(min);
-         System.out.println(max);
-         System.out.println(avg);
+         int dpTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("DEW POINT")){
+               dpTab = i;
+            }
+         }
+         jtp.setSelectedIndex(dpTab);
+         JPanel dpPanel  = (JPanel)jtp.getSelectedComponent();
+         JPanel topPanel = (JPanel)dpPanel.getComponent(2);
+         JPanel mmaPanel = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         mmaPanel.add(new JLabel("Min: " + min));
+         mmaPanel.add(new JLabel("     Max: " + max));
+         mmaPanel.add(new JLabel("     Avg: " + avg));
+         jtp.setSelectedIndex(dpTab + 1);
+         jtp.setSelectedIndex(dpTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      catch(ArrayIndexOutOfBoundsException oob){
+         oob.printStackTrace();
+      }
    }
 
    /**/
@@ -1307,15 +1325,9 @@ implements WeatherDatabaseClientObserver{
 
       panel.add(topPanel);
 
+      //Just put in an empty panel
       JPanel bottomPanel = new JPanel();
-      /*
-      this._dpMinLabel = new JLabel("Min:  ");
-      this._dpMaxLabel = new JLabel("Max:  ");
-      this._dpAvgLabel = new JLabel("Avg:  ");
-      bottomPanel.add(this._dpMinLabel);
-      bottomPanel.add(this._dpMaxLabel);
-      bottomPanel.add(this._dpAvgLabel);
-      */
+
       panel.add(bottomPanel);
       return panel;
    }
