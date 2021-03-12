@@ -412,10 +412,7 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       this.dewpointMinMaxAvgData = data;
-      if(this.dewpointDisplay == GRAPH){
-         this.displayDewpointMinMaxAvg(data);
-      }
-      else{}
+      this.displayDewpointMinMaxAvg(data);
    }
 
    public void updateHeatIndexData(java.util.List<WeatherData> data){
@@ -1174,12 +1171,16 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.temperatureUnits),
                                                  BorderLayout.CENTER);
-         this.addDateToPanel(data.get(0),
-                             (JPanel)tempPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(data.get(0),datePanel,2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){npe.printStackTrace();}
+      catch(ArrayIndexOutOfBoundsException oob){
+         oob.printStackTrace();
+      }
    }
 
    /**/
@@ -1547,8 +1548,9 @@ implements WeatherDatabaseClientObserver{
       this.setSize(WIDTH,HEIGHT);
       this.setResizable(false);
       this.saveButtonGroup = new ButtonGroup();
-      JPanel northPanel = this.setUpNorthPanel();
+      //JPanel northPanel = this.setUpNorthPanel();
       JTabbedPane jtp = this.setTabbedPane();
+      JPanel northPanel = this.setUpNorthPanel();
       this.getContentPane().add(northPanel, BorderLayout.NORTH);
       this.getContentPane().add(jtp, BorderLayout.CENTER);
       this.setVisible(true);
@@ -1682,44 +1684,46 @@ implements WeatherDatabaseClientObserver{
       ButtonGroup temperatureGroup = new ButtonGroup();
       ButtonGroup dataGroup        = new ButtonGroup();
       panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
 
+      JPanel topPanel = new JPanel();
       JPanel temperaturePanel = new JPanel();
       JRadioButton celsius    = new JRadioButton("Celsius", true);
       celsius.setActionCommand("TCelsius");
       temperatureGroup.add(celsius);
       temperaturePanel.add(celsius);
       celsius.addItemListener(this._controller);
-      //Add another listener...
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("TFahrenheit");
       temperatureGroup.add(fahrenheit);
       temperaturePanel.add(fahrenheit);
       fahrenheit.addItemListener(this._controller);
-      //Add another listener...
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("TKelvin");
       temperatureGroup.add(kelvin);
       temperaturePanel.add(kelvin);
       kelvin.addItemListener(this._controller);
-      //Add another listener...
-
-      panel.add(temperaturePanel);
+      topPanel.add(temperaturePanel);
 
       JPanel dataPanel = new JPanel();
-
       JRadioButton graph = new JRadioButton("Graph", true);
       graph.setActionCommand("TGraph");
       dataGroup.add(graph);
       dataPanel.add(graph);
       graph.addItemListener(this._controller);
-      //Add another Listener...
       JRadioButton data = new JRadioButton("Data");
       data.setActionCommand("TData");
       dataGroup.add(data);
       dataPanel.add(data);
       data.addItemListener(this._controller);
-      //Add another Listener...
-      panel.add(dataPanel);
+      topPanel.add(dataPanel);
+
+      panel.add(topPanel);
+
+      //Just put in an empty Panel
+      JPanel bottomPanel = new JPanel();
+
+      panel.add(bottomPanel);
       return panel;
    }
 
