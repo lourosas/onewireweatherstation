@@ -904,7 +904,9 @@ implements WeatherDatabaseClientObserver{
          this.addDateToPanel(data.get(0),
                                    (JPanel)dpPanel.getComponent(2),2);
          */
-         System.out.println(dpPanel.getComponent(2));
+         JPanel panel = (JPanel)dpPanel.getComponent(2);
+         //System.out.println(dpPanel.getComponent(2));
+         System.out.println(panel.getComponent(1));
          jtp.setSelectedIndex(dpTab + 1);
          jtp.setSelectedIndex(dpTab);
 
