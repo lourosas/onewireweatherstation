@@ -1308,13 +1308,14 @@ implements WeatherDatabaseClientObserver{
       panel.add(topPanel);
 
       JPanel bottomPanel = new JPanel();
+      /*
       this._dpMinLabel = new JLabel("Min:  ");
       this._dpMaxLabel = new JLabel("Max:  ");
       this._dpAvgLabel = new JLabel("Avg:  ");
       bottomPanel.add(this._dpMinLabel);
       bottomPanel.add(this._dpMaxLabel);
       bottomPanel.add(this._dpAvgLabel);
-
+      */
       panel.add(bottomPanel);
       return panel;
    }
