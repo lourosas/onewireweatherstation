@@ -588,6 +588,7 @@ implements WeatherDatabaseClientObserver{
       this.setTemperatureDisplay(display);
       this.displayTemperature(this.temperatureUnits);
    }
+
    /**/
    public void displayTemperature(Units units){
       try{
@@ -900,18 +901,17 @@ implements WeatherDatabaseClientObserver{
          drawPanel.setLayout(new BorderLayout());
          drawPanel.add(new WeatherPanel(data, this.dewpointUnits),
                                                  BorderLayout.CENTER);
-         /*
-         this.addDateToPanel(data.get(0),
-                                   (JPanel)dpPanel.getComponent(2),2);
-         */
-         JPanel panel = (JPanel)dpPanel.getComponent(2);
-         //System.out.println(dpPanel.getComponent(2));
-         System.out.println(panel.getComponent(1));
+         JPanel topPanel  = (JPanel)dpPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(data.get(0),datePanel,2);
          jtp.setSelectedIndex(dpTab + 1);
          jtp.setSelectedIndex(dpTab);
 
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      catch(ArrayIndexOutOfBoundsException oob){
+         oob.printStackTrace();
+      }
    }
 
    /**/
@@ -939,7 +939,9 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(dpSP, BorderLayout.CENTER);
-         this.addDateToPanel(null,(JPanel)dpPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)dpPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(null,datePanel,2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(dpTab);
       }
