@@ -25,9 +25,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import rosas.lou.weatherclasses.*;
 import com.sun.net.httpserver.*;
-
+/*
+All this does is parse the web address for the requested data
+*/
 public class WeatherPage{
-   private static final int PORT    = 8000;
+   private static final int PORT    = 8500;
    private static final int TIMEOUT = 20000;
 
    //private byte[]            _addr;
@@ -50,7 +52,7 @@ public class WeatherPage{
    {
       //_addr = new byte[]{(byte)68,(byte)230,(byte)27,(byte)225};
       //_port            = PORT;
-      _addr            = new String("68.230.27.225:8500");
+      _addr            = new String("24.251.238.3:8500");
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
       _temperatureData = null;
