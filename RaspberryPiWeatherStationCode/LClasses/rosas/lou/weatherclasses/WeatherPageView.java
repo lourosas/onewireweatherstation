@@ -452,10 +452,7 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       this.humidityMinMaxAvgData = data;
-      if(this.humidityDisplay == GRAPH){
-         this.displayHumidityMinMaxAvg(data);
-      }
-      else{}
+      this.displayHumidityMinMaxAvg(data);
    }
 
    public void updatePressureData(java.util.List<WeatherData> data){
@@ -811,9 +808,32 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       try{
-         System.out.println(data);
+         String min = data.get(0).toStringPercentage();
+         String max = data.get(1).toStringPercentage();
+         String avg = data.get(2).toStringPercentage();
+         int humidityTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("HUMIDITY")){
+               humidityTab = i;
+            }
+         }
+         jtp.setSelectedIndex(humidityTab);
+         JPanel humidityPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel topPanel      = (JPanel)humidityPanel.getComponent(2);
+         JPanel mmaPanel      = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         mmaPanel.add(new JLabel("Min: " + min));
+         mmaPanel.add(new JLabel("     Max: " + max));
+         mmaPanel.add(new JLabel("     Avg: " + avg));
+         jtp.setSelectedIndex(0);
+         jtp.setSelectedIndex(humidityTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      catch(ArrayIndexOutOfBoundsException ooe){
+         ooe.printStackTrace();
+      }
    }
 
    /**/
@@ -1081,8 +1101,9 @@ implements WeatherDatabaseClientObserver{
 
          drawPanel.add(new WeatherPanel(data, Units.PERCENTAGE),
                                                  BorderLayout.CENTER);
-         this.addDateToPanel(data.get(0),
-                             (JPanel)humidityPanel.getComponent(2),1);
+         JPanel topPanel  = (JPanel)humidityPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(data.get(0),datePanel,1);
          jtp.setSelectedIndex(humidityTab + 1);
          jtp.setSelectedIndex(humidityTab);
       }
@@ -1114,8 +1135,9 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(humiditySP, BorderLayout.CENTER);
-         this.addDateToPanel(null,
-                             (JPanel)humidityPanel.getComponent(2),1);
+         JPanel topPanel  = (JPanel)humidityPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(null,datePanel,1);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(humidityTab);
       }
@@ -1501,7 +1523,9 @@ implements WeatherDatabaseClientObserver{
       JPanel panel               = new JPanel();
       ButtonGroup dataGroup      = new ButtonGroup();
       panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
 
+      JPanel topPanel  = new JPanel();
       JPanel dataPanel = new JPanel();
       JRadioButton graph = new JRadioButton("Graph", true);
       graph.setActionCommand("HGraph");
@@ -1513,8 +1537,14 @@ implements WeatherDatabaseClientObserver{
       dataGroup.add(data);
       dataPanel.add(data);
       data.addItemListener(this._controller);
+      topPanel.add(dataPanel);
 
-      panel.add(dataPanel);
+      panel.add(topPanel);
+
+      //Just put in an empty panel
+      JPanel bottomPanel = new JPanel();
+
+      panel.add(bottomPanel);
       return panel;
    }
 
