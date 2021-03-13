@@ -52,7 +52,8 @@ public class WeatherPage{
    {
       //_addr = new byte[]{(byte)68,(byte)230,(byte)27,(byte)225};
       //_port            = PORT;
-      _addr            = new String("24.251.238.3:8500");
+      //_addr            = new String("24.251.238.3:8500");
+      _addr            = new String("onewireweather.us:8500");
       _cal             = new String[]{"January", "01", "2017"};
       _rawData         = null;
       _temperatureData = null;
