@@ -62,9 +62,6 @@ implements WeatherDatabaseClientObserver{
    private JComboBox<String> _dayCB   = null;
    private JComboBox<String> _yearCB  = null;
 
-   private JLabel _dpMinLabel = null;
-   private JLabel _dpMaxLabel = null;
-   private JLabel _dpAvgLabel = null;
 
    private java.util.List<WeatherData> temperatureData = null;
    private java.util.List<WeatherData> temperatureMinMaxAvgData=null;
@@ -490,10 +487,7 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       this.temperatureMinMaxAvgData = data;
-      if(this.tempDisplay == GRAPH){
-         this.displayTempMinMaxAvg(data);
-      }
-      else{}
+      this.displayTempMinMaxAvg(data);
    }
 
    ///////////////////////Public Methods//////////////////////////////
@@ -592,6 +586,8 @@ implements WeatherDatabaseClientObserver{
          this.setTemperatureUnits(units);
          if(this.temperatureData.size() > 0){
             this.updateTemperatureData(this.temperatureData);
+            this.updateTemperatureMinMaxAvg(
+                                       this.temperatureMinMaxAvgData);
          }
          else{
             this.alertNoTemperatureData();
@@ -826,9 +822,48 @@ implements WeatherDatabaseClientObserver{
       java.util.List<WeatherData> data
    ){
       try{
-         System.out.println(data);
+         WeatherData minData = data.get(0);
+         WeatherData maxData = data.get(1);
+         WeatherData avgData = data.get(2);
+         String min = null; String max = null; String avg = null;
+         if(this.temperatureUnits == Units.METRIC){
+            min = minData.toStringMetric();
+            max = maxData.toStringMetric();
+            avg = avgData.toStringMetric();
+         }
+         else if(this.temperatureUnits == Units.ENGLISH){
+            min = minData.toStringEnglish();
+            max = maxData.toStringEnglish();
+            avg = avgData.toStringEnglish();
+         }
+         else if(this.temperatureUnits == Units.ABSOLUTE){
+            min = minData.toStringAbsolute();
+            max = maxData.toStringAbsolute();
+            avg = avgData.toStringAbsolute();
+         }
+         int tempTab = -1;
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(1);
+         for(int i = 0; i < jtp.getTabCount(); i++){
+            if(jtp.getTitleAt(i).toUpperCase().equals("TEMPERATURE")){
+               tempTab = i;
+            }
+         }
+         jtp.setSelectedIndex(tempTab);
+         JPanel tempPanel = (JPanel)jtp.getSelectedComponent();
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel mmaPanel  = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         mmaPanel.add(new JLabel("Min: " + min));
+         mmaPanel.add(new JLabel("     Max: " + max));
+         mmaPanel.add(new JLabel("     Avg: " + avg));
+         jtp.setSelectedIndex(tempTab + 1);
+         jtp.setSelectedIndex(tempTab);
       }
       catch(NullPointerException npe){ npe.printStackTrace(); }
+      catch(ArrayIndexOutOfBoundsException ooe){
+         ooe.printStackTrace();
+      }
    }
 
    /**/
@@ -1208,7 +1243,9 @@ implements WeatherDatabaseClientObserver{
                         BorderFactory.createEmptyBorder(25,25,25,25));
          textPanel.setLayout(new BorderLayout());
          textPanel.add(tempSP, BorderLayout.CENTER);
-         this.addDateToPanel(null,(JPanel)tempPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         this.addDateToPanel(null,datePanel,2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
       }
@@ -1548,9 +1585,9 @@ implements WeatherDatabaseClientObserver{
       this.setSize(WIDTH,HEIGHT);
       this.setResizable(false);
       this.saveButtonGroup = new ButtonGroup();
-      //JPanel northPanel = this.setUpNorthPanel();
-      JTabbedPane jtp = this.setTabbedPane();
       JPanel northPanel = this.setUpNorthPanel();
+      JTabbedPane jtp = this.setTabbedPane();
+      //JPanel northPanel = this.setUpNorthPanel();
       this.getContentPane().add(northPanel, BorderLayout.NORTH);
       this.getContentPane().add(jtp, BorderLayout.CENTER);
       this.setVisible(true);
