@@ -103,7 +103,8 @@ ItemListener{
          if(jt.getName().toUpperCase().equals("ADDRESS")){
             char k = ke.getKeyChar();
             int  c = ke.getKeyCode();
-            if((k >= '0' && k <= '9') || k == '.' || k == ':' ||
+            if((k >= '0' && k <= '9') || (k >= 'a' && k <= 'z')
+                || k == '.' || k == ':' ||
                 c == KeyEvent.VK_BACK_SPACE){
                jt.setEditable(true);
             }
