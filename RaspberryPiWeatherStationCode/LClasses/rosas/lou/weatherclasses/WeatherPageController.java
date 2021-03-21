@@ -131,7 +131,6 @@ ItemListener{
          int  c = ke.getKeyCode();
          char k = ke.getKeyChar();
          if(c == KeyEvent.VK_ENTER){
-            //System.out.println(jt.getText());
             this._model.setServerAddress(jt.getText());
          }
       }
@@ -213,6 +212,7 @@ ItemListener{
          npe.printStackTrace();
       }
       catch(ClassCastException cce){}
+      catch(Exception e){}
    }
 
    /**/
@@ -235,7 +235,13 @@ ItemListener{
    }
 
    /**/
-   private void handleJTextField(ActionEvent ae){}
+   private void handleJTextField(ActionEvent ae){
+      try{
+         JTextField jtf = ((JTextField)ae.getSource());
+      }
+      catch(ClassCastException cce){}
+      catch(NullPointerException npe){}
+   }
 
    /**/
    private void handleDewpointItemSelection(String command){

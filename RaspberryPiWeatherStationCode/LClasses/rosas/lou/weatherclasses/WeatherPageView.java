@@ -281,7 +281,10 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoHumidityMinMaxAvg(Exception e){
-      e.printStackTrace();
+      //e.printStackTrace();
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                   "No Min/Max/Avg Humidity Data",
+                                   JOptionPane.ERROR_MESSAGE);
    }
 
    public void alertNoPressureData(){
@@ -376,7 +379,12 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoTemperatureMinMaxAvgData(Exception e){
-      e.printStackTrace();//change later
+      //e.printStackTrace();//change later
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "No Min/Max/Avg Temperature Data",
+                                    JOptionPane.ERROR_MESSAGE);
+      this.temperatureMinMaxAvgData =
+                              new java.util.LinkedList<WeatherData>();
    }
 
    public void updateAddress(String address){

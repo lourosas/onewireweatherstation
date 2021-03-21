@@ -180,7 +180,13 @@ public class WeatherPage{
    }
 
    /**/
-   public void grabHumidityData(String month,String day,String year){
+   public void grabHumidityData
+   (
+      String month,
+      String day,
+      String year
+   ) throws SocketTimeoutException, MalformedURLException,
+     IOException, Exception{
       List<WeatherData> wl = null;
       try{
          this.setCalendar(month,day,year);
@@ -192,10 +198,12 @@ public class WeatherPage{
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
          this.publishHumidity(npe);
+         throw npe;
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
          this.publishHumidity(e);
+         throw e;
       }
       finally{
          this._humidityData = wl;
@@ -203,7 +211,13 @@ public class WeatherPage{
    }
 
    /**/
-   public void grabHumidityMinMaxAvg(String mo,String dy,String yr){
+   public void grabHumidityMinMaxAvg
+   (
+      String mo,
+      String dy,
+      String yr
+   ) throws SocketTimeoutException, MalformedURLException,
+     IOException, Exception{
       List<WeatherData> wl = null;
       try{
          this.setCalendar(mo,dy,yr);
@@ -215,10 +229,12 @@ public class WeatherPage{
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
          this.publishMinMaxAvgHumidity(npe);
+         throw npe;
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
          this.publishMinMaxAvgHumidity(e);
+         throw e;
       }
       finally{
          this._humidityMinMaxAvg = wl;
@@ -249,7 +265,13 @@ public class WeatherPage{
    }
 
    /**/
-   public void grabTemperatureData(String month,String day,String year){
+   public void grabTemperatureData
+   (
+      String month,
+      String day,
+      String year
+   ) throws SocketTimeoutException, MalformedURLException,
+   IOException, Exception{
       List<WeatherData> wl = null;
       try{
          this.setCalendar(month,day,year);
@@ -263,11 +285,13 @@ public class WeatherPage{
          //Need to figure out a better way to aleart the view!!!
          //Let the View figure out what to do!!
          wl = new LinkedList<WeatherData>();
-	      this.publishTemperature(npe);
+         this.publishTemperature(npe);
+         throw npe;
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
-	      this.publishTemperature(e);
+         this.publishTemperature(e);
+         throw e;
       }
       finally{
          this._temperatureData = wl;
@@ -275,7 +299,13 @@ public class WeatherPage{
    }
 
    /**/
-   public void grabTemperatureMinMaxAvg(String mo,String dy,String yr){
+   public void grabTemperatureMinMaxAvg
+   (
+      String mo,
+      String dy,
+      String yr
+   ) throws SocketTimeoutException, MalformedURLException,
+   IOException, Exception{
       List<WeatherData> wl = null;
       try{
          this.setCalendar(mo,dy,yr);
@@ -287,10 +317,12 @@ public class WeatherPage{
       catch(NullPointerException npe){
          wl = new LinkedList<WeatherData>();
          this.publishMinMaxAvgTemp(npe);
+         throw npe;
       }
       catch(Exception e){
          wl = new LinkedList<WeatherData>();
          this.publishMinMaxAvgTemp(e);
+         throw e;
       }
       finally{
          this._temperatureMinMaxAvg = wl;
@@ -455,7 +487,7 @@ public class WeatherPage{
             }
             returnLine = returnLine.concat(line);
          }
-	      return returnLine;
+         return returnLine;
       }
       catch(SocketTimeoutException ste){
          ste.printStackTrace();
