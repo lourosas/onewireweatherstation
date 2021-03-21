@@ -160,8 +160,11 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
-         this.addDateToPanel(new DewpointData(),
-                             (JPanel)tempPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         JPanel mmaPanel  = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         this.addDateToPanel(new DewpointData(),datePanel,2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("dewpoint", false);
@@ -182,7 +185,12 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoDewpointMinMaxAvg(Exception e){
-      e.printStackTrace();
+      //e.printStackTrace();
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "No Min/Max/Avg Dewpiont Data",
+                                    JOptionPane.ERROR_MESSAGE);
+      this.dewpointMinMaxAvgData =
+                              new java.util.LinkedList<WeatherData>();
    }
 
    public void alertNoHeatIndexData(){
@@ -208,8 +216,11 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
-         this.addDateToPanel(new HeatIndexData(),
-                                 (JPanel)tempPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         JPanel mmaPanel  = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         this.addDateToPanel(new HeatIndexData(),datePanel,2);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("heatindex", false);
@@ -231,7 +242,12 @@ implements WeatherDatabaseClientObserver{
    }
 
    public void alertNoHeatIndexMinMaxAvg(Exception e){
-      e.printStackTrace();
+      //e.printStackTrace();
+      JOptionPane.showMessageDialog(this, e.getMessage(),
+                                    "No Min/Max/Avg HeatIndex Data",
+                                    JOptionPane.ERROR_MESSAGE);
+      this.heatIndexMinMaxAvgData =
+                              new java.util.LinkedList<WeatherData>();
    }
 
    public void alertNoHumidityData(){
@@ -257,8 +273,11 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
-         this.addDateToPanel(new HumidityData(),
-                                 (JPanel)tempPanel.getComponent(2),1);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         JPanel mmaPanel  = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         this.addDateToPanel(new HumidityData(),datePanel,1);
          jtp.setSelectedIndex(0);
          jtp.setSelectedIndex(tempTab);
          this.enableSaveButton("humidity", false);
@@ -285,6 +304,8 @@ implements WeatherDatabaseClientObserver{
       JOptionPane.showMessageDialog(this, e.getMessage(),
                                    "No Min/Max/Avg Humidity Data",
                                    JOptionPane.ERROR_MESSAGE);
+      this.humidityMinMaxAvgData =
+                              new java.util.LinkedList<WeatherData>();
    }
 
    public void alertNoPressureData(){
@@ -354,8 +375,11 @@ implements WeatherDatabaseClientObserver{
          //errorString = errorString.concat("Available for this Date");
          JLabel label = new JLabel(errorString,SwingConstants.CENTER);
          drawPanel.add(label, BorderLayout.CENTER);
-         this.addDateToPanel(new TemperatureData(),
-                            (JPanel)tempPanel.getComponent(2),2);
+         JPanel topPanel  = (JPanel)tempPanel.getComponent(2);
+         JPanel datePanel = (JPanel)topPanel.getComponent(0);
+         JPanel mmaPanel  = (JPanel)topPanel.getComponent(1);
+         mmaPanel.removeAll();
+         this.addDateToPanel(new TemperatureData(),datePanel,2);
          jtp.setSelectedIndex(tempTab + 1);
          jtp.setSelectedIndex(tempTab);
          //If there is NO DATA, do not want to print
