@@ -414,9 +414,11 @@ implements WeatherDatabaseClientObserver{
    public void updateAddress(String address){
       this._address.setText(address);
       this._address.setCaretPosition(this._address.getText().length());
-      this._address.requestFocus();
-      this._address.selectAll();
+      //this._address.setFocusable(false);
       this.pressCurrentRefresh();
+      //this._address.setFocusable(true);
+      //this._address.requestFocus();
+      //this._address.selectAll();
    }
 
    public void updatePort(String port){
