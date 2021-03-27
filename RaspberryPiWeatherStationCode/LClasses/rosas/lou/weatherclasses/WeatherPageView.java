@@ -1709,7 +1709,6 @@ implements WeatherDatabaseClientObserver{
       this.saveButtonGroup = new ButtonGroup();
       JPanel northPanel = this.setUpNorthPanel();
       JTabbedPane jtp = this.setTabbedPane();
-      //JPanel northPanel = this.setUpNorthPanel();
       this.getContentPane().add(northPanel, BorderLayout.NORTH);
       this.getContentPane().add(jtp, BorderLayout.CENTER);
       this.setVisible(true);
@@ -1723,8 +1722,8 @@ implements WeatherDatabaseClientObserver{
       JLabel addLabel=new JLabel("Address:  ",SwingConstants.RIGHT);
       this._address = new JTextField("Enter Address", 16);
       this._address.setName("Address");
-      this._address.addActionListener(this._controller);
       this._address.addKeyListener(this._controller);
+      this._address.addActionListener(this._controller);
       JLabel gap = new JLabel("                  ");
       this._address.requestFocus();
       this._address.selectAll();

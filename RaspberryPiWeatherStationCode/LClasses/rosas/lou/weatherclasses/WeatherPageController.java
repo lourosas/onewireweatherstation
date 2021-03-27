@@ -126,15 +126,20 @@ ItemListener{
 
    /**/
    public void keyReleased(KeyEvent ke){
+      /*
+      KeyReleased() is very odd--try to avoid its use!!!
+      I should have known better (RELEASED--DUH!!!!)
       try{
          JTextField jt = ((JTextField)ke.getSource());
          int  c = ke.getKeyCode();
          char k = ke.getKeyChar();
          if(c == KeyEvent.VK_ENTER){
-            this._model.setServerAddress(jt.getText());
+            System.out.println(jt.getText());
+            //this._model.setServerAddress(jt.getText());
          }
       }
       catch(ClassCastException cce){}
+      */
    }
 
    /**/
@@ -238,6 +243,7 @@ ItemListener{
    private void handleJTextField(ActionEvent ae){
       try{
          JTextField jtf = ((JTextField)ae.getSource());
+         this._model.setServerAddress(jtf.getText());
       }
       catch(ClassCastException cce){}
       catch(NullPointerException npe){}
