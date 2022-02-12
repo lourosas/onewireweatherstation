@@ -36,7 +36,7 @@ extends CurrentWeatherDataSubscriber implements HttpHandler{
                               "09","10","11","12","13","14","15","16",
                               "17","18","19","20","21","22","23","24",
                               "25","26","27","28","29","30","31"};
-   private String [] years = {"2020", "2019", "2018", "2017"};
+   private String [] years = {"2022","2021","2020", "2019", "2018", "2017"};
    private String [] units = {"English", "metric", "absolute"};
    List<WeatherData> _temperature;
    List<WeatherData> _humidity;
