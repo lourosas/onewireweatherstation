@@ -51,7 +51,7 @@ implements WeatherDatabaseClientObserver{
    "07","08","09","10","11","12","13","14","15","16","17","18","19",
    "20","21","22","23","24","25","26","27","28","29","30","31"};
    private static String [] YEARS = {"2017", "2018", "2019", "2020",
-   "2021"};
+   "2021","2022"};
 
    private GenericWeatherController _controller = null;
    //Really do not need these to be global any longer--handled by
