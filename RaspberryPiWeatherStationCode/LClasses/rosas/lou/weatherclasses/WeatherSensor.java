@@ -20,11 +20,13 @@ package rosas.lou.weatherclasses;
 import java.lang.*;
 import java.util.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
+*/
 
 public abstract class WeatherSensor{
    protected String _address;
@@ -32,7 +34,7 @@ public abstract class WeatherSensor{
    protected String _type;
    protected Units  _units;
 
-   static protected DSPortAdapter _dspa = null;
+   //static protected DSPortAdapter _dspa = null;
 
    {
       _address     = null;
@@ -98,6 +100,7 @@ public abstract class WeatherSensor{
    /*
    */
    protected void usbAdapter(){
+      /*
       try{
         if(_dspa == null){
             PortSniffer ps = new PortSniffer(PortSniffer.PORT_USB);
@@ -122,6 +125,7 @@ public abstract class WeatherSensor{
          this._dspa = null;
          owe.printStackTrace();
       }
+      */
    }
 
 

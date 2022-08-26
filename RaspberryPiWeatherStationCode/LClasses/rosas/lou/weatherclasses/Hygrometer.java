@@ -20,11 +20,13 @@ package rosas.lou.weatherclasses;
 import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
+*/
 
 public class Hygrometer extends WeatherSensor{
    public static final double DEFAULTHUMIDITY = -99.9;
@@ -35,11 +37,11 @@ public class Hygrometer extends WeatherSensor{
    //HumidityContainer, I need to declare the hygrometerSensor
    //as OneWireContainer26 (Unless I want to mess with casting all
    //over the place)!  Essentially, this just seems easier.
-   private OneWireContainer26 hygrometerSensor;
+   //private OneWireContainer26 hygrometerSensor;
 
    {
       instance         = null;
-      hygrometerSensor = null;
+      //hygrometerSensor = null;
    };
 
    //************************Constructors***************************
@@ -79,6 +81,7 @@ public class Hygrometer extends WeatherSensor{
       double rh = this.measureHumidity();
       //Make a test print--TODO--DELETE
       System.out.println("Hygrometer.measure():  "+rh);
+      /*
       if(rh > WeatherData.DEFAULTHUMIDITY){ //Relative Humidity Good
          data = new HumidityData(Units.PERCENTAGE,
                                 rh,
@@ -91,6 +94,7 @@ public class Hygrometer extends WeatherSensor{
                                  bad,
                                  Calendar.getInstance());
       }
+      */
       return data;
    }
 
@@ -112,6 +116,7 @@ public class Hygrometer extends WeatherSensor{
    */
    @Override
    protected void findSensors() throws NullPointerException{
+      /*
       try{
          boolean found = false;
          Enumeration<OneWireContainer> e =
@@ -145,6 +150,7 @@ public class Hygrometer extends WeatherSensor{
          npe.printStackTrace();
          throw npe;
       }
+      */
    }
 
    /*
@@ -153,7 +159,7 @@ public class Hygrometer extends WeatherSensor{
    */
    @Override
    protected void initialize(){
-
+      /*
       try{
          //0.  Set the Type (in this case, it is a Hygrometer)
          //Very prudent in determining the WeatherSensor
@@ -212,6 +218,7 @@ public class Hygrometer extends WeatherSensor{
          this.hygrometerSensor = null;
          System.out.println(npe.getMessage());
       }
+      */
    }
 
    //***********************Private Methods*************************
@@ -223,6 +230,7 @@ public class Hygrometer extends WeatherSensor{
       double voltageDD,
       double temp
    ){
+      /*
       final double CONST_1         = 0.16;
       final double CONST_2         = 0.0062;
       final double CONST_3         = 1.0546;
@@ -234,6 +242,8 @@ public class Hygrometer extends WeatherSensor{
       double calcHumidity = (rh/(CONST_3 - CONST_4 * temp));
 
       return (calcHumidity * HUMIDITY_GAIN + HUMIDITY_OFFSET);
+      */
+      return WeatherData.DEFAULTHUMIDITY;
    }
 
    /*
@@ -242,6 +252,7 @@ public class Hygrometer extends WeatherSensor{
    */
    private double measureCalculatedHumidity(){
       double calcHum = WeatherData.DEFAULTHUMIDITY;
+      /*
       try{
          double temp, vad, vdd;
          //Read the temperature sensor
@@ -283,6 +294,7 @@ public class Hygrometer extends WeatherSensor{
          System.out.println(""+npe.getStackTrace()[0].getLineNumber());
          calcHum = WeatherData.DEFAULTHUMIDITY;
       }
+      */
       return calcHum;
    }
 
@@ -291,6 +303,7 @@ public class Hygrometer extends WeatherSensor{
    */
    private double measureHumidity(){
       double rh = WeatherData.DEFAULTHUMIDITY;
+      /*
       try{
          byte [] state = this.hygrometerSensor.readDevice();
          this.hygrometerSensor.doHumidityConvert(state);
@@ -305,6 +318,7 @@ public class Hygrometer extends WeatherSensor{
       catch(NullPointerException npe){
          rh = WeatherData.DEFAULTHUMIDITY;
       }
+      */
       return rh;
    }
 }

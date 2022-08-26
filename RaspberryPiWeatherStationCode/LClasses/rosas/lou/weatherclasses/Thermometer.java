@@ -20,22 +20,24 @@ package rosas.lou.weatherclasses;
 import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
 import com.dalsemi.onewire.utils.Convert;
+*/
 
 public class Thermometer extends WeatherSensor{
    public static final int DEFAULTTEMP = -999;
-   private TemperatureContainer thermalSensor;
+   //private TemperatureContainer thermalSensor;
    private static Thermometer instance;
    private static final String MAIN_NAME      = "DS1920";
    private static final String SECONDARY_NAME = "DS18S20";
 
    {
-      thermalSensor = null;
+      //thermalSensor = null;
       instance      = null;
    };
    
@@ -69,10 +71,11 @@ public class Thermometer extends WeatherSensor{
    public WeatherData measure(){
       String bad = new String("No Temperature Data Available:  ");
       bad = bad.concat("default value returned");
-      WeatherData currentData;
+      WeatherData currentData = null;
       //Default the data in case something bad happens, have
       //Something to return
       double currentTemp = WeatherData.DEFAULTVALUE;
+      /*
       try{
          byte [] state = this.thermalSensor.readDevice();
          //perform the temperature conversion
@@ -115,6 +118,7 @@ public class Thermometer extends WeatherSensor{
                                            bad,
                                            Calendar.getInstance());
       }
+      */
       return currentData;
    }
    
@@ -136,6 +140,7 @@ public class Thermometer extends WeatherSensor{
    */
    @Override
    protected void initialize(){
+      /*
       try{
          //0.  Set the Type (in this case, it is a Thermometer)
          //Very prudent in determining the WeatherSensor
@@ -178,6 +183,7 @@ public class Thermometer extends WeatherSensor{
          this.thermalSensor = null;
          System.out.println(npe.getMessage());
       }
+      */
    }
 
    /*
@@ -186,6 +192,7 @@ public class Thermometer extends WeatherSensor{
    */
    @Override
    protected void findSensors() throws NullPointerException{
+      /*
       try{
          boolean found = false;
          Enumeration<OneWireContainer> e =
@@ -219,6 +226,7 @@ public class Thermometer extends WeatherSensor{
          npe.printStackTrace();
          throw npe;
       }
+      */
    }
 
    //***********************Private Methods*************************

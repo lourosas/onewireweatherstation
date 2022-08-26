@@ -100,4 +100,15 @@ implements WeatherClientDataSubscriber{
          catch(ClassCastException cce){}
       }
    }
+
+   ///////////////////////Instance Methods////////////////////////////
+   /*
+   */
+   public double temperature(Units units){
+      return Thermometer.DEFAULTTEMP;
+   }
+
+   public String temperatureString(Units units){
+      return new String("Poop");
+   }
 }

@@ -5,22 +5,24 @@ package rosas.lou.weatherclasses;
 import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
+*/
 
 public class Barometer extends WeatherSensor{
    public static final double DEFAULTPRESSURE = -999.9;
    private static final String NAME    = "DS2438";
    private static final String ADDRESS = "92000000BCA3EF26";
    
-   private ADContainer barometricSensor;
+   //private ADContainer barometricSensor;
    private static Barometer instance;
 
    {
-      barometricSensor = null;
+      //barometricSensor = null;
       instance         = null;
    };
    
@@ -55,6 +57,7 @@ public class Barometer extends WeatherSensor{
       String good = new String("Good");
       WeatherData data = null;
       double pressureInches = WeatherData.DEFAULTVALUE;
+      /*
       try{
          byte[] state = this.barometricSensor.readDevice();
          //Perform the AD output voltage measurement
@@ -98,6 +101,7 @@ public class Barometer extends WeatherSensor{
                                  bad,
                                  Calendar.getInstance());
       }
+      */
       return data;
    }
 
@@ -120,6 +124,7 @@ public class Barometer extends WeatherSensor{
    */
    @Override
    protected void findSensors() throws NullPointerException{
+      /*
       try{
          boolean found = false;
          Enumeration<OneWireContainer> e =
@@ -153,6 +158,7 @@ public class Barometer extends WeatherSensor{
          npe.printStackTrace();
          throw npe;
       }
+      */
    }
    
    /*
@@ -161,6 +167,7 @@ public class Barometer extends WeatherSensor{
    */
    @Override
    protected void initialize(){
+      /*
       try{
          this.type("Barometer");
          if(_dspa == null){
@@ -182,6 +189,7 @@ public class Barometer extends WeatherSensor{
          this.barometricSensor = null;
          System.out.println(npe.getMessage());
       }
+      */
    }
    
    //********************Private Methods***************************
@@ -191,12 +199,15 @@ public class Barometer extends WeatherSensor{
    formula
    */
    private double convertVoltageToPressure(double vad){
+      /*
       final double PRESSUREGAIN   =  0.7352;
       final double PRESSUREOFFSET = 26.5296;
       double returnPressure       = DEFAULTPRESSURE;
       
       returnPressure = (vad * PRESSUREGAIN) + PRESSUREOFFSET;
       return returnPressure;
+      */
+      return WeatherData.DEFAULTVALUE;
    }
    
 }

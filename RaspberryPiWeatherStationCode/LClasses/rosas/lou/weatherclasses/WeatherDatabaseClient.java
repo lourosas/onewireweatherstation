@@ -47,7 +47,7 @@ public class WeatherDatabaseClient{
       //Open it "up" later when running...
       //_addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)114};
       //_addr = new byte[]{(byte)68, (byte)98, (byte)39, (byte)39};
-      _addr = new byte[]{(byte)68, (byte)110, (byte)91, (byte)225};
+      _addr = new byte[]{(byte)70, (byte)162, (byte)74, (byte)239};
       _port            = PORT;
       _dates           = new String[]{"January", "01", "2017"};
       _socket          = null;
