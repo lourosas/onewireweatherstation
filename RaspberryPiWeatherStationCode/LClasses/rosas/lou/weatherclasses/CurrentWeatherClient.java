@@ -38,8 +38,8 @@ implements Runnable{
    private List<WeatherData> _weatherData;
    {
       //_addr = new byte[]{(byte)192, (byte)168, (byte)1, (byte)145};
-      _addr = new byte[]{(byte)192, (byte)168, (byte)0, (byte)173};
-      //_addr = new byte[]{(byte)70, (byte)162, (byte)74, (byte)239};
+      //_addr = new byte[]{(byte)192, (byte)168, (byte)0, (byte)173};
+      _addr = new byte[]{(byte)70, (byte)162, (byte)74, (byte)239};
       _socket      = null;
       _rawData     = null;
       _weatherData = null;
