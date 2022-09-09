@@ -102,6 +102,7 @@ implements WeatherClientDataSubscriber{
    }
 
    ///////////////////////Instance Methods////////////////////////////
+   ////////////////////////Public Methods/////////////////////////////
    /*
    */
    public double temperature(Units units){
@@ -111,4 +112,6 @@ implements WeatherClientDataSubscriber{
    public String temperatureString(Units units){
       return new String("Poop");
    }
+
+   ////////////////////////Protected Methods//////////////////////////
 }

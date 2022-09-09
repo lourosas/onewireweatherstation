@@ -63,6 +63,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
             }
             catch(ClassCastException cce){}
          }
+         this.publish();
       }
       catch(NullPointerException npe){
          npe.printStackTrace();
