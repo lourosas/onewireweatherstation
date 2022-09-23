@@ -42,6 +42,10 @@ implements WeatherClientDataSubscriber{
       this._wdp = new WeatherDataParser();
    }
 
+   /*
+   */
+   public void addObserver(CurrentWeatherDataObserver ob){}
+
    ///////////////////Interface Implementations///////////////////////
    /*
    */

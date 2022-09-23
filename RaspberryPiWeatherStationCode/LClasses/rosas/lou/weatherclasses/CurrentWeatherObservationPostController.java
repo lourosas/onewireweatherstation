@@ -24,7 +24,42 @@ import java.awt.event.*;
 import javax.swing.*;
 import rosas.lou.weatherclasses.*;
 
-public class CurrentWeatherObservationPostController implements
-ActionListener, KeyListener, ItemListener{
+public class CurrentWeatherObservationPostController
+extends CurrentWeatherController{
+   private CurrentWeatherView           _view  = null;
+   private CurrentWeatherDataSubscriber _model = null;
 
+   /**/
+   public CurrentWeatherObservationPostController(){}
+
+   /**/
+   public CurrentWeatherObservationPostController
+   (
+      CurrentWeatherView view
+   ){}
+
+   /**/
+   public CurrentWeatherObservationPostController
+   (
+      CurrentWeatherView view,
+      CurrentWeatherDataSubscriber model
+   ){
+      this._model = model;
+      this._view  = view;
+   }
+
+   /**/
+   public void addModel(CurrentWeatherDataSubscriber model){
+      this._model = model;
+   }
+
+   /**/
+   public void addObserverToModel(CurrentWeatherDataObserver ob){
+      this._model.addObserver(ob);
+   }
+
+   /**/
+   public void addView(CurrentWeatherView view){
+      this._view = view;
+   }
 }

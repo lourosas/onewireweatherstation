@@ -23,6 +23,8 @@ import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherObservationPost extends
 CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
+   private List<CurrentWeatherDataObserver> _observers = null;
+
    //////////////////////////Constructors/////////////////////////////
    /*
    */
@@ -30,6 +32,18 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
 
    ////////////////////////Instance Methods///////////////////////////
    /////////////////////////Public Methods////////////////////////////
+   /*
+   */
+   public void addObserver(CurrentWeatherDataObserver ob){
+      try{
+         this._observers.add(ob);
+      }
+      catch(NullPointerException npe){
+         this._observers =
+                         new LinkedList<CurrentWeatherDataObserver>();
+         this._observers.add(ob);
+      }
+   }
    ////////////////////////Protected Methods//////////////////////////
    /////////////////////////Private Methods///////////////////////////
    /*
@@ -47,7 +61,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private void publishDewpoint(){
       System.out.println("\n*************************************\n");
       System.out.println(this.dewpointData);
-      System.out.println("\n*************************************\n"); 
+      System.out.println("\n*************************************\n");
    }
 
    /*
@@ -55,7 +69,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private void publishHeatindex(){
       System.out.println("\n*************************************\n");
       System.out.println(this.heatIndexData);
-      System.out.println("\n*************************************\n"); 
+      System.out.println("\n*************************************\n");
    }
 
    /*
@@ -63,7 +77,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private void publishHumidity(){
       System.out.println("\n*************************************\n");
       System.out.println(this.humidityData);
-      System.out.println("\n*************************************\n"); 
+      System.out.println("\n*************************************\n");
    }
 
    /*
@@ -71,7 +85,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private void publishPressure(){
       System.out.println("\n*************************************\n");
       System.out.println(this.pressureData);
-      System.out.println("\n*************************************\n"); 
+      System.out.println("\n*************************************\n");
    }
 
    /*
@@ -79,7 +93,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private void publishTemperature(){
       System.out.println("\n*************************************\n");
       System.out.println(this.temperatureData);
-      System.out.println("\n*************************************\n"); 
+      System.out.println("\n*************************************\n");
    }
 
    ///////////////////////Interface Implementation////////////////////
