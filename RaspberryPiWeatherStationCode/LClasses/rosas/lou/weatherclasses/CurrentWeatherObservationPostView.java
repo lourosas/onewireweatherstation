@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Lou Rosas
+Copyright 2022 Lou Rosas
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.WeatherPanel;
 
-public class CurrentWeatherObservationPostView extends GenericJFrame
-//implements CurrentWeatherObserver
+public class CurrentWeatherObservationPostView
+extends CurrentWeatherView implements CurrentWeatherDataObserver
 {
    private static final short WIDTH        = 750;
    private static final short HEIGHT       = 700;
@@ -55,5 +55,9 @@ public class CurrentWeatherObservationPostView extends GenericJFrame
    public CurrentWeatherObservationPostView(String title){
       super(title);
    }
+
+   ///////////////////Interface Implementation////////////////////////
+   /**/
+   public void updateTemperature(WeatherData data){}
 
 }
