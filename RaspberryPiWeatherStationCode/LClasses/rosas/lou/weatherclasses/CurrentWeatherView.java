@@ -24,6 +24,9 @@ import rosas.lou.weatherclasses.*;
 
 public abstract class CurrentWeatherView extends GenericJFrame
 implements CurrentWeatherDataObserver{
+   /////////////////////////Constructors//////////////////////////////
+   public CurrentWeatherView(String title){ super(title); }
+
    //////////////////////Interface Implementation/////////////////////
    public void updateTemperature(WeatherData data){}
 }

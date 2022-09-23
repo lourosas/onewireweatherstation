@@ -59,41 +59,51 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    /*
    */
    private void publishDewpoint(){
+      /*
       System.out.println("\n*************************************\n");
       System.out.println(this.dewpointData);
       System.out.println("\n*************************************\n");
+      */
    }
 
    /*
    */
    private void publishHeatindex(){
+      /*
       System.out.println("\n*************************************\n");
       System.out.println(this.heatIndexData);
       System.out.println("\n*************************************\n");
+      */
    }
 
    /*
    */
    private void publishHumidity(){
+      /*
       System.out.println("\n*************************************\n");
       System.out.println(this.humidityData);
       System.out.println("\n*************************************\n");
+      */
    }
 
    /*
    */
    private void publishPressure(){
+      /*
       System.out.println("\n*************************************\n");
       System.out.println(this.pressureData);
       System.out.println("\n*************************************\n");
+      */
    }
 
    /*
    */
    private void publishTemperature(){
-      System.out.println("\n*************************************\n");
-      System.out.println(this.temperatureData);
-      System.out.println("\n*************************************\n");
+      Iterator<CurrentWeatherDataObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         it.next().updateTemperature(this.temperatureData);
+      }
    }
 
    ///////////////////////Interface Implementation////////////////////

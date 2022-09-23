@@ -31,6 +31,7 @@ Observations
 public abstract class CurrentWeatherController
 implements ActionListener, KeyListener, ItemListener{
    public void addModel(CurrentWeatherDataSubscriber model){}
+   public void addView(CurrentWeatherView view){}
    //////////////////////////Interface Implementations////////////////
    public void actionPerformed(ActionEvent ae){}
    public void keyPressed(KeyEvent ke){}

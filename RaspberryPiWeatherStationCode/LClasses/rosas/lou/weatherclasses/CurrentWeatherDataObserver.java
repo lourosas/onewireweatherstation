@@ -22,5 +22,5 @@ import java.util.*;
 import rosas.lou.weatherclasses.*;
 
 public interface CurrentWeatherDataObserver{
-   public void updateTemperarture(WeatherData data);
+   public void updateTemperature(WeatherData data);
 }

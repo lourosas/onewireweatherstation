@@ -38,6 +38,8 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    private static final short HEIGHT       = 700;
    private static final short TOTAL_PANELS = 5;
 
+   private CurrentWeatherController _controller = null;
+
    //private CurrentWeatherObservationPostController _controller=null;
    //
    //Lots more stuff to add
@@ -54,10 +56,145 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    /**/
    public CurrentWeatherObservationPostView(String title){
       super(title);
+      this._controller=new CurrentWeatherObservationPostController();
+      this._controller.addView(this);
+      this.setUpGUI();
+   }
+
+   /**/
+   public CurrentWeatherObservationPostView
+   (
+      String title,
+      CurrentWeatherController controller
+   ){
+      super(title);
+      this._controller = controller;
+      this._controller.addView(this);
+      this.setUpGUI();
+   }
+
+   ////////////////////Insatance Methods//////////////////////////////
+   ////////////////////Public Methods/////////////////////////////////
+   /////////////////////Protected Methods/////////////////////////////
+   //////////////////////Private Methods//////////////////////////////
+   /**/
+   private void setUpGUI(){
+      this.setLayout(new BorderLayout());
+      this.setSize(WIDTH, HEIGHT);
+      this.setResizable(false);
+      JTabbedPane jtp = this.setUpTabbedPane();
+      JPanel southPanel = this.setUpSouthPanel();
+      this.getContentPane().add(jtp, BorderLayout.CENTER);
+      this.getContentPane().add(southPanel, BorderLayout.SOUTH);
+
+      this.setVisible(true);
+   }
+
+   /**/
+   private JPanel setUpSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+
+      JButton refresh = new JButton("Refresh");
+      refresh.setActionCommand("Refresh");
+      refresh.setMnemonic(KeyEvent.VK_R);
+      refresh.addActionListener(this._controller);
+      refresh.addKeyListener(this._controller);
+      panel.add(refresh);
+
+      JButton save = new JButton("Save");
+      save.setActionCommand("Save");
+      save.setMnemonic(KeyEvent.VK_S);
+      save.addActionListener(this._controller);
+      save.addKeyListener(this._controller);
+      panel.add(save);
+
+      return panel;
+   }
+
+   /**/
+   private JTabbedPane setUpTabbedPane(){
+      JTabbedPane jtp = new JTabbedPane();
+
+      jtp.addTab("Temperature",
+                 null,
+                 this.setUpTemperaturePanel(),
+                 "Current Temperature Data");
+      jtp.setMnemonicAt(0, KeyEvent.VK_T);
+
+      return jtp;
+   }
+
+   /**/
+   private JPanel setUpTemperatureCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      JLabel tempLabel = new JLabel("Temperature");
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      centerPanel.add(tempLabel);
+      return centerPanel;
+   }
+
+   /**/
+   private JPanel setUpTemperatureNorthPanel(){
+      JPanel panel                 = new JPanel();
+      ButtonGroup temperatureGroup = new ButtonGroup();
+      ButtonGroup graphGroup       = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
+
+      JPanel topPanel = new JPanel();
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("TempC");
+      temperatureGroup.add(celsius);
+      celsius.addItemListener(this._controller);
+      topPanel.add(celsius);
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("TempF");
+      temperatureGroup.add(fahrenheit);
+      fahrenheit.addItemListener(this._controller);
+      topPanel.add(fahrenheit);
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("TempK");
+      temperatureGroup.add(kelvin);
+      kelvin.addItemListener(this._controller);
+      topPanel.add(kelvin);
+      panel.add(topPanel);
+
+      JPanel bottomPanel = new JPanel();
+      JRadioButton analog = new JRadioButton("Analog");
+      analog.setActionCommand("TempAnalog");
+      graphGroup.add(analog);
+      analog.addItemListener(this._controller);
+      bottomPanel.add(analog);
+      JRadioButton digital = new JRadioButton("Digital", true);
+      digital.setActionCommand("TempDigital");
+      graphGroup.add(digital);
+      digital.addItemListener(this._controller);
+      bottomPanel.add(digital);
+
+      panel.add(bottomPanel);
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpTemperaturePanel(){
+      JPanel temperaturePanel = new JPanel();
+      temperaturePanel.setLayout(new BorderLayout());
+      temperaturePanel.add(this.setUpTemperatureNorthPanel(),
+                                                  BorderLayout.NORTH);
+      //Set the Center Panel next
+      temperaturePanel.add(this.setUpTemperatureCenterPanel(),
+                                                 BorderLayout.CENTER);
+
+      return temperaturePanel;
    }
 
    ///////////////////Interface Implementation////////////////////////
    /**/
-   public void updateTemperature(WeatherData data){}
+   public void updateTemperature(WeatherData data){
+      System.out.println("\n+++++++++++++++++++++++++++++++++\n");
+      System.out.println(data);
+      System.out.println("\n+++++++++++++++++++++++++++++++++\n");
+   }
 
 }
