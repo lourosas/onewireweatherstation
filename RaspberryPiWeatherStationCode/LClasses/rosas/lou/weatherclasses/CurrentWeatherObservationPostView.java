@@ -34,11 +34,14 @@ import rosas.lou.lgraphics.WeatherPanel;
 public class CurrentWeatherObservationPostView
 extends CurrentWeatherView implements CurrentWeatherDataObserver
 {
-   private static final short WIDTH        = 750;
-   private static final short HEIGHT       = 700;
-   private static final short TOTAL_PANELS = 5;
+   private static final short WIDTH         = 750;
+   private static final short HEIGHT        = 700;
+   private static final short TOTAL_PANELS  = 5;
+
 
    private CurrentWeatherController _controller = null;
+   private int temp_minutes = -1;
+   private int temp_seconds = -1;
 
    //private CurrentWeatherObservationPostController _controller=null;
    //
@@ -122,6 +125,9 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
                  "Current Temperature Data");
       jtp.setMnemonicAt(0, KeyEvent.VK_T);
 
+      //Set on the Temperature tab
+      jtp.setSelectedIndex(0);
+
       return jtp;
    }
 
@@ -192,9 +198,34 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    ///////////////////Interface Implementation////////////////////////
    /**/
    public void updateTemperature(WeatherData data){
-      System.out.println("\n+++++++++++++++++++++++++++++++++\n");
-      System.out.println(data);
-      System.out.println("\n+++++++++++++++++++++++++++++++++\n");
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      JPanel panel = (JPanel)jtp.getComponent(0);
+      JPanel topPanel = (JPanel)panel.getComponent(0);
+      JPanel unitsPanel = (JPanel)topPanel.getComponent(0);
+      JPanel displayPanel = (JPanel)topPanel.getComponent(1);
+      Calendar cal = data.calendar();
+      if(temp_minutes != data.calendar().get(Calendar.MINUTE) ||
+         temp_seconds != data.calendar().get(Calendar.SECOND)){
+         System.out.println("\n+++++++++++++++++++++++++++++++++\n");
+         System.out.println(data);
+         System.out.println("\n+++++++++++++++++++++++++++++++++\n");
+         temp_minutes = data.calendar().get(Calendar.MINUTE);
+         temp_seconds = data.calendar().get(Calendar.SECOND);
+         System.out.println(temp_minutes);
+         System.out.println(temp_seconds);
+         for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
+            JRadioButton un = (JRadioButton)unitsPanel.getComponent(i);
+            if(un.isSelected()){
+               System.out.println(un.getActionCommand());
+            }
+         }
+         for(int i = 0; i < displayPanel.getComponentCount(); ++i){
+            JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
+            if(dis.isSelected()){
+               System.out.println(dis.getActionCommand());
+            }
+         }
+      }
    }
-
 }
