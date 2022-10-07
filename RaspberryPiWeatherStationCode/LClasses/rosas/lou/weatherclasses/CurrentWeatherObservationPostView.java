@@ -197,14 +197,20 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       String unitsDisplay = new String("");
       if(units.equals("TEMPC")){
          temp         = this._temperatureData.metricData();
+         int set = (int)(temp * 100);
+         temp = (double)set/100;
          unitsDisplay = " \u00b0C";
       }
       else if(units.equals("TEMPF")){
          temp         = this._temperatureData.englishData();
+         int set = (int)(temp * 100);
+         temp = (double)set/100;
          unitsDisplay = " \u00b0F";
       }
       else if(units.equals("TEMPK")){
          temp         = this._temperatureData.absoluteData();
+         int set = (int)(temp * 100);
+         temp = (double)set/100;
          unitsDisplay = " K";
       }
       JPanel panel = new JPanel();
@@ -236,16 +242,37 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       celsius.setActionCommand("TempC");
       temperatureGroup.add(celsius);
       celsius.addItemListener(this._controller);
+      celsius.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateTemperaturePane();
+            }
+         }
+      });
       topPanel.add(celsius);
       JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
       fahrenheit.setActionCommand("TempF");
       temperatureGroup.add(fahrenheit);
       fahrenheit.addItemListener(this._controller);
+      fahrenheit.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateTemperaturePane();
+            }
+         }
+      });
       topPanel.add(fahrenheit);
       JRadioButton kelvin = new JRadioButton("Kelvin");
       kelvin.setActionCommand("TempK");
       temperatureGroup.add(kelvin);
       kelvin.addItemListener(this._controller);
+      kelvin.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateTemperaturePane();
+            }
+         }
+      });
       topPanel.add(kelvin);
       panel.add(topPanel);
 
@@ -280,7 +307,6 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
 
    /**/
    private void updateTemperaturePane(){
-      double temp    = Double.NaN;
       String units   = "";
       String display = "";
 
