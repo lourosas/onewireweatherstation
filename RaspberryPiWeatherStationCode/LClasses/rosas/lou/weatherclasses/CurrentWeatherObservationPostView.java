@@ -38,10 +38,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    private static final short HEIGHT        = 700;
    private static final short TOTAL_PANELS  = 5;
 
-
+   private WeatherData _humidityData            = null;
+   private WeatherData _temperatureData         = null;
    private CurrentWeatherController _controller = null;
-   private int temp_minutes = -1;
-   private int temp_seconds = -1;
+   private int temp_minutes                     = -1;
+   private int temp_seconds                     = -1;
 
    //private CurrentWeatherObservationPostController _controller=null;
    //
@@ -94,6 +95,60 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   private JPanel setUpHumidityCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      JLabel humLabel = new JLabel("Humidity");
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      centerPanel.add(humLabel);
+      return centerPanel;
+   }
+
+   /**/
+   private JPanel setUpHumidityNorthPanel(){
+      JPanel panel           = new JPanel();
+      ButtonGroup graphGroup = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
+
+      JPanel graphPanel   = new JPanel();
+      JRadioButton analog = new JRadioButton("Analog");
+      analog.setActionCommand("HumidityAnalog");
+      graphGroup.add(analog);
+      analog.addItemListener(this._controller);
+      analog.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            System.out.println(e.getItem());
+         }
+      });
+      graphPanel.add(analog);
+
+      JRadioButton digital = new JRadioButton("Digital",true);
+      digital.setActionCommand("HumidityDigital");
+      graphGroup.add(digital);
+      digital.addItemListener(this._controller);
+      digital.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            System.out.println(e.getItem());
+         }
+      });
+      graphPanel.add(digital);
+      panel.add(graphPanel);
+      return panel;
+   }
+
+
+   /**/
+   private JPanel setUpHumidityPanel(){
+      JPanel humidityPanel = new JPanel();
+      humidityPanel.setLayout(new BorderLayout());
+      humidityPanel.add(this.setUpHumidityNorthPanel(),
+                                                  BorderLayout.NORTH);
+      humidityPanel.add(this.setUpHumidityCenterPanel(),
+                                                 BorderLayout.CENTER);
+      return humidityPanel;
+   }
+
+   /**/
    private JPanel setUpSouthPanel(){
       JPanel panel = new JPanel();
       panel.setBorder(BorderFactory.createEtchedBorder());
@@ -122,13 +177,41 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       jtp.addTab("Temperature",
                  null,
                  this.setUpTemperaturePanel(),
-                 "Current Temperature Data");
+                 "Current Temperature");
       jtp.setMnemonicAt(0, KeyEvent.VK_T);
+      jtp.addTab("Humidity",
+                  null,
+                  this.setUpHumidityPanel(),
+                  "Current Humidity");
+      jtp.setMnemonicAt(1, KeyEvent.VK_H);
 
       //Set on the Temperature tab
       jtp.setSelectedIndex(0);
 
       return jtp;
+   }
+
+   /**/
+   private JPanel setUpTemperatureDigital(String units){
+      double temp         = Double.NaN;
+      String unitsDisplay = new String("");
+      if(units.equals("TEMPC")){
+         temp         = this._temperatureData.metricData();
+         unitsDisplay = " \u00b0C";
+      }
+      else if(units.equals("TEMPF")){
+         temp         = this._temperatureData.englishData();
+         unitsDisplay = " \u00b0F";
+      }
+      else if(units.equals("TEMPK")){
+         temp         = this._temperatureData.absoluteData();
+         unitsDisplay = " K";
+      }
+      JPanel panel = new JPanel();
+      JTextField textField = new JTextField(temp + unitsDisplay);
+      textField.setEditable(false);
+      panel.add(textField);
+      return panel;
    }
 
    /**/
@@ -195,37 +278,70 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       return temperaturePanel;
    }
 
-   ///////////////////Interface Implementation////////////////////////
    /**/
-   public void updateTemperature(WeatherData data){
+   private void updateTemperaturePane(){
+      double temp    = Double.NaN;
+      String units   = "";
+      String display = "";
+
       JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(0);
       JPanel panel = (JPanel)jtp.getComponent(0);
       JPanel topPanel = (JPanel)panel.getComponent(0);
       JPanel unitsPanel = (JPanel)topPanel.getComponent(0);
       JPanel displayPanel = (JPanel)topPanel.getComponent(1);
-      Calendar cal = data.calendar();
-      if(temp_minutes != data.calendar().get(Calendar.MINUTE) ||
-         temp_seconds != data.calendar().get(Calendar.SECOND)){
-         System.out.println("\n+++++++++++++++++++++++++++++++++\n");
-         System.out.println(data);
-         System.out.println("\n+++++++++++++++++++++++++++++++++\n");
-         temp_minutes = data.calendar().get(Calendar.MINUTE);
-         temp_seconds = data.calendar().get(Calendar.SECOND);
-         System.out.println(temp_minutes);
-         System.out.println(temp_seconds);
-         for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
-            JRadioButton un = (JRadioButton)unitsPanel.getComponent(i);
-            if(un.isSelected()){
-               System.out.println(un.getActionCommand());
-            }
-         }
-         for(int i = 0; i < displayPanel.getComponentCount(); ++i){
-            JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
-            if(dis.isSelected()){
-               System.out.println(dis.getActionCommand());
-            }
+      JPanel centerPanel = (JPanel)panel.getComponent(1);
+      Calendar cal = this._temperatureData.calendar();
+
+
+      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
+         JRadioButton un=(JRadioButton)unitsPanel.getComponent(i);
+         if(un.isSelected()){
+            units = un.getActionCommand().toUpperCase();
          }
       }
+      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
+         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
+         if(dis.isSelected()){
+            display = dis.getActionCommand().toUpperCase();
+         }
+      }
+
+      centerPanel.removeAll();
+      centerPanel.setLayout(new BorderLayout());
+      String time = cal.getTime().toString();
+      JPanel timePanel = new JPanel();
+      timePanel.add(new JLabel(time));
+      centerPanel.add(timePanel, BorderLayout.NORTH);
+      if(display.equals("TEMPANALOG")){
+
+      }
+      else if(display.equals("TEMPDIGITAL")){
+         JPanel digitpanel = this.setUpTemperatureDigital(units);
+         centerPanel.add(digitpanel, BorderLayout.CENTER);
+      }
+
+      jtp.setSelectedIndex(1);
+      jtp.setSelectedIndex(0);
+      jtp.setSelectedIndex(index);
+   }
+
+   ///////////////////Interface Implementation////////////////////////
+   /**/
+   public void updateHumidity(WeatherData data){
+      this._humidityData = data;
+   }
+
+   /**/
+   public void updateTemperature(WeatherData data){
+      if(this.temp_minutes != data.calendar().get(Calendar.MINUTE) ||
+         this.temp_seconds != data.calendar().get(Calendar.SECOND)){
+            this.temp_minutes = data.calendar().get(Calendar.MINUTE);
+            this.temp_seconds = data.calendar().get(Calendar.SECOND);
+            this._temperatureData = data;
+            this.updateTemperaturePane();
+         }
    }
 }

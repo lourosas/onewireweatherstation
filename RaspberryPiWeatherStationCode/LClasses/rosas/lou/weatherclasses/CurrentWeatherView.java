@@ -28,5 +28,6 @@ implements CurrentWeatherDataObserver{
    public CurrentWeatherView(String title){ super(title); }
 
    //////////////////////Interface Implementation/////////////////////
+   public void updateHumidity(WeatherData data){}
    public void updateTemperature(WeatherData data){}
 }
