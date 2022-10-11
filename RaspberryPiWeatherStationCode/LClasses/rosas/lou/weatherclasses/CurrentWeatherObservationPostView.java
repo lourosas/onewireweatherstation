@@ -194,27 +194,28 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    /**/
    private JPanel setUpTemperatureDigital(String units){
       double temp         = Double.NaN;
+      String display      = "";
       String unitsDisplay = new String("");
       if(units.equals("TEMPC")){
          temp         = this._temperatureData.metricData();
-         int set = (int)(temp * 100);
-         temp = (double)set/100;
          unitsDisplay = " \u00b0C";
+         display      = String.format("%1$.2f", temp);
+         display     += unitsDisplay;
       }
       else if(units.equals("TEMPF")){
          temp         = this._temperatureData.englishData();
-         int set = (int)(temp * 100);
-         temp = (double)set/100;
+         display      = String.format("%1$.0f", temp);
          unitsDisplay = " \u00b0F";
+         display     += unitsDisplay;
       }
       else if(units.equals("TEMPK")){
          temp         = this._temperatureData.absoluteData();
-         int set = (int)(temp * 100);
-         temp = (double)set/100;
+         display      = String.format("%1.2f", temp);
          unitsDisplay = " K";
+         display     += unitsDisplay;
       }
       JPanel panel = new JPanel();
-      JTextField textField = new JTextField(temp + unitsDisplay);
+      JTextField textField = new JTextField(display);
       textField.setEditable(false);
       panel.add(textField);
       return panel;
