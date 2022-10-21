@@ -29,7 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
-import rosas.lou.lgraphics.WeatherPanel;
+import rosas.lou.lgraphics.AnalogGuage;
 
 public class CurrentWeatherObservationPostView
 extends CurrentWeatherView implements CurrentWeatherDataObserver
@@ -192,6 +192,32 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   private JPanel setUpTemperatureAnalog(String units){
+      double temp         = Double.NaN;
+      String display      = new String("");
+      String unitsDisplay = new String("");
+      if(units.equals("TEMPC")){
+         temp         = this._temperatureData.metricData();
+         unitsDisplay = " \u00b0C";
+         display      = String.format("%1$.2f", temp);
+         //display     += unitsDisplay;
+      }
+      else if(units.equals("TEMPF")){
+         temp         = this._temperatureData.englishData();
+         display      = String.format("%1$.0f", temp);
+         unitsDisplay = " \u00b0F";
+         //display     += unitsDisplay;
+      }
+      else if(units.equals("TEMPK")){
+         temp         = this._temperatureData.absoluteData();
+         display      = String.format("%1.2f", temp);
+         unitsDisplay = " K";
+         //display     += unitsDisplay;
+      }
+      return new AnalogGuage(display, units);
+   }
+
+   /**/
    private JPanel setUpTemperatureDigital(String units){
       double temp         = Double.NaN;
       String display      = "";
@@ -282,11 +308,25 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       analog.setActionCommand("TempAnalog");
       graphGroup.add(analog);
       analog.addItemListener(this._controller);
+      analog.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateTemperaturePane();
+            }
+         }
+      });
       bottomPanel.add(analog);
       JRadioButton digital = new JRadioButton("Digital", true);
       digital.setActionCommand("TempDigital");
       graphGroup.add(digital);
       digital.addItemListener(this._controller);
+      digital.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateTemperaturePane();
+            }
+         }
+      });
       bottomPanel.add(digital);
 
       panel.add(bottomPanel);
@@ -343,11 +383,12 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       timePanel.add(new JLabel(time));
       centerPanel.add(timePanel, BorderLayout.NORTH);
       if(display.equals("TEMPANALOG")){
-
+         JPanel analogPanel = this.setUpTemperatureAnalog(units);
+         centerPanel.add(analogPanel, BorderLayout.CENTER);
       }
       else if(display.equals("TEMPDIGITAL")){
-         JPanel digitpanel = this.setUpTemperatureDigital(units);
-         centerPanel.add(digitpanel, BorderLayout.CENTER);
+         JPanel digitPanel = this.setUpTemperatureDigital(units);
+         centerPanel.add(digitPanel, BorderLayout.CENTER);
       }
 
       jtp.setSelectedIndex(1);
