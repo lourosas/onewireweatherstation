@@ -29,6 +29,10 @@ import rosas.lou.weatherclasses.*;
 /*
 */
 public class AnalogGuage extends JPanel{
+   private static final int DISTANCE_DOT_FROM_ORIGIN = 480/2 - 40;
+   private static final int DIAMETER_BIG_DOT         = 8;
+   private static final int DIAMETER_SMALL_DOT       = 4;
+
    private String _data;
    private String _units;
 
@@ -56,50 +60,84 @@ public class AnalogGuage extends JPanel{
       //g.fillOval(10,10,470,470);
       //g.fillOval(XCENTER-230, YCENTER-230,470,470);
       g.fillOval(5, 5,470,470);
-      g.setColor(Color.RED);
-      //g.fillOval(237,237,15,15);
-      g.setFont(g.getFont().deriveFont(Font.BOLD,20));
-      g.drawString("12", XCENTER-10, YCENTER-215);
-      g.drawString("3",  XCENTER+224,YCENTER);
-      g.drawString("6",  XCENTER-10, YCENTER+235);
-      g.drawString("9",  XCENTER-230,YCENTER);
-      /*
-      int x = 240 + (int)((240-30)*Math.sin(0));
-      int y = 240 - (int)((240-30)*Math.cos(0));
-      g.drawString("A", x, y);
-      x = 240 + (int)((240-30)*Math.sin(Math.PI/2));
-      y = 240 - (int)((240-30)*Math.cos(Math.PI/2));
-      g.drawString("B", x, y);
-      x = 240 + (int)((240-30)*Math.sin(Math.PI));
-      y = 240 - (int)((240-30)*Math.cos(Math.PI));
-      g.drawString("C", x, y);
-      x = 240 + (int)((240-30)*Math.sin(3*Math.PI/2));
-      y = 240 - (int)((240-30)*Math.cos(3*Math.PI/2));
-      g.drawString("D", x, y);
-      */
-      /*
-      String value = new String("-40");
-      int x = 240 + (int)(210*Math.sin(7*Math.PI/6));
-      int y = 253 - (int)(210*Math.cos(7*Math.PI/6));
-      g.drawString(value, x, y);
-      value = new String("120");
-      x = 240 + (int)(210*Math.sin(5*Math.PI/6));
-      y = 253 - (int)(210*Math.cos(5*Math.PI/6));
-      g.drawString(value, x, y);
-      value = new String("40");
-      x = 240;
-      y = 253 - (int)(210*Math.cos(0));
-      g.drawString(value, x, y);
-      */
-      /*
-      for(int i = 1; i < 13; ++i){
-         String value = Integer.toString(i);
 
-         int x = 240+(int)(210*Math.sin(i*Math.PI/6));
-         //int y = 253-(int)(210*Math.cos(i*Math.PI/6));
-         int y = 240-(int)(210*Math.cos(i*Math.PI/6));
-         g.drawString(value, x, y);
+      g.setColor(Color.RED);
+      for(int i = -40; /*i < 60*/i < 121  ; i++){
+         if((i%10) == 0){
+            Point dot = this.minToLocation(i,DISTANCE_DOT_FROM_ORIGIN);
+            g.fillOval(dot.x - (DIAMETER_SMALL_DOT/2),
+                       dot.y - (DIAMETER_SMALL_DOT/2),
+                       DIAMETER_SMALL_DOT,
+                       DIAMETER_SMALL_DOT);
+            g.drawString(""+i, dot.x-10, dot.y-5);
+         }
       }
+      String numerical = this.concatTempAndUnits();
+      g.setFont(new Font("TimesRoman", Font.BOLD, 16));
+      if(this._units.equals("TEMPF")){
+         g.drawString(numerical, 230, 400);
+      }
+      else if(this._units.equals("TEMPC")){
+         g.drawString(numerical, 220, 400);
+      }
+      else if(this._units.equals("TEMPK")){
+         g.drawString(numerical, 215,400);
+      }
+      Point end =this.grabEnd(this._data,DISTANCE_DOT_FROM_ORIGIN-10);
+      g.drawLine(XCENTER,YCENTER,end.x,end.y);
+   }
+
+   /////////////////////////Private Methods///////////////////////////
+   /*
+   */
+   private String concatTempAndUnits(){
+      String tempUnits = this._data;
+      if(this._units.equals("TEMPC")){
+         tempUnits = tempUnits.concat(" \u00b0C");
+      }
+      else if(this._units.equals("TEMPF")){
+         tempUnits = tempUnits.concat(" \u00b0F");
+      }
+      else if(this._units.equals("TEMPK")){
+         tempUnits = tempUnits.concat(" K");
+      }
+      return tempUnits;
+   }
+   /*
+   */
+   private Point minToLocation(int step, int radius){
+      /*
+      2PI radians/60 ticks
+      radians/tick * tick = radians
+      grab the sine and cosine values of both
+      x_value = (X-Center + R*cos(angle above))
+      y_value = (Y-Center + R*sin(angle above))
+      These values will need to change based on the number of markings
+      in the 2PI radians
       */
+      //double t = 2*Math.PI*(step-15)/60;
+      double t = Math.PI/120.0*(step  - 100);
+      int x    = (int)(480/2 + radius * Math.cos(t));
+      int y    = (int)(480/2 + radius * Math.sin(t));
+      return new Point(x,y);
+   }
+
+   /*
+   */
+   private Point grabEnd(String data, int radius){
+      int    engValue;
+      double metValue;
+      double t;
+      if(this._units.equals("TEMPF")){
+         engValue = Integer.parseInt(data);
+         t = Math.PI/120.0*(engValue - 100);
+      }
+      else{
+         metValue = Double.parseDouble(data);
+         t = Math.PI/120.0*(metValue - 100);
+      }
+      int x = (int)(480/2 + radius * Math.cos(t));
+      int y = (int)(480/2 + radius * Math.sin(t));
+      return new Point(x,y);
    }
 }
