@@ -29,7 +29,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
-import rosas.lou.lgraphics.AnalogGuage;
+import rosas.lou.lgraphics.*;
 
 public class CurrentWeatherObservationPostView
 extends CurrentWeatherView implements CurrentWeatherDataObserver
@@ -214,7 +214,8 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
          unitsDisplay = " K";
          //display     += unitsDisplay;
       }
-      return new AnalogGuage(display, units);
+      //return new AnalogGuage(display, units);
+      return new ThermalGuage(display, units);
    }
 
    /**/
