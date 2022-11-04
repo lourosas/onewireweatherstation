@@ -69,21 +69,16 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    /*
    */
    private void publishHeatindex(){
-      /*
-      System.out.println("\n*************************************\n");
-      System.out.println(this.heatIndexData);
-      System.out.println("\n*************************************\n");
-      */
    }
 
    /*
    */
    private void publishHumidity(){
-      /*
-      System.out.println("\n*************************************\n");
-      System.out.println(this.humidityData);
-      System.out.println("\n*************************************\n");
-      */
+      Iterator<CurrentWeatherDataObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         it.next().updateHumidity(this.humidityData);
+      }
    }
 
    /*

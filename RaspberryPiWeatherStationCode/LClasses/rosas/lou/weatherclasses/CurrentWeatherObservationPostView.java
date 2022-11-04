@@ -41,6 +41,8 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    private WeatherData _humidityData            = null;
    private WeatherData _temperatureData         = null;
    private CurrentWeatherController _controller = null;
+   private int humidity_minutes                 = -1;
+   private int humidity_seconds                 = -1;
    private int temp_minutes                     = -1;
    private int temp_seconds                     = -1;
 
@@ -104,6 +106,28 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   /*
+   private JPanel setUpHumidityAnalog(){
+      double humidity = this._humidityData.percentageData();
+      String display  = String.format("%1$.0f", humidity);
+      display         = display.concat("%");
+
+      return new HumidityGuage(display);
+   }
+   */
+
+   /**/
+   private JPanel setUpHumidityDigital(){
+      double humidity      = this._humidityData.percentageData();
+      String display       = String.format("%1$.0f", humidity);
+      display              = display.concat("%");
+      JPanel panel         = new JPanel();
+      JTextField textField = new JTextField(display);
+      textField.setEditable(false);
+      panel.add(textField);
+      return panel;
+   }
+   /**/
    private JPanel setUpHumidityNorthPanel(){
       JPanel panel           = new JPanel();
       ButtonGroup graphGroup = new ButtonGroup();
@@ -117,7 +141,9 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       analog.addItemListener(this._controller);
       analog.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
-            System.out.println(e.getItem());
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateHumidityPane();
+            }
          }
       });
       graphPanel.add(analog);
@@ -128,14 +154,15 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       digital.addItemListener(this._controller);
       digital.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
-            System.out.println(e.getItem());
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateHumidityPane();
+            }
          }
       });
       graphPanel.add(digital);
       panel.add(graphPanel);
       return panel;
    }
-
 
    /**/
    private JPanel setUpHumidityPanel(){
@@ -348,6 +375,45 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   private void updateHumidityPane(){
+      String display = "";
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(1);
+      JPanel panel        = (JPanel)jtp.getComponent(1);
+      JPanel topPanel     = (JPanel)panel.getComponent(0);
+      JPanel displayPanel = (JPanel)topPanel.getComponent(0);
+      JPanel centerPanel  = (JPanel)panel.getComponent(1);
+      Calendar cal        = this._humidityData.calendar();
+
+      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
+         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
+         if(dis.isSelected()){
+            display = dis.getActionCommand().toUpperCase();
+         }
+      }
+
+      centerPanel.removeAll();
+      centerPanel.setLayout(new BorderLayout());
+      String time      = cal.getTime().toString();
+      JPanel timePanel = new JPanel();
+      timePanel.add(new JLabel(time));
+      centerPanel.add(timePanel, BorderLayout.NORTH);
+      if(display.equals("HUMIDITYANALOG")){
+
+      }
+      else if(display.equals("HUMIDITYDIGITAL")){
+         JPanel digitalPanel = this.setUpHumidityDigital();
+         centerPanel.add(digitalPanel, BorderLayout.CENTER);
+      }
+
+      jtp.setSelectedIndex(0);
+      jtp.setSelectedIndex(1);
+      jtp.setSelectedIndex(index);
+   }
+
+   /**/
    private void updateTemperaturePane(){
       String units   = "";
       String display = "";
@@ -400,17 +466,23 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    ///////////////////Interface Implementation////////////////////////
    /**/
    public void updateHumidity(WeatherData data){
-      this._humidityData = data;
+      if(this.humidity_minutes!=data.calendar().get(Calendar.MINUTE)||
+         this.humidity_seconds!=data.calendar().get(Calendar.SECOND)){
+         this.humidity_minutes = data.calendar().get(Calendar.MINUTE);
+         this.humidity_seconds = data.calendar().get(Calendar.SECOND);
+         this._humidityData = data;
+         this.updateHumidityPane();
+      }
    }
 
    /**/
    public void updateTemperature(WeatherData data){
       if(this.temp_minutes != data.calendar().get(Calendar.MINUTE) ||
          this.temp_seconds != data.calendar().get(Calendar.SECOND)){
-            this.temp_minutes = data.calendar().get(Calendar.MINUTE);
-            this.temp_seconds = data.calendar().get(Calendar.SECOND);
-            this._temperatureData = data;
-            this.updateTemperaturePane();
-         }
+         this.temp_minutes = data.calendar().get(Calendar.MINUTE);
+         this.temp_seconds = data.calendar().get(Calendar.SECOND);
+         this._temperatureData = data;
+         this.updateTemperaturePane();
+      }
    }
 }
