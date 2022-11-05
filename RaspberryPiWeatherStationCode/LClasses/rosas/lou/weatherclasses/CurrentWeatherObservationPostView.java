@@ -40,9 +40,13 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
 
    private WeatherData _humidityData            = null;
    private WeatherData _temperatureData         = null;
+   private WeatherData _pressureData            = null;
    private CurrentWeatherController _controller = null;
+
    private int humidity_minutes                 = -1;
    private int humidity_seconds                 = -1;
+   private int pressure_minutes                 = -1;
+   private int pressure_seconds                 = -1;
    private int temp_minutes                     = -1;
    private int temp_seconds                     = -1;
 
@@ -106,15 +110,12 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
-   /*
    private JPanel setUpHumidityAnalog(){
       double humidity = this._humidityData.percentageData();
       String display  = String.format("%1$.0f", humidity);
-      display         = display.concat("%");
 
       return new HumidityGuage(display);
    }
-   */
 
    /**/
    private JPanel setUpHumidityDigital(){
@@ -127,6 +128,7 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       panel.add(textField);
       return panel;
    }
+
    /**/
    private JPanel setUpHumidityNorthPanel(){
       JPanel panel           = new JPanel();
@@ -176,6 +178,141 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   private JPanel setUpPressureAnalog(String units){
+      String display = "";
+      if(units.equals("MMHG")){
+         display=String.format("%1$.2f",_pressureData.metricData());
+      }
+      else if(units.equals("INHG")){
+         display=String.format("%1$.2f",_pressureData.englishData());
+      }
+      else if(units.equals("MB")){
+         display=String.format("%1$.1f",_pressureData.absoluteData());
+      }
+
+      return new JPanel();
+      //return new PressureGuage(display, units);
+   }
+
+   /**/
+   private JPanel setUpPressureDigital(String units){
+      String display = "";
+      if(units.equals("MMHG")){
+         display=String.format("%1$.2f",_pressureData.metricData());
+         display = display.concat(" millimeters Hg");
+      }
+      else if(units.equals("INHG")){
+         display=String.format("%1$.2f",_pressureData.englishData());
+         display = display.concat(" inches Hg");
+      }
+      else if(units.equals("MB")){
+         display=String.format("%1$.1f",_pressureData.absoluteData());
+         display = display.concat(" millibars");
+      }
+      JPanel panel         = new JPanel();
+      JTextField textField = new JTextField(display);
+      textField.setEditable(false);
+      panel.add(textField);
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpPressurePanel(){
+      JPanel pressurePanel = new JPanel();
+      pressurePanel.setLayout(new BorderLayout());
+      pressurePanel.add(this.setUpPressureNorthPanel(),
+                                                  BorderLayout.NORTH);
+      pressurePanel.add(this.setUpPressureCenterPanel(),
+                                                 BorderLayout.CENTER);
+      return pressurePanel;
+   }
+
+   /**/
+   private JPanel setUpPressureCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      JLabel pressLabel  = new JLabel("Pressure");
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      centerPanel.add(pressLabel);
+      return centerPanel;
+   }
+
+   /**/
+   private JPanel setUpPressureNorthPanel(){
+      JPanel panel              = new JPanel();
+      ButtonGroup pressureGroup = new ButtonGroup();
+      ButtonGroup graphGroup    = new ButtonGroup();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
+
+      JPanel topPanel   = new JPanel();
+      JRadioButton mmHg = new JRadioButton("millimeters Hg");
+      mmHg.setActionCommand("mmHg");
+      pressureGroup.add(mmHg);
+      mmHg.addItemListener(this._controller);
+      mmHg.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updatePressurePane();
+            }
+         }
+      });
+      topPanel.add(mmHg);
+      JRadioButton inHg = new JRadioButton("inches Hg");
+      inHg.setActionCommand("inHg");
+      pressureGroup.add(inHg);
+      inHg.addItemListener(this._controller);
+      inHg.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updatePressurePane();
+            }
+         }
+      });
+      topPanel.add(inHg);
+      JRadioButton mb = new JRadioButton("millibars", true);
+      mb.setActionCommand("mb");
+      pressureGroup.add(mb);
+      mb.addItemListener(this._controller);
+      mb.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updatePressurePane();
+            }
+         }
+      });
+      topPanel.add(mb);
+      panel.add(topPanel);
+
+      JPanel bottomPanel  = new JPanel();
+      JRadioButton analog = new JRadioButton("Analog");
+      analog.setActionCommand("PresAnalog");
+      graphGroup.add(analog);
+      analog.addItemListener(this._controller);
+      analog.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               //updatePressurePane();
+            }
+         }
+      });
+      bottomPanel.add(analog);
+      JRadioButton digital = new JRadioButton("Digital", true);
+      digital.setActionCommand("PresDigital");
+      graphGroup.add(digital);
+      digital.addItemListener(this._controller);
+      digital.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               //updatePressurePane();
+            }
+         }
+      });
+      bottomPanel.add(digital);
+      panel.add(bottomPanel);
+      return panel;
+   }
+
+   /**/
    private JPanel setUpSouthPanel(){
       JPanel panel = new JPanel();
       panel.setBorder(BorderFactory.createEtchedBorder());
@@ -211,6 +348,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
                   this.setUpHumidityPanel(),
                   "Current Humidity");
       jtp.setMnemonicAt(1, KeyEvent.VK_H);
+      jtp.addTab("Pressure",
+                  null,
+                  this.setUpPressurePanel(),
+                  "Current Pressure");
+      jtp.setMnemonicAt(2,KeyEvent.VK_P);
 
       //Set on the Temperature tab
       jtp.setSelectedIndex(0);
@@ -401,7 +543,8 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       timePanel.add(new JLabel(time));
       centerPanel.add(timePanel, BorderLayout.NORTH);
       if(display.equals("HUMIDITYANALOG")){
-
+         JPanel analogPanel = this.setUpHumidityAnalog();
+         centerPanel.add(analogPanel, BorderLayout.CENTER);
       }
       else if(display.equals("HUMIDITYDIGITAL")){
          JPanel digitalPanel = this.setUpHumidityDigital();
@@ -410,6 +553,54 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
 
       jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(1);
+      jtp.setSelectedIndex(index);
+   }
+
+   /**/
+   private void updatePressurePane(){
+      String units   = "";
+      String display = "";
+
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(2);
+      JPanel panel         = (JPanel)jtp.getComponent(2);
+      JPanel topPanel      = (JPanel)panel.getComponent(0);
+      JPanel unitsPanel    = (JPanel)topPanel.getComponent(0);
+      JPanel displayPanel  = (JPanel)topPanel.getComponent(1);
+      JPanel centerPanel   = (JPanel)panel.getComponent(1);
+      Calendar cal         = this._pressureData.calendar();
+
+      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
+         JRadioButton un=(JRadioButton)unitsPanel.getComponent(i);
+         if(un.isSelected()){
+            units = un.getActionCommand().toUpperCase();
+         }
+      }
+      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
+         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
+         if(dis.isSelected()){
+            display = dis.getActionCommand().toUpperCase();
+         }
+      }
+
+      centerPanel.removeAll();
+      centerPanel.setLayout(new BorderLayout());
+      String time      = cal.getTime().toString();
+      JPanel timePanel = new JPanel();
+      timePanel.add(new JLabel(time));
+      centerPanel.add(timePanel, BorderLayout.NORTH);
+      if(display.equals("PRESANALOG")){
+         JPanel analogPanel = this.setUpPressureAnalog(units);
+         centerPanel.add(analogPanel, BorderLayout.CENTER);
+      }
+      else if(display.equals("PRESDIGITAL")){
+         JPanel digitalPanel = this.setUpPressureDigital(units);
+         centerPanel.add(digitalPanel, BorderLayout.CENTER);
+      }
+
+      jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(index);
    }
 
@@ -472,6 +663,17 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
          this.humidity_seconds = data.calendar().get(Calendar.SECOND);
          this._humidityData = data;
          this.updateHumidityPane();
+      }
+   }
+
+   /**/
+   public void updatePressure(WeatherData data){
+      if(this.pressure_minutes!=data.calendar().get(Calendar.MINUTE)||
+         this.pressure_seconds!=data.calendar().get(Calendar.SECOND)){
+         this.pressure_minutes=data.calendar().get(Calendar.MINUTE);
+         this.pressure_seconds=data.calendar().get(Calendar.SECOND);
+         this._pressureData  = data;
+         this.updatePressurePane();
       }
    }
 

@@ -84,11 +84,11 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    /*
    */
    private void publishPressure(){
-      /*
-      System.out.println("\n*************************************\n");
-      System.out.println(this.pressureData);
-      System.out.println("\n*************************************\n");
-      */
+      Iterator<CurrentWeatherDataObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         it.next().updatePressure(this.pressureData);
+      }
    }
 
    /*
