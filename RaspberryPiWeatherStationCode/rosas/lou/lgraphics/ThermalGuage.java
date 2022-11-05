@@ -68,7 +68,7 @@ public class ThermalGuage extends AnalogGuage{
          radToTics    =   75.0;
          zeroDegValue = 320.65;
       }
-      for(int i = min; /*i < 60*/i < (max + 1)  ; i++){
+      for(int i = min; i < (max + 1)  ; i++){
          if((i%10) == 0){
             Point dot = this.minToLocation(i,
                                            DISTANCE_DOT_FROM_ORIGIN,
@@ -102,6 +102,7 @@ public class ThermalGuage extends AnalogGuage{
    /////////////////////Protected Methods/////////////////////////////
    /*
    */
+   @Override
    protected Point grabEnd
    (
       String data,

@@ -51,8 +51,42 @@ public class HumidityGuage extends AnalogGuage{
       super.paintComponent(g);
       for(int i = min; i < (max + 1); ++i){
          if((i%10) == 0){
-            
+            Point dot = this.minToLocation(i,
+                                           DISTANCE_DOT_FROM_ORIGIN,
+                                           radToTics,
+                                           zeroDegValue);
+            g.fillOval(dot.x - (DIAMETER_SMALL_DOT/2),
+                       dot.y - (DIAMETER_SMALL_DOT/2),
+                       DIAMETER_SMALL_DOT,
+                       DIAMETER_SMALL_DOT);
+            g.drawString(""+i, dot.x-10, dot.y-5);
          }
       }
+      String percentage = (this.data()).concat("%");
+      g.setFont(new Font("TimesRoman", Font.BOLD, 16));
+      g.drawString(percentage, 230,400);
+      Point end = this.grabEnd(this.data(),
+                               DISTANCE_DOT_FROM_ORIGIN-10,
+                               radToTics,
+                               zeroDegValue);
+      g.drawLine(XCENTER,YCENTER,end.x,end.y);
+   }
+
+   //////////////////////Protected Methods////////////////////////////
+   /*
+   */
+   @Override
+   protected Point grabEnd
+   (
+      String data,
+      int    radius,
+      double radToTics,
+      double zeroDegValue
+   ){
+      int value = Integer.parseInt(data);
+      double t  = Math.PI/radToTics*(value - zeroDegValue);
+      int x     = (int)(480/2 + radius * Math.cos(t));
+      int y     = (int)(480/2 + radius * Math.sin(t));
+      return new Point(x,y);
    }
 }
