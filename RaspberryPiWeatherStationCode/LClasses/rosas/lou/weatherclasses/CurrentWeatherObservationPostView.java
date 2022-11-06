@@ -41,8 +41,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    private WeatherData _humidityData            = null;
    private WeatherData _temperatureData         = null;
    private WeatherData _pressureData            = null;
+   private WeatherData _dewpointData            = null;
    private CurrentWeatherController _controller = null;
 
+   private int dewpoint_minutes                 = -1;
+   private int dewpoint_seconds                 = -1;
    private int humidity_minutes                 = -1;
    private int humidity_seconds                 = -1;
    private int pressure_minutes                 = -1;
@@ -87,6 +90,147 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    ////////////////////Public Methods/////////////////////////////////
    /////////////////////Protected Methods/////////////////////////////
    //////////////////////Private Methods//////////////////////////////
+   /**/
+   private JPanel setUpDewPointPanel(){
+      JPanel dewPointPanel = new JPanel();
+      dewPointPanel.setLayout(new BorderLayout());
+      dewPointPanel.add(this.setUpDewPointNorthPanel(),
+                                                  BorderLayout.NORTH);
+      dewPointPanel.add(this.setUpDewPointCenterPanel(),
+                                                 BorderLayout.CENTER);
+      return dewPointPanel;
+   }
+
+   /**/
+   private JPanel setUpDewPointCenterPanel(){
+      JPanel centerPanel = new JPanel();
+      JLabel dpLabel = new JLabel("Dew Point");
+      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+      centerPanel.add(dpLabel);
+      return centerPanel;
+   }
+
+   /**/
+   private JPanel setUpDewPointAnalog(String units){
+      double dp        = Double.NaN;
+      String display   = new String("");
+      if(units.equals("DPC")){
+         dp      = this._dewpointData.metricData();
+         display = String.format("%1$.2f", dp);
+      }
+      else if(units.equals("DPF")){
+         dp      = this._dewpointData.englishData();
+         display = String.format("%1$.0f", dp);
+      }
+      else if(units.equals("DPK")){
+         dp      = this._dewpointData.absoluteData();
+         display = String.format("%1$.2f", dp);
+      }
+      return new ThermalGuage(display, units);
+   }
+
+   /**/
+   private JPanel setUpDewPointDigital(String units){
+      double dp    = Double.NaN;
+      String display = "";
+      if(units.equals("DPC")){
+         dp       = this._dewpointData.metricData();
+         display  = String.format("%1$.2f", dp);
+         display += " \u00b0C";
+      }
+      else if(units.equals("DPF")){
+         dp       = this._dewpointData.englishData();
+         display  = String.format("%1$.0f", dp);
+         display += " \u00b0F";
+      }
+      else if(units.equals("DPK")){
+         dp       = this._dewpointData.absoluteData();
+         display  = String.format("%1$.1f", dp);
+         display += " K";
+      }
+      JPanel panel         = new JPanel();
+      JTextField textField = new JTextField(display);
+      textField.setEditable(false);
+      panel.add(textField);
+      return panel;
+   }
+
+   /**/
+   private JPanel setUpDewPointNorthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      panel.setLayout(new GridLayout(2,1));
+
+      ButtonGroup dpGroup    = new ButtonGroup();
+      ButtonGroup graphGroup = new ButtonGroup();
+
+      JPanel topPanel  = new JPanel();
+      JRadioButton celsius = new JRadioButton("Celsius", true);
+      celsius.setActionCommand("dpC");
+      dpGroup.add(celsius);
+      celsius.addItemListener(this._controller);
+      celsius.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateDewPointPane();
+            }
+         }
+      });
+      topPanel.add(celsius);
+      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
+      fahrenheit.setActionCommand("dpF");
+      dpGroup.add(fahrenheit);
+      fahrenheit.addItemListener(this._controller);
+      fahrenheit.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateDewPointPane();
+            }
+         }
+      });
+      topPanel.add(fahrenheit);
+      JRadioButton kelvin = new JRadioButton("Kelvin");
+      kelvin.setActionCommand("dpK");
+      dpGroup.add(kelvin);
+      kelvin.addItemListener(this._controller);
+      kelvin.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateDewPointPane();
+            }
+         }
+      });
+      topPanel.add(kelvin);
+      panel.add(topPanel);
+      JPanel bottomPanel = new JPanel();
+      JRadioButton analog = new JRadioButton("Analog");
+      analog.setActionCommand("dpAnalog");
+      graphGroup.add(analog);
+      analog.addItemListener(this._controller);
+      analog.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateDewPointPane();
+            }
+         }
+      });
+      bottomPanel.add(analog);
+      JRadioButton digital = new JRadioButton("Digital", true);
+      digital.setActionCommand("dpDigital");
+      graphGroup.add(digital);
+      digital.addItemListener(this._controller);
+      digital.addItemListener(new ItemListener(){
+         public void itemStateChanged(ItemEvent e){
+            if(e.getStateChange() == ItemEvent.SELECTED){
+               updateDewPointPane();
+            }
+         }
+      });
+      bottomPanel.add(digital);
+      panel.add(bottomPanel);
+      return panel;
+   }
+
    /**/
    private void setUpGUI(){
       this.setLayout(new BorderLayout());
@@ -190,8 +334,8 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
          display=String.format("%1$.1f",_pressureData.absoluteData());
       }
 
-      return new JPanel();
-      //return new PressureGuage(display, units);
+      //return new JPanel();
+      return new PressureGuage(display, units);
    }
 
    /**/
@@ -291,7 +435,7 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       analog.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
             if(e.getStateChange() == ItemEvent.SELECTED){
-               //updatePressurePane();
+               updatePressurePane();
             }
          }
       });
@@ -303,7 +447,7 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       digital.addItemListener(new ItemListener(){
          public void itemStateChanged(ItemEvent e){
             if(e.getStateChange() == ItemEvent.SELECTED){
-               //updatePressurePane();
+               updatePressurePane();
             }
          }
       });
@@ -353,6 +497,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
                   this.setUpPressurePanel(),
                   "Current Pressure");
       jtp.setMnemonicAt(2,KeyEvent.VK_P);
+      jtp.addTab("Dew Point",
+                 null,
+                 this.setUpDewPointPanel(),
+                 "Current Dewpoint");
+      jtp.setMnemonicAt(3,KeyEvent.VK_D);
 
       //Set on the Temperature tab
       jtp.setSelectedIndex(0);
@@ -517,6 +666,53 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   private void updateDewPointPane(){
+      String units    = "";
+      String display  = "";
+
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(3);
+      JPanel panel        = (JPanel)jtp.getComponent(3);
+      JPanel topPanel     = (JPanel)panel.getComponent(0);
+      JPanel unitsPanel   = (JPanel)topPanel.getComponent(0);
+      JPanel displayPanel = (JPanel)topPanel.getComponent(1);
+      JPanel centerPanel  = (JPanel)panel.getComponent(1);
+      Calendar cal        = this._dewpointData.calendar();
+
+      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
+         JRadioButton un=(JRadioButton)unitsPanel.getComponent(i);
+         if(un.isSelected()){
+            units = un.getActionCommand().toUpperCase();
+         }
+      }
+      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
+         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
+         if(dis.isSelected()){
+            display = dis.getActionCommand().toUpperCase();
+         }
+      }
+
+      centerPanel.removeAll();
+      centerPanel.setLayout(new BorderLayout());
+      String time = cal.getTime().toString();
+      JPanel timePanel = new JPanel();
+      timePanel.add(new JLabel(time));
+      centerPanel.add(timePanel, BorderLayout.NORTH);
+      if(display.equals("DPANALOG")){
+         //JPanel analogPanel = this.setUpDewPointAnalog(units);
+         centerPanel.add(this.setUpDewPointAnalog(units));
+      }
+      else if(display.equals("DPDIGITAL")){
+         JPanel digitPanel = this.setUpDewPointDigital(units);
+         centerPanel.add(digitPanel, BorderLayout.CENTER);
+      }
+      jtp.setSelectedIndex(0);
+      jtp.setSelectedIndex(index);
+   }
+
+   /**/
    private void updateHumidityPane(){
       String display = "";
       JTabbedPane jtp =
@@ -655,6 +851,17 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    ///////////////////Interface Implementation////////////////////////
+   /**/
+   public void updateDewpoint(WeatherData data){
+      if(this.dewpoint_minutes!=data.calendar().get(Calendar.MINUTE)||
+         this.dewpoint_seconds!=data.calendar().get(Calendar.SECOND)){
+         this.dewpoint_minutes=data.calendar().get(Calendar.MINUTE);
+         this.dewpoint_seconds=data.calendar().get(Calendar.SECOND);
+         this._dewpointData = data;
+         this.updateDewPointPane();
+      }
+   }
+
    /**/
    public void updateHumidity(WeatherData data){
       if(this.humidity_minutes!=data.calendar().get(Calendar.MINUTE)||
