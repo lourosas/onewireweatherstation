@@ -47,22 +47,59 @@ public class PressureGuage extends AnalogGuage{
       int max             =  -1;
       double radToTics    = 0.0;
       double zeroDegValue = 0.0;
+      int    modulo       = 1;
 
       super.paintComponent(g);
       if(this.units().equals("INHG")){
          min          = 27;
-         mix          = 32;
-         radToTics    = 15.0/4.0;
-         zeroDegValue = 31.25;
+         max          = 32;
+         radToTics    = 3.75;
+         zeroDegValue = 31.375;
       }
       else if(this.units().equals("MMHG")){
-
+         min          = 685;
+         max          = 815;
+         radToTics    = 97.5;
+         zeroDegValue = 798.75;
+         modulo       = 5;
       }
       else if(this.units().equals("MB")){
-
+         min          =  914;
+         max          = 1084;
+         radToTics    = 127.5;
+         zeroDegValue = 1062.75;
+         modulo       = 10;
       }
       for(int i = min; i < (max + 1); ++i){
-         
+         if((i % modulo) == 0){
+            Point dot = this.minToLocation(i,
+                                           DISTANCE_DOT_FROM_ORIGIN,
+                                           radToTics,
+                                           zeroDegValue);
+            g.fillOval(dot.x - (DIAMETER_SMALL_DOT/2),
+                       dot.y - (DIAMETER_SMALL_DOT/2),
+                       DIAMETER_SMALL_DOT,
+                       DIAMETER_SMALL_DOT);
+            g.drawString(""+i, dot.x-10, dot.y-5);
+         }
       }
+      g.setFont(new Font("TimesRoman", Font.BOLD, 16));
+      if(this.units().equals("INHG")){
+         String value = this.data() + " in. Hg";
+         g.drawString(value, 210, 400);
+      }
+      else if(this.units().equals("MMHG")){
+         String value = this.data() + " mm Hg";
+         g.drawString(value, 205,400);
+      }
+      else if(this.units().equals("MB")){
+         String value = this.data()+" mb";
+         g.drawString(value, 205,400);
+      }
+      Point end = this.grabEnd(this.data(),
+                               DISTANCE_DOT_FROM_ORIGIN-10,
+                               radToTics,
+                               zeroDegValue);
+      g.drawLine(XCENTER,YCENTER,end.x,end.y);
    }
 }
