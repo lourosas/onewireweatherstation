@@ -50,19 +50,21 @@ public class ThermalGuage extends AnalogGuage{
       int max             =   -1;
       double radToTics    =  0.0;
       double zeroDegValue =  0.0;
-      if(this.units().equals("TEMPF")){
+      if(this.units().equals("TEMPF") || this.units().equals("DPF")){
          min          =   -40;
          max          =   120;
          radToTics    = 120.0;  //PI radians per 120 degrees
          zeroDegValue = 100.0;  //at Zero (radians), 100 degrees
       }
-      else if(this.units().equals("TEMPC")){
+      else if(this.units().equals("TEMPC") ||
+              this.units().equals("DPC")){
          min          =  -40;
          max          =   60;
          radToTics    = 75.0;
          zeroDegValue = 47.5;
       }
-      else if(this.units().equals("TEMPK")){
+      else if(this.units().equals("TEMPK") ||
+              this.units().equals("DPK")){
          min          =    233;
          max          =    333;
          radToTics    =   75.0;
@@ -83,13 +85,16 @@ public class ThermalGuage extends AnalogGuage{
       }
       String numerical = this.concatTempAndUnits();
       g.setFont(new Font("TimesRoman", Font.BOLD, 16));
-      if(this.units().equals("TEMPF")){
+      if(this.units().equals("TEMPF") ||
+         this.units().equals("DPF")){
          g.drawString(numerical, 230, 400);
       }
-      else if(this.units().equals("TEMPC")){
+      else if(this.units().equals("TEMPC") ||
+              this.units().equals("DPC")){
          g.drawString(numerical, 220, 400);
       }
-      else if(this.units().equals("TEMPK")){
+      else if(this.units().equals("TEMPK") ||
+              this.units().equals("DPK")){
          g.drawString(numerical, 215,400);
       }
       Point end = this.grabEnd(this.data(),
@@ -133,13 +138,16 @@ public class ThermalGuage extends AnalogGuage{
       //Going to start here for now...then go into more detail as
       //needed...
       String tempUnits = this.data();
-      if(this.units().equals("TEMPC")){
+      if(this.units().equals("TEMPC") ||
+         this.units().equals("DPC")){
          tempUnits = tempUnits.concat(" \u00b0C");
       }
-      else if(this.units().equals("TEMPF")){
+      else if(this.units().equals("TEMPF") ||
+              this.units().equals("DPF")){
          tempUnits = tempUnits.concat(" \u00b0F");
       }
-      else if(this.units().equals("TEMPK")){
+      else if(this.units().equals("TEMPK") ||
+              this.units().equals("DPK")){
          tempUnits = tempUnits.concat(" K");
       }
       return tempUnits;
