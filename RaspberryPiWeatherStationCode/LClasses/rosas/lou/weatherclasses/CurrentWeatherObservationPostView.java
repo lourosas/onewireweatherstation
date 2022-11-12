@@ -32,7 +32,8 @@ import myclasses.*;
 import rosas.lou.lgraphics.*;
 
 public class CurrentWeatherObservationPostView
-extends CurrentWeatherView implements CurrentWeatherDataObserver
+extends CurrentWeatherView implements CurrentWeatherDataObserver,
+PanelUpdateObserver
 {
    private static final short WIDTH         = 750;
    private static final short HEIGHT        = 700;
@@ -88,6 +89,7 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
 
    ////////////////////Insatance Methods//////////////////////////////
    ////////////////////Public Methods/////////////////////////////////
+
    /////////////////////Protected Methods/////////////////////////////
    //////////////////////Private Methods//////////////////////////////
    /**/
@@ -502,6 +504,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
                  this.setUpDewPointPanel(),
                  "Current Dewpoint");
       jtp.setMnemonicAt(3,KeyEvent.VK_D);
+      jtp.addTab("Heat Index",
+                  null,
+                  new GenericThermalPanel(this._controller),
+                  "Current Heat Index");
+      jtp.setMnemonicAt(4,KeyEvent.VK_H);
 
       //Set on the Temperature tab
       jtp.setSelectedIndex(0);
@@ -712,6 +719,23 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
       jtp.setSelectedIndex(index);
    }
 
+   /*
+   This is the way it will be implemented--probably should say more
+   than what I just said
+   */
+   private void updateHeatIndexPane(WeatherData data){
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(4);
+      GenericThermalPanel panel =
+                             (GenericThermalPanel)jtp.getComponent(4);
+      panel.addObserver(this);
+      panel.update(data);
+      jtp.setSelectedIndex(0);
+      jtp.setSelectedIndex(index);
+   }
+
    /**/
    private void updateHumidityPane(){
       String display = "";
@@ -863,6 +887,11 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
    }
 
    /**/
+   public void updateHeatindex(WeatherData data){
+      this.updateHeatIndexPane(data);
+   }
+
+   /**/
    public void updateHumidity(WeatherData data){
       if(this.humidity_minutes!=data.calendar().get(Calendar.MINUTE)||
          this.humidity_seconds!=data.calendar().get(Calendar.SECOND)){
@@ -893,5 +922,16 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver
          this._temperatureData = data;
          this.updateTemperaturePane();
       }
+   }
+
+
+   //PanelUpdateObserver Implementation
+   /**/
+   public void updateTheViews(){
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(0);
+      jtp.setSelectedIndex(index);
    }
 }

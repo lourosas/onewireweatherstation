@@ -23,6 +23,7 @@ import rosas.lou.weatherclasses.*;
 
 public interface CurrentWeatherDataObserver{
    public void updateDewpoint(WeatherData data);
+   public void updateHeatindex(WeatherData data);
    public void updateHumidity(WeatherData data);
    public void updatePressure(WeatherData data);
    public void updateTemperature(WeatherData data);
