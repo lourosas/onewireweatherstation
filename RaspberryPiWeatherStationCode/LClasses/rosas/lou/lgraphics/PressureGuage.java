@@ -50,20 +50,23 @@ public class PressureGuage extends AnalogGuage{
       int    modulo       = 1;
 
       super.paintComponent(g);
-      if(this.units().equals("INHG")){
+      if(this.units().equals("INHG")     ||
+         this.units().equals("INCHES HG")){
          min          = 27;
          max          = 32;
          radToTics    = 3.75;
          zeroDegValue = 31.375;
       }
-      else if(this.units().equals("MMHG")){
+      else if(this.units().equals("MMHG") ||
+              this.units().equals("MILLIMETERS HG")){
          min          = 685;
          max          = 815;
          radToTics    = 97.5;
          zeroDegValue = 798.75;
          modulo       = 5;
       }
-      else if(this.units().equals("MB")){
+      else if(this.units().equals("MB")   ||
+              this.units().equals("MILLIBARS")){
          min          =  914;
          max          = 1084;
          radToTics    = 127.5;
@@ -84,15 +87,18 @@ public class PressureGuage extends AnalogGuage{
          }
       }
       g.setFont(new Font("TimesRoman", Font.BOLD, 16));
-      if(this.units().equals("INHG")){
+      if(this.units().equals("INHG")       ||
+         this.units().equals("INCHES HG")){
          String value = this.data() + " in. Hg";
          g.drawString(value, 210, 400);
       }
-      else if(this.units().equals("MMHG")){
+      else if(this.units().equals("MMHG") ||
+              this.units().equals("MILLIMETERS HG")){
          String value = this.data() + " mm Hg";
          g.drawString(value, 205,400);
       }
-      else if(this.units().equals("MB")){
+      else if(this.units().equals("MB")   ||
+              this.units().equals("MILLIBARS")){
          String value = this.data()+" mb";
          g.drawString(value, 205,400);
       }
