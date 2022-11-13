@@ -50,21 +50,25 @@ public class ThermalGuage extends AnalogGuage{
       int max             =   -1;
       double radToTics    =  0.0;
       double zeroDegValue =  0.0;
-      if(this.units().equals("TEMPF") || this.units().equals("DPF")){
+      if(this.units().equals("TEMPF") ||
+         this.units().equals("DPF")   ||
+         this.units().equals("FAHRENHEIT")){
          min          =   -40;
          max          =   120;
          radToTics    = 120.0;  //PI radians per 120 degrees
          zeroDegValue = 100.0;  //at Zero (radians), 100 degrees
       }
       else if(this.units().equals("TEMPC") ||
-              this.units().equals("DPC")){
+              this.units().equals("DPC")   ||
+              this.units().equals("CELSIUS")){
          min          =  -40;
          max          =   60;
          radToTics    = 75.0;
          zeroDegValue = 47.5;
       }
       else if(this.units().equals("TEMPK") ||
-              this.units().equals("DPK")){
+              this.units().equals("DPK")   ||
+              this.units().equals("KELVIN")){
          min          =    233;
          max          =    333;
          radToTics    =   75.0;
@@ -86,15 +90,18 @@ public class ThermalGuage extends AnalogGuage{
       String numerical = this.concatTempAndUnits();
       g.setFont(new Font("TimesRoman", Font.BOLD, 16));
       if(this.units().equals("TEMPF") ||
-         this.units().equals("DPF")){
+         this.units().equals("DPF")   ||
+         this.units().equals("FAHRENHEIT")){
          g.drawString(numerical, 230, 400);
       }
       else if(this.units().equals("TEMPC") ||
-              this.units().equals("DPC")){
+              this.units().equals("DPC")   ||
+              this.units().equals("CELSIUS")){
          g.drawString(numerical, 220, 400);
       }
       else if(this.units().equals("TEMPK") ||
-              this.units().equals("DPK")){
+              this.units().equals("DPK")   ||
+              this.units().equals("KELVIN")){
          g.drawString(numerical, 215,400);
       }
       Point end = this.grabEnd(this.data(),
@@ -118,7 +125,9 @@ public class ThermalGuage extends AnalogGuage{
       int    engValue;
       double metValue;
       double t;
-      if(this.units().equals("TEMPF")){
+      if(this.units().equals("TEMPF")   ||
+         this.units().equals("DPF")     ||
+         this.units().equals("FAHRENHEIT")){
          engValue = Integer.parseInt(data);
          t = Math.PI/radToTics*(engValue - zeroDegValue);
       }
@@ -139,15 +148,18 @@ public class ThermalGuage extends AnalogGuage{
       //needed...
       String tempUnits = this.data();
       if(this.units().equals("TEMPC") ||
-         this.units().equals("DPC")){
+         this.units().equals("DPC")   ||
+         this.units().equals("CELSIUS")){
          tempUnits = tempUnits.concat(" \u00b0C");
       }
       else if(this.units().equals("TEMPF") ||
-              this.units().equals("DPF")){
+              this.units().equals("DPF")   ||
+              this.units().equals("FAHRENHEIT")){
          tempUnits = tempUnits.concat(" \u00b0F");
       }
       else if(this.units().equals("TEMPK") ||
-              this.units().equals("DPK")){
+              this.units().equals("DPK")   ||
+              this.units().equals("KELVIN")){
          tempUnits = tempUnits.concat(" K");
       }
       return tempUnits;
