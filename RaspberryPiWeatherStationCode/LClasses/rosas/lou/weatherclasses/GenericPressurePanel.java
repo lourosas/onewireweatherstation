@@ -190,7 +190,7 @@ public class GenericPressurePanel extends JPanel{
          display = display.concat(" inches Hg");
       }
       else if(units.equals("MILLIBARS")){
-         display = String.format("%1$.2f",this._data.absoluteData());
+         display = String.format("%1$.1f",this._data.absoluteData());
          display = display.concat(" millibars");
       }
       JPanel panel         = new JPanel();
