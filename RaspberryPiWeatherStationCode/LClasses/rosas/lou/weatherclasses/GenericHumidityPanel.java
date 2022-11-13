@@ -33,38 +33,30 @@ import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.*;
 
-public class GenericThermalPanel extends JPanel{
+public class GenericHumidityPanel extends JPanel{
    private WeatherData _data         = null;
    private int _data_minutes         = -1;
    private int _data_seconds         = -1;
-   private PanelUpdateObserver _view = null;
-   //////////////////////Constructors/////////////////////////////////
-   public GenericThermalPanel
+   /////////////////////Constructors//////////////////////////////////
+   public GenericHumidityPanel
    (
       CurrentWeatherController controller,
       int                      index
    ){
       super();
       this.setLayout(new BorderLayout());
-      this.add(this.setNorthPanel(controller, index),
+      this.add(this.setNorthPanel(controller,index),
                                                   BorderLayout.NORTH);
-      this.add(this.setCenterPanel(controller, index),
+      this.add(this.setCenterPanel(controller,index),
                                                  BorderLayout.CENTER);
    }
 
-   /////////////////////Public Methods////////////////////////////////
-   /*
-   This will need to change!!!
-   */
-   public void addObserver(PanelUpdateObserver view){
-      this._view = view;
-   }
-
+   //////////////////////Public Methods///////////////////////////////
    /**/
    public void update(WeatherData data){
       this._data = data;
-      if(this._data_minutes != data.calendar().get(Calendar.MINUTE) ||
-         this._data_seconds != data.calendar().get(Calendar.SECOND)){
+      if(this._data_minutes!=data.calendar().get(Calendar.MINUTE)   ||
+         this._data_seconds!=data.calendar().get(Calendar.SECOND)){
          this._data = data;
          this._data_minutes = data.calendar().get(Calendar.MINUTE);
          this._data_seconds = data.calendar().get(Calendar.SECOND);
@@ -72,7 +64,7 @@ public class GenericThermalPanel extends JPanel{
       }
    }
 
-   ////////////////////Private Methods////////////////////////////////
+   ////////////////////////Private Methods////////////////////////////
    /**/
    private JPanel setCenterPanel
    (
@@ -80,7 +72,7 @@ public class GenericThermalPanel extends JPanel{
       int                      index
    ){
       JPanel panel = new JPanel();
-      JLabel label = new JLabel("Generic Thermal Panel");
+      JLabel label = new JLabel("Generic Humdity Panel");
       panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
       panel.add(label);
       return panel;
@@ -96,49 +88,9 @@ public class GenericThermalPanel extends JPanel{
       JPanel panel = new JPanel();
       panel.setBorder(BorderFactory.createEtchedBorder());
       panel.setLayout(new GridLayout(2,1));
-
-      ButtonGroup unitsGroup = new ButtonGroup();
       ButtonGroup graphGroup = new ButtonGroup();
 
-      JPanel topPanel    = new JPanel();
-      JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand(idx);
-      unitsGroup.add(celsius);
-      celsius.addItemListener(controller);
-      celsius.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updatePane();
-            }
-         }
-      });
-      topPanel.add(celsius);
-      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand(idx);
-      unitsGroup.add(fahrenheit);
-      fahrenheit.addItemListener(controller);
-      fahrenheit.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updatePane();
-            }
-         }
-      });
-      topPanel.add(fahrenheit);
-      JRadioButton kelvin = new JRadioButton("Kelvin");
-      kelvin.setActionCommand(idx);
-      unitsGroup.add(kelvin);
-      kelvin.addItemListener(controller);
-      kelvin.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updatePane();
-            }
-         }
-      });
-      topPanel.add(kelvin);
-      panel.add(topPanel);
-      JPanel bottomPanel = new JPanel();
+      JPanel graphPanel   = new JPanel();
       JRadioButton analog = new JRadioButton("Analog");
       analog.setActionCommand(idx);
       graphGroup.add(analog);
@@ -150,7 +102,8 @@ public class GenericThermalPanel extends JPanel{
             }
          }
       });
-      bottomPanel.add(analog);
+      graphPanel.add(analog);
+
       JRadioButton digital = new JRadioButton("Digital", true);
       digital.setActionCommand(idx);
       graphGroup.add(digital);
@@ -162,49 +115,24 @@ public class GenericThermalPanel extends JPanel{
             }
          }
       });
-      bottomPanel.add(digital);
-      panel.add(bottomPanel);
+      graphPanel.add(digital);
+      panel.add(graphPanel);
       return panel;
    }
 
    /**/
-   private JPanel setUpAnalog(String units){
-      double value   = Double.NaN;
-      String display = new String("");
-      if(units.equals("CELSIUS")){
-         value    = this._data.metricData();
-         display  = String.format("%1$.2f", value);
-      }
-      else if(units.equals("FAHRENHEIT")){
-         value    = this._data.englishData();
-         display  = String.format("%1$.0f", value);
-      }
-      else if(units.equals("KELVIN")){
-         value    = this._data.absoluteData();
-         display  = String.format("%1$.2f", value);
-      }
-      return new ThermalGuage(display, units);
+   private JPanel setUpAnalog(){
+      double humidity = this._data.percentageData();
+      String display  = String.format("%1$.0f", humidity);
+
+      return new HumidityGuage(display);
    }
 
    /**/
-   private JPanel setUpDigital(String units){
-      double value   = Double.NaN;
-      String display = new String("");
-      if(units.equals("CELSIUS")){
-         value    = this._data.metricData();
-         display  = String.format("%1$.2f", value);
-         display += " \u00b0C";
-      }
-      else if(units.equals("FAHRENHEIT")){
-         value    = this._data.englishData();
-         display  = String.format("%1$.0f", value);
-         display += " \u00b0F";
-      }
-      else if(units.equals("KELVIN")){
-         value    = this._data.absoluteData();
-         display  = String.format("%1$.2f", value);
-         display += " K";
-      }
+   private JPanel setUpDigital(){
+      double humidity      = this._data.percentageData();
+      String display       = String.format("%1$.0f", humidity);
+      display              = display.concat("%");
       JPanel panel         = new JPanel();
       JTextField textField = new JTextField(display);
       textField.setEditable(false);
@@ -214,21 +142,13 @@ public class GenericThermalPanel extends JPanel{
 
    /**/
    private void updatePane(){
-      String units   = "";
       String display = "";
 
       JPanel topPanel     = (JPanel)this.getComponent(0);
-      JPanel unitsPanel   = (JPanel)topPanel.getComponent(0);
-      JPanel displayPanel = (JPanel)topPanel.getComponent(1);
+      JPanel displayPanel = (JPanel)topPanel.getComponent(0);
       JPanel centerPanel  = (JPanel)this.getComponent(1);
-      Calendar cal = this._data.calendar();
+      Calendar cal        = this._data.calendar();
 
-      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
-         JRadioButton un = (JRadioButton)unitsPanel.getComponent(i);
-         if(un.isSelected()){
-            units = un.getText().toUpperCase();
-         }
-      }
       for(int i = 0; i < displayPanel.getComponentCount(); ++i){
          JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
          if(dis.isSelected()){
@@ -242,10 +162,10 @@ public class GenericThermalPanel extends JPanel{
       timePanel.add(new JLabel(time));
       centerPanel.add(timePanel, BorderLayout.NORTH);
       if(display.equals("ANALOG")){
-         centerPanel.add(this.setUpAnalog(units),BorderLayout.CENTER);
+         centerPanel.add(this.setUpAnalog(), BorderLayout.CENTER);
       }
       else if(display.equals("DIGITAL")){
-         centerPanel.add(this.setUpDigital(units),BorderLayout.CENTER);
+         centerPanel.add(this.setUpDigital(), BorderLayout.CENTER);
       }
    }
 }

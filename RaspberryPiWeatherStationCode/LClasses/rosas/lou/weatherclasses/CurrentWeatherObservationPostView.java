@@ -32,8 +32,7 @@ import myclasses.*;
 import rosas.lou.lgraphics.*;
 
 public class CurrentWeatherObservationPostView
-extends CurrentWeatherView implements CurrentWeatherDataObserver,
-PanelUpdateObserver
+extends CurrentWeatherView implements CurrentWeatherDataObserver
 {
    private static final short WIDTH         = 750;
    private static final short HEIGHT        = 700;
@@ -89,150 +88,27 @@ PanelUpdateObserver
 
    ////////////////////Insatance Methods//////////////////////////////
    ////////////////////Public Methods/////////////////////////////////
-
+   /**/
+   public void updateTheViews(String idx){
+      try{
+         JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+         int selectedIndex = jtp.getSelectedIndex();
+         int index = Integer.parseInt(idx);
+         if(selectedIndex == index){
+            if(index > 0){
+               jtp.setSelectedIndex(index - 1);
+            }
+            else{
+               jtp.setSelectedIndex(index + 1);
+            }
+            jtp.setSelectedIndex(index);
+         }
+      }
+      catch(NumberFormatException nfe){}
+   }
    /////////////////////Protected Methods/////////////////////////////
    //////////////////////Private Methods//////////////////////////////
-   /**/
-   private JPanel setUpDewPointPanel(){
-      JPanel dewPointPanel = new JPanel();
-      dewPointPanel.setLayout(new BorderLayout());
-      dewPointPanel.add(this.setUpDewPointNorthPanel(),
-                                                  BorderLayout.NORTH);
-      dewPointPanel.add(this.setUpDewPointCenterPanel(),
-                                                 BorderLayout.CENTER);
-      return dewPointPanel;
-   }
-
-   /**/
-   private JPanel setUpDewPointCenterPanel(){
-      JPanel centerPanel = new JPanel();
-      JLabel dpLabel = new JLabel("Dew Point");
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-      centerPanel.add(dpLabel);
-      return centerPanel;
-   }
-
-   /**/
-   private JPanel setUpDewPointAnalog(String units){
-      double dp        = Double.NaN;
-      String display   = new String("");
-      if(units.equals("DPC")){
-         dp      = this._dewpointData.metricData();
-         display = String.format("%1$.2f", dp);
-      }
-      else if(units.equals("DPF")){
-         dp      = this._dewpointData.englishData();
-         display = String.format("%1$.0f", dp);
-      }
-      else if(units.equals("DPK")){
-         dp      = this._dewpointData.absoluteData();
-         display = String.format("%1$.2f", dp);
-      }
-      return new ThermalGuage(display, units);
-   }
-
-   /**/
-   private JPanel setUpDewPointDigital(String units){
-      double dp    = Double.NaN;
-      String display = "";
-      if(units.equals("DPC")){
-         dp       = this._dewpointData.metricData();
-         display  = String.format("%1$.2f", dp);
-         display += " \u00b0C";
-      }
-      else if(units.equals("DPF")){
-         dp       = this._dewpointData.englishData();
-         display  = String.format("%1$.0f", dp);
-         display += " \u00b0F";
-      }
-      else if(units.equals("DPK")){
-         dp       = this._dewpointData.absoluteData();
-         display  = String.format("%1$.1f", dp);
-         display += " K";
-      }
-      JPanel panel         = new JPanel();
-      JTextField textField = new JTextField(display);
-      textField.setEditable(false);
-      panel.add(textField);
-      return panel;
-   }
-
-   /**/
-   private JPanel setUpDewPointNorthPanel(){
-      JPanel panel = new JPanel();
-      panel.setBorder(BorderFactory.createEtchedBorder());
-      panel.setLayout(new GridLayout(2,1));
-
-      ButtonGroup dpGroup    = new ButtonGroup();
-      ButtonGroup graphGroup = new ButtonGroup();
-
-      JPanel topPanel  = new JPanel();
-      JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand("dpC");
-      dpGroup.add(celsius);
-      celsius.addItemListener(this._controller);
-      celsius.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateDewPointPane();
-            }
-         }
-      });
-      topPanel.add(celsius);
-      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand("dpF");
-      dpGroup.add(fahrenheit);
-      fahrenheit.addItemListener(this._controller);
-      fahrenheit.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateDewPointPane();
-            }
-         }
-      });
-      topPanel.add(fahrenheit);
-      JRadioButton kelvin = new JRadioButton("Kelvin");
-      kelvin.setActionCommand("dpK");
-      dpGroup.add(kelvin);
-      kelvin.addItemListener(this._controller);
-      kelvin.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateDewPointPane();
-            }
-         }
-      });
-      topPanel.add(kelvin);
-      panel.add(topPanel);
-      JPanel bottomPanel = new JPanel();
-      JRadioButton analog = new JRadioButton("Analog");
-      analog.setActionCommand("dpAnalog");
-      graphGroup.add(analog);
-      analog.addItemListener(this._controller);
-      analog.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateDewPointPane();
-            }
-         }
-      });
-      bottomPanel.add(analog);
-      JRadioButton digital = new JRadioButton("Digital", true);
-      digital.setActionCommand("dpDigital");
-      graphGroup.add(digital);
-      digital.addItemListener(this._controller);
-      digital.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateDewPointPane();
-            }
-         }
-      });
-      bottomPanel.add(digital);
-      panel.add(bottomPanel);
-      return panel;
-   }
-
    /**/
    private void setUpGUI(){
       this.setLayout(new BorderLayout());
@@ -246,82 +122,6 @@ PanelUpdateObserver
       this.setVisible(true);
    }
 
-   /**/
-   private JPanel setUpHumidityCenterPanel(){
-      JPanel centerPanel = new JPanel();
-      JLabel humLabel = new JLabel("Humidity");
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-      centerPanel.add(humLabel);
-      return centerPanel;
-   }
-
-   /**/
-   private JPanel setUpHumidityAnalog(){
-      double humidity = this._humidityData.percentageData();
-      String display  = String.format("%1$.0f", humidity);
-
-      return new HumidityGuage(display);
-   }
-
-   /**/
-   private JPanel setUpHumidityDigital(){
-      double humidity      = this._humidityData.percentageData();
-      String display       = String.format("%1$.0f", humidity);
-      display              = display.concat("%");
-      JPanel panel         = new JPanel();
-      JTextField textField = new JTextField(display);
-      textField.setEditable(false);
-      panel.add(textField);
-      return panel;
-   }
-
-   /**/
-   private JPanel setUpHumidityNorthPanel(){
-      JPanel panel           = new JPanel();
-      ButtonGroup graphGroup = new ButtonGroup();
-      panel.setBorder(BorderFactory.createEtchedBorder());
-      panel.setLayout(new GridLayout(2,1));
-
-      JPanel graphPanel   = new JPanel();
-      JRadioButton analog = new JRadioButton("Analog");
-      analog.setActionCommand("HumidityAnalog");
-      graphGroup.add(analog);
-      analog.addItemListener(this._controller);
-      analog.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateHumidityPane();
-            }
-         }
-      });
-      graphPanel.add(analog);
-
-      JRadioButton digital = new JRadioButton("Digital",true);
-      digital.setActionCommand("HumidityDigital");
-      graphGroup.add(digital);
-      digital.addItemListener(this._controller);
-      digital.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateHumidityPane();
-            }
-         }
-      });
-      graphPanel.add(digital);
-      panel.add(graphPanel);
-      return panel;
-   }
-
-   /**/
-   private JPanel setUpHumidityPanel(){
-      JPanel humidityPanel = new JPanel();
-      humidityPanel.setLayout(new BorderLayout());
-      humidityPanel.add(this.setUpHumidityNorthPanel(),
-                                                  BorderLayout.NORTH);
-      humidityPanel.add(this.setUpHumidityCenterPanel(),
-                                                 BorderLayout.CENTER);
-      return humidityPanel;
-   }
 
    /**/
    private JPanel setUpPressureAnalog(String units){
@@ -486,12 +286,14 @@ PanelUpdateObserver
 
       jtp.addTab("Temperature",
                  null,
-                 this.setUpTemperaturePanel(),
+                 //this.setUpTemperaturePanel(),
+                 new GenericThermalPanel(this._controller,0),
                  "Current Temperature");
       jtp.setMnemonicAt(0, KeyEvent.VK_T);
       jtp.addTab("Humidity",
                   null,
-                  this.setUpHumidityPanel(),
+                  //this.setUpHumidityPanel(),
+                  new GenericHumidityPanel(this._controller,1),
                   "Current Humidity");
       jtp.setMnemonicAt(1, KeyEvent.VK_H);
       jtp.addTab("Pressure",
@@ -501,14 +303,15 @@ PanelUpdateObserver
       jtp.setMnemonicAt(2,KeyEvent.VK_P);
       jtp.addTab("Dew Point",
                  null,
-                 this.setUpDewPointPanel(),
+                 //this.setUpDewPointPanel(),
+                 new GenericThermalPanel(this._controller,3),
                  "Current Dewpoint");
       jtp.setMnemonicAt(3,KeyEvent.VK_D);
       jtp.addTab("Heat Index",
                   null,
-                  new GenericThermalPanel(this._controller),
+                  new GenericThermalPanel(this._controller,4),
                   "Current Heat Index");
-      jtp.setMnemonicAt(4,KeyEvent.VK_H);
+      jtp.setMnemonicAt(4,KeyEvent.VK_I);
 
       //Set on the Temperature tab
       jtp.setSelectedIndex(0);
@@ -517,204 +320,14 @@ PanelUpdateObserver
    }
 
    /**/
-   private JPanel setUpTemperatureAnalog(String units){
-      double temp         = Double.NaN;
-      String display      = new String("");
-      String unitsDisplay = new String("");
-      if(units.equals("TEMPC")){
-         temp         = this._temperatureData.metricData();
-         unitsDisplay = " \u00b0C";
-         display      = String.format("%1$.2f", temp);
-         //display     += unitsDisplay;
-      }
-      else if(units.equals("TEMPF")){
-         temp         = this._temperatureData.englishData();
-         display      = String.format("%1$.0f", temp);
-         unitsDisplay = " \u00b0F";
-         //display     += unitsDisplay;
-      }
-      else if(units.equals("TEMPK")){
-         temp         = this._temperatureData.absoluteData();
-         display      = String.format("%1.2f", temp);
-         unitsDisplay = " K";
-         //display     += unitsDisplay;
-      }
-      //return new AnalogGuage(display, units);
-      return new ThermalGuage(display, units);
-   }
-
-   /**/
-   private JPanel setUpTemperatureDigital(String units){
-      double temp         = Double.NaN;
-      String display      = "";
-      String unitsDisplay = new String("");
-      if(units.equals("TEMPC")){
-         temp         = this._temperatureData.metricData();
-         unitsDisplay = " \u00b0C";
-         display      = String.format("%1$.2f", temp);
-         display     += unitsDisplay;
-      }
-      else if(units.equals("TEMPF")){
-         temp         = this._temperatureData.englishData();
-         display      = String.format("%1$.0f", temp);
-         unitsDisplay = " \u00b0F";
-         display     += unitsDisplay;
-      }
-      else if(units.equals("TEMPK")){
-         temp         = this._temperatureData.absoluteData();
-         display      = String.format("%1.2f", temp);
-         unitsDisplay = " K";
-         display     += unitsDisplay;
-      }
-      JPanel panel = new JPanel();
-      JTextField textField = new JTextField(display);
-      textField.setEditable(false);
-      panel.add(textField);
-      return panel;
-   }
-
-   /**/
-   private JPanel setUpTemperatureCenterPanel(){
-      JPanel centerPanel = new JPanel();
-      JLabel tempLabel = new JLabel("Temperature");
-      centerPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-      centerPanel.add(tempLabel);
-      return centerPanel;
-   }
-
-   /**/
-   private JPanel setUpTemperatureNorthPanel(){
-      JPanel panel                 = new JPanel();
-      ButtonGroup temperatureGroup = new ButtonGroup();
-      ButtonGroup graphGroup       = new ButtonGroup();
-      panel.setBorder(BorderFactory.createEtchedBorder());
-      panel.setLayout(new GridLayout(2,1));
-
-      JPanel topPanel = new JPanel();
-      JRadioButton celsius = new JRadioButton("Celsius", true);
-      celsius.setActionCommand("TempC");
-      temperatureGroup.add(celsius);
-      celsius.addItemListener(this._controller);
-      celsius.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateTemperaturePane();
-            }
-         }
-      });
-      topPanel.add(celsius);
-      JRadioButton fahrenheit = new JRadioButton("Fahrenheit");
-      fahrenheit.setActionCommand("TempF");
-      temperatureGroup.add(fahrenheit);
-      fahrenheit.addItemListener(this._controller);
-      fahrenheit.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateTemperaturePane();
-            }
-         }
-      });
-      topPanel.add(fahrenheit);
-      JRadioButton kelvin = new JRadioButton("Kelvin");
-      kelvin.setActionCommand("TempK");
-      temperatureGroup.add(kelvin);
-      kelvin.addItemListener(this._controller);
-      kelvin.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateTemperaturePane();
-            }
-         }
-      });
-      topPanel.add(kelvin);
-      panel.add(topPanel);
-
-      JPanel bottomPanel = new JPanel();
-      JRadioButton analog = new JRadioButton("Analog");
-      analog.setActionCommand("TempAnalog");
-      graphGroup.add(analog);
-      analog.addItemListener(this._controller);
-      analog.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateTemperaturePane();
-            }
-         }
-      });
-      bottomPanel.add(analog);
-      JRadioButton digital = new JRadioButton("Digital", true);
-      digital.setActionCommand("TempDigital");
-      graphGroup.add(digital);
-      digital.addItemListener(this._controller);
-      digital.addItemListener(new ItemListener(){
-         public void itemStateChanged(ItemEvent e){
-            if(e.getStateChange() == ItemEvent.SELECTED){
-               updateTemperaturePane();
-            }
-         }
-      });
-      bottomPanel.add(digital);
-
-      panel.add(bottomPanel);
-      return panel;
-   }
-
-   /**/
-   private JPanel setUpTemperaturePanel(){
-      JPanel temperaturePanel = new JPanel();
-      temperaturePanel.setLayout(new BorderLayout());
-      temperaturePanel.add(this.setUpTemperatureNorthPanel(),
-                                                  BorderLayout.NORTH);
-      //Set the Center Panel next
-      temperaturePanel.add(this.setUpTemperatureCenterPanel(),
-                                                 BorderLayout.CENTER);
-
-      return temperaturePanel;
-   }
-
-   /**/
-   private void updateDewPointPane(){
-      String units    = "";
-      String display  = "";
-
+   private void updateDewPointPane(WeatherData data){
       JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(0);
       int index = jtp.getSelectedIndex();
       jtp.setSelectedIndex(3);
-      JPanel panel        = (JPanel)jtp.getComponent(3);
-      JPanel topPanel     = (JPanel)panel.getComponent(0);
-      JPanel unitsPanel   = (JPanel)topPanel.getComponent(0);
-      JPanel displayPanel = (JPanel)topPanel.getComponent(1);
-      JPanel centerPanel  = (JPanel)panel.getComponent(1);
-      Calendar cal        = this._dewpointData.calendar();
-
-      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
-         JRadioButton un=(JRadioButton)unitsPanel.getComponent(i);
-         if(un.isSelected()){
-            units = un.getActionCommand().toUpperCase();
-         }
-      }
-      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
-         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
-         if(dis.isSelected()){
-            display = dis.getActionCommand().toUpperCase();
-         }
-      }
-
-      centerPanel.removeAll();
-      centerPanel.setLayout(new BorderLayout());
-      String time = cal.getTime().toString();
-      JPanel timePanel = new JPanel();
-      timePanel.add(new JLabel(time));
-      centerPanel.add(timePanel, BorderLayout.NORTH);
-      if(display.equals("DPANALOG")){
-         //JPanel analogPanel = this.setUpDewPointAnalog(units);
-         centerPanel.add(this.setUpDewPointAnalog(units));
-      }
-      else if(display.equals("DPDIGITAL")){
-         JPanel digitPanel = this.setUpDewPointDigital(units);
-         centerPanel.add(digitPanel, BorderLayout.CENTER);
-      }
+      GenericThermalPanel p=(GenericThermalPanel)jtp.getComponent(3);
+      p.update(data);
+      //this.updateTheViews("3");
       jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(index);
    }
@@ -730,13 +343,14 @@ PanelUpdateObserver
       jtp.setSelectedIndex(4);
       GenericThermalPanel panel =
                              (GenericThermalPanel)jtp.getComponent(4);
-      panel.addObserver(this);
+
       panel.update(data);
+      //this.updateTheViews("4")
       jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(index);
    }
 
-   /**/
+   /*
    private void updateHumidityPane(){
       String display = "";
       JTabbedPane jtp =
@@ -773,6 +387,21 @@ PanelUpdateObserver
 
       jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(1);
+      jtp.setSelectedIndex(index);
+   }
+   */
+
+   /**/
+   private void updateHumidityPane(WeatherData data){
+      JTabbedPane jtp =
+                   (JTabbedPane)this.getContentPane().getComponent(0);
+      int index = jtp.getSelectedIndex();
+      jtp.setSelectedIndex(1);
+      GenericHumidityPanel panel =
+                            (GenericHumidityPanel)jtp.getComponent(1);
+      panel.update(data);
+      //this.updateTheViews("2");
+      jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(index);
    }
 
@@ -825,50 +454,14 @@ PanelUpdateObserver
    }
 
    /**/
-   private void updateTemperaturePane(){
-      String units   = "";
-      String display = "";
-
+   private void updateTemperaturePane(WeatherData data){
       JTabbedPane jtp =
                    (JTabbedPane)this.getContentPane().getComponent(0);
       int index = jtp.getSelectedIndex();
       jtp.setSelectedIndex(0);
-      JPanel panel = (JPanel)jtp.getComponent(0);
-      JPanel topPanel = (JPanel)panel.getComponent(0);
-      JPanel unitsPanel = (JPanel)topPanel.getComponent(0);
-      JPanel displayPanel = (JPanel)topPanel.getComponent(1);
-      JPanel centerPanel = (JPanel)panel.getComponent(1);
-      Calendar cal = this._temperatureData.calendar();
-
-
-      for(int i = 0; i < unitsPanel.getComponentCount(); ++i){
-         JRadioButton un=(JRadioButton)unitsPanel.getComponent(i);
-         if(un.isSelected()){
-            units = un.getActionCommand().toUpperCase();
-         }
-      }
-      for(int i = 0; i < displayPanel.getComponentCount(); ++i){
-         JRadioButton dis=(JRadioButton)displayPanel.getComponent(i);
-         if(dis.isSelected()){
-            display = dis.getActionCommand().toUpperCase();
-         }
-      }
-
-      centerPanel.removeAll();
-      centerPanel.setLayout(new BorderLayout());
-      String time = cal.getTime().toString();
-      JPanel timePanel = new JPanel();
-      timePanel.add(new JLabel(time));
-      centerPanel.add(timePanel, BorderLayout.NORTH);
-      if(display.equals("TEMPANALOG")){
-         JPanel analogPanel = this.setUpTemperatureAnalog(units);
-         centerPanel.add(analogPanel, BorderLayout.CENTER);
-      }
-      else if(display.equals("TEMPDIGITAL")){
-         JPanel digitPanel = this.setUpTemperatureDigital(units);
-         centerPanel.add(digitPanel, BorderLayout.CENTER);
-      }
-
+      GenericThermalPanel p=(GenericThermalPanel)jtp.getComponent(0);
+      p.update(data);
+      //this.updateTheViews("0");
       jtp.setSelectedIndex(1);
       jtp.setSelectedIndex(0);
       jtp.setSelectedIndex(index);
@@ -877,13 +470,7 @@ PanelUpdateObserver
    ///////////////////Interface Implementation////////////////////////
    /**/
    public void updateDewpoint(WeatherData data){
-      if(this.dewpoint_minutes!=data.calendar().get(Calendar.MINUTE)||
-         this.dewpoint_seconds!=data.calendar().get(Calendar.SECOND)){
-         this.dewpoint_minutes=data.calendar().get(Calendar.MINUTE);
-         this.dewpoint_seconds=data.calendar().get(Calendar.SECOND);
-         this._dewpointData = data;
-         this.updateDewPointPane();
-      }
+      this.updateDewPointPane(data);
    }
 
    /**/
@@ -893,13 +480,7 @@ PanelUpdateObserver
 
    /**/
    public void updateHumidity(WeatherData data){
-      if(this.humidity_minutes!=data.calendar().get(Calendar.MINUTE)||
-         this.humidity_seconds!=data.calendar().get(Calendar.SECOND)){
-         this.humidity_minutes = data.calendar().get(Calendar.MINUTE);
-         this.humidity_seconds = data.calendar().get(Calendar.SECOND);
-         this._humidityData = data;
-         this.updateHumidityPane();
-      }
+      this.updateHumidityPane(data);
    }
 
    /**/
@@ -915,23 +496,6 @@ PanelUpdateObserver
 
    /**/
    public void updateTemperature(WeatherData data){
-      if(this.temp_minutes != data.calendar().get(Calendar.MINUTE) ||
-         this.temp_seconds != data.calendar().get(Calendar.SECOND)){
-         this.temp_minutes = data.calendar().get(Calendar.MINUTE);
-         this.temp_seconds = data.calendar().get(Calendar.SECOND);
-         this._temperatureData = data;
-         this.updateTemperaturePane();
-      }
-   }
-
-
-   //PanelUpdateObserver Implementation
-   /**/
-   public void updateTheViews(){
-      JTabbedPane jtp =
-                   (JTabbedPane)this.getContentPane().getComponent(0);
-      int index = jtp.getSelectedIndex();
-      jtp.setSelectedIndex(0);
-      jtp.setSelectedIndex(index);
+      this.updateTemperaturePane(data);
    }
 }

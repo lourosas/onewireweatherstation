@@ -62,4 +62,14 @@ extends CurrentWeatherController{
    public void addView(CurrentWeatherView view){
       this._view = view;
    }
+   /////////////////////////Interface Implementation//////////////////
+   ////////////////////////ItemListener Interface/////////////////////
+   /**/
+   public void itemStateChanged(ItemEvent e){
+      if(e.getStateChange() == ItemEvent.SELECTED){
+         JRadioButton jrb = (JRadioButton)e.getItem();
+         String command   = jrb.getActionCommand();
+         this._view.updateTheViews(command);
+      }
+   }
 }

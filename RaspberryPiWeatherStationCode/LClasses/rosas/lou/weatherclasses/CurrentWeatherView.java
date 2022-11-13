@@ -27,6 +27,9 @@ implements CurrentWeatherDataObserver{
    /////////////////////////Constructors//////////////////////////////
    public CurrentWeatherView(String title){ super(title); }
 
+   ////////////////////Public Methods/////////////////////////////////
+   public void updateTheViews(String s){}
+
    //////////////////////Interface Implementation/////////////////////
    public void updateHumidity(WeatherData data){}
    public void updateTemperature(WeatherData data){}
