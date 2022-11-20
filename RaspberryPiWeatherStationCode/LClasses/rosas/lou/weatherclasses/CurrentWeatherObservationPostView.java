@@ -32,8 +32,7 @@ import myclasses.*;
 import rosas.lou.lgraphics.*;
 
 public class CurrentWeatherObservationPostView
-extends CurrentWeatherView implements CurrentWeatherDataObserver
-{
+extends CurrentWeatherView implements CurrentWeatherDataObserver{
    private static final short WIDTH         = 750;
    private static final short HEIGHT        = 700;
    private static final short TOTAL_PANELS  = 5;
