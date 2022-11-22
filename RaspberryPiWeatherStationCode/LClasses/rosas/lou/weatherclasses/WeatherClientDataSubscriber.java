@@ -23,4 +23,5 @@ import java.util.*;
 public interface WeatherClientDataSubscriber{
    public void updateData(String rawData);
    public void updateData(List<WeatherData> data);
+   public void addPublisher(WeatherClientDataPublisher publisher);
 }

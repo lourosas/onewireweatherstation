@@ -93,6 +93,7 @@ implements Runnable{
                   new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
          this._rawData = new String(receivePacket.getData());
+         //Test Prints...need to be removed...
          System.out.println(receivePacket.getAddress());
          System.out.println(receivePacket.getPort());
          System.out.println(receivePacket.getLength());

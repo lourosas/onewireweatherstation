@@ -41,6 +41,9 @@ public abstract class WeatherClientDataPublisher{
       }
    }
 
+   /**/
+   public void request(){}
+
    
    ///////////////////Protected Methods///////////////////////////////
    /*

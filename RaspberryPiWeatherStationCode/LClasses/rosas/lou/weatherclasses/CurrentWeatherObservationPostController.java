@@ -26,8 +26,8 @@ import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherObservationPostController
 extends CurrentWeatherController{
-   private CurrentWeatherView           _view  = null;
-   private CurrentWeatherDataSubscriber _model = null;
+   private CurrentWeatherView            _view      = null;
+   private CurrentWeatherDataSubscriber  _model     = null;
 
    /**/
    public CurrentWeatherObservationPostController(){}
@@ -62,8 +62,15 @@ extends CurrentWeatherController{
    public void addView(CurrentWeatherView view){
       this._view = view;
    }
+
    /////////////////////////Interface Implementation//////////////////
    ////////////////////////ItemListener Interface/////////////////////
+   /**/
+   public void actionPerformed(ActionEvent e){
+      //upon the request button being activated
+      //this._model.request();
+   }
+
    /**/
    public void itemStateChanged(ItemEvent e){
       if(e.getStateChange() == ItemEvent.SELECTED){

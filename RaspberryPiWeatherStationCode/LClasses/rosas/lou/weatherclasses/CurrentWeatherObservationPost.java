@@ -24,6 +24,7 @@ import rosas.lou.weatherclasses.*;
 public class CurrentWeatherObservationPost extends
 CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    private List<CurrentWeatherDataObserver> _observers = null;
+   private WeatherClientDataPublisher wcdp             = null;
 
    //////////////////////////Constructors/////////////////////////////
    /*
@@ -43,6 +44,11 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
                          new LinkedList<CurrentWeatherDataObserver>();
          this._observers.add(ob);
       }
+   }
+
+   /**/
+   public void request(){
+      this.wcdp.request();
    }
    ////////////////////////Protected Methods//////////////////////////
    /////////////////////////Private Methods///////////////////////////
@@ -144,5 +150,10 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
+   }
+
+   /**/
+   public void addPublisher(WeatherClientDataPublisher publisher){
+      wcdp = publisher;
    }
 }
