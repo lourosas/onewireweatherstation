@@ -69,6 +69,11 @@ extends CurrentWeatherController{
    public void actionPerformed(ActionEvent e){
       //upon the request button being activated
       //this._model.request();
+      if(e.getSource() instanceof JButton){
+         if(e.getActionCommand().toUpperCase().equals("REFRESH")){
+            this._model.requestUpdateFromPublisher();
+         }
+      }
    }
 
    /**/

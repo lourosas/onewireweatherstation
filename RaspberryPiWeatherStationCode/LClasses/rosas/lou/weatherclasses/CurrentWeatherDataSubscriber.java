@@ -108,6 +108,9 @@ implements WeatherClientDataSubscriber{
    /**/
    public void addPublisher(WeatherClientDataPublisher publisher){}
 
+   /**/
+   public void requestUpdateFromPublisher(){}
+
    ///////////////////////Instance Methods////////////////////////////
    ////////////////////////Public Methods/////////////////////////////
    /*

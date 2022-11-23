@@ -82,8 +82,6 @@ implements Runnable{
          byte test[] = testData.getBytes();
          InetAddress iNetAddr = InetAddress.getByAddress(this._addr);
          byte[] receiveData = new byte[1024];
-         System.out.println(iNetAddr.getHostName());
-         System.out.println(iNetAddr.getHostAddress());
          sendPacket = new DatagramPacket(test,
                                          test.length,
                                          iNetAddr,
@@ -93,11 +91,7 @@ implements Runnable{
                   new DatagramPacket(receiveData, receiveData.length);
          this._socket.receive(receivePacket);
          this._rawData = new String(receivePacket.getData());
-         //Test Prints...need to be removed...
-         System.out.println(receivePacket.getAddress());
-         System.out.println(receivePacket.getPort());
-         System.out.println(receivePacket.getLength());
-         System.out.println(this._rawData);
+         this.publishData(this._rawData);
       }
       catch(SocketTimeoutException ste){
          ste.printStackTrace();
