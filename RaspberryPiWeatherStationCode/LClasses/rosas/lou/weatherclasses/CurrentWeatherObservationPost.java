@@ -115,10 +115,8 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    ///////////////////////Interface Implementation////////////////////
    /**/
    public void updateData(String data){
-
       this._data = data;
-      /*Test Print*/
-      System.out.println(this._data);
+      RawDataToWeatherDataConverter.temperature(this._data);
    }
 
    /**/

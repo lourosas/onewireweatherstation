@@ -19,10 +19,11 @@ package rosas.lou.weatherclasses;
 
 import java.lang.*;
 import java.util.*;
+import java.text.*;
 import rosas.lou.weatherclasses.*;
 
 public class RawDataToWeatherDataConverter{
-   private Calendar _cal = null;
+   private static Calendar _cal = null;
 
    /////////////////////Constructors//////////////////////////////////
    /**/
@@ -30,14 +31,58 @@ public class RawDataToWeatherDataConverter{
 
    ///////////////////////Public Methods//////////////////////////////
    ///////////////////////Static Methods//////////////////////////////
+   /*
+   */
+   public static WeatherData barometricPressure(String rawData){
+      WeatherData data = null;
+      calendar(rawData);
+      return data;
+   }
+
+   /*
+   */
+   public static WeatherData dewpoint(String rawData){
+      WeatherData data = null;
+      calendar(rawData);
+      return data;
+   }
+
+   /*
+   */
+   public static WeatherData heatindex(String rawData){
+      WeatherData data = null;
+      calendar(rawData);
+      return data;
+   }
+
+   /*
+   */
+   public static WeatherData humidity(String rawData){
+      WeatherData data = null;
+      calendar(rawData);
+      return data;
+   }
+
+   /*
+   */
+   public static WeatherData temperature(String rawData)
+   throws NullPointerException{
+      WeatherData data = null;
+      calendar(rawData);
+      if(rawData == null){
+         throw new NullPointerException();
+      }
+      return data;
+   }
 
    //////////////////////Private Methods//////////////////////////////
    /**/
-   private void calendar(String data){
-      this._cal = Calendar.getInstance();
-      String mdy = data.split(" ")[0];
-      String hms = data.split(" ")[1];
+   private static void calendar(String rawData)
+   throws NullPointerException{
+      _cal = Calendar.getInstance();
       try{
+         String mdy = rawData.split(" ")[0];
+         String hms = rawData.split(" ")[1];
          String [] yearmonthday = mdy.split("-");
          String yr              = yearmonthday[0];
          String mt              = yearmonthday[1];
@@ -49,10 +94,22 @@ public class RawDataToWeatherDataConverter{
          int hour               = Integer.parseInt(hourminsec[0]);
          int min                = Integer.parseInt(hourminsec[1]);
          int sec = Integer.parseInt(hourminsec[2].split("\\.")[0]);
-         this._cal.set(year, month, day, hour, min, sec);
+         _cal.set(year, month - 1, day, hour, min, sec);
       }
       catch(NumberFormatException nfe){
          nfe.printStackTrace();
+      }
+      catch(ArrayIndexOutOfBoundsException e){
+         WeatherDataParser wdp = new WeatherDataParser();
+         String date = wdp.parseCalendar(rawData);
+         System.out.println(date);
+         DateFormat df = DateFormat.getDateInstance();
+         try{
+            _cal.setTime(df.parse(date));
+         }
+         catch(ParseException pe){
+            pe.printStackTrace();
+         }
       }
    }
 }
