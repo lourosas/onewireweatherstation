@@ -116,7 +116,21 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    /**/
    public void updateData(String data){
       this._data = data;
-      RawDataToWeatherDataConverter.temperature(this._data);
+      String[] test = this._data.split("\\n");
+      try{
+         this.temperatureData =
+                RawDataToWeatherDataConverter.temperature(this._data);
+         this.humidityData =
+                   RawDataToWeatherDataConverter.humidity(this._data);
+         this.pressureData =
+          RawDataToWeatherDataConverter.barometricPressure(this._data);
+         this.dewpointData =
+                   RawDataToWeatherDataConverter.dewpoint(this._data);
+         this.heatIndexData =
+                  RawDataToWeatherDataConverter.heatindex(this._data);
+         //this.publish();
+      }
+      catch(RuntimeException e){ e.printStackTrace(); }
    }
 
    /**/
