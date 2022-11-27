@@ -146,7 +146,7 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
          this.heatIndexData =
             WeatherDataStringToWeatherDataConverter.heatindex(
                                                           this._data);
-         System.out.println(heatIndexData);
+         this.publish();
       }
    }
 
