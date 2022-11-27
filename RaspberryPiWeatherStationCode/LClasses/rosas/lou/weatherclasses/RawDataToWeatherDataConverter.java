@@ -191,7 +191,6 @@ public class RawDataToWeatherDataConverter{
                                             _cal);
          }
          catch(NumberFormatException nfe){
-            nfe.printStackTrace();
             data = new HeatIndexData(Units.ENGLISH,
                                             heatI,
                                             nfe.getMessage(),
@@ -284,18 +283,6 @@ public class RawDataToWeatherDataConverter{
          nfe.printStackTrace();
       }
       catch(ArrayIndexOutOfBoundsException e){
-         /*
-         WeatherDataParser wdp = new WeatherDataParser();
-         String date = wdp.parseCalendar(rawData);
-         SimpleDateFormat df =
-                    new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
-         try{
-            _cal.setTime(df.parse(date));
-         }
-         catch(ParseException pe){
-            pe.printStackTrace();
-         }
-         */
          throw e;
       }
    }

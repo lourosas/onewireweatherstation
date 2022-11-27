@@ -35,8 +35,7 @@ import rosas.lou.lgraphics.*;
 
 public class GenericThermalPanel extends JPanel{
    private WeatherData _data         = null;
-   private int _data_minutes         = -1;
-   private int _data_seconds         = -1;
+   private long _millistime          = -1;
    private PanelUpdateObserver _view = null;
    //////////////////////Constructors/////////////////////////////////
    public GenericThermalPanel
@@ -62,12 +61,12 @@ public class GenericThermalPanel extends JPanel{
 
    /**/
    public void update(WeatherData data){
-      this._data = data;
-      if(this._data_minutes != data.calendar().get(Calendar.MINUTE) ||
-         this._data_seconds != data.calendar().get(Calendar.SECOND)){
+      if(this._data == null){
          this._data = data;
-         this._data_minutes = data.calendar().get(Calendar.MINUTE);
-         this._data_seconds = data.calendar().get(Calendar.SECOND);
+      }
+      if(this._millistime < data.calendar().getTimeInMillis()){
+         this._data = data;
+         this._millistime = data.calendar().getTimeInMillis();
          this.updatePane();
       }
    }

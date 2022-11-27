@@ -128,9 +128,26 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
                    RawDataToWeatherDataConverter.dewpoint(this._data);
          this.heatIndexData =
                   RawDataToWeatherDataConverter.heatindex(this._data);
-         //this.publish();
+         this.publish();
       }
-      catch(RuntimeException e){ e.printStackTrace(); }
+      catch(RuntimeException e){
+         this.temperatureData =
+            WeatherDataStringToWeatherDataConverter.temperature(
+                                                          this._data);
+         this.humidityData =
+            WeatherDataStringToWeatherDataConverter.humidity(
+                                                          this._data);
+         this.pressureData =
+            WeatherDataStringToWeatherDataConverter.pressure(
+                                                          this._data);
+         this.dewpointData =
+            WeatherDataStringToWeatherDataConverter.dewpoint(                 
+                                                          this._data);
+         this.heatIndexData =
+            WeatherDataStringToWeatherDataConverter.heatindex(
+                                                          this._data);
+         System.out.println(heatIndexData);
+      }
    }
 
    /**/
