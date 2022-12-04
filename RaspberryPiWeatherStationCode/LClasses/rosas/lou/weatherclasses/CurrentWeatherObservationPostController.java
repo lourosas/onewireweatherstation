@@ -22,12 +22,14 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.filechooser.*;
+import java.io.*;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherObservationPostController
 extends CurrentWeatherController{
    private CurrentWeatherView            _view      = null;
-   private CurrentWeatherDataSubscriber  _model     = null;
+   private CurrentWeatherObservationPost _model     = null;
 
    /**/
    public CurrentWeatherObservationPostController(){}
@@ -41,15 +43,15 @@ extends CurrentWeatherController{
    /**/
    public CurrentWeatherObservationPostController
    (
-      CurrentWeatherView view,
-      CurrentWeatherDataSubscriber model
+      CurrentWeatherView            view,
+      CurrentWeatherObservationPost model
    ){
       this._model = model;
       this._view  = view;
    }
 
    /**/
-   public void addModel(CurrentWeatherDataSubscriber model){
+   public void addModel(CurrentWeatherObservationPost model){
       this._model = model;
    }
 
@@ -67,11 +69,22 @@ extends CurrentWeatherController{
    ////////////////////////ItemListener Interface/////////////////////
    /**/
    public void actionPerformed(ActionEvent e){
-      //upon the request button being activated
-      //this._model.request();
       if(e.getSource() instanceof JButton){
          if(e.getActionCommand().toUpperCase().equals("REFRESH")){
             this._model.requestUpdateFromPublisher();
+         }
+         else if(e.getActionCommand().toUpperCase().equals("SAVE")){
+            try{
+               JFileChooser jfc = new JFileChooser();
+               FileNameExtensionFilter filter =
+                   new FileNameExtensionFilter("Weather Data", "wea");
+               jfc.setFileFilter(filter);
+               int fileValue = jfc.showSaveDialog(this._view);
+               if(fileValue == JFileChooser.APPROVE_OPTION){
+                  this._model.save(jfc.getSelectedFile());
+               }
+            }
+            catch(HeadlessException he){}
          }
       }
    }

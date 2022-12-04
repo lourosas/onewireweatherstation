@@ -22,6 +22,7 @@ import java.util.*;
 import rosas.lou.weatherclasses.*;
 
 public interface CurrentWeatherDataObserver{
+   public void receiveError(String error);
    public void updateDewpoint(WeatherData data);
    public void updateHeatindex(WeatherData data);
    public void updateHumidity(WeatherData data);

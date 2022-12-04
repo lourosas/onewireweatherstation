@@ -19,6 +19,7 @@ package rosas.lou.weatherclasses;
 
 import java.lang.*;
 import java.util.*;
+import java.io.*;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherObservationPost extends
@@ -50,6 +51,30 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    public void requestUpdateFromPublisher(){
       this.wcdp.request();
    }
+
+   /**/
+   public void save(File file){
+      PrintWriter outs = null;
+      try{
+         FileWriter fw = new FileWriter(file,true);
+         outs          = new PrintWriter(fw,true);
+         outs.println(this.temperatureData);
+         outs.println(this.humidityData);
+         outs.println(this.pressureData);
+         outs.println(this.dewpointData);
+         outs.println(this.heatIndexData);
+      }
+      catch(IOException ioe){
+         this.publishError(ioe.getMessage());
+      }
+      finally{
+         outs.close();
+      }
+   }
+
+   /**/
+   public void save(String fileName){}
+
    ////////////////////////Protected Methods//////////////////////////
    /////////////////////////Private Methods///////////////////////////
    /*
@@ -60,6 +85,16 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
       this.publishPressure();
       this.publishDewpoint();
       this.publishHeatindex();
+   }
+
+   /*
+   */
+   private void publishError(String error){
+      Iterator<CurrentWeatherDataObserver> it =
+                                           this._observers.iterator();
+      while(it.hasNext()){
+         it.next().receiveError(error);
+      }
    }
 
    /*

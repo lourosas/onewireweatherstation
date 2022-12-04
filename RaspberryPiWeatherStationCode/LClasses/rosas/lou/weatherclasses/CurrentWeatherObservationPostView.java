@@ -258,6 +258,15 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
 
    ///////////////////Interface Implementation////////////////////////
    /**/
+   public void receiveError(String error){
+      //System.out.println(error);
+      JOptionPane.showMessageDialog(this,
+                                    error,
+                                    "Received Error",
+                                    JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**/
    public void updateDewpoint(WeatherData data){
       this.updateDewPointPane(data);
    }
