@@ -20,8 +20,8 @@ public class TestURLStringRequest{
       System.out.println("Hello World");
       StringBuffer send = new StringBuffer("http://");
       send.append("68.98.39.39:8000/daily");
-      //send.append("?month=August&date=20&year=2019");
-      //send.append("&units=English");
+      send.append("?month=August&date=06&year=2019");
+      send.append("&units=English");
       try{
          System.out.println(send);
          URL url = new URL(send.toString().trim());
@@ -38,6 +38,40 @@ public class TestURLStringRequest{
                   if(line.contains("Temperature")){
                      System.out.println(line);
                   }
+                  else if(line.contains("Humidity")){
+                     System.out.println(line);
+                  }
+                  else if(line.contains("Dew Point")){
+                     System.out.println(line);
+                  }
+                  else if(line.contains("Heat Index")){
+                     System.out.println(line);
+                  }
+               }
+            }
+            else if(line.contains("tempdata.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  System.out.println(line);
+               }
+            }
+            else if(line.contains("humdata.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  System.out.println(line);
+               }
+            }
+            else if(line.contains("presdata.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  System.out.println(line);
+               }
+            }
+            else if(line.contains("dpdata.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  System.out.println(line);
+               }
+            }
+            else if(line.contains("hidata.addRows")){
+               while(!(line = in.readLine()).contains("]);")){
+                  System.out.println(line);
                }
             }
          }
