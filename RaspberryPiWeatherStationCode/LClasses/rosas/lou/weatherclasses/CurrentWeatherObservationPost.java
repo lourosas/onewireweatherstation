@@ -23,7 +23,8 @@ import java.io.*;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherObservationPost extends
-CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
+CurrentWeatherDataSubscriber 
+implements WeatherClientDataSubscriber, Runnable{
    private List<CurrentWeatherDataObserver> _observers = null;
    private WeatherClientDataPublisher wcdp             = null;
 
@@ -148,6 +149,9 @@ CurrentWeatherDataSubscriber implements WeatherClientDataSubscriber{
    }
 
    ///////////////////////Interface Implementation////////////////////
+   /**/
+   public void run(){}
+
    /**/
    public void updateData(String data){
       this._data = data;

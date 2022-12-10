@@ -22,8 +22,9 @@ import java.util.*;
 import rosas.lou.weatherclasses.*;
 
 public class CurrentWeatherDataSubscriber
-implements WeatherClientDataSubscriber{
+implements WeatherClientDataSubscriber, Runnable{
    protected String            _data;
+   protected int               _sleepTime;
    protected WeatherDataParser _wdp;
    protected WeatherData       temperatureData;
    protected WeatherData       humidityData;
@@ -32,8 +33,9 @@ implements WeatherClientDataSubscriber{
    protected WeatherData       heatIndexData;
 
    {
-      _data = null;
-      _wdp  = null;
+      _data      = null;
+      _wdp       = null;
+      _sleepTime = -1;
    };
    ///////////////////////Constructors////////////////////////////////
    /*
@@ -43,6 +45,10 @@ implements WeatherClientDataSubscriber{
    }
 
    ///////////////////Interface Implementations///////////////////////
+   /*
+   */
+   public void run(){}
+
    /*
    */
    public void updateData(String data){
@@ -104,11 +110,12 @@ implements WeatherClientDataSubscriber{
    /**/
    public void addPublisher(WeatherClientDataPublisher publisher){}
 
-   /**/
-   public void requestUpdateFromPublisher(){}
 
    ///////////////////////Instance Methods////////////////////////////
    ////////////////////////Public Methods/////////////////////////////
+   /**/
+   public void requestUpdateFromPublisher(){}
+
    /*
    */
    public double temperature(Units units){
