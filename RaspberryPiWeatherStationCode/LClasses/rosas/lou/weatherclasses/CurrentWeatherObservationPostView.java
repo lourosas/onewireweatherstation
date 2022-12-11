@@ -88,6 +88,25 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
    ////////////////////Insatance Methods//////////////////////////////
    ////////////////////Public Methods/////////////////////////////////
    /**/
+   public void displayInteraction(String type){
+      if(type.toUpperCase().equals("SLEEPTIME")){
+         GenericJInteractionFrame f =
+                  new GenericJInteractionFrame("Change Request Time");
+         JLabel name = new JLabel("User: ");
+         JLabel pass = new JLabel("Password: ");
+         JPanel panel = new JPanel();
+         panel.setLayout(new GridLayout(2,2));
+         panel.add(new JLabel("User: "));
+         panel.add(new JTextField(20));
+         panel.add(new JLabel("Password: "));
+         panel.add(new JPasswordField(20));
+         f.getContentPane().add(panel);
+         f.setSize(100,100);
+         f.setVisible(true);
+      }
+   }
+
+   /**/
    public void updateTheViews(String idx){
       try{
          JTabbedPane jtp =

@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.io.*;
 import rosas.lou.weatherclasses.*;
+import myclasses.*;
 
 public class CurrentWeatherObservationPostController
 extends CurrentWeatherController{
@@ -86,8 +87,9 @@ extends CurrentWeatherController{
             }
             catch(HeadlessException he){}
          }
-         else{
-            System.out.println(e.getActionCommand().toUpperCase());
+         else if(
+                e.getActionCommand().toUpperCase().equals("REQUEST")){
+            this._view.displayInteraction("SLEEPTIME");
          }
       }
    }
