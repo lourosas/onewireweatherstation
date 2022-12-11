@@ -139,6 +139,12 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
       save.addActionListener(this._controller);
       save.addKeyListener(this._controller);
       panel.add(save);
+      
+      JButton requestTime = new JButton("Request Time");
+      requestTime.setActionCommand("Request");
+      requestTime.addActionListener(this._controller);
+      requestTime.addKeyListener(this._controller);
+      panel.add(requestTime);
 
       return panel;
    }
@@ -257,6 +263,9 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
    }
 
    ///////////////////Interface Implementation////////////////////////
+   /**/
+   public void receiveMessage(String message){}
+
    /**/
    public void receiveError(String error){
       //System.out.println(error);

@@ -1,5 +1,5 @@
 /*
-Copyright 2018 Lou Rosas
+Copyright 2022 Lou Rosas
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -114,7 +114,24 @@ implements WeatherClientDataSubscriber, Runnable{
    ///////////////////////Instance Methods////////////////////////////
    ////////////////////////Public Methods/////////////////////////////
    /**/
+   public void changeSleepTime(){}
+
+   public boolean confirmSuperUserCredentials
+   (
+      String name,
+      char[] password
+   ){
+      return false;
+   }
+
+   /**/
    public void requestUpdateFromPublisher(){}
+
+   /**/
+   public void setSleepTime(int seconds){}
+
+   /**/
+   public void setSleepTime(int hours,int minutes,int seconds){}
 
    /*
    */

@@ -86,6 +86,9 @@ extends CurrentWeatherController{
             }
             catch(HeadlessException he){}
          }
+         else{
+            System.out.println(e.getActionCommand().toUpperCase());
+         }
       }
    }
 
