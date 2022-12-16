@@ -19,7 +19,6 @@ package rosas.lou.weatherclasses;
 
 import java.lang.*;
 import java.util.*;
-import myclasses.*;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
 
