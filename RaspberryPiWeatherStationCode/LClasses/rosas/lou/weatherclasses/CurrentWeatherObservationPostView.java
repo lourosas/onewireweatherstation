@@ -42,7 +42,6 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
    private WeatherData _pressureData            = null;
    private WeatherData _dewpointData            = null;
    private CurrentWeatherController _controller = null;
-   private GenericJInteractionFrame _slpTime    = null;
 
    private int dewpoint_minutes                 = -1;
    private int dewpoint_seconds                 = -1;
@@ -93,6 +92,9 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
       if(type.toUpperCase().equals("SLEEPTIME")){
          SuperUserAccountFrame sua =SuperUserAccountFrame.instance();
          sua.setVisible(true);
+         //SleepTimeFrame stf = SleepTimeFrame.instance();
+         //stf.setController(this._controller);
+         //stf.setVisible(true);
       }
    }
 
