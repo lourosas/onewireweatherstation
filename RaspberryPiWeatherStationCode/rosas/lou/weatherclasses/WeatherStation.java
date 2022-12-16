@@ -1,4 +1,19 @@
-/**/
+/********************************************************************
+Copyright 2018 Lou Rosas
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+********************************************************************/
 
 package rosas.lou.weatherclasses;
 
@@ -20,11 +35,10 @@ import com.dalsemi.onewire.utils.Convert;
 //Database Stuff (TBD)
 //import java.sql.*;
 
-public class WeatherStation implements TimeListener{
-   private Units units;
-   private DSPortAdapter dspa        = null;
-   private StopWatch     stopWatch   = null;
-   private Calendar      currentDate = null;
+public class WeatherStation extends WeatherDataPublisher 
+implements TimeListener{
+   private static int _id                    = -1;
+
    //put into a list to handle multiple observers
    private List<TemperatureObserver> t_o_List  = null;
    private List<HumidityObserver>    h_o_List  = null;
@@ -32,23 +46,29 @@ public class WeatherStation implements TimeListener{
    private List<CalculatedObserver>  c_o_List  = null;
    private List<TimeObserver>        ti_o_List = null;
    private List<ExtremeObserver>     ex_o_List = null;
+   private List<TemperatureHumidityObserver> t_h_List = null;
+   private WeatherData               _dewPoint = null;
+   private WeatherData              _heatIndex = null;
+   private WeatherData               _humidity = null;
+   private WeatherData               _pressure = null;
+   private WeatherData            _temperature = null;
+   private long            _previousTimeMillis =   -1;
+   //Save to the database (by default) every 10 minutes
+   private long             _dataBaseSaveTime = 600000;
 
    //************************Constructors*****************************
    /*
    Constructor of no arguments
    */
    public WeatherStation(){
-      this(Units.METRIC);
+      ++_id;
    }
 
    /*
    Constructor initializing the Units, et. al...
    */
    public WeatherStation(Units units){
-      final int DEFAULTUPDATERATE = 5; //5 minutes
-      this.currentDate = Calendar.getInstance();
-      this.setUpDSPA();
-      this.setUpdateRate(DEFAULTUPDATERATE);
+      ++_id;
    }
 
    /**/
@@ -94,6 +114,19 @@ public class WeatherStation implements TimeListener{
          this.h_o_List.add(ho);
       }
    }
+
+   public void addTemperatureHumidityObserver
+   (
+      TemperatureHumidityObserver tho
+   ){
+      try{
+         this.t_h_List.add(tho);
+      }
+      catch(NullPointerException npe){
+         this.t_h_List = new Vector<TemperatureHumidityObserver>();
+         this.t_h_List.add(tho);
+      }
+   }
    
    /***/
    public void addTemperatureObserver(TemperatureObserver to){
@@ -116,50 +149,204 @@ public class WeatherStation implements TimeListener{
          this.ti_o_List.add(to);
       }
    }
+
+   /*
+   */
+   public void barometricPressure(){
+      this.setPressure();
+      this.publishBarometricPressure(this._pressure);
+   }
+
+   /*
+   */
+   public void barometricPressureAbsolute(){
+      this.setPressure();
+      double pressure = this._pressure.absoluteData();
+      this.publishBarometricPressure(pressure, Units.ABSOLUTE);
+   }
+
+   /*
+   */
+   public void barometricPressureEnglish(){
+      this.setPressure();
+      double pressure = this._pressure.englishData();
+      this.publishBarometricPressure(pressure, Units.ENGLISH);
+
+   }
+
+   /*
+   */
+   public void barometricPressureMetric(){
+      this.setPressure();
+      double pressure = this._pressure.metricData();
+      this.publishBarometricPressure(pressure, Units.METRIC);
+   }
+
+   /*
+   Pick the time (in minutes) to save off the database.
+   The default is 10 minutes
+   */
+   public void dataBaseSaveTime(int minutes){
+      final int SECONDS      = 60;   //Seconds in a minutue
+      final int MILLISECONDS = 1000; //Milli-Seconds in a second
+      this._dataBaseSaveTime = minutes*SECONDS*MILLISECONDS;
+   }
    
    /*
    */
-   public void mesure(){
-      this.publishTimeEvent();
-      this.publishTemperature();
-      this.publishHumidity();
-      this.publishDewpoint();
-      this.publishHeatIndex();
-      //Until I can handle null exceptions better
-      this.publishBarometricPressure();
-      this.publishExtremes();
-   }
-
-   /**
-   **/
-   public List<String> requestData(String request){
-      List<String> returnList = null;
-      try{
-        WeatherStorage ws = WeatherStorage.getInstance();
-        returnList        = ws.requestData(request); 
-        System.out.println(returnList);
-      }
-      catch(NullPointerException npe){}
-      finally{
-         return returnList;
-      }
+   public void dewpoint(){
+      this.setDewpoint();
+      this.publishDewpoint(this._dewPoint);
    }
    
-   /**
+   /*
+   */
+   public void dewpointAbsolute(){
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.absoluteData();
+      this.publishDewpoint(dewpoint, Units.ABSOLUTE);
+   }
+   
+   /*
+   */
+   public void dewpointEnglish(){
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.englishData();
+      this.publishDewpoint(dewpoint, Units.ENGLISH);
+   }
+   
+   /*
+   */
+   public void dewpointMetric(){
+      this.setDewpoint();
+      double dewpoint  = this._dewPoint.metricData();
+      this.publishDewpoint(dewpoint, Units.METRIC);
+   }
+   
+   /*
+   */
+   public void heatIndex(){
+      this.setHeatIndex();
+      this.publishHeatIndex(this._heatIndex);
+      
+   }
+   
+   /*
+   */
+   public void heatIndexAbsolute(){
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.absoluteData();
+      this.publishHeatIndex(heatIndex, Units.ABSOLUTE);
+   }
+   
+   /*
+   */
+   public void heatIndexEnglish(){
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.englishData();
+      this.publishHeatIndex(heatIndex, Units.ENGLISH);
+   }
+   
+   /*
+   */
+   public void heatIndexMetric(){
+      this.setHeatIndex();
+      double heatIndex = this._heatIndex.metricData();
+      this.publishHeatIndex(heatIndex, Units.METRIC);
+   }
+
+   /*
+   */
+   public void humidity(){
+      this.setHumidity();
+      this.publishHumidity(this._humidity);
+   }
+
+   /*
+   */
+   public void humidityValue(){
+      this.setHumidity();
+      this.publishHumidity(this._humidity.percentageData());
+   }
+
+   /*
+   */
+   public int id(){ return _id; }
+
+   /*
+   Now make this real easy
+   */
+   public void measure(){
+      this.temperature();
+      this.humidity();
+      this.barometricPressure();
+      this.dewpoint();
+      this.heatIndex();
+      //The User needs to know if this was possible
+      this.archiveToDatabase();
+   }
+
+   /*
+   */
+   public void removeBarometerObserver(BarometerObserver bo){}
+   
+   /*
+   */
+   public void removeCalculatedObserver(CalculatedObserver co){}
+
+   /*
+   */
+   public void removeTemperatureHumidityObserver
+   (
+      TemperatureHumidityObserver tho
+   ){}
+
+   /*
    */
    public void setUpdateRate(int mins){
       final int SECONDS      = 60;   //Seconds in a minutue
       final int MILLISECONDS = 1000; //Milli-Seconds in a second
-      try{
-         this.stopWatch.setQuerryTime(mins*SECONDS*MILLISECONDS);
+      boolean run = true;
+      while(run){
+         try{
+            this.measure();
+            Thread.sleep(mins*SECONDS*MILLISECONDS);
+         }
+         catch(InterruptedException ie){
+            run = false;
+         }
       }
-      catch(NullPointerException npe){
-         this.stopWatch = new StopWatch(mins*SECONDS*MILLISECONDS);
-         this.stopWatch.addTimeListener(this);
-         Thread t = new Thread(this.stopWatch);
-         t.start();
-         this.stopWatch.start();
-      }
+   }
+
+   /*
+   */
+   public void temperature(){
+      this.setTemperature();
+      this.publishTemperature(this._temperature);
+   }
+
+   /**
+   */
+   public void temperatureAbsolute(){
+      this.setTemperature();
+      double temp = this._temperature.absoluteData();
+      this.publishTemperature(temp, Units.ABSOLUTE);
+   }
+
+   /**
+   */
+   public void temperatureEnglish(){
+      this.setTemperature();
+      double temp = this._temperature.englishData();
+      this.publishTemperature(temp, Units.ENGLISH);
+   }
+
+   /**
+   */
+   public void temperatureMetric(){
+      this.setTemperature();
+      double temp = this._temperature.metricData();
+      this.publishTemperature(temp, Units.METRIC);
    }
    
    ////////////Implementation of the TimeListener Interface///////////
@@ -172,14 +359,33 @@ public class WeatherStation implements TimeListener{
    public void update(Stack<TimeFormater> tfs, ClockState cs){}
    
    public void update(TimeFormater tf){
-      this.mesure();
+      this.measure();
    }
    
    public void update(TimeFormater tf, ClockState cs){}
    ///////////////////////////////////////////////////////////////////
-   
-   
-   ///////////////////////////////////////////////////////////////////
+
+   ////////////////////////////Private Methods////////////////////////
+   /*
+   */
+   private void archiveToDatabase(){
+      Calendar cal            = Calendar.getInstance();
+      WeatherDatabase db      = MySQLWeatherDatabase.getInstance();
+      long currentTimeMillis  = cal.getTimeInMillis();
+      if((currentTimeMillis - this._previousTimeMillis) >= 
+                                             this._dataBaseSaveTime){
+         System.out.println("Archive!\n");
+         System.out.println(currentTimeMillis + "\n");
+         System.out.println(this._previousTimeMillis + "\n");
+         this._previousTimeMillis = currentTimeMillis;
+         db.temperature(this._temperature);
+         db.humidity(this._humidity);
+         db.barometricPressure(this._pressure);
+         db.dewpoint(this._dewPoint);
+         db.heatIndex(this._heatIndex);
+      }
+   }
+
    /*
    Very Simple:
    Calculate the dewpoint for a given pair of humidity and
@@ -197,7 +403,8 @@ public class WeatherStation implements TimeListener{
    and 0.0 < RH < 100.0.
    Temperature -45 to 60 degrees celsius
    */
-   private double calculateDewpoint(){
+   private WeatherData calculateDewpoint(){
+      /*
       final double l = 243.12;  //lambda constant
       final double b =  17.62;  //Beta constant
 
@@ -216,6 +423,34 @@ public class WeatherStation implements TimeListener{
          dewpoint = (l * alpha)/(b - alpha);
       }
 
+      return dewpoint;
+      */
+      final double l  = 243.12;  //lambda constant
+      final double b  =  17.62;  //Beta constant
+      double temp     = this._temperature.metricData();
+      double humidity = this._humidity.percentageData();
+      
+      WeatherData dewpoint = null;
+      
+      if(temp     > WeatherData.DEFAULTVALUE &&
+         humidity > WeatherData.DEFAULTHUMIDITY){
+         double alpha = ((b*temp)/(l+temp))+Math.log(humidity*0.01);
+         double dp    = (l * alpha)/(b - alpha);
+         String message = new String("Good Dewpoint Data");
+         dewpoint = new DewpointData(Units.METRIC,
+                                     dp,
+                                     message,
+                                     Calendar.getInstance());
+      }
+      else{
+         //If temp OR humidity did not give a good reading, the
+         //dewpoint CANNOT be calculated!
+         String message = new String("No Dewpoint Data");
+         dewpoint = new DewpointData(Units.METRIC,
+                                     WeatherData.DEFAULTVALUE,
+                                     message,
+                                     Calendar.getInstance());
+      }
       return dewpoint;
    }
 
@@ -253,95 +488,117 @@ public class WeatherStation implements TimeListener{
           System to figure out the appropriateness of the Heat Index
           data for display.
    */
-   private double calculateHeatIndex(){
-      final double MINIMUMTEMP = 70.;
-      double heatIndex = Thermometer.DEFAULTTEMP;
+   private WeatherData calculateHeatIndex(){
+      //final double MINIMUMTEMP = 70.;
+      //double heatIndex = Thermometer.DEFAULTTEMP;
 
-      Thermometer t = Thermometer.getInstance();
-      Hygrometer  h = Hygrometer.getInstance();
+      //Thermometer t = Thermometer.getInstance();
+      //Hygrometer  h = Hygrometer.getInstance();
 
       //For this calculation, the tempertaure needs to be in English
       //units (degrees Fahrenheit)
-      double tf = t.getTemperature(Units.ENGLISH);
-      double rh = h.getHumidity();
+      //double tf = t.getTemperature(Units.ENGLISH);
+      //double rh = h.getHumidity();
 
       /*
       Only consider to calculate the HeatIndex if the Temperature
       and Relative Humidity are not the default values (This would
       indicate an issue related to the sensors or network)
       */
-      if(tf > Thermometer.DEFAULTTEMP &&
-         rh > Hygrometer.DEFAULTHUMIDITY){
+      //if(tf > Thermometer.DEFAULTTEMP &&
+      //   rh > Hygrometer.DEFAULTHUMIDITY){
          /*If the Temperature and Humidity are valid (at least
          seem valid), go ahead and determine if the temperature
          is high enough for a valid heat index calculation (> 70).
          The Humidity is assumed to be >= 0. by default/expectation
          of the sensor working correctly.
          */
+      //   if(tf >= MINIMUMTEMP){
+      //      heatIndex  = 16.923;
+      //      heatIndex += (0.185212 * tf);
+      //      heatIndex += (5.37941  * rh);
+      //      heatIndex -= ((0.100254) * tf * rh);
+      //      heatIndex += ((9.41685 * 0.001) * tf * tf);
+      //      heatIndex += ((7.28898 * 0.001) * rh * rh);
+      //      heatIndex += ((3.45372 * 0.0001) * tf * tf * rh);
+      //      heatIndex -= ((8.14971 * 0.0001) * tf * rh * rh);
+      //      heatIndex += ((1.02102 * 0.00001) * tf * tf * rh * rh);
+      //      heatIndex -= ((3.8646  * 0.00001) * tf * tf * tf);
+      //      heatIndex += ((2.91583 * 0.00001) * rh * rh * rh);
+      //      heatIndex += ((1.42721 * .000001)* tf * tf * tf *rh);
+      //      heatIndex += ((1.97483 * .0000001) * tf * rh * rh * rh);
+      //      heatIndex -= ((2.18429 * .00000001) *tf*tf*tf* rh * rh);
+      //      heatIndex += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
+      //      heatIndex-=((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
+      //   }
+      //}
+      //return heatIndex;
+      final double MINIMUMTEMP = 70.;
+      double tf = this._temperature.englishData();
+      double rh = this._humidity.percentageData();
+      
+      WeatherData heatIndex = null;
+      
+      if(tf > WeatherData.DEFAULTVALUE &&
+         rh > WeatherData.DEFAULTHUMIDITY){
          if(tf >= MINIMUMTEMP){
-            heatIndex  = 16.923;
-            heatIndex += (0.185212 * tf);
-            heatIndex += (5.37941  * rh);
-            heatIndex -= ((0.100254) * tf * rh);
-            heatIndex += ((9.41685 * 0.001) * tf * tf);
-            heatIndex += ((7.28898 * 0.001) * rh * rh);
-            heatIndex += ((3.45372 * 0.0001) * tf * tf * rh);
-            heatIndex -= ((8.14971 * 0.0001) * tf * rh * rh);
-            heatIndex += ((1.02102 * 0.00001) * tf * tf * rh * rh);
-            heatIndex -= ((3.8646  * 0.00001) * tf * tf * tf);
-            heatIndex += ((2.91583 * 0.00001) * rh * rh * rh);
-            heatIndex += ((1.42721 * .000001)* tf * tf * tf *rh);
-            heatIndex += ((1.97483 * .0000001) * tf * rh * rh * rh);
-            heatIndex -= ((2.18429 * .00000001) *tf*tf*tf* rh * rh);
-            heatIndex += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
-            heatIndex-=((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
+            double heatI  = 16.923;
+            heatI += (0.185212 * tf);
+            heatI += (5.37941  * rh);
+            heatI -= ((0.100254) * tf * rh);
+            heatI += ((9.41685 * 0.001) * tf * tf);
+            heatI += ((7.28898 * 0.001) * rh * rh);
+            heatI += ((3.45372 * 0.0001) * tf * tf * rh);
+            heatI -= ((8.14971 * 0.0001) * tf * rh * rh);
+            heatI += ((1.02102 * 0.00001) * tf * tf * rh * rh);
+            heatI -= ((3.8646  * 0.00001) * tf * tf * tf);
+            heatI += ((2.91583 * 0.00001) * rh * rh * rh);
+            heatI += ((1.42721 * .000001)* tf * tf * tf *rh);
+            heatI += ((1.97483 * .0000001) * tf * rh * rh * rh);
+            heatI -= ((2.18429 * .00000001) *tf*tf*tf* rh * rh);
+            heatI += ((8.43196 * .0000000001)*tf*tf*rh*rh*rh);
+            heatI -= ((4.81975 * .00000000001)*tf*tf*tf*rh*rh*rh);
+            String message = new String("Good HeatIndex Data");
+            heatIndex = new HeatIndexData(Units.ENGLISH,
+                                          heatI,
+                                          message,
+                                          Calendar.getInstance());
          }
+         else{
+            //Temperature is too low for accurate calculation
+            String message = new String("Temperature Too Low");
+            heatIndex = new HeatIndexData(Units.METRIC,
+                                          WeatherData.DEFAULTVALUE,
+                                          message,
+                                          Calendar.getInstance());
+         }
+      }
+      else{
+         //if temp or humidity did not give a good reading, the
+         //Heat Index CANNOT be calculated!
+         String message = new String("No Heat Index Data");
+         heatIndex = new HeatIndexData(Units.METRIC,
+                                       WeatherData.DEFAULTVALUE,
+                                       message,
+                                       Calendar.getInstance());
       }
       return heatIndex;
    }
 
    /**
    */
-   private void findSensors(Stack<String> sensors){
+   protected void publishBarometricPressure(WeatherData data){
       try{
-         Units units = Units.METRIC;
-         while(sensors.size() > 0){
-            String address = sensors.pop();
-            String name    = sensors.pop();
-            if(!name.equals("DS1990A")){
-               if(name.equals("DS1920") || name.equals("DS18S20")){
-                  Sensor thermometer = Thermometer.getInstance();
-                  thermometer.initialize(units,address,name,this.dspa);
-                  System.out.println(thermometer);
-               }
-               //Eventually, will need to check the address, since
-               //both the hygrometer and barometer have the same name,
-               //BUT different addresses:  this IS the biggest PAIN in
-               //the ASS with the OneWireSystem!!!
-               else if(name.equals("DS2438")){
-                  if(address.equals("92000000BCA3EF26")){
-                     Sensor barometer = Barometer.getInstance();
-                     barometer.initialize(units, address, name,
-                                                           this.dspa);
-                     System.out.println(barometer);
-                  }
-                  else{
-                     Sensor hygrometer = Hygrometer.getInstance();
-                     hygrometer.initialize(units, address, name,
-                                                           this.dspa);
-                     System.out.println(hygrometer);
-                  }
-               }
-            }
+         Iterator<BarometerObserver> i = this.b_o_List.iterator();
+         while(i.hasNext()){
+            BarometerObserver bo = i.next();
+            bo.updatePressure(data);
          }
       }
-      catch(EmptyStackException ese){}
-      catch(Exception e){ e.printStackTrace(); }
-   }
-   
-   /**
-   */
-   private void publishBarometricPressure(){
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      /*
       WeatherEvent evt1     = null;
       WeatherEvent evt2     = null;
       WeatherEvent evt3     = null;
@@ -382,11 +639,36 @@ public class WeatherStation implements TimeListener{
          }
       
       }
+      */
    }
 
-   /**
+   /*
    */
-   private void publishDewpoint(){
+   protected void publishBarometricPressure(double data, Units units){
+      try{
+         Iterator<BarometerObserver> i = this.b_o_List.iterator();
+         while(i.hasNext()){
+            BarometerObserver bo = i.next();
+            if(units == Units.METRIC){
+               bo.updatePressureMetric(data);
+            }
+            else if(units == Units.ENGLISH){
+               bo.updatePressureEnglish(data);
+            }
+            else if(units == Units.ABSOLUTE){
+               bo.updatePressureAbsolute(data);
+            }
+	 }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+   
+   /*
+   */
+   protected void publishDewpoint(WeatherData data){
+      /*
       WeatherEvent evt1 = null;
       WeatherEvent evt2 = null;
       WeatherEvent evt3 = null;
@@ -437,11 +719,45 @@ public class WeatherStation implements TimeListener{
             co.updateDewpoint(ws);
          }
       }
+      */
+      try{
+         Iterator<CalculatedObserver> i = c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            co.updateDewpoint(data);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
+   /**/
+   protected void publishDewpoint(double data, Units units){
+      try{
+         Iterator<CalculatedObserver> i = c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            if(units == Units.METRIC){
+               co.updateDewpointMetric(data);
+            }
+            else if(units == Units.ENGLISH){
+               co.updateDewpointEnglish(data);
+            }
+            else if(units == Units.ABSOLUTE){
+               co.updateDewpointAbsolute(data);
+            }
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
 
    /*
    */
    private void publishExtremes(){
+      /*
       try{
          WeatherStorage ws = WeatherStorage.getInstance();
          Iterator<ExtremeObserver> i = this.ex_o_List.iterator();
@@ -453,10 +769,13 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
+      */
    }
+
    /**
    */
-   private void publishHeatIndex(){
+   protected void publishHeatIndex(WeatherData data){
+      /*
       WeatherEvent evt1 = null;
       WeatherEvent evt2 = null;
       WeatherEvent evt3 = null;
@@ -492,8 +811,6 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
          WeatherStorage ws = WeatherStorage.getInstance();
-         //evt1 = new WeatherEvent(null, "Heat Index", -999.9,
-         //                                    null, this.currentDate);
          evt1 = new WeatherEvent(null, "Heat Index",
                                             Thermometer.DEFAULTTEMP,
                                              null, this.currentDate);
@@ -507,11 +824,57 @@ public class WeatherStation implements TimeListener{
             co.updateHeatIndex(ws);
          }
       }
+      */
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            co.updateHeatIndex(data);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
    }
-   
+
+   /*
+   */
+   protected void publishHeatIndex(double data, Units units){
+      try{
+         Iterator<CalculatedObserver> i = this.c_o_List.iterator();
+         while(i.hasNext()){
+            CalculatedObserver co = i.next();
+            if(units == Units.METRIC){
+               co.updateHeatIndexMetric(data);
+            }
+            else if(units == Units.ENGLISH){
+               co.updateHeatIndexEnglish(data);
+            }
+            else if(units == Units.ABSOLUTE){
+               co.updateHeatIndexAbsolute(data);
+            }
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   }
+
    /**
    */
-   private void publishHumidity(){
+   protected void publishHumidity(WeatherData data){
+      try{
+         Iterator<TemperatureHumidityObserver> i =
+                                            this.t_h_List.iterator();
+         while(i.hasNext()){
+            TemperatureHumidityObserver tho = i.next();
+            tho.updateHumidity(data);
+	 }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      /*
       WeatherEvent evt1     = null;
       WeatherEvent evt2     = null;
       Sensor     hygrometer = Hygrometer.getInstance();
@@ -547,11 +910,43 @@ public class WeatherStation implements TimeListener{
             ho.updateHumidity(ws);
          }
       }
+      */
    }
-   
+
    /**
    */
-   private void publishTemperature(){
+   protected void publishHumidity(double humidity){
+      try{
+         Iterator<TemperatureHumidityObserver> i =
+                                            this.t_h_List.iterator();
+         while(i.hasNext()){
+            TemperatureHumidityObserver tho = i.next();
+            tho.updateHumidity(humidity);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      
+   }
+
+
+
+   /**
+   */
+   protected void publishTemperature(WeatherData data){
+      try{
+         Iterator<TemperatureHumidityObserver> i =
+                                            this.t_h_List.iterator();
+         while(i.hasNext()){
+            TemperatureHumidityObserver tho = i.next();
+            tho.updateTemperature(data);
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+      /*
       WeatherEvent evt1  = null;
       WeatherEvent evt2  = null;
       WeatherEvent evt3  = null;
@@ -588,11 +983,37 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
+      */
    }
-   
+
+   /*
+   */
+   protected void publishTemperature(double temp, Units units){
+      try{
+         Iterator<TemperatureHumidityObserver> i =
+                                            this.t_h_List.iterator();
+         while(i.hasNext()){
+            TemperatureHumidityObserver tho = i.next();
+            if(units == Units.METRIC){
+               tho.updateTemperatureMetric(temp);
+            }
+            else if(units == Units.ENGLISH){
+               tho.updateTemperatureEnglish(temp);
+            }
+            else if(units == Units.ABSOLUTE){
+               tho.updateTemperatureAbsolute(temp);
+            }
+         }
+      }
+      catch(NullPointerException npe){
+         npe.printStackTrace();
+      }
+   } 
+
    /**
    */
    private void publishTimeEvent(){
+      /*
       this.currentDate = Calendar.getInstance();
       String date = String.format("%tc", this.currentDate.getTime());
       try{
@@ -604,10 +1025,10 @@ public class WeatherStation implements TimeListener{
       catch(NullPointerException npe){
          npe.printStackTrace();
       }
+      */
    }
    
-   /**
-   */
+   /*
    private void setUpDSPA(){
       final int ADAPTER_DATA_SIZE = 2;
       PortSniffer ps = new PortSniffer(PortSniffer.PORT_USB);
@@ -627,5 +1048,39 @@ public class WeatherStation implements TimeListener{
             catch(OneWireException owe){ owe.printStackTrace(); }
          }
       }
+   }
+   */
+
+   /*
+   */
+   private void setDewpoint(){
+      this._dewPoint = this.calculateDewpoint();
+   }
+
+   /*
+   */
+   private void setHeatIndex(){
+      this._heatIndex = this.calculateHeatIndex();
+   }
+
+   /*
+   Set the _humidity WeatherData by messaging the Hygrometer for
+   data
+   */
+   private void setHumidity(){
+      this._humidity = Hygrometer.getInstance().measure();
+   }
+
+   /*
+   */
+   private void setPressure(){
+      this._pressure = Barometer.getInstance().measure();
+   }
+   /*
+   Set the _temperature WeatherData by messaging the Thermometer for
+   data
+   */
+   private void setTemperature(){
+      this._temperature = Thermometer.getInstance().measure();
    }
 }

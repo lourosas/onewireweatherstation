@@ -118,6 +118,7 @@ CalculatedObserver, ExtremeObserver{
       this.updateHeatIndexExtremes(data);
    }
 
+   //
    //Implementation of the CalculatedObserver Interface
    //
    public void updateHeatIndex(WeatherEvent event){}
@@ -212,26 +213,53 @@ CalculatedObserver, ExtremeObserver{
       try{
          String value = 
                      String.format("%.2f", this.dewPoint.getValue());
-         data.append("<td>" + value + " &#176F</td>");
+         double dp = Double.parseDouble(value);
+         if(dp <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + value + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String maxDewPoint =
                   String.format("%.2f", this.dewPointMax.getValue());
-         data.append("<td>" + maxDewPoint + " &#176F</td>");
+         double maxdp = Double.parseDouble(maxDewPoint);
+         if(maxdp <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + maxDewPoint + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String minDewPoint =
                   String.format("%.2f", this.dewPointMin.getValue());
-         data.append("<td>" + minDewPoint + " &#176F</td>");
+         double mindp = Double.parseDouble(minDewPoint);
+         if(mindp <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + minDewPoint + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       finally{
          data.append("</tr>");
@@ -297,7 +325,16 @@ CalculatedObserver, ExtremeObserver{
       try{
          String value =
                     String.format("%.2f", this.heatIndex.getValue());
-         data.append("<td>" + value + " &#176F</td>");
+         double hi = Double.parseDouble(value);
+         if(hi <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + value + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/A</td>");
       }
       catch(NullPointerException npe){
          data.append("<td>N/A</td>");
@@ -305,7 +342,16 @@ CalculatedObserver, ExtremeObserver{
       try{
          String maxHeatIndex =
                   String.format("%.2f", this.heatIndexMax.getValue());
-         data.append("<td>" + maxHeatIndex + " &#176F</td>");
+         double hiMax = Double.parseDouble(maxHeatIndex);
+         if(hiMax <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + maxHeatIndex + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/A</td>");
       }
       catch(NullPointerException npe){
          data.append("<td>N/A</td>");
@@ -313,7 +359,16 @@ CalculatedObserver, ExtremeObserver{
       try{
          String minHeatIndex =
                   String.format("%.2f", this.heatIndexMin.getValue());
-         data.append("<td>" + minHeatIndex + " &#176F</td>");
+         double hiMin = Double.parseDouble(minHeatIndex);
+         if(hiMin <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + minHeatIndex + " &#176F</td>");
+         }
+      }
+      catch(NumberFormatException npe){
+         data.append("<td>N/A</td>");
       }
       catch(NullPointerException npe){
          data.append("<td>N/A</td>");
@@ -338,26 +393,53 @@ CalculatedObserver, ExtremeObserver{
       try{
          String value =
                      String.format("%.2f", this.humidity.getValue());
-         data.append("<td>" + value + "%</td>");
+         double humidity = Double.parseDouble(value);
+         if(humidity <= Hygrometer.DEFAULTHUMIDITY){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + value + "%</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String maxHumidity =
                   String.format("%.2f", this.humidityMax.getValue());
-         data.append("<td>" + maxHumidity + "%</td>");
+         double max = Double.parseDouble(maxHumidity);
+         if(max <= Hygrometer.DEFAULTHUMIDITY){
+            throw new NullPointerException();
+         }
+         else{    
+            data.append("<td>" + maxHumidity + "%</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe1){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String minHumidity = 
                   String.format("%.2f", this.humidityMin.getValue());
-         data.append("<td>" + minHumidity + "%</td>");
+         double min = Double.parseDouble(minHumidity);
+         if(min <= Hygrometer.DEFAULTHUMIDITY){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + minHumidity + "%</td>");
+         }
+      }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe2){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       finally{
          data.append("</tr>");
@@ -379,26 +461,53 @@ CalculatedObserver, ExtremeObserver{
       try{
          String value =
                      String.format("%.2f", this.pressure.getValue());
-         data.append("<td>" + value + " in Hg</td>");
+         double pressure = Double.parseDouble(value);
+         if(pressure <= Barometer.DEFAULTPRESSURE){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + value + " in Hg</td>");
+         }
+      }
+      catch(NumberFormatException npe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String maxPressure =
                   String.format("%.2f", this.pressureMax.getValue());
-         data.append("<td>" + maxPressure + "in Hg</td>");
+         double max = Double.parseDouble(maxPressure);
+         if(max <= Barometer.DEFAULTPRESSURE){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + maxPressure + "in Hg</td>");
+         }
+      }
+      catch(NumberFormatException npe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe1){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String minPressure =
                   String.format("%.2f", this.pressureMin.getValue());
-         data.append("<td>" + minPressure + "in Hg</td>");
+         double min = Double.parseDouble(minPressure);
+         if(min <= Barometer.DEFAULTPRESSURE){
+            throw new NullPointerException();
+         }
+         else{
+            data.append("<td>" + minPressure + "in Hg</td>");
+         }
+      }
+      catch(NumberFormatException npe){
+         data.append("<td>N/R</td>");
       }
       catch(NullPointerException npe2){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       finally{
          data.append("</tr>");
@@ -420,25 +529,48 @@ CalculatedObserver, ExtremeObserver{
       try{
          String temp = 
                    String.format("%.2f",this.temperature.getValue());
+         double value = Double.parseDouble(temp);
+         if(value <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
          data.append("<td>"+ temp +" &#176F</td>");
       }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
+      }
       catch(NullPointerException npe){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String tempMax =
                String.format("%.2f", this.temperatureMax.getValue());
+         double max = Double.parseDouble(tempMax);
+         if(max <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
          data.append("<td>" + tempMax + " &#176F</td>");
       }
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
+      }
       catch(NullPointerException npe2){
-         data.append("<td>N/A</td>");
+         data.append("<td>N/R</td>");
       }
       try{
          String tempMin =
                String.format("%.2f", this.temperatureMin.getValue());
+         double min = Double.parseDouble(tempMin);
+         if(min <= Thermometer.DEFAULTTEMP){
+            throw new NullPointerException();
+         }
          data.append("<td>" + tempMin + " &#176F</td>");
       }
-      catch(NullPointerException npe3){}
+      catch(NumberFormatException nfe){
+         data.append("<td>N/R</td>");
+      }
+      catch(NullPointerException npe3){
+         data.append("<td>N/R</td>");
+      }
       finally{
          data.append("</tr>");
          return data.toString();

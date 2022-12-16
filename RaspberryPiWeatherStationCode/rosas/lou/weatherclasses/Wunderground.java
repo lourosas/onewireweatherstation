@@ -1,7 +1,18 @@
-/********************************************************************
-<GNU stuff goes here>
-********************************************************************/
-
+//////////////////////////////////////////////////////////////////////
+/*
+Copyright 2018 Lou Rosas
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+//////////////////////////////////////////////////////////////////////
 package rosas.lou.weatherclasses;
 
 import java.lang.*;
@@ -13,20 +24,10 @@ import java.net.*;
 import java.io.*;
 import rosas.lou.weatherclasses.*;
 
-public class Wunderground implements TemperatureObserver,
-BarometerObserver, HumidityObserver, CalculatedObserver,
-ExtremeObserver, Runnable{
+public class Wunderground implements TemperatureHumidityObserver,
+BarometerObserver, CalculatedObserver, Runnable{
    //Timeout in 5 seconds
    private final long TIMEOUT = 5000;
-   //By convention, the Metric Data is stored in the first position
-   //in the list
-   private final int METRIC  = 0;
-   //By convention, the English Data is stored in the second
-   //position in the list
-   private final int ENGLISH = 1;
-   //By convention, the Absolute Data is stored in the third
-   //position in the list
-   private final int ABSOLUTE = 2;
    //
    private final String USERNAME = "KAZTUCSO647";
    //
@@ -34,240 +35,165 @@ ExtremeObserver, Runnable{
    //
    private final String URL      = "weatherstation.wunderground.com";
 
- 
-   //State Enumeration
-   private enum State{WAIT, RECEIVE, SEND}
+   private WeatherData _temperature;
+   private WeatherData _humidity;
+   private WeatherData _pressure;
+   private WeatherData _heatIndex;
+   private WeatherData _dewPoint;
 
-   private State   state;
-   private boolean dewpointUpdated;
-   private boolean extremeUpdated;
-   private boolean heatIndexUpdated;
-   private boolean humidityUpdated;
-   private boolean pressureUpdated;
-   private boolean temperatureUpdated;
-   private long    currentTime;
-   private long    startTime;
-   private double  currentTemperature;
-   private WeatherEvent temp;
-   private WeatherEvent humidity;
-   private WeatherEvent pressure;
-   private WeatherEvent heatIndex;
-   private WeatherEvent dewPoint;
-   private Socket socket;
+   private Socket _socket;
 
    {
-      state              = State.WAIT;
-      dewpointUpdated    = false;
-      extremeUpdated     = false;
-      heatIndexUpdated   = false;
-      humidityUpdated    = false;
-      pressureUpdated    = false;
-      temperatureUpdated = false;
-      temp               = null;
-      humidity           = null;
-      pressure           = null;
-      heatIndex          = null;
-      dewPoint           = null;
-      startTime          = 0;
-      currentTime        = 0;
-      socket             = null;
+      _temperature = null;
+      _humidity    = null;
+      _pressure    = null;
+      _heatIndex   = null;
+      _dewPoint    = null;
+      _socket      = null;
    }
 
-   //Constructor
-   public Wunderground(){
-      this.reset();
-   }
+   //////////////////////////Constructor//////////////////////////////
+   public Wunderground(){}
 
-   //Public Methods
+   ////////////////////////Public Methods/////////////////////////////
 
-   //Interface Implementations
+   /////////////////Interface Implementations/////////////////////////
    //
    //Implementation of the Runnable interface
    //
    public void run(){
-      Thread t = Thread.currentThread();
-      while(true){
-         if(this.state == State.RECEIVE){
-            Calendar cal = Calendar.getInstance();
-            this.currentTime = cal.getTimeInMillis();
-            if(this.currentTime - this.startTime >= TIMEOUT){
-               this.state = State.SEND;
-            }
-            else if(this.checkAllUpdates()){
-               this.state = State.SEND;
-            }
-         }
-         else if(this.state == State.SEND){
+      boolean toRun = true;
+      //Thread t = Thread.currentThread();
+      while(toRun){
+         try{
+            //Publish data to Wunderground
             StringBuffer message = this.setUpMessage();
             this.sendToWunderground(message.toString().trim());
-            //The last thing you do is go back to the WAIT state
-            this.reset();
+            //Sleep for 10 mins, then publish to Wunderground again
+            Thread.sleep(600000);
+         }
+         catch(InterruptedException ie){
+            toRun = false;
+            ie.printStackTrace();
          }
       }
    }
 
-   //
-   //Implementation of the BarometerObserver Interface
-   //
+   ////Implementation of the TemperatureHumidityObserver Interface////
+   /*
+   */
+   public void updateTemperature(WeatherData data){
+      this._temperature = data;
+   }
+
+   /*
+   */
+   public void updateTemperatureMetric(double temp){}
+
+   /*
+   */
+   public void updateTemperatureEnglish(double temp){}
+
+   /*
+   */
+   public void updateTemperatureAbsolute(double temp){}
+
+   /*
+   */
+   public void updateHumidity(WeatherData data){
+      this._humidity = data;
+   }
+
+   /*
+   */
+   public void updateHumidity(double humidity){}
+
+   ///////Implementation of the BarometerObserver Interface//////////
+   /*
+   */
    public void updatePressure(WeatherEvent event){}
 
-   //
-   //Implementation of the BarometerObserver Interface
-   //
-   public void updatePressure(WeatherStorage data){
-      List<WeatherEvent> event = data.getLatestData("pressure");
-      try{
-         //Get the English Value
-         this.pressure = event.get(ENGLISH);
-         this.pressureUpdated = true;
-         Calendar cal = Calendar.getInstance();
-         this.startTime = cal.getTimeInMillis();
-         if(this.state == State.WAIT){
-            this.state = State.RECEIVE;
-         }
-      }
-      catch(NullPointerException npe){
-         this.pressure = null;
-      }
+   /*
+   */
+   public void updatePressure(WeatherStorage store){}
+
+   /*
+   */
+   public void updatePressure(WeatherData data){
+      this._pressure = data;
    }
 
-   //
-   //Implementation of the CaclulatedObserver Interface
-   //
+   /*
+   */
+   public void updatePressureAbsolute(double data){}
+
+   /*
+   */
+   public void updatePressureEnglish(double data){}
+
+   /*
+   */
+   public void updatePressureMetric(double data){}
+
+   ///////Implementation of the CalculatedObserver Interface/////////
+   /*
+   */
    public void updateDewpoint(WeatherEvent event){}
 
-   //
-   //Implementation of the CaclulatedObserver Interface
-   //
-   public void updateDewpoint(WeatherStorage data){
-      List<WeatherEvent> event = data.getLatestData("dewpoint");
-      try{
-         //Get the English Value
-         this.dewPoint = event.get(ENGLISH);
-         this.dewpointUpdated = true;
-         Calendar cal = Calendar.getInstance();
-         this.startTime = cal.getTimeInMillis();
-         if(this.state == State.WAIT){
-            this.state = State.RECEIVE;
-         }
-      }
-      catch(NullPointerException npe){
-         this.dewPoint = null;
-      }
+   /*
+   */
+   public void updateDewpoint(WeatherStorage storage){}
+
+   /*
+   */
+   public void updateDewpoint(WeatherData data){
+      this._dewPoint = data;
    }
 
-   //
-   //Implementation of the CalculatedObserver Interface
-   //
+   /*
+   */
+   public void updateDewpointAbsolute(double data){}
+
+   /*
+   */
+   public void updateDewpointEnglish(double data){}
+
+   /*
+   */
+   public void updateDewpointMetric(double data){}
+
+   /*
+   */
    public void updateHeatIndex(WeatherEvent event){}
-   
-   //
-   //Implementation of the CalculatedObserver Interface
-   //
-   public void updateHeatIndex(WeatherStorage data){
-      List<WeatherEvent> event = data.getLatestData("heatindex");
-      try{
-         //Get the English Value
-         this.heatIndex = event.get(ENGLISH);
-         this.heatIndexUpdated = true;
-         Calendar cal = Calendar.getInstance();
-         this.startTime = cal.getTimeInMillis();
-         if(this.state == State.WAIT){
-            this.state = State.RECEIVE;
-         }
-      }
-      catch(NullPointerException npe){
-         this.heatIndex = null;
-      }
+
+   /*
+   */
+   public void updateHeatIndex(WeatherStorage store){}
+
+   /*
+   */
+   public void updateHeatIndex(WeatherData data){
+      this._heatIndex = data;
    }
 
-   //
-   //Implementation of the CalculatedObserver Interface
-   //
+   /*
+   */
+   public void updateHeatIndexAbsolute(double hi){}
+
+   /*
+   */
+   public void updateHeatIndexEnglish(double hi){}
+
+   /*
+   */
+   public void updateHeatIndexMetric(double hi){}
+
+   /*
+   */
    public void updateWindChill(WeatherEvent event){}
 
-   //
-   //Implementation of the ExtremeObserver
-   //
-   public void updateExtremes(WeatherEvent event){}
-
-   //
-   //Implementation of the ExtremeObserver
-   //
-   public void updateExtremes(WeatherStorage data){
-      List<WeatherEvent> max = data.getMax("Temperature");
-      Iterator<WeatherEvent> it = max.iterator();
-      while(it.hasNext()){
-         WeatherEvent we = it.next();
-      }
-   }
-
-   //
-   //Implementation of the HumidityObserver Interface
-   //
-   public void updateHumidity(WeatherEvent event){}
-
-   //
-   //Implementation of the HumidityObserver Interface
-   //
-   public void updateHumidity(WeatherStorage data){
-      List<WeatherEvent> event = data.getLatestData("humidity");
-      try{
-         Iterator<WeatherEvent> it = event.iterator();
-         while(it.hasNext()){
-            this.humidity = it.next();
-         }
-         this.humidityUpdated = true;
-         Calendar cal = Calendar.getInstance();
-         this.startTime = cal.getTimeInMillis();
-         if(this.state == State.WAIT){
-            this.state = State.RECEIVE;
-         }
-      }
-      catch(NullPointerException npe){
-         this.humidity = null;
-      }
-   }
-
-   //
-   //Implementation of the TemperatureObserver Interface
-   //
-   public void updateTemperature(WeatherEvent event){}
-   
-   //
-   //Implementation of the TemperatureObserver Interface
-   //
-   public void updateTemperature(WeatherStorage data){
-      List<WeatherEvent> event = data.getLatestData("temperature");
-      try{
-         //Get the English Value
-         this.temp = event.get(ENGLISH);
-         this.temperatureUpdated = true;
-         Calendar cal = Calendar.getInstance();
-         this.startTime = cal.getTimeInMillis();
-         if(this.state == State.WAIT){
-            this.state = State.RECEIVE;
-         }
-      }
-      catch(NullPointerException npe){
-         this.temp = null;
-      }
-   }
 
    //Private Methods
-   //
-   //Check to see if all the updates have come in
-   //
-   private boolean checkAllUpdates(){
-      boolean isAllUpdated = true;
-      isAllUpdated &= this.temperatureUpdated;
-      isAllUpdated &= this.humidityUpdated;
-      isAllUpdated &= this.pressureUpdated;
-      isAllUpdated &= this.dewpointUpdated;
-      isAllUpdated &= this.heatIndexUpdated;
-      return isAllUpdated;
-   }
-
    //
    //
    //
@@ -276,41 +202,31 @@ ExtremeObserver, Runnable{
       SimpleDateFormat formatter =
              new SimpleDateFormat("yyyy-MM-dd+HH:mm:ss");
       formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-      if(this.temp != null){
-         Calendar cal = this.temp.getCalendar();
-         Date date    = cal.getTime();
-         UTC          = formatter.format(date);
+      try{
+         if(this._temperature != null){
+            Calendar cal = this._temperature.calendar();
+            Date date    = cal.getTime();
+            UTC          = formatter.format(date);
+         }
+         else if(this._humidity != null){
+            Calendar cal = this._humidity.calendar();
+            Date date    = cal.getTime();
+            UTC          = formatter.format(date);
+         }
+         else if(this._pressure != null){
+            Calendar cal = this._pressure.calendar();
+            Date date    = cal.getTime();
+            UTC          = formatter.format(date);
+         }
+         else{
+            throw new NullPointerException();
+         }
+         UTC = UTC.replaceAll(":", "%3A");
       }
-      else if(this.humidity != null){
-         Calendar cal = this.humidity.getCalendar();
-         Date date    = cal.getTime();
-         UTC          = formatter.format(date);
+      catch(NullPointerException npe){
+         UTC = new String("1001-01-01+00%3A00%3A00");
       }
-      else if(this.pressure != null){
-         Calendar cal = this.pressure.getCalendar();
-         Date date    = cal.getTime();
-         UTC          = formatter.format(date);
-      }
-      UTC = UTC.replaceAll(":", "%3A");
       return UTC;
-   }
-
-   //
-   //Reset the data fields as needed
-   //
-   private void reset(){
-      this.dewpointUpdated    = false;
-      this.extremeUpdated     = false;
-      this.heatIndexUpdated   = false;
-      this.humidityUpdated    = false;
-      this.pressureUpdated    = false;
-      this.temperatureUpdated = false;
-      this.temp               = null;
-      this.humidity           = null;
-      this.pressure           = null;
-      this.heatIndex          = null;
-      this.dewPoint           = null;
-      this.state              = State.WAIT;
    }
 
    //
@@ -318,18 +234,14 @@ ExtremeObserver, Runnable{
    //
    private void sendToWunderground(String message){
       System.out.println(message);
-      final int PORT = 80;
+      final int PORT = 443;
       final int TIMES = 100;
       try{
-         Socket socket = new Socket(this.URL, PORT);
-         //Test Print
-         System.out.println(socket);
-         PrintStream out = new PrintStream(socket.getOutputStream());
-         System.out.println("Sending:  " + message);
-         out.print(message);
+         URL url = new URL(message);
+         URLConnection conn = url.openConnection();
          BufferedReader in = new BufferedReader(
                                     new InputStreamReader(
-                                          socket.getInputStream()));
+                                          conn.getInputStream()));
          int i = 0;
          while(i < TIMES){
             if(in.ready()){
@@ -339,14 +251,9 @@ ExtremeObserver, Runnable{
             catch(InterruptedException ie){}
             ++i;
          }
-         socket.close();
       }
-      catch(UnknownHostException uhe){
-         System.out.println("Unable to connect to Wunderground");
-         System.out.println(uhe);
-      }
-      catch(NullPointerException npe){
-         System.out.println("Wunderground Socket Error:  " + npe);
+      catch (MalformedURLException me){
+         System.out.println("Wunderground URL Exception:  " + me);
       }
       catch(IOException ioe){
          System.out.println("Wunderground I/O Error:  " + ioe);
@@ -359,31 +266,41 @@ ExtremeObserver, Runnable{
    private StringBuffer setUpMessage(){
       StringBuffer message = new StringBuffer();
 
-      message.append("GET https://" + this.URL);
-      //message.append("https://" + URL);
+      message.append("https://" + URL);
       message.append("/weatherstation/updateweatherstation.php?");
       message.append("ID=" + this.USERNAME);
       message.append("&PASSWORD=" + this.PASSWORD);
-      //message.append("&dateutc="+this.findUTC());
-      message.append("&dateutc=now");
-      if(this.temperatureUpdated){
-         message.append("&tempf=" + this.temp.getValue());
+      message.append("&dateutc="+this.findUTC());
+      try{
+         message.append("&tempf=" + this._temperature.englishData());
       }
-      if(this.humidityUpdated){
-         message.append("&humidity=" + this.humidity.getValue());
+      catch(NullPointerException npe0){
+         message.append("&tempf=" + Thermometer.DEFAULTTEMP);
       }
-      if(this.pressureUpdated){
-         message.append("&baromin=" + this.pressure.getValue());
+      try{
+         message.append("&humidity="+this._humidity.percentageData());
+      }
+      catch(NullPointerException npe1){
+         message.append("&humidity="+ Hygrometer.DEFAULTHUMIDITY);
+      }
+      try{
+         message.append("&baromin=" + this._pressure.englishData());
+      }
+      catch(NullPointerException npe2){
+         message.append("&baromin="+ Barometer.DEFAULTPRESSURE);
       }
       //if(this.heatIndexUpdated){
       //   message.append("&heatidxf=" + this.heatIndex.getValue());
       //}
-      if(this.dewpointUpdated){
-         message.append("&dewptf=" + this.dewPoint.getValue());
+      try{
+         message.append("&dewptf=" + this._dewPoint.englishData());
+      }
+      catch(NullPointerException npe3){
+         message.append("&dewptf=" + Thermometer.DEFAULTTEMP);
       }
       message.append("&softwaretype=tws&action=updateraw ");
       //message.append("HTTP//1.1\r\nConnection: keep-alive\r\n\r\n");
-      message.append("HTTP//1.1");
+      //message.append("HTTP//1.1");
       return message;
    }
 }

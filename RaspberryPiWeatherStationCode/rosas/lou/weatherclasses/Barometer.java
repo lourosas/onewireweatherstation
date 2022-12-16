@@ -5,22 +5,26 @@ package rosas.lou.weatherclasses;
 import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
+*/
 
-public class Barometer extends Sensor{
+public class Barometer extends WeatherSensor{
    public static final double DEFAULTPRESSURE = -999.9;
+   private static final String NAME    = "DS2438";
+   private static final String ADDRESS = "92000000BCA3EF26";
    
-   private double inHg;
-   private double mmHg;
-   private double millibars;
-   
-   private ADContainer barometricSensor = null;
-   
-   private static Barometer instance = null;
+   //private ADContainer barometricSensor;
+   private static Barometer instance;
+
+   {
+      //barometricSensor = null;
+      instance         = null;
+   };
    
    //**********************Constructors*****************************
    /*
@@ -28,10 +32,7 @@ public class Barometer extends Sensor{
    NOTE:  the constructor is protected
    */
    protected Barometer(){
-      this.setBarometricPressureinHg(DEFAULTPRESSURE);
-      this.setBarometricPressuremmHg(DEFAULTPRESSURE);
-      this.setBarometricPressuremillibars(DEFAULTPRESSURE);
-      this.barometricSensor = null;
+      this.initialize();
    }
    
    //************************Public Methods*************************
@@ -44,146 +45,151 @@ public class Barometer extends Sensor{
       }
       return instance;
    }
-   
+
    /*
+   Override the abstract measure() from the WeatherSensor
+   abstract class.  This method takes no attributes.   
    */
-   public double getBarometricPressure(){
-      return this.getBarometricPressure(this.getUnits());
-   }
-   
-   /*
-   */
-   public double getBarometricPressure(Units units){
-      double returnPressure = DEFAULTPRESSURE;
+   @Override
+   public WeatherData measure(){
+      String bad = new String("No Barometric Pressure Data ");
+      bad = bad.concat("Available:  default value returned");
+      String good = new String("Good");
+      WeatherData data = null;
+      double pressureInches = WeatherData.DEFAULTVALUE;
+      /*
       try{
-         switch(units){
-            case METRIC:
-               returnPressure = this.getBarometricPressuremmHg();
-               break;
-            case ENGLISH:
-               returnPressure = this.getBarometricPressureinHg();
-               break;
-            case ABSOLUTE:
-               returnPressure=this.getBarometricPressuremillibars();
-               break;
-            default:
-               returnPressure = this.getBarometricPressuremmHg();
-         }
+         byte[] state = this.barometricSensor.readDevice();
+         //Perform the AD output voltage measurement
+         this.barometricSensor.doADConvert(
+                                      OneWireContainer26.CHANNEL_VAD,
+                                      state);
+         //read the result of the conversion
+         double vad = this.barometricSensor.getADVoltage(
+                                      OneWireContainer26.CHANNEL_VAD,
+                                      state);
+         pressureInches=this.convertVoltageToPressure(vad);
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 good,
+                                 Calendar.getInstance());
+      }
+      catch(OneWireIOException ioe){
+         System.out.println(ioe.getStackTrace()[0].getFileName());
+         System.out.println(""+ioe.getStackTrace()[0].getLineNumber());
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
+      }
+      catch(OneWireException owe){
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
       }
       catch(NullPointerException npe){
-         returnPressure = DEFAULTPRESSURE;
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
+         pressureInches = WeatherData.DEFAULTVALUE;
+         data = new PressureData(Units.ENGLISH,
+                                 pressureInches,
+                                 bad,
+                                 Calendar.getInstance());
       }
-      finally{
-         return returnPressure;
+      */
+      return data;
+   }
+
+   /*
+   Override the toString() method
+   */
+   @Override
+   public String toString(){
+      String returnString = new String();
+      returnString = returnString.concat(this.type() + ", ");
+      returnString = returnString.concat(this.name() + ", ");
+      returnString = returnString.concat(this.address());
+      return returnString;
+   }
+
+   //***********************Protected Methods************************
+   /*
+   Override the abstract findSensors() method from the WeatherSensor
+   abstract class
+   */
+   @Override
+   protected void findSensors() throws NullPointerException{
+      /*
+      try{
+         boolean found = false;
+         Enumeration<OneWireContainer> e =
+                                 this._dspa.getAllDeviceContainers();
+         while(e.hasMoreElements() && !found){
+            OneWireContainer o = (OneWireContainer)e.nextElement();
+            if((o.getName().equals(NAME)) &&
+               (o.getAddressAsString().equals(ADDRESS))){
+               this.name(o.getName());
+               this.address(o.getAddressAsString());
+               found = true;
+            }
+         }
+         if(!found){
+            throw new NullPointerException("\n\nNo Barometer\n\n");
+         }
       }
+      catch(OneWireIOException ioe){
+         this._address = null;
+         this._name    = null;
+         ioe.printStackTrace();
+      }
+      catch(OneWireException owe){
+         this._address = null;
+         this._name    = null;
+         owe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         this._address = null;
+         this._name    = null;
+         npe.printStackTrace();
+         throw npe;
+      }
+      */
    }
    
    /*
    Override the abstract initialize(...) method from the Sensor
    Abstract class
    */
-   public void initialize
-   (
-      Units  units,      //English, Metric, Absolute
-      String address,    //64-bit Address as a String
-      String name,       //DS2438, DS
-      DSPortAdapter dspa //The DSPortAdpater...
-   ){
-      //First, save off the attributes
-      this.setUnits(units);
-      this.setAddress(address);
-      this.setName(name);
-      this.setType("Barometer");
-      this.setUSBAdapter(dspa);
-      
-      //Next, go ahead and set up the Barometric Sensor (the actual
-      //Dallas Semiconductor hardware device communicating over the
-      //network).
-      String addr          = this.getAddress();
-      this.barometricSensor=new OneWireContainer26(this.dspa,addr);
-   }
-   
-   /*
-   Override the abstract measure(...) method from the Sensor
-   Abstract Class.  This method takes no attributes, which means
-   to measure the temperature in the Units set in the intialize
-   method.
-   */
-   public double measure(){
-      return this.measure(this.getUnits());
-   }
-   
-   /*
-   Override the abstract measure(...) method from the Sensor
-   Abstract class.  This method takes the units attributes, which
-   means to measure the temperature data in the requested units:
-   Metric, English or Absolute.  If the Units attribute is NOT one
-   of the three, this method will by default return the measured
-   temperature in Metric  
-   */
-   public double measure(Units units){
+   @Override
+   protected void initialize(){
+      /*
       try{
-         this.setUnits(units);
-         byte [] state = this.barometricSensor.readDevice();
-         //perform the A to D output for the output voltage
-         this.barometricSensor.doADConvert(
-                                     OneWireContainer26.CHANNEL_VAD,
-                                     state);
-         //read the result of the conversion
-         double vad = this.barometricSensor.getADVoltage(
-                                     OneWireContainer26.CHANNEL_VAD,
-                                     state);
-         
-         //perform the A to D output for the Supply Voltage
-         //(for reference only)
-         this.barometricSensor.doADConvert(
-                                     OneWireContainer26.CHANNEL_VDD,
-                                     state);
-         //read the result of the conversion
-         double vdd = this.barometricSensor.getADVoltage(
-                                     OneWireContainer26.CHANNEL_VDD,
-                                     state);
-         //Now Convert to Barometric Pressure in inHg
-         double inchesHg = this.convertVoltageToPressure(vad, vdd);
-         this.setBarometricPressureinHg(inchesHg);
-         //Convert the pressure to mmHg and millibars
-         double mmhg = WeatherConvert.inchesToMillimeters(inchesHg);
-         double millibars = 
-                         WeatherConvert.inchesToMillibars(inchesHg);
-         this.setBarometricPressuremmHg(mmhg);
-         this.setBarometricPressuremillibars(millibars);
-      }
-      catch(OneWireIOException owe){
-         this.setBarometricPressureinHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremmHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremillibars(DEFAULTPRESSURE);
-      }
-      catch(OneWireException we){
-         this.setBarometricPressureinHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremmHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremillibars(DEFAULTPRESSURE);
+         this.type("Barometer");
+         if(_dspa == null){
+            this.usbAdapter();
+         }
+         if(_dspa == null){
+            throw new NullPointerException("No DSP Adapter");
+         }
+         this.findSensors();
+         //Next, go ahead and set up the Barometric Sensor (the
+         //actual
+         //Dallas Semiconductor hardware device communicating over
+         //the network).
+         String addr = this.address();
+         this.barometricSensor =
+                             new OneWireContainer26(this._dspa,addr);
       }
       catch(NullPointerException npe){
-         this.setBarometricPressureinHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremmHg(DEFAULTPRESSURE);
-         this.setBarometricPressuremillibars(DEFAULTPRESSURE);
+         this.barometricSensor = null;
+         System.out.println(npe.getMessage());
       }
-      return this.getBarometricPressure();
-   }
-   
-   /*
-   Override the toString() method
-   */
-   public String toString(){
-      double pressure = this.getBarometricPressure();
-      String returnString = new String();
-      returnString = returnString.concat(this.getType() + ", ");
-      returnString = returnString.concat(this.getName() + ", ");
-      returnString = returnString.concat(this.getAddress() + ", ");
-      String s = String.format("%.3f", pressure);
-      returnString = returnString.concat(s +", ");
-      returnString = returnString.concat("" + this.getUnits());
-      return returnString;
+      */
    }
    
    //********************Private Methods***************************
@@ -192,51 +198,16 @@ public class Barometer extends Sensor{
    the current pressure (in inHg) by applying the appropriate
    formula
    */
-   private double convertVoltageToPressure(double vad, double vdd){
+   private double convertVoltageToPressure(double vad){
+      /*
       final double PRESSUREGAIN   =  0.7352;
       final double PRESSUREOFFSET = 26.5296;
       double returnPressure       = DEFAULTPRESSURE;
       
       returnPressure = (vad * PRESSUREGAIN) + PRESSUREOFFSET;
       return returnPressure;
+      */
+      return WeatherData.DEFAULTVALUE;
    }
    
-   /*
-   */
-   private double getBarometricPressureinHg(){
-      return this.inHg;
-   }
-   
-   /*
-   */
-   private double getBarometricPressuremmHg(){
-      return this.mmHg;
-   }
-   
-   /*
-   */
-   private double getBarometricPressuremillibars(){
-      return this.millibars;
-   }
-   
-   /*
-   Set the ENGLISH Units of Barometric Pressure
-   */
-   private void setBarometricPressureinHg(double inchesHg){
-      this.inHg = inchesHg;
-   }
-   
-   /*
-   Set the METRIC Units of Barometric Pressure
-   */
-   private void setBarometricPressuremmHg(double millimetersHg){
-      this.mmHg = millimetersHg;
-   }
-   
-   /*
-   Set the (What I am calling) ABSOLUTE Units of Barometric Pressure
-   */
-   private void setBarometricPressuremillibars(double mb){
-      this.millibars = mb;
-   }
 }

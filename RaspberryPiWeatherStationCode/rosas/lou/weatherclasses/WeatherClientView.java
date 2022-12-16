@@ -1,5 +1,21 @@
 /********************************************************************
-<GNU Stuff to go here>
+//******************************************************************
+//Weather Client View Class
+//Copyright (C) 2017 by Lou Rosas
+//This file is part of onewireweatherstation application.
+//onewireweatherstation is free software; you can redistribute it
+//and/or modify
+//it under the terms of the GNU General Public License as published
+//by the Free Software Foundation; either version 3 of the License,
+//or (at your option) any later version.
+//PaceCalculator is distributed in the hope that it will be
+//useful, but WITHOUT ANY WARRANTY; without even the implied
+//warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//See the GNU General Public License for more details.
+//You should have received a copy of the GNU General Public License
+//along with this program.
+//If not, see <http://www.gnu.org/licenses/>.
+//*******************************************************************
 ********************************************************************/
 package rosas.lou.weatherclasses;
 
@@ -15,13 +31,14 @@ import java.awt.event.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
+import rosas.lou.IOObserver;
 import rosas.lou.weatherclasses.*;
 import myclasses.*;
 import rosas.lou.lgraphics.TestPanel2;
 
 //Need to implement a Subscriber...for the Publish-Subscribe pattern
 public class WeatherClientView extends GenericJFrame  implements
-WeatherClientObserver{
+WeatherClientObserver, IOObserver{
    private static final short WIDTH  = 700;
    private static final short HEIGHT = 500;
    
@@ -94,7 +111,7 @@ WeatherClientObserver{
    **/
    public WeatherClientView(String title){
       super(title);
-      WeatherClient wc = new WeatherClient(this);
+      WeatherClient wc = new WeatherClient(this,this);
       WeatherClientController wcc =
                                 new WeatherClientController(this,wc);
       this.addActionListener(wcc);
@@ -107,6 +124,30 @@ WeatherClientObserver{
    }
 
    //////////////////////////Public Methods//////////////////////////
+   //////////////////IOObserver implementation///////////////////////
+   /**
+   **/
+   public void alertGeneralIOError(File f, Exception e){}
+
+   /**
+   **/
+   public void alertNoDataError(File f){
+      String exception = new String("No Data Found to be saved!\n");
+      exception += "Please select Weather Data to save";
+      String error = new String("Data Needed For Saving!");
+      JOptionPane.showMessageDialog(this,exception,error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public void alertIOExceptionError(File f){
+      String exception = new String("Could not save data to:  " + f);
+      String error = new String("I/O Error!!");
+      JOptionPane.showMessageDialog(this,exception,error,
+                                          JOptionPane.ERROR_MESSAGE);
+   }
+
    ////////////////WeatherClientObserver implementation//////////////
    /**
    **/
@@ -140,6 +181,29 @@ WeatherClientObserver{
 
    /**
    **/
+   public int alertHeatIndexSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
    public void alertMissionTimeout(){
       String exception = new String("Not All Dates ");
       exception += "Displayed!\nHit 'Refresh' button as needed";
@@ -151,12 +215,104 @@ WeatherClientObserver{
 
    /**
    **/
+   public int alertDewpointSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }   
+
+   /**
+   **/
+   public int alertPressureSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
    public void alertPressureTimeout(){
       String exception = new String("Not All Pressure Data ");
       exception += "Displayed!\nHit 'Refresh' button as needed";
       String error = new String("Pressure Timeout!!\n");
       JOptionPane.showMessageDialog(this, exception, error,
                                           JOptionPane.ERROR_MESSAGE);
+   }
+
+   /**
+   **/
+   public int alertHumiditySaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to append to ");
+         exception += "an existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
+   }
+
+   /**
+   **/
+   public int alertTemperatureSaveError(String type){
+      int output = JOptionPane.YES_OPTION;
+      if(type.toUpperCase().contains("DIRECTORY")){
+         String exception = new String("This is a Directory!");
+         exception += "\nPlease input a File Name";
+         String error = new String("File Name Needed!");
+         JOptionPane.showMessageDialog(this, exception, error,
+                                          JOptionPane.ERROR_MESSAGE);
+      }
+      else if(type.toUpperCase().contains("EXISTS")){
+         String exception = new String("Do you want to overwrite ");
+         exception += "existing file?";
+         String error = new String("File Already Exits!!!");
+         output = JOptionPane.showConfirmDialog(this,
+                                          exception,
+                                          error,
+                                          JOptionPane.YES_NO_OPTION);
+      }
+      return output;
    }
 
    /**
@@ -235,16 +391,87 @@ WeatherClientObserver{
          //OR when a date has changed, if the Combo Boxes are already
          //setup, clear them out, so as to prevent the doubling of
          //previous dates.
-         this.clearComboBoxesFirst();
+         //this.clearComboBoxesFirst();
          this.missionData = new LinkedList<String>(missionData);
          Iterator<String> it = this.missionData.iterator();
-         while(it.hasNext()){            
-            String date = it.next();
-            this.tempComboBox.addItem(date.trim());
-            this.humidityComboBox.addItem(date.trim());
-            this.dewPointComboBox.addItem(date.trim());
-            this.heatIndexComboBox.addItem(date.trim());
-            this.pressureComboBox.addItem(date.trim());
+         if(this.tempComboBox.getItemCount() == 0){
+            while(it.hasNext()){            
+               String date = it.next();
+               this.tempComboBox.addItem(date.trim());
+               this.humidityComboBox.addItem(date.trim());
+               this.dewPointComboBox.addItem(date.trim());
+               this.heatIndexComboBox.addItem(date.trim());
+               this.pressureComboBox.addItem(date.trim());
+            }
+         }
+         else{
+            Object sTemp = this.tempComboBox.getSelectedItem();
+            Object sHumi = this.humidityComboBox.getSelectedItem();
+            Object sPres = this.pressureComboBox.getSelectedItem();
+            Object sDp   = this.dewPointComboBox.getSelectedItem();
+            Object sHi   = this.heatIndexComboBox.getSelectedItem();
+            int total    = this.tempComboBox.getItemCount();
+            this.tempComboBox.removeActionListener(
+                                                this.actionListener);
+            this.humidityComboBox.removeActionListener(
+                                                this.actionListener);
+            this.pressureComboBox.removeActionListener(
+                                                this.actionListener);
+            this.dewPointComboBox.removeActionListener(
+                                                this.actionListener);
+            this.heatIndexComboBox.removeActionListener(
+                                                this.actionListener);
+            while(it.hasNext()){
+               int i         = 0;
+               boolean found = false;
+               String date   = it.next();
+               do{
+                  String curDate =
+                              (String)this.tempComboBox.getItemAt(i);
+                  if(curDate.equals(date.trim())){
+                     found = true;
+                  }
+                  ++i;
+               }while(!found && i < total);
+               if(!found){
+                  System.out.println(date.trim());
+                  //Just out of curriosity, I want to see what this
+                  //would look like
+                  System.out.println(sTemp);
+                  //Now, find out where in the LinkedList the
+                  //uncommon date is--eventually, want to insert into
+                  //the Combo Box(es)
+                  System.out.println(this.missionData.indexOf(date));
+                  int index = this.missionData.indexOf(date);
+                  if(index > total){
+                     index = total;
+                     ++total;
+                  }
+                  this.tempComboBox.insertItemAt(date.trim(), index);
+                  this.humidityComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.pressureComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.dewPointComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.heatIndexComboBox.insertItemAt(
+                                                  date.trim(),index);
+                  this.tempComboBox.setSelectedItem(sTemp);
+                  this.humidityComboBox.setSelectedItem(sHumi);
+                  this.pressureComboBox.setSelectedItem(sPres);
+                  this.dewPointComboBox.setSelectedItem(sDp);
+                  this.heatIndexComboBox.setSelectedItem(sHi);
+               }
+            }
+            this.tempComboBox.addActionListener(this.actionListener);
+            this.humidityComboBox.addActionListener(
+                                                this.actionListener);
+            this.pressureComboBox.addActionListener(
+                                                this.actionListener);
+            this.dewPointComboBox.addActionListener(
+                                                this.actionListener);
+            this.heatIndexComboBox.addActionListener(
+                                                this.actionListener);
          }
       }
       catch(NullPointerException npe){
@@ -414,6 +641,61 @@ WeatherClientObserver{
       return returnState;
    }
 
+   /**
+   **/
+   public void requestDewpointJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser dewpointChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      dewpointChooser.setFileFilter(filter);
+      dewpointChooser.setFileSelectionMode(selectMode);
+      dewpointChooser.setApproveButtonToolTipText("Save Dewpoint");
+      dewpointChooser.addActionListener(this.actionListener);
+      dewpointChooser.showSaveDialog(this);
+   }
+
+   /**
+   **/
+   public void requestHeatIndexJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser heatIndexChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      heatIndexChooser.setFileFilter(filter);
+      heatIndexChooser.setFileSelectionMode(selectMode);
+      heatIndexChooser.setApproveButtonToolTipText("Save Heat Index");
+      heatIndexChooser.addActionListener(this.actionListener);
+      heatIndexChooser.showSaveDialog(this);
+   }
+
+   /**
+   **/
+   public void requestHumidityJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser humidityChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      humidityChooser.setFileFilter(filter);
+      humidityChooser.setFileSelectionMode(selectMode);
+      humidityChooser.setApproveButtonToolTipText("Save Humidity");
+      humidityChooser.addActionListener(this.actionListener);
+      humidityChooser.showSaveDialog(this);
+   }
+
+   /**
+   **/
+   public void requestPressureJFileChooser(){
+      int selectMode = JFileChooser.FILES_AND_DIRECTORIES;
+      JFileChooser pressureChooser = new JFileChooser();
+      FileNameExtensionFilter filter = 
+           new FileNameExtensionFilter("*.csv, *.txt", "csv", "txt");
+      pressureChooser.setFileFilter(filter);
+      pressureChooser.setFileSelectionMode(selectMode);
+      pressureChooser.setApproveButtonToolTipText("Save Pressure");
+      pressureChooser.addActionListener(this.actionListener);
+      pressureChooser.showSaveDialog(this);
+   }
 
    /**
    **/
@@ -429,8 +711,6 @@ WeatherClientObserver{
       tempChooser.addActionListener(this.actionListener);
       //tempChooser.addKeyListener(this.keyListener);
       tempChooser.showSaveDialog(this);
-      File file = tempChooser.getSelectedFile();
-      System.out.println(file);
    }
 
    /**
@@ -785,8 +1065,8 @@ WeatherClientObserver{
 
       JButton save = new JButton("Save Pressure Data");
       save.setActionCommand("P Save");
-      //save.addActionListener(this.actionListener);
-      //save.addKeyListener(this.keyListener);
+      save.addActionListener(this.actionListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit = new JButton("Quit");
@@ -921,16 +1201,14 @@ WeatherClientObserver{
 
       JButton save = new JButton("Save Dewpoint Data");
       save.setActionCommand("DP Save");
-      //save.addActionListener(this.actionListener);
-      //save.addKeyListener(this.keyListener);
+      save.addActionListener(this.actionListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit = new JButton("Quit");
       quit.setActionCommand("DP Quit");
       quit.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
             setVisible(false);
             System.exit(0);
          }
@@ -971,8 +1249,6 @@ WeatherClientObserver{
       JPanel northPanel       = new JPanel();
       this.heatIndexGroup     = new ButtonGroup();
       this.heatIndexDataGroup = new ButtonGroup();
-      //ButtonGroup unitsGroup  = new ButtonGroup();
-      //ButtonGroup dataGroup   = new ButtonGroup();
       northPanel.setBorder(BorderFactory.createEtchedBorder());
 
       JPanel unitsPanel = new JPanel();
@@ -1061,6 +1337,7 @@ WeatherClientObserver{
       southPanel.add(refresh);
 
       JButton save = new JButton("Save Heat Index Data");
+      save.setActionCommand("HI Save");
       //Add Action Listern
       save.addActionListener(this.actionListener);
       //Add Key Listener
@@ -1072,8 +1349,6 @@ WeatherClientObserver{
       //Add Action Listener
       quit.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            System.out.println(e.getSource());
-            System.out.println(e.getActionCommand());
             setVisible(false);
             System.exit(0);
          }
@@ -1179,9 +1454,9 @@ WeatherClientObserver{
       JButton save = new JButton("Save Humidity Data");
       save.setActionCommand("Humidity Save");
       //Add Action Listener
-      //save.addActionListner(this.actionListener);
+      save.addActionListener(this.actionListener);
       //Add Key Listener
-      //save.addKeyListener(this.keyListener);
+      save.addKeyListener(this.keyListener);
       southPanel.add(save);
 
       JButton quit  = new JButton("Quit");
@@ -1387,11 +1662,11 @@ WeatherClientObserver{
       this.tempComboBox.setActionCommand("Temperature Combo Box");
       this.tempComboBox.setName("Temperature");
       //Figure out what to do with this.
-      this.tempComboBox.addActionListener(new ActionListener(){
-         public void actionPerformed(ActionEvent e){
-            setTheDayTemperature(e);
-         }
-      });
+      //this.tempComboBox.addActionListener(new ActionListener(){
+      //   public void actionPerformed(ActionEvent e){
+      //      setTheDayTemperature(e);
+      //   }
+      //});
       this.tempComboBox.addActionListener(this.actionListener);
       this.tempComboBox.addKeyListener(this.keyListener);
       northPanel.add(this.tempComboBox);

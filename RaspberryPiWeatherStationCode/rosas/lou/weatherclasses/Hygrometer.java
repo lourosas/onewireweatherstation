@@ -1,28 +1,48 @@
-/**/
+/*
+Copyright 2018 Lou Rosas
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package rosas.lou.weatherclasses;
 
 import java.util.*;
 import java.lang.*;
 import rosas.lou.weatherclasses.*;
-import gnu.io.*;
+//import gnu.io.*;
 
+/*
 import com.dalsemi.onewire.*;
 import com.dalsemi.onewire.adapter.*;
 import com.dalsemi.onewire.container.*;
+*/
 
-public class Hygrometer extends Sensor{
+public class Hygrometer extends WeatherSensor{
    public static final double DEFAULTHUMIDITY = -99.9;
-   
-   private static Hygrometer instance          = null;
+   private static final String NAME           = "DS2438";
 
-   private double calculatedHumidity;
-   private double relativeHumidity;
+   private static Hygrometer instance;
    //Because I am calling functionality OUTSIDE OF the
    //HumidityContainer, I need to declare the hygrometerSensor
    //as OneWireContainer26 (Unless I want to mess with casting all
    //over the place)!  Essentially, this just seems easier.
-   private OneWireContainer26 hygrometerSensor;
+   //private OneWireContainer26 hygrometerSensor;
+
+   {
+      instance         = null;
+      //hygrometerSensor = null;
+   };
 
    //************************Constructors***************************
    /*
@@ -30,9 +50,7 @@ public class Hygrometer extends Sensor{
    NOTE:  Constructor is protected
    */
    protected Hygrometer(){
-      this.setCalculatedHumidity(DEFAULTHUMIDITY);
-      this.setHumidity(DEFAULTHUMIDITY);
-      this.hygrometerSensor = null;
+      this.initialize();
    }
 
    //**********************Public Methods***************************
@@ -46,44 +64,124 @@ public class Hygrometer extends Sensor{
       return instance;
    }
 
+
+
    /*
+   Override the abstract measure(...) method from the WeatherSensor
+   Abstract class.  This method takes no attributes, which is
+   irrelevant for this sensor, since the value is measured in
+   percentage.
    */
-   public double getCalculatedHumidity(){
-      return this.calculatedHumidity;
+   @Override
+   public WeatherData measure(){
+      String bad = new String("No Humidity Data Available:  ");
+      bad = bad.concat("default value returned");
+      WeatherData data = null;
+      //double rh = this.measureCalculatedHumidity();
+      double rh = this.measureHumidity();
+      //Make a test print--TODO--DELETE
+      System.out.println("Hygrometer.measure():  "+rh);
+      /*
+      if(rh > WeatherData.DEFAULTHUMIDITY){ //Relative Humidity Good
+         data = new HumidityData(Units.PERCENTAGE,
+                                rh,
+                                "Calculated Relative Humidity",
+                                Calendar.getInstance());
+      }
+      else{
+         data = new HumidityData(Units.PERCENTAGE,
+                                 rh,
+                                 bad,
+                                 Calendar.getInstance());
+      }
+      */
+      return data;
    }
 
    /*
+   Override the toString() method
    */
-   public double getHumidity(){
-      return this.relativeHumidity;
+   public String toString(){
+      String returnString = new String();
+      returnString = returnString.concat(this.type() + ", ");
+      returnString = returnString.concat(this.name() + ", ");
+      returnString = returnString.concat(this.address());
+      return returnString;
    }
 
+   //********************Protected Methods***************************
    /*
-   Override the abstract initialize(...) method from the Sensor
-   Abstract Class
+   Override the abstract findSensors() method from the WeatherSensor
+   abstract class
    */
-   public void initialize
-   (
-      Units         units,    //N/A for a Hygrometer
-      String        address, //16-Bit Address as a String
-      String        name,     //DS1920, DS18S20, DS2438...
-      DSPortAdapter dspa
-   ){
-      //First, save off the attributes
-      this.setUnits(units);
-      this.setAddress(address);
-      this.setName(name);
-      this.setType("Hygrometer");
-      this.setUSBAdapter(dspa);
-
-      //Next, go ahead and set up the Humidity Sensor (hygrometer)
-      //The actual Dallas Semiconductor hardware device 
-      //communicating over the network.
-      String addr          = this.getAddress();
-      this.hygrometerSensor= new OneWireContainer26(this.dspa,addr);
-      //Will need the temperature, so go ahead and set up the
-      //Temperature Resolution to the highest possible resolution
+   @Override
+   protected void findSensors() throws NullPointerException{
+      /*
       try{
+         boolean found = false;
+         Enumeration<OneWireContainer> e =
+                                 this._dspa.getAllDeviceContainers();
+         while(e.hasMoreElements() && !found){
+            OneWireContainer o = (OneWireContainer)e.nextElement();
+            if(o.getName().equals(NAME) &&
+              (!(o.getAddressAsString().equals("92000000BCA3EF26")))){
+               this.name(o.getName());
+               this.address(o.getAddressAsString());
+               found = true;//Get the First Hygrometer
+            }
+         }
+         if(!found){
+            throw new NullPointerException("\n\nNo Hygrometer\n\n");
+         }
+      }
+      catch(OneWireIOException ioe){
+         this._address = null;
+         this._name    = null;
+         ioe.printStackTrace();
+      }
+      catch(OneWireException owe){
+         this._address = null;
+         this._name    = null;
+         owe.printStackTrace();
+      }
+      catch(NullPointerException npe){
+         this._address = null;
+         this._name    = null;
+         npe.printStackTrace();
+         throw npe;
+      }
+      */
+   }
+
+   /*
+   Override the abstract initialize(...) method from the
+   WeatherSensor Abstract Class
+   */
+   @Override
+   protected void initialize(){
+      /*
+      try{
+         //0.  Set the Type (in this case, it is a Hygrometer)
+         //Very prudent in determining the WeatherSensor
+         this.type("Hygrometer");
+         //1.Set the USB Adapter (this is actually not needed, per
+         //se, since it should already be set in the Thermometer--the
+         //Thermometer is the prime <first> sensor initialized,
+         //usually)
+         if(this._dspa == null){
+            this.usbAdapter();
+         }
+         if(this._dspa == null){
+            throw new NullPointerException("No DSP Adapter!");
+         }
+         this.findSensors();
+         //Next, go ahead and set up the Humidity Sensor (hygrometer)
+         //The actual Dallas Semiconductor hardware device
+         //communicating over the network.
+         this.hygrometerSensor =
+                   new OneWireContainer26(this._dspa,this.address());
+         //Will need the temperature, so go ahead and set up the
+         //Temperature Resolution to the highest possible resolution
          byte [] state = this.hygrometerSensor.readDevice();
          if(
           this.hygrometerSensor.hasSelectableTemperatureResolution()
@@ -107,52 +205,20 @@ public class Hygrometer extends Sensor{
          }
       }
       catch(OneWireIOException ioe){
+         this.hygrometerSensor = null;
+         ioe.printStackTrace();
          System.out.println("Error Setting up Humidity Resolutions");
       }
       catch(OneWireException owe){
+         this.hygrometerSensor = null;
+         owe.printStackTrace();
          System.out.println("Error Setting up Humidity Resolutions");
       }
-   }
-
-   /*
-   Override the abstract measure(...) method from the Sensor
-   Abstract class.  This method takes no attributes, which is
-   irrelevant for this sensor, since the value is measured in
-   percentage.
-   */
-   public double measure(){
-      return this.measure(this.getUnits());
-   }
-
-   /*
-   Override the abstract measure(...) method from the Sensor
-   Abstract class.  This method takes the units attribute, which
-   is irrelevant in the measurement of the humidity data, since the
-   humidity data is in terms of percentage
-   */
-   public double measure(Units units){
-      this.setUnits(units);
-      this.measureHumidity();
-      this.measureCalculatedHumidity();
-      return this.getHumidity();
-   }
-
-   /*
-   Override the toString() method
-   */
-   public String toString(){
-      String returnString = new String();
-      returnString = returnString.concat(this.getType() + ", ");
-      returnString = returnString.concat(this.getName() + ", ");
-      returnString = returnString.concat(this.getAddress() + ", ");
-      String s = String.format("%.3f", this.getHumidity());
-      //returnString = returnString.concat(this.getHumidity()+", ");
-      returnString = returnString.concat(s + ", ");
-      s = String.format("%.3f", this.getCalculatedHumidity());
-      returnString = returnString.concat(s + ", ");
-           //returnString.concat(this.getCalculatedHumidity() + ", ");
-      returnString = returnString.concat("" + this.getUnits());
-      return returnString;
+      catch(NullPointerException npe){
+         this.hygrometerSensor = null;
+         System.out.println(npe.getMessage());
+      }
+      */
    }
 
    //***********************Private Methods*************************
@@ -164,6 +230,7 @@ public class Hygrometer extends Sensor{
       double voltageDD,
       double temp
    ){
+      /*
       final double CONST_1         = 0.16;
       final double CONST_2         = 0.0062;
       final double CONST_3         = 1.0546;
@@ -175,15 +242,19 @@ public class Hygrometer extends Sensor{
       double calcHumidity = (rh/(CONST_3 - CONST_4 * temp));
 
       return (calcHumidity * HUMIDITY_GAIN + HUMIDITY_OFFSET);
+      */
+      return WeatherData.DEFAULTHUMIDITY;
    }
 
    /*
    Measure the Calculated Humidity as originally specified.  Use
    the constants as specified in previous builds.
    */
-   private void measureCalculatedHumidity(){
+   private double measureCalculatedHumidity(){
+      double calcHum = WeatherData.DEFAULTHUMIDITY;
+      /*
       try{
-         double calcHum, temp, vad, vdd;
+         double temp, vad, vdd;
          //Read the temperature sensor
          byte [] state = this.hygrometerSensor.readDevice();
          this.hygrometerSensor.doTemperatureConvert(state);
@@ -202,45 +273,52 @@ public class Hygrometer extends Sensor{
          vdd = this.hygrometerSensor.getADVoltage(
                                      OneWireContainer26.CHANNEL_VDD,
                                      state);
+         //TODO--Delete after investigation!!!
+         System.out.println("measureCalculatedHumidity():  "+vad);
+         System.out.println("measureCalculatedHumidity():  "+vdd);
+         System.out.println("measureCalculatedHumidity():  "+temp);
          calcHum=this.convertVoltageToRelativeHumidity(vad,vdd,temp);
-         this.setCalculatedHumidity(calcHum);
       }
       catch(OneWireIOException owe){
-         this.setCalculatedHumidity(DEFAULTHUMIDITY);
+         System.out.println(owe.getStackTrace()[0].getFileName());
+         System.out.println(""+owe.getStackTrace()[0].getLineNumber());
+         calcHum = WeatherData.DEFAULTHUMIDITY;
       }
       catch(OneWireException we){
-         this.setCalculatedHumidity(DEFAULTHUMIDITY);
+         System.out.println(we.getStackTrace()[0].getFileName());
+         System.out.println(""+we.getStackTrace()[0].getLineNumber());
+         calcHum = WeatherData.DEFAULTHUMIDITY;
       }
+      catch(NullPointerException npe){
+         System.out.println(npe.getStackTrace()[0].getFileName());
+         System.out.println(""+npe.getStackTrace()[0].getLineNumber());
+         calcHum = WeatherData.DEFAULTHUMIDITY;
+      }
+      */
+      return calcHum;
    }
 
    /*
    Get the humidity as measured by the OneWireSensor26.
    */
-   private void measureHumidity(){
+   private double measureHumidity(){
+      double rh = WeatherData.DEFAULTHUMIDITY;
+      /*
       try{
-         double rh;
          byte [] state = this.hygrometerSensor.readDevice();
          this.hygrometerSensor.doHumidityConvert(state);
          rh = this.hygrometerSensor.getHumidity(state);
-         this.setHumidity(rh);
       }
       catch(OneWireIOException ioe){
-         this.setHumidity(DEFAULTHUMIDITY);
+         rh = WeatherData.DEFAULTHUMIDITY;
       }
       catch(OneWireException we){
-         this.setHumidity(DEFAULTHUMIDITY);
+         rh = WeatherData.DEFAULTHUMIDITY;
       }
-   }
-
-   /*
-   */
-   private void setCalculatedHumidity(double calcHumidity){
-      this.calculatedHumidity = calcHumidity;
-   }
-
-   /*
-   */
-   private void setHumidity(double humidity){
-      this.relativeHumidity = humidity;
+      catch(NullPointerException npe){
+         rh = WeatherData.DEFAULTHUMIDITY;
+      }
+      */
+      return rh;
    }
 }
