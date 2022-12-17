@@ -44,5 +44,50 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
    private JTextField               _secs       = null;
 
    ///////////////////////Public Methods//////////////////////////////
+   /**/
+   public static SleepTimeFrame instance(){
+      if(_instance == null){
+         _instance = new SleepTimeFrame();
+      }
+      return _instance;
+   }
    
+   //////////////////////Protected Methods////////////////////////////
+   /**/
+   protected SleepTimeFrame(){
+      super("Sleep Time");
+      System.out.println(superUserConfirm());
+      this.setLayout(new BorderLayout());
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(1,6));
+      panel.add(new JLabel("Hours: ", SwingConstants.RIGHT));
+      this._hrs = new JTextField(3);
+      panel.add(this._hrs);
+      panel.add(new JLabel("Minutes: ", SwingConstants.RIGHT));
+      this._mins = new JTextField(3);
+      panel.add(this._mins);
+      panel.add(new JLabel("Seconds: ", SwingConstants.RIGHT));
+      this._secs = new JTextField(3);
+      panel.add(this._secs);
+      this.getContentPane().add(panel, BorderLayout.CENTER);
+      //Add The Buttons
+      this.setSize(WIDTH, HEIGHT);
+      this.setResizable(false);
+   }
+
+   /////////////////////Private Methods///////////////////////////////
+   /**/
+   private int superUserConfirm(){
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(2, 2));
+      panel.add(new JLabel("Super User: ",SwingConstants.RIGHT));
+      panel.add(new JTextField(20));
+      panel.add(new JLabel("Password: ",  SwingConstants.RIGHT));
+      panel.add(new JPasswordField(20));
+      int n = JOptionPane.showConfirmDialog(null,
+                                        panel,
+                                        "Password",
+                                        JOptionPane.OK_CANCEL_OPTION);
+      return n;
+   }
 }
