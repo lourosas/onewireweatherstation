@@ -90,12 +90,9 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
    /**/
    public void displayInteraction(String type){
       if(type.toUpperCase().equals("SLEEPTIME")){
+         SuperUserAccountDialog su = new SuperUserAccountDiaglog();
          SleepTimeFrame stf = SleepTimeFrame.instance();
-         //SuperUserAccountFrame sua =SuperUserAccountFrame.instance();
-         //sua.setVisible(true);
-         //SleepTimeFrame stf = SleepTimeFrame.instance();
-         //stf.setController(this._controller);
-         //stf.setVisible(true);
+         stf.setVisible(true);
       }
    }
 

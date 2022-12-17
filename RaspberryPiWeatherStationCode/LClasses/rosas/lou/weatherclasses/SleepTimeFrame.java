@@ -35,7 +35,7 @@ import rosas.lou.lgraphics.*;
 
 public class SleepTimeFrame extends GenericJInteractionFrame{
    private static SleepTimeFrame _instance      = null;
-   private static int WIDTH                     = 400;
+   private static int WIDTH                     = 300;
    private static int HEIGHT                    = 300;
 
    private CurrentWeatherController _controller = null;
@@ -46,20 +46,25 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
    ///////////////////////Public Methods//////////////////////////////
    /**/
    public static SleepTimeFrame instance(){
-      if(_instance == null){
-         _instance = new SleepTimeFrame();
+      int confirm = superUserConfirm();
+      if(confirm == 0){
+         if(_instance == null){
+            _instance = new SleepTimeFrame();
+         }
+         return _instance;
       }
-      return _instance;
+      else{
+         return null;
+      }
    }
    
    //////////////////////Protected Methods////////////////////////////
    /**/
    protected SleepTimeFrame(){
       super("Sleep Time");
-      System.out.println(superUserConfirm());
       this.setLayout(new BorderLayout());
       JPanel panel = new JPanel();
-      panel.setLayout(new GridLayout(1,6));
+      panel.setLayout(new GridLayout(3,2));
       panel.add(new JLabel("Hours: ", SwingConstants.RIGHT));
       this._hrs = new JTextField(3);
       panel.add(this._hrs);
@@ -72,12 +77,12 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       this.getContentPane().add(panel, BorderLayout.CENTER);
       //Add The Buttons
       this.setSize(WIDTH, HEIGHT);
-      this.setResizable(false);
+      //this.setResizable(false);
    }
 
    /////////////////////Private Methods///////////////////////////////
    /**/
-   private int superUserConfirm(){
+   private static int superUserConfirm(){
       JPanel panel = new JPanel();
       panel.setLayout(new GridLayout(2, 2));
       panel.add(new JLabel("Super User: ",SwingConstants.RIGHT));
