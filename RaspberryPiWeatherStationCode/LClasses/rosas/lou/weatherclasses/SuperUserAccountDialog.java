@@ -50,24 +50,35 @@ public class SuperUserAccountDialog{
    //////////////////////////Constructor//////////////////////////////
    /**/
    public SuperUserAccountDialog(JFrame frame){
-      if(this.setUpDialogBox(frame) == 0){
-         this._isSuperUser = this.checkPassword();
+      //if(this.setUpDialogBox(frame) == 0){
+      while(this.setUpDialogBox(frame)==0 && !_isSuperUser){
+         this._isSuperUser = this.checkPassword(frame);
          System.out.println(this._isSuperUser);
       }
+      //}
    }
    ////////////////////////Public Methods/////////////////////////////
    ////////////////////////Private Methods////////////////////////////
    /**/
-   private boolean checkPassword(){
+   private boolean checkPassword(JFrame frame){
       boolean isSuperUser = false;
       try{
          char [] passwrd = accounts.get(_superUser.getText());
          String password = new String(passwrd);
          String entered  = new String(_password.getPassword());
          isSuperUser = entered.equals(password);
-
+         if(!isSuperUser){
+            throw new NullPointerException();
+         }
       }
       catch(NullPointerException npe){
+         String err = "Name/Password combination incorrect";
+         err += "\nplease re-enter a correct Name/Password\n";
+         err += "combination";
+         JOptionPane.showMessageDialog(frame,
+                                       err,
+                                       "Wrong Name/Password",
+                                       JOptionPane.ERROR_MESSAGE);
       }
       finally{
          return isSuperUser;
