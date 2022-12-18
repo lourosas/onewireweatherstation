@@ -35,21 +35,35 @@ import myclasses.*;
 import rosas.lou.lgraphics.*;
 
 public class SuperUserAccountDialog{
-   private static int WIDTH          = 250;
-   private static int HEIGHT         = 80;
+   private static Hashtable<String, char[]> accounts=new Hashtable();
 
    private JTextField     _superUser = null;
    private JPasswordField _password  = null;
    private boolean        _toDisplay = false;
-
+   private String name = "Administrator";
+   private String pwd  = "Password";
+   
+   {
+      accounts.put(name, pwd.toCharArray());
+   };
 
    //////////////////////////Constructor//////////////////////////////
    /**/
    public SuperUserAccountDialog(){
-      this.setUpDialogBox();
+      if(this.setUpDialogBox() == 0){
+         checkPassword();
+      }
    }
    ////////////////////////Public Methods/////////////////////////////
    ////////////////////////Private Methods////////////////////////////
+   /**/
+   private boolean checkPassword(){
+      System.out.println(_superUser.getText());
+      System.out.println(_password.getPassword());
+      System.out.println(accounts);
+      return false;
+   }
+
    /**/
    private int setUpDialogBox(){
       JPanel panel         = new JPanel();
