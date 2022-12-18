@@ -37,9 +37,9 @@ import rosas.lou.lgraphics.*;
 public class SuperUserAccountDialog{
    private static Hashtable<String, char[]> accounts=new Hashtable();
 
-   private JTextField     _superUser = null;
-   private JPasswordField _password  = null;
-   private boolean        _toDisplay = false;
+   private JTextField     _superUser   = null;
+   private JPasswordField _password    = null;
+   private boolean        _isSuperUser = false;
    private String name = "Administrator";
    private String pwd  = "Password";
    
@@ -49,23 +49,33 @@ public class SuperUserAccountDialog{
 
    //////////////////////////Constructor//////////////////////////////
    /**/
-   public SuperUserAccountDialog(){
-      if(this.setUpDialogBox() == 0){
-         checkPassword();
+   public SuperUserAccountDialog(JFrame frame){
+      if(this.setUpDialogBox(frame) == 0){
+         this._isSuperUser = this.checkPassword();
+         System.out.println(this._isSuperUser);
       }
    }
    ////////////////////////Public Methods/////////////////////////////
    ////////////////////////Private Methods////////////////////////////
    /**/
    private boolean checkPassword(){
-      System.out.println(_superUser.getText());
-      System.out.println(_password.getPassword());
-      System.out.println(accounts);
-      return false;
+      boolean isSuperUser = false;
+      try{
+         char [] passwrd = accounts.get(_superUser.getText());
+         String password = new String(passwrd);
+         String entered  = new String(_password.getPassword());
+         isSuperUser = entered.equals(password);
+
+      }
+      catch(NullPointerException npe){
+      }
+      finally{
+         return isSuperUser;
+      }
    }
 
    /**/
-   private int setUpDialogBox(){
+   private int setUpDialogBox(JFrame frame){
       JPanel panel         = new JPanel();
       panel.setLayout(new GridLayout(2,2));
       panel.add(new JLabel("Super User: ", SwingConstants.RIGHT));
@@ -74,7 +84,7 @@ public class SuperUserAccountDialog{
       panel.add(new JLabel("Password: ", SwingConstants.RIGHT));
       this._password = new JPasswordField(20);
       panel.add(this._password);
-      return JOptionPane.showConfirmDialog(null,
+      return JOptionPane.showConfirmDialog(frame,
                                         panel,
                                         "Password",
                                         JOptionPane.OK_CANCEL_OPTION);
