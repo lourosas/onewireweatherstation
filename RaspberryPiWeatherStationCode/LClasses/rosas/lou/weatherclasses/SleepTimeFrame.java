@@ -46,16 +46,10 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
    ///////////////////////Public Methods//////////////////////////////
    /**/
    public static SleepTimeFrame instance(){
-      int confirm = superUserConfirm();
-      if(confirm == 0){
-         if(_instance == null){
-            _instance = new SleepTimeFrame();
-         }
-         return _instance;
+      if(_instance == null){
+         _instance = new SleepTimeFrame();
       }
-      else{
-         return null;
-      }
+      return _instance;
    }
    
    //////////////////////Protected Methods////////////////////////////
@@ -81,18 +75,4 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
    }
 
    /////////////////////Private Methods///////////////////////////////
-   /**/
-   private static int superUserConfirm(){
-      JPanel panel = new JPanel();
-      panel.setLayout(new GridLayout(2, 2));
-      panel.add(new JLabel("Super User: ",SwingConstants.RIGHT));
-      panel.add(new JTextField(20));
-      panel.add(new JLabel("Password: ",  SwingConstants.RIGHT));
-      panel.add(new JPasswordField(20));
-      int n = JOptionPane.showConfirmDialog(null,
-                                        panel,
-                                        "Password",
-                                        JOptionPane.OK_CANCEL_OPTION);
-      return n;
-   }
 }
