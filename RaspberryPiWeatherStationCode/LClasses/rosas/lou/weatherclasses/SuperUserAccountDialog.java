@@ -50,14 +50,20 @@ public class SuperUserAccountDialog{
    //////////////////////////Constructor//////////////////////////////
    /**/
    public SuperUserAccountDialog(JFrame frame){
-      //if(this.setUpDialogBox(frame) == 0){
-      while(this.setUpDialogBox(frame)==0 && !_isSuperUser){
-         this._isSuperUser = this.checkPassword(frame);
-         System.out.println(this._isSuperUser);
-      }
-      //}
+      int okPressed = -1;
+      do{
+         okPressed = this.setUpDialogBox(frame);
+         if(okPressed == 0){
+            this._isSuperUser = this.checkPassword(frame);
+         }
+      }while(okPressed == 0 && !this._isSuperUser);
    }
    ////////////////////////Public Methods/////////////////////////////
+   /**/
+   public boolean isSuperUser(){
+      return this._isSuperUser;
+   }
+
    ////////////////////////Private Methods////////////////////////////
    /**/
    private boolean checkPassword(JFrame frame){
