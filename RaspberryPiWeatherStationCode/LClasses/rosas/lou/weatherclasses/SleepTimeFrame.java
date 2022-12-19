@@ -52,7 +52,25 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       if(_instance == null){
          _instance = new SleepTimeFrame(c);
       }
+      if(!_instance.isVisible()){
+         _instance.setVisible(true);
+      }
       return _instance;
+   }
+   
+   /**/
+   public void cancel(){
+      _instance.setVisible(false);
+   }
+
+   /**/
+   public void clear(){
+      this._hrs.setText("");
+      this._mins.setText("");
+      this._secs.setText("");
+      this._hours   = 0;
+      this._minutes = 0;
+      this._seconds = 0;
    }
    
    //////////////////////Protected Methods////////////////////////////
@@ -69,7 +87,7 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       panel = this.setSouthPanel();
       this.getContentPane().add(panel, BorderLayout.SOUTH);
       this.setSize(WIDTH, HEIGHT);
-      //this.setResizable(false);
+      this.setResizable(false);
    }
 
    /////////////////////Private Methods///////////////////////////////

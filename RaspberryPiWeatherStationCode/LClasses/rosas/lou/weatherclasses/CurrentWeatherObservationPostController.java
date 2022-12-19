@@ -91,7 +91,19 @@ extends CurrentWeatherController{
                 e.getActionCommand().toUpperCase().equals("REQUEST")){
             this._view.displayInteraction("SLEEPTIME");
          }
-         else{ System.out.println(e.getActionCommand()); }
+         else{
+            String cmd = e.getActionCommand().toUpperCase();
+            if(cmd.contains("SLEEPTIME")){
+               SleepTimeFrame stf = SleepTimeFrame.instance(this);
+               if(cmd.equals("SLEEPTIMESET")){}
+               else if(cmd.equals("SLEEPTIMECLEAR")){
+                  stf.clear();
+               }
+               else if(cmd.equals("SLEEPTIMECANCEL")){
+                  stf.cancel();
+               }
+            }
+         }
       }
    }
 
