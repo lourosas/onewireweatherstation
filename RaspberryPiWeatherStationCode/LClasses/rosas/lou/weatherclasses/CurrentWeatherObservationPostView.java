@@ -94,7 +94,7 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
          if(su.isSuperUser()){
             SleepTimeFrame stf =
                             SleepTimeFrame.instance(this._controller);
-            stf.setVisible(true);
+            //stf.setVisible(true);
          }
       }
    }

@@ -71,6 +71,34 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       this._hours   = 0;
       this._minutes = 0;
       this._seconds = 0;
+      this._hrs.requestFocus();
+   }
+
+   /**/
+   public int[] requestTimes(){
+      int[] times = new int[3];
+      try{
+         this._hours = Integer.parseInt(this._hrs.getText());
+      }
+      catch(NumberFormatException npe){
+         this._hours = 0;
+      }
+      try{
+         this._minutes = Integer.parseInt(this._mins.getText());
+      }
+      catch(NumberFormatException npe){
+         this._minutes = 0;
+      }
+      try{
+         this._seconds = Integer.parseInt(this._secs.getText());
+      }
+      catch(NumberFormatException npe){
+         this._seconds = 0;
+      }
+      times[0] = this._hours;
+      times[1] = this._minutes;
+      times[2] = this._seconds;
+      return times;
    }
    
    //////////////////////Protected Methods////////////////////////////
@@ -110,7 +138,7 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       this._secs.addActionListener(this._controller);
       this._secs.addKeyListener(this._controller);
       panel.add(this._secs);
-
+      this._hrs.requestFocus();
       return panel;
    }
 
