@@ -40,6 +40,7 @@ public class SuperUserAccountDialog{
    private JTextField     _superUser   = null;
    private JPasswordField _password    = null;
    private boolean        _isSuperUser = false;
+
    private String name = "Administrator";
    private String pwd  = "Password";
    

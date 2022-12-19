@@ -36,43 +36,109 @@ import rosas.lou.lgraphics.*;
 public class SleepTimeFrame extends GenericJInteractionFrame{
    private static SleepTimeFrame _instance      = null;
    private static int WIDTH                     = 300;
-   private static int HEIGHT                    = 300;
+   private static int HEIGHT                    = 150;
 
    private CurrentWeatherController _controller = null;
    private JTextField               _hrs        = null;
    private JTextField               _mins       = null;
    private JTextField               _secs       = null;
+   private int                      _hours      = -1;
+   private int                      _minutes    = -1;
+   private int                      _seconds    = -1;
 
    ///////////////////////Public Methods//////////////////////////////
    /**/
-   public static SleepTimeFrame instance(){
+   public static SleepTimeFrame instance(CurrentWeatherController c){
       if(_instance == null){
-         _instance = new SleepTimeFrame();
+         _instance = new SleepTimeFrame(c);
       }
       return _instance;
    }
    
    //////////////////////Protected Methods////////////////////////////
    /**/
-   protected SleepTimeFrame(){
+   protected SleepTimeFrame(CurrentWeatherController cwc){
       super("Sleep Time");
+      this._controller = cwc;
       this.setLayout(new BorderLayout());
-      JPanel panel = new JPanel();
-      panel.setLayout(new GridLayout(3,2));
-      panel.add(new JLabel("Hours: ", SwingConstants.RIGHT));
-      this._hrs = new JTextField(3);
-      panel.add(this._hrs);
-      panel.add(new JLabel("Minutes: ", SwingConstants.RIGHT));
-      this._mins = new JTextField(3);
-      panel.add(this._mins);
-      panel.add(new JLabel("Seconds: ", SwingConstants.RIGHT));
-      this._secs = new JTextField(3);
-      panel.add(this._secs);
-      this.getContentPane().add(panel, BorderLayout.CENTER);
+      JPanel panel = this.setNorthPanel();;
+      //this.getContentPane().add(panel,BorderLayout.NORTH);
+      panel = this.setCenterPanel();
+      this.getContentPane().add(panel,BorderLayout.CENTER);
       //Add The Buttons
+      panel = this.setSouthPanel();
+      this.getContentPane().add(panel, BorderLayout.SOUTH);
       this.setSize(WIDTH, HEIGHT);
       //this.setResizable(false);
    }
 
    /////////////////////Private Methods///////////////////////////////
+   /**/
+   private JPanel setCenterPanel(){
+      JPanel panel = new JPanel();
+      panel.setLayout(new GridLayout(3,2));
+      panel.add(new JLabel("Hours: ", SwingConstants.RIGHT));
+      this._hrs = new JTextField(3);
+      this._hrs.addActionListener(this._controller);
+      this._hrs.addKeyListener(this._controller);
+      panel.add(this._hrs);
+      panel.add(new JLabel("Minutes: ", SwingConstants.RIGHT));
+      this._mins = new JTextField(3);
+      this._mins.addActionListener(this._controller);
+      this._mins.addKeyListener(this._controller);
+      panel.add(this._mins);
+      panel.add(new JLabel("Seconds: ", SwingConstants.RIGHT));
+      this._secs = new JTextField(3);
+      this._secs.addActionListener(this._controller);
+      this._secs.addKeyListener(this._controller);
+      panel.add(this._secs);
+
+      return panel;
+   }
+
+   /**/
+   private JPanel setNorthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      JLabel label = new JLabel("Hours: " + this._hours);
+      panel.add(label);
+      label = new JLabel("Minutes: " + this._minutes);
+      panel.add(label);
+      label = new JLabel("Seconds: " + this._seconds);
+      panel.add(label);
+      return panel;
+   }
+
+   /**/
+   private JPanel setSouthPanel(){
+      JPanel panel = new JPanel();
+      panel.setBorder(BorderFactory.createEtchedBorder());
+      
+      JButton set = new JButton("Set");
+      set.setActionCommand("SleeptimeSet");
+      set.addActionListener(this._controller);
+      set.addKeyListener(this._controller);
+      panel.add(set);
+
+      JButton clear = new JButton("Clear");
+      clear.setActionCommand("SleeptimeClear");
+      clear.addActionListener(this._controller);
+      clear.addKeyListener(this._controller);
+      panel.add(clear);
+
+      JButton cancel = new JButton("Cancel");
+      cancel.setActionCommand("SleeptimeCancel");
+      cancel.addActionListener(this._controller);
+      cancel.addKeyListener(this._controller);
+      /*
+      cancel.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            setVisible(false);
+         }
+      });
+      */
+      panel.add(cancel);
+
+      return panel;
+   }
 }

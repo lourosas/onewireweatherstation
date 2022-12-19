@@ -91,6 +91,7 @@ extends CurrentWeatherController{
                 e.getActionCommand().toUpperCase().equals("REQUEST")){
             this._view.displayInteraction("SLEEPTIME");
          }
+         else{ System.out.println(e.getActionCommand()); }
       }
    }
 
