@@ -32,6 +32,11 @@ implements CurrentWeatherDataObserver{
    public void updateTheViews(String s){}
 
    //////////////////////Interface Implementation/////////////////////
+   public void receiveError(String error){}
+   public void receiveMessage(String message){}
+   public void updateDewpoint(WeatherData data){}
+   public void updateHeatindex(WeatherData data){}
    public void updateHumidity(WeatherData data){}
+   public void updatePressure(WeatherData data){}
    public void updateTemperature(WeatherData data){}
 }

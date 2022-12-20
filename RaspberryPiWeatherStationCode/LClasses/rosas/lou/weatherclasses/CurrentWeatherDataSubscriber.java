@@ -114,7 +114,9 @@ implements WeatherClientDataSubscriber, Runnable{
    ///////////////////////Instance Methods////////////////////////////
    ////////////////////////Public Methods/////////////////////////////
    /**/
-   public void changeSleepTime(){}
+   public void changeSleepTime(){
+      System.out.println("changeSleepTime()");
+   }
 
    public boolean confirmSuperUserCredentials
    (

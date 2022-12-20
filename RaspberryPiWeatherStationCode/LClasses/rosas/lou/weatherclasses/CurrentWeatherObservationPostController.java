@@ -71,6 +71,7 @@ extends CurrentWeatherController{
    /**/
    public void actionPerformed(ActionEvent e){
       if(e.getSource() instanceof JButton){
+         String cmd = e.getActionCommand().toUpperCase();
          if(e.getActionCommand().toUpperCase().equals("REFRESH")){
             this._model.requestUpdateFromPublisher();
          }
@@ -87,18 +88,23 @@ extends CurrentWeatherController{
             }
             catch(HeadlessException he){}
          }
-         else if(
-                e.getActionCommand().toUpperCase().equals("REQUEST")){
-            this._view.displayInteraction("SLEEPTIME");
+         //This will need to change...
+         else if(cmd.equals("REQUEST")){
+            //this._view.displayInteraction("SLEEPTIME");
+            //this._model.changeSleepTime();
+            SuperUserAccountDialog suad =
+                               new SuperUserAccountDialog(this._view);
+            if(suad.isSuperUser()){
+               SleepTimeFrame stf = SleepTimeFrame.instance(this);
+            }
          }
-         else if(
-               e.getActionCommand().toUpperCase().contains("SLEEPT")){
-            String cmd = e.getActionCommand().toUpperCase();
+         //This will need to change....
+         else if(cmd.contains("SLEEPT")){
+            //String cmd = e.getActionCommand().toUpperCase();
             SleepTimeFrame stf = SleepTimeFrame.instance(this);
             if(cmd.equals("SLEEPTIMESET")){
                int[] hms = stf.requestTimes();
                System.out.println(hms[0]+" "+hms[1]+" "+hms[2]);
-               stf.setVisible(false);
             }
             else if(cmd.equals("SLEEPTIMECLEAR")){
                stf.clear();
@@ -106,6 +112,14 @@ extends CurrentWeatherController{
             else if(cmd.equals("SLEEPTIMECANCEL")){
                 stf.cancel();
             }
+         }
+      }
+      else if(e.getSource() instanceof JTextField){
+         JTextField jtf = (JTextField)e.getSource();
+         String name = jtf.getName().toUpperCase();
+         if(name.equals("HOURS") || name.equals("MINUTES")){
+            SleepTimeFrame stf = SleepTimeFrame.instance(this);
+            stf.nextTextField(name);
          }
       }
    }
@@ -117,5 +131,28 @@ extends CurrentWeatherController{
          String command   = jrb.getActionCommand();
          this._view.updateTheViews(command);
       }
+   }
+
+   /**/
+   public void keyPressed(KeyEvent k){
+      if(k.getKeyCode() == KeyEvent.VK_ENTER){
+         try{
+            JButton button = ((JButton)k.getSource());
+            button.doClick(100);
+         }
+         catch(ClassCastException cce){}
+      }
+   }
+
+   /**/
+   public void keyTyped(KeyEvent k){
+      try{
+         JTextField jtf = (JTextField)k.getComponent();
+         char c = k.getKeyChar();
+         if(!Character.isDigit(c)){
+            k.consume();
+         }
+      }
+      catch(ClassCastException cce){}
    }
 }

@@ -88,18 +88,6 @@ extends CurrentWeatherView implements CurrentWeatherDataObserver{
    ////////////////////Insatance Methods//////////////////////////////
    ////////////////////Public Methods/////////////////////////////////
    /**/
-   public void displayInteraction(String type){
-      if(type.toUpperCase().equals("SLEEPTIME")){
-         SuperUserAccountDialog su = new SuperUserAccountDialog(this);
-         if(su.isSuperUser()){
-            SleepTimeFrame stf =
-                            SleepTimeFrame.instance(this._controller);
-            //stf.setVisible(true);
-         }
-      }
-   }
-
-   /**/
    public void updateTheViews(String idx){
       try{
          JTabbedPane jtp =

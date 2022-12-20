@@ -60,7 +60,8 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
    
    /**/
    public void cancel(){
-      _instance.setVisible(false);
+      this.clear();
+      this.setVisible(false);
    }
 
    /**/
@@ -72,6 +73,16 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       this._minutes = 0;
       this._seconds = 0;
       this._hrs.requestFocus();
+   }
+
+   /**/
+   public void nextTextField(String name){
+      if(name.equals("HOURS")){
+         this._mins.requestFocus();
+      }
+      else if(name.equals("MINUTES")){
+         this._secs.requestFocus();
+      }
    }
 
    /**/
@@ -98,6 +109,7 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       times[0] = this._hours;
       times[1] = this._minutes;
       times[2] = this._seconds;
+      this.setVisible(false);
       return times;
    }
    
@@ -125,19 +137,25 @@ public class SleepTimeFrame extends GenericJInteractionFrame{
       panel.setLayout(new GridLayout(3,2));
       panel.add(new JLabel("Hours: ", SwingConstants.RIGHT));
       this._hrs = new JTextField(3);
+      this._hrs.setName("Hours");
       this._hrs.addActionListener(this._controller);
       this._hrs.addKeyListener(this._controller);
       panel.add(this._hrs);
+
       panel.add(new JLabel("Minutes: ", SwingConstants.RIGHT));
       this._mins = new JTextField(3);
+      this._mins.setName("Minutes");
       this._mins.addActionListener(this._controller);
       this._mins.addKeyListener(this._controller);
       panel.add(this._mins);
+
       panel.add(new JLabel("Seconds: ", SwingConstants.RIGHT));
       this._secs = new JTextField(3);
+      this._secs.setName("Seconds");
       this._secs.addActionListener(this._controller);
       this._secs.addKeyListener(this._controller);
       panel.add(this._secs);
+
       this._hrs.requestFocus();
       return panel;
    }
