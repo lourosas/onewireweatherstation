@@ -114,27 +114,16 @@ implements WeatherClientDataSubscriber, Runnable{
    ///////////////////////Instance Methods////////////////////////////
    ////////////////////////Public Methods/////////////////////////////
    /**/
-   public void changeSleepTime(){
-      System.out.println("changeSleepTime()");
-   }
-
-   public boolean confirmSuperUserCredentials
-   (
-      String name,
-      char[] password
-   ){
-      return false;
-   }
-
-   /**/
    public void requestUpdateFromPublisher(){}
 
    /**/
    public void setSleepTime(int seconds){
+      int SECSTOMILLIS = 1000;
       if(seconds > -1){
-         this._sleepTime = seconds;
+         //Set the Sleep time in milli-seconds:  since that is how
+         //the Java Thread sleeps (essentially)
+         this._sleepTime = seconds * SECSTOMILLIS;
       }
-      System.out.println(this._sleepTime);
    }
 
    /**/

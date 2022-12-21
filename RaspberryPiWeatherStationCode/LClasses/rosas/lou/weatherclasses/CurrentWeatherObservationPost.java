@@ -149,8 +149,21 @@ implements WeatherClientDataSubscriber, Runnable{
    }
 
    ///////////////////////Interface Implementation////////////////////
-   /**/
-   public void run(){}
+   public void run(){
+      int ZEROTIME = 0;
+      while(true){
+         try{
+            if(this._sleepTime > ZEROTIME){
+               this.requestUpdateFromPublisher();
+               Thread.sleep(this._sleepTime);
+            }
+            else{
+               Thread.sleep(50);
+            }
+         }
+         catch(InterruptedException ie){}
+      }
+   }
 
    /**/
    public void updateData(String data){
