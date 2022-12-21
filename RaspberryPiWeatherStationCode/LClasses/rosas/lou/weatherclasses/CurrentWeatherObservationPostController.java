@@ -98,13 +98,11 @@ extends CurrentWeatherController{
                SleepTimeFrame stf = SleepTimeFrame.instance(this);
             }
          }
-         //This will need to change....
          else if(cmd.contains("SLEEPT")){
-            //String cmd = e.getActionCommand().toUpperCase();
             SleepTimeFrame stf = SleepTimeFrame.instance(this);
             if(cmd.equals("SLEEPTIMESET")){
                int[] hms = stf.requestTimes();
-               System.out.println(hms[0]+" "+hms[1]+" "+hms[2]);
+               this._model.setSleepTime(hms[0],hms[1],hms[2]);
             }
             else if(cmd.equals("SLEEPTIMECLEAR")){
                stf.clear();
@@ -135,6 +133,8 @@ extends CurrentWeatherController{
 
    /**/
    public void keyPressed(KeyEvent k){
+      //If there <ENTER> button is pressed when a button
+      //has focus...this is typical...
       if(k.getKeyCode() == KeyEvent.VK_ENTER){
          try{
             JButton button = ((JButton)k.getSource());

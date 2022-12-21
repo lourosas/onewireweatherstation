@@ -130,10 +130,29 @@ implements WeatherClientDataSubscriber, Runnable{
    public void requestUpdateFromPublisher(){}
 
    /**/
-   public void setSleepTime(int seconds){}
+   public void setSleepTime(int seconds){
+      if(seconds > -1){
+         this._sleepTime = seconds;
+      }
+      System.out.println(this._sleepTime);
+   }
 
    /**/
-   public void setSleepTime(int hours,int minutes,int seconds){}
+   public void setSleepTime(int hours,int minutes,int seconds){
+      int HRSTOSECS   = 3600;
+      int MINSTOSECS  = 60;
+      int currentTime = 0;
+      if(hours > -1){
+         currentTime += HRSTOSECS*hours;
+      }
+      if(minutes > -1){
+         currentTime += MINSTOSECS*minutes;
+      }
+      if(seconds > -1){
+         currentTime += seconds;
+      }
+      this.setSleepTime(currentTime);
+   }
 
    /*
    */

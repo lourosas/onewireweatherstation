@@ -49,12 +49,6 @@ implements WeatherClientDataSubscriber, Runnable{
    }
 
    /**/
-   @Override
-   public void changeSleepTime(){
-      System.out.println("changeSleepTime()--2");
-   }
-
-   /**/
    public void requestUpdateFromPublisher(){
       this.wcdp.request();
    }
