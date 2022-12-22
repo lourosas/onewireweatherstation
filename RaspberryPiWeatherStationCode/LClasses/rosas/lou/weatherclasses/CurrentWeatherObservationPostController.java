@@ -88,10 +88,7 @@ extends CurrentWeatherController{
             }
             catch(HeadlessException he){}
          }
-         //This will need to change...
          else if(cmd.equals("REQUEST")){
-            //this._view.displayInteraction("SLEEPTIME");
-            //this._model.changeSleepTime();
             SuperUserAccountDialog suad =
                                new SuperUserAccountDialog(this._view);
             if(suad.isSuperUser()){
